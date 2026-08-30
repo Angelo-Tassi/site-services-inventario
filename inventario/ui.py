@@ -37,6 +37,12 @@ def chiave_ordinamento(item, campo):
     return str(valore).lower()
 
 
+def nome_file(testo):
+    """Un nome di stanza utilizzabile come nome di file."""
+    pulito = "".join(c if c.isalnum() or c in " -_" else "-" for c in str(testo))
+    return "_".join(pulito.split()) or "stanza"
+
+
 def item_stato_iphone(spedito):
     return SPEDITO if spedito else DA_RISPEDIRE
 
@@ -469,6 +475,70 @@ class ScanDialog(_Modal):
         self.destroy()
 
 
+PAROLA_RESET = "ELIMINA TUTTO"
+
+
+class ResetDialog(_Modal):
+    """Conferma dello svuotamento dell'inventario.
+
+    Non basta un si': va scritta una frase, perche' l'operazione riguarda i dati
+    condivisi di tutti e non si annulla con un tasto.
+    """
+
+    def __init__(self, parent, da_eliminare, protetti):
+        _Modal.__init__(self, parent, "Reset dell'inventario")
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+
+        tk.Label(body, text="Stai per svuotare l'inventario condiviso",
+                 bg=theme.LOAN_FG, fg="#FFFFFF", font=self.master.fonts["card_title"],
+                 padx=12, pady=9, anchor="w").pack(fill="x")
+
+        righe = ["Verranno eliminati %d dispositivi, per tutti gli utenti." % da_eliminare,
+                 "L'operazione non si annulla dal programma."]
+        if protetti:
+            righe.append("")
+            righe.append("Restano dentro %d iPhone protetti: non ancora rispediti, o"
+                         % protetti)
+            righe.append("rispediti da meno di %d mesi. Non possono essere eliminati."
+                         % MESI_CONSERVAZIONE)
+        tk.Label(body, text="\n".join(righe), justify="left", anchor="w",
+                 bg=theme.LOAN_BG, fg=theme.LOAN_FG, padx=12, pady=10).pack(
+            fill="x", pady=(0, 10))
+
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text="Prima di procedere il programma salva una copia del file dati\n"
+                       "nella stessa cartella, con la data di oggi nel nome: se qualcosa\n"
+                       "va storto, l'inventario si recupera da li'.").pack(anchor="w")
+
+        ttk.Label(body, text="Per confermare, scrivi   %s" % PAROLA_RESET).pack(
+            anchor="w", pady=(14, 4))
+        self.var_conferma = tk.StringVar()
+        entry = ttk.Entry(body, textvariable=self.var_conferma, width=34)
+        entry.pack(fill="x")
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(16, 0))
+        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text="Svuota l'inventario",
+                   command=self._ok).pack(side="right")
+        self.bind("<Return>", lambda e: self._ok())
+        entry.focus_set()
+
+    def parola_giusta(self):
+        return self.var_conferma.get().strip().upper() == PAROLA_RESET
+
+    def _ok(self):
+        if not self.parola_giusta():
+            messagebox.showwarning(
+                "Conferma non valida",
+                "Per svuotare l'inventario devi scrivere esattamente:\n\n%s"
+                % PAROLA_RESET, parent=self)
+            return
+        self.result = True
+        self.destroy()
+
+
 class ImportDialog(_Modal):
     def __init__(self, parent, path, count, esito=None):
         _Modal.__init__(self, parent, "Importa inventario")
@@ -649,6 +719,8 @@ class App(tk.Tk):
         ):
             ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 6))
         ttk.Button(bar, text="Impostazioni", command=self.on_settings).pack(side="right")
+        ttk.Button(bar, text="Reset inventario",
+                   command=self.on_reset).pack(side="right", padx=(0, 6))
         ttk.Button(bar, text="Aggiorna", command=self.on_refresh).pack(side="right", padx=6)
 
     def _build_filters(self):
@@ -1061,6 +1133,9 @@ class App(tk.Tk):
             titolo = self.var_type.get() if self.view == "type" else self.var_room.get()
             ttk.Label(header, text=titolo,
                       style="Section.TLabel").pack(side="left")
+            if self.view == "room":
+                ttk.Button(header, text="Esporta questa stanza in xls",
+                           command=self.on_export_room).pack(side="right")
             self.var_section_count = tk.StringVar()
             ttk.Label(header, textvariable=self.var_section_count,
                       style="Muted.TLabel").pack(side="left", padx=(10, 0))
@@ -1639,6 +1714,33 @@ class App(tk.Tk):
             messagebox.showinfo("Importazione completata",
                                 "Aggiunti: %d\nAggiornati: %d" % (added, updated), parent=self)
 
+    def on_export_room(self):
+        """Esporta il contenuto della stanza aperta, filtri esclusi."""
+        stanza = self.var_room.get()
+        items = [i for i in self.store.items if i.get("stanza") == stanza]
+        if not items:
+            messagebox.showinfo("Esporta", "%s non contiene dispositivi." % stanza,
+                                parent=self)
+            return
+        percorso = filedialog.asksaveasfilename(
+            parent=self, title="Esporta %s" % stanza, defaultextension=".xlsx",
+            initialfile="Inventario_%s_%s.xlsx" % (
+                nome_file(stanza), datetime.now().strftime("%Y%m%d")),
+            filetypes=[("File Excel", "*.xlsx")])
+        if not percorso:
+            return
+        try:
+            excel_io.export(items, percorso, rooms=[stanza])
+        except InventoryError as exc:
+            messagebox.showerror("Esportazione non riuscita", str(exc), parent=self)
+            return
+        if messagebox.askyesno(
+            "Esportazione completata",
+            "%d dispositivi di %s esportati in:\n%s\n\nAprirlo ora?"
+            % (len(items), stanza, percorso), parent=self
+        ):
+            excel_io.open_file(percorso)
+
     def on_export(self):
         items = self.filtered_items()
         if not items and not messagebox.askyesno(
@@ -1687,6 +1789,32 @@ class App(tk.Tk):
             messagebox.showinfo(
                 "Stampa", "Il documento e' stato aperto in Excel.\n"
                 "Usa File > Stampa per inviarlo alla stampante.", parent=self)
+
+    def on_reset(self):
+        """Svuota l'inventario, per poi ricaricarlo da un'importazione."""
+        if not self.store.items:
+            messagebox.showinfo("Reset", "L'inventario e' gia' vuoto.", parent=self)
+            return
+        protetti = [i for i in self.store.items if not puo_essere_eliminato(i)[0]]
+        da_eliminare = len(self.store.items) - len(protetti)
+        if not da_eliminare:
+            messagebox.showinfo(
+                "Reset",
+                "Non c'e' niente da eliminare: tutti i %d dispositivi in inventario\n"
+                "sono iPhone protetti dalla conservazione." % len(protetti), parent=self)
+            return
+        if not ResetDialog(self, da_eliminare, len(protetti)).show():
+            return
+        esito = self._run(lambda: self.store.reset())
+        if not esito:
+            return
+        eliminati, tenuti, copia = esito
+        messaggio = "Eliminati %d dispositivi." % eliminati
+        if tenuti:
+            messaggio += "\nMantenuti %d iPhone protetti." % tenuti
+        messaggio += ("\n\nCopia di sicurezza del file precedente:\n%s\n\n"
+                      "Ora puoi ricaricare l'inventario con Importa xls..." % copia)
+        messagebox.showinfo("Inventario svuotato", messaggio, parent=self)
 
     def on_settings(self):
         result = RoomsDialog(self, self.cfg["rooms"], self.cfg["types"],

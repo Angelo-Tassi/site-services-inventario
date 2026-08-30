@@ -203,7 +203,8 @@ programma, e solo in ultimo lo si chiede all'utente.
   direttamente nell'elenco (`Invio` salva, `Esc` annulla). Doppio clic su una
   qualsiasi altra colonna apre la scheda completa.
 - Aggiunta, modifica ed eliminazione; spostamento di un dispositivo da una
-  stanza all'altra. Gli iPhone fanno eccezione: non si spostano, e se una
+  stanza all'altra; **esportazione della singola stanza** e **reset completo**
+  dell'inventario con copia di sicurezza. Gli iPhone fanno eccezione: non si spostano, e se una
   selezione ne contiene qualcuno gli altri vengono spostati e il programma dice
   quanti telefoni ha lasciato dov'erano. Vale anche in importazione: un iPhone
   con una stanza diversa viene ricondotto alla sua.
@@ -469,6 +470,40 @@ Ogni passo di scansione ha il pulsante **"Non riesco a scansionare - inserisci a
 mano"**: cambia la finestra in scrittura manuale per quel solo campo, senza
 perdere i passi gia' fatti e senza uscire dalla procedura. Il campo non puo'
 restare vuoto: se si conferma a vuoto, il programma lo dice e resta li'.
+
+## Svuotare l'inventario per ricaricarlo
+
+Il pulsante **Reset inventario**, in alto a destra, serve a ripartire da zero
+prima di una reimportazione completa.
+
+Non e' un'operazione che si fa per sbaglio: prima di procedere il programma
+
+1. mostra un avviso con quanti dispositivi verranno eliminati **per tutti gli
+   utenti**, e chiede di scrivere per esteso `ELIMINA TUTTO`;
+2. **salva una copia** del file dati nella stessa cartella di rete, con data e
+   ora nel nome (`Inventario_prima_del_reset_20260830_214927.xlsx`);
+3. solo allora svuota l'inventario.
+
+Se la copia di sicurezza non riesce - cartella piena, permessi mancanti - il
+reset viene annullato e non si tocca niente.
+
+**Gli iPhone protetti restano.** Quelli non ancora rispediti, e quelli rispediti
+da meno di tre mesi, non vengono eliminati: non potrebbero essere ricaricati da
+un'importazione, dato che gli iPhone si inseriscono solo a mano. Il programma
+dice quanti ne ha mantenuti. Se in inventario ci sono solo iPhone protetti, il
+reset avverte che non c'e' niente da eliminare e non fa nulla.
+
+Dopo il reset si ricarica tutto con *Importa xls...*.
+
+## Esportare una sola stanza
+
+Entrando in una stanza, accanto al suo nome compare **Esporta questa stanza in
+xls**: produce un file con i soli dispositivi di quella stanza, chiamato per
+esempio `Inventario_Digital_Kiosk_20260830.xlsx`.
+
+Esporta la stanza **intera**, non quello che stai vedendo: eventuali ricerche o
+filtri attivi non la riducono. Per esportare esattamente la vista corrente c'e'
+sempre *Esporta xls...* nella barra in alto.
 
 ## Il modello di importazione
 

@@ -18,6 +18,7 @@ import getpass
 import json
 import os
 import platform
+import shutil
 import socket
 import time
 import uuid
@@ -564,6 +565,40 @@ class InventoryStore(object):
             before = len(items)
             items[:] = [it for it in items if it["asset_tag"] not in wanted]
             return before - len(items)
+
+        return self._apply(op)
+
+    def copia_di_sicurezza(self):
+        """Duplica il file dati accanto a se stesso, prima di un'operazione grossa."""
+        cartella = os.path.dirname(self.path)
+        nome = "%s_prima_del_reset_%s.xlsx" % (
+            os.path.splitext(os.path.basename(self.path))[0],
+            datetime.now().strftime("%Y%m%d_%H%M%S"))
+        destinazione = os.path.join(cartella, nome)
+        try:
+            shutil.copy2(self.path, destinazione)
+        except OSError as exc:
+            raise InventoryError(
+                "Non riesco a creare la copia di sicurezza:\n%s\n\n"
+                "Il reset e' stato annullato: nessun dato e' stato toccato." % exc)
+        return destinazione
+
+    def reset(self):
+        """Svuota l'inventario, tenendo solo cio' che non e' eliminabile.
+
+        Prima crea una copia di sicurezza del file dati. Gli iPhone protetti -
+        non ancora rispediti, o rispediti da meno di %d mesi - restano dentro:
+        non potrebbero essere ricaricati da un'importazione.
+
+        Ritorna (eliminati, mantenuti, percorso della copia).
+        """ % MESI_CONSERVAZIONE
+
+        def op(items):
+            copia = self.copia_di_sicurezza()
+            tenuti = [it for it in items if not puo_essere_eliminato(it)[0]]
+            eliminati = len(items) - len(tenuti)
+            items[:] = tenuti
+            return eliminati, len(tenuti), copia
 
         return self._apply(op)
 
