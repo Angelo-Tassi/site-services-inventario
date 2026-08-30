@@ -12,6 +12,9 @@ Sono nella cartella **`Collaudo`**, accanto a `Inventario.exe`:
 ```
 \\server\Condivisa\Inventario\
     Inventario.exe
+    Produzione\
+        Inventario.xlsx      l'inventario vero, uno solo per tutti
+    Backup\                  le copie di sicurezza
     Collaudo\
         Inventario_di_prova.xlsx
         Inventario_di_prova_con_difetti.xlsx

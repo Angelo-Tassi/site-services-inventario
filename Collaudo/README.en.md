@@ -12,6 +12,9 @@ They are in the **`Collaudo`** folder, next to `Inventario.exe`:
 ```
 \\server\Shared\Inventory\
     Inventario.exe
+    Produzione\
+        Inventario.xlsx      the real inventory, one for everybody
+    Backup\                  the backup copies
     Collaudo\
         Inventario_di_prova.xlsx
         Inventario_di_prova_con_difetti.xlsx

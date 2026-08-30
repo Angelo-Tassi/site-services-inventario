@@ -481,8 +481,12 @@ impostazioni di Excel: Numbers le ignora, ma i dati restano identici.
 | File | Contenuto |
 | --- | --- |
 | `Inventario.exe` | il programma; da solo, senza prerequisiti |
-| `Inventario.xlsx` | i dati; e' gia' l'inventario, apribile in Excel |
-| `inventario_impostazioni.json` | stanze, tipi, stanze con prestito, stanza degli iPhone, stati |
+| `Produzione\Inventario.xlsx` | i dati; e' gia' l'inventario, apribile in Excel |
+| `Produzione\inventario_impostazioni.json` | stanze, tipi, stanze con prestito, stanza degli iPhone, stati |
+| `Backup\` | le copie salvate prima di ogni reset e di ogni importazione in sostituzione |
+| `Collaudo\` | i file di prova e le istruzioni di collaudo |
+| `.Inventario.xlsx.lock` | presente solo per una frazione di secondo durante un salvataggio |
+| `inventario_percorso.json` | quale file apre il programma, e la preferenza di lingua |
 
 ## Provare l'importazione
 
