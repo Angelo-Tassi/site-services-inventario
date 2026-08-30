@@ -1,0 +1,15 @@
+{
+  "rooms": [
+    "Site Services BAU",
+    "Digital Kiosk",
+    "Magazzino Disaster Recovery"
+  ],
+  "types": [
+    "Laptop",
+    "Tablet",
+    "Iphone"
+  ],
+  "loan_rooms": [
+    "Digital Kiosk"
+  ]
+}

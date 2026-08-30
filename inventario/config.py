@@ -1,0 +1,124 @@
+"""Configurazione dell'applicazione.
+
+Il percorso del file dati si determina in quest'ordine:
+
+  1. la variabile d'ambiente INVENTARIO_FILE (utile per prove e collegamenti);
+  2. il file inventario_percorso.json accanto al programma, o nel profilo utente;
+  3. Inventario.xlsx nella stessa cartella del programma - e' il caso normale
+     quando l'eseguibile e i dati stanno insieme nella cartella di rete;
+  4. altrimenti si chiede all'utente, una volta sola.
+
+Le impostazioni condivise (stanze, tipi, prestiti) vivono accanto al file dati,
+cosi' sono uguali per tutti gli utenti.
+"""
+
+import json
+import os
+import sys
+
+from . import store
+
+APP_NAME = "Inventario"
+
+DEFAULT_ROOMS = ["Site Services BAU", "Digital Kiosk", "Magazzino Disaster Recovery"]
+DEFAULT_TYPES = ["Laptop", "Tablet"]
+# Stanze in cui e' attiva la gestione dei prestiti.
+DEFAULT_LOAN_ROOMS = ["Digital Kiosk"]
+# Gli iPhone stanno sempre qui e non possono essere spostati altrove.
+DEFAULT_IPHONE_ROOM = "Site Services BAU"
+
+
+def app_dir():
+    """Cartella in cui si trova lo script (o l'eseguibile PyInstaller)."""
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(os.path.abspath(sys.executable))
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+DATA_FILE_NAME = "Inventario.xlsx"
+
+
+def local_config_path():
+    return os.path.join(app_dir(), "inventario_percorso.json")
+
+
+def user_config_path():
+    """Ripiego per quando la cartella del programma e' in sola lettura."""
+    base = os.environ.get("APPDATA") or os.path.expanduser("~")
+    return os.path.join(base, "inventario_percorso.json")
+
+
+def default_data_path():
+    """Il file dati accanto al programma: la cartella di rete si basta da sola."""
+    return os.path.join(app_dir(), DATA_FILE_NAME)
+
+
+def _read_config_path(path):
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            return json.load(fh).get("data_path") or None
+    except (OSError, ValueError):
+        return None
+
+
+def load_data_path():
+    """Percorso del file dati da usare, oppure None se va ancora scelto."""
+    path = os.environ.get("INVENTARIO_FILE")
+    if path:
+        return path
+    for source in (local_config_path(), user_config_path()):
+        saved = _read_config_path(source)
+        if saved and os.path.exists(saved):
+            return saved
+    accanto = default_data_path()
+    if os.path.exists(accanto):
+        return accanto
+    return None
+
+
+def save_data_path(path):
+    """Ricorda la scelta; se la cartella del programma non e' scrivibile,
+    ripiega sul profilo dell'utente."""
+    payload = json.dumps({"data_path": path}, indent=2, ensure_ascii=False)
+    for target in (local_config_path(), user_config_path()):
+        try:
+            with open(target, "w", encoding="utf-8") as fh:
+                fh.write(payload)
+            return target
+        except OSError:
+            continue
+    return None
+
+
+def shared_config_path(data_path):
+    folder = os.path.dirname(os.path.abspath(data_path))
+    return os.path.join(folder, "inventario_impostazioni.json")
+
+
+def load_shared_config(data_path):
+    """Impostazioni condivise; ritorna sempre un dizionario valido."""
+    cfg = {"rooms": list(DEFAULT_ROOMS), "types": list(DEFAULT_TYPES),
+           "loan_rooms": list(DEFAULT_LOAN_ROOMS),
+           "iphone_room": DEFAULT_IPHONE_ROOM,
+           "states": list(store.STATI)}
+    try:
+        with open(shared_config_path(data_path), "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except (OSError, ValueError):
+        data = {}
+    for key in ("rooms", "types", "loan_rooms", "states"):
+        values = [str(v).strip() for v in data.get(key, []) if str(v).strip()]
+        if values or key == "loan_rooms":
+            cfg[key] = values
+    stanza = str(data.get("iphone_room") or cfg["iphone_room"]).strip()
+    # Se la stanza degli iPhone non esiste (o e' stata rinominata) si ripiega
+    # sulla prima, cosi' i telefoni restano sempre in una stanza valida.
+    cfg["iphone_room"] = stanza if stanza in cfg["rooms"] else cfg["rooms"][0]
+    return cfg
+
+
+def save_shared_config(data_path, cfg):
+    tmp = shared_config_path(data_path) + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump(cfg, fh, indent=2, ensure_ascii=False)
+    os.replace(tmp, shared_config_path(data_path))

@@ -1,0 +1,22 @@
+# ambiente di sviluppo
+.venv/
+__pycache__/
+*.py[cod]
+
+# artefatti di compilazione
+build/
+dist/
+Distribuzione/
+*.spec
+
+# file generati a runtime (solo nella radice: i dati di esempio restano)
+/avvio.log
+/inventario_percorso.json
+/inventario_impostazioni.json
+/Inventario.xlsx
+/Inventario dispositivi.lnk
+.*.xlsx.lock
+*.tmp-*
+
+# macOS
+.DS_Store

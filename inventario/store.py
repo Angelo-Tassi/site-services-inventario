@@ -1,0 +1,640 @@
+"""Archivio dati dell'inventario.
+
+I dati risiedono in un unico file .xlsx sulla cartella di rete: e' allo stesso
+tempo il database e l'inventario apribile in Excel.
+
+Sicurezza sugli accessi concorrenti:
+  * ogni modifica avviene dentro un lock esclusivo (file .lock creato con
+    O_CREAT|O_EXCL, che su SMB e' atomico);
+  * dentro il lock i dati vengono sempre riletti da disco e l'operazione
+    (aggiunta / modifica / eliminazione) viene riapplicata sui dati freschi,
+    quindi due utenti che lavorano su schede diverse non si sovrascrivono;
+  * la scrittura avviene su un file temporaneo nella stessa cartella e poi
+    os.replace(), quindi il file non resta mai a meta'.
+"""
+
+import getpass
+import json
+import os
+import platform
+import socket
+import time
+import uuid
+from datetime import datetime
+
+from openpyxl import Workbook, load_workbook
+
+SHEET_NAME = "Inventario"
+
+FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
+          "stanza", "stato", "prestato_a", "prestato_il", "note"]
+
+# Per un iPhone l'identita' e' l'IMEI, non l'asset tag aziendale.
+TIPO_IPHONE = "iphone"
+
+DISPONIBILE = "Disponibile"
+NON_DISPONIBILE = "Non disponibile"
+# Gli iPhone in nostro possesso sono sempre in attesa di essere rispediti.
+DA_RISPEDIRE = "Da Rispedire"
+
+# Stati scegliibili a mano. Gli altri due sono automatici: NON_DISPONIBILE
+# mentre c'e' un prestito in corso, DA_RISPEDIRE per gli iPhone.
+STATI = [
+    DISPONIBILE,
+    "In attesa ritiro",
+    "Guasto in attesa tecnico",
+    "Da rebuildare",
+    "Controllare",
+]
+AUDIT_FIELDS = ["modificato_il", "modificato_da"]
+ALL_FIELDS = FIELDS + AUDIT_FIELDS
+
+HEADERS = {
+    "asset_tag": "Asset Tag",
+    "tipo": "Tipo",
+    "modello": "Modello",
+    "seriale": "Numero di serie",
+    "imei": "IMEI",
+    "restituito_da": "Restituito da",
+    "stanza": "Stanza",
+    "stato": "Stato",
+    "prestato_a": "In prestito a",
+    "prestato_il": "Prestato il",
+    "note": "Note",
+    "modificato_il": "Ultima modifica",
+    "modificato_da": "Modificato da",
+}
+
+# Intestazioni accettate in importazione (minuscole, senza spazi doppi).
+HEADER_ALIASES = {
+    "asset_tag": ["asset tag", "assettag", "asset", "tag", "etichetta", "inventario"],
+    "tipo": ["tipo", "tipologia", "categoria", "device type", "type"],
+    "modello": ["modello", "model", "descrizione", "dispositivo", "device"],
+    "seriale": ["numero di serie", "seriale", "serial", "serial number", "s/n",
+                "sn", "matricola", "service tag"],
+    "imei": ["imei", "imei/meid", "meid", "codice imei"],
+    "restituito_da": ["restituito da", "proprietario", "consegnato da",
+                      "riconsegnato da", "owner"],
+    "stanza": ["stanza", "room", "locale", "ubicazione", "posizione", "location"],
+    "stato": ["stato", "status", "disponibilita", "disponibilita'"],
+    "prestato_a": ["in prestito a", "prestato a", "prestito", "assegnato a",
+                   "utilizzatore", "borrower", "assigned to"],
+    "prestato_il": ["prestato il", "data prestito", "in prestito dal",
+                    "loan date", "borrowed on"],
+    "note": ["note", "nota", "commenti", "notes"],
+    "modificato_il": ["ultima modifica", "modificato il", "data"],
+    "modificato_da": ["modificato da", "utente"],
+}
+
+LOCK_TIMEOUT = 20.0     # secondi di attesa prima di rinunciare
+LOCK_STALE_AFTER = 120  # secondi dopo i quali un lock e' considerato abbandonato
+
+
+class InventoryError(Exception):
+    """Errore mostrabile all'utente."""
+
+
+class LockBusy(InventoryError):
+    pass
+
+
+def current_user():
+    try:
+        user = getpass.getuser()
+    except Exception:
+        user = "sconosciuto"
+    try:
+        host = socket.gethostname()
+    except Exception:
+        host = platform.node() or "?"
+    return "%s@%s" % (user, host)
+
+
+def norm_tag(value):
+    return " ".join(str(value or "").split()).upper()
+
+
+def clean(value):
+    if value is None:
+        return ""
+    if isinstance(value, datetime):
+        return value.strftime("%d/%m/%Y %H:%M")
+    return " ".join(str(value).split())
+
+
+def is_iphone(tipo):
+    return clean(tipo).lower() == TIPO_IPHONE
+
+
+def new_item(asset_tag="", tipo="", modello="", seriale="", stanza="", note="",
+             prestato_a="", prestato_il="", imei="", restituito_da="", stato=""):
+    item = {
+        "asset_tag": norm_tag(asset_tag),
+        "tipo": clean(tipo),
+        "modello": clean(modello),
+        "seriale": clean(seriale),
+        "imei": clean(imei),
+        "restituito_da": clean(restituito_da),
+        "stanza": clean(stanza),
+        "stato": clean(stato),
+        "prestato_a": clean(prestato_a),
+        "prestato_il": clean(prestato_il),
+        "note": clean(note),
+        "modificato_il": "",
+        "modificato_da": "",
+    }
+    return normalize_state(normalize_identity(item))
+
+
+def normalize_identity(item):
+    """Per un iPhone l'IMEI e' l'identificativo: se manca l'asset tag, lo sostituisce."""
+    if not item.get("asset_tag") and item.get("imei"):
+        item["asset_tag"] = norm_tag(item["imei"])
+    return item
+
+
+def normalize_state(item, stati=None):
+    """Mette a posto lo stato.
+
+    Due casi sono automatici e vincono sempre: un iPhone e' "Da Rispedire", un
+    dispositivo in prestito e' "Non disponibile". Negli altri casi si tiene lo
+    stato scelto dall'utente, purche' sia fra quelli previsti.
+    """
+    ammessi = list(stati or STATI)
+    if is_iphone(item.get("tipo")):
+        item["stato"] = DA_RISPEDIRE
+    elif item.get("prestato_a"):
+        item["stato"] = NON_DISPONIBILE
+    elif clean(item.get("stato")) not in ammessi:
+        item["stato"] = DISPONIBILE
+    return item
+
+
+def is_on_loan(item):
+    return bool(item.get("prestato_a"))
+
+
+class _Lock(object):
+    """Lock esclusivo basato su un file accanto ai dati."""
+
+    def __init__(self, data_path):
+        self.path = os.path.join(
+            os.path.dirname(os.path.abspath(data_path)),
+            "." + os.path.basename(data_path) + ".lock",
+        )
+        self.fd = None
+
+    def _holder(self):
+        try:
+            with open(self.path, "r", encoding="utf-8") as fh:
+                return json.load(fh)
+        except (OSError, ValueError):
+            return {}
+
+    def __enter__(self):
+        deadline = time.time() + LOCK_TIMEOUT
+        while True:
+            try:
+                self.fd = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+                info = json.dumps(
+                    {"utente": current_user(), "pid": os.getpid(), "ts": time.time()}
+                )
+                os.write(self.fd, info.encode("utf-8"))
+                os.close(self.fd)
+                self.fd = None
+                return self
+            except FileExistsError:
+                holder = self._holder()
+                # L'eta' si misura sul file, non sul contenuto: subito dopo la
+                # creazione il file e' ancora vuoto e non va scambiato per
+                # abbandonato.
+                try:
+                    age = time.time() - os.stat(self.path).st_mtime
+                except OSError:
+                    continue
+                if age > LOCK_STALE_AFTER:
+                    # Lock abbandonato (PC spento, crash): lo rimuoviamo.
+                    try:
+                        os.remove(self.path)
+                    except OSError:
+                        pass
+                    continue
+                if time.time() >= deadline:
+                    raise LockBusy(
+                        "L'inventario e' in uso da %s. Riprova tra qualche istante."
+                        % (holder.get("utente") or "un altro utente")
+                    )
+                time.sleep(0.4)
+            except OSError as exc:
+                raise InventoryError(
+                    "Impossibile accedere alla cartella di rete:\n%s" % exc
+                )
+
+    def __exit__(self, *exc):
+        try:
+            os.remove(self.path)
+        except OSError:
+            pass
+        return False
+
+
+class InventoryStore(object):
+    def __init__(self, data_path, iphone_room=None, stati=None):
+        self.path = os.path.abspath(data_path)
+        # Stanza in cui gli iPhone stanno per forza; None disattiva il vincolo.
+        self.iphone_room = iphone_room
+        self.stati = list(stati or STATI)
+        self.items = []
+        self._stamp = None
+
+    def _enforce_iphone_room(self, item):
+        """Un iPhone appartiene sempre alla sua stanza, comunque lo si registri."""
+        if self.iphone_room and is_iphone(item.get("tipo")):
+            item["stanza"] = self.iphone_room
+        return item
+
+    # ------------------------------------------------------------ lettura
+
+    def exists(self):
+        return os.path.exists(self.path)
+
+    def create_if_missing(self):
+        if self.exists():
+            return False
+        folder = os.path.dirname(self.path)
+        if folder and not os.path.isdir(folder):
+            raise InventoryError("La cartella %s non esiste." % folder)
+        self._write([])
+        return True
+
+    def _disk_stamp(self):
+        try:
+            st = os.stat(self.path)
+        except OSError:
+            return None
+        return (st.st_mtime, st.st_size)
+
+    def changed_on_disk(self):
+        """True se qualcun altro ha scritto il file dopo la nostra lettura."""
+        return self._disk_stamp() != self._stamp
+
+    def load(self):
+        self.items = self._read()
+        self._stamp = self._disk_stamp()
+        return self.items
+
+    def _read(self):
+        if not self.exists():
+            return []
+        try:
+            wb = load_workbook(self.path, read_only=True, data_only=True)
+        except Exception as exc:
+            raise InventoryError("Impossibile leggere %s:\n%s" % (self.path, exc))
+        try:
+            ws = wb[SHEET_NAME] if SHEET_NAME in wb.sheetnames else wb.worksheets[0]
+            rows = ws.iter_rows(values_only=True)
+            try:
+                header = next(rows)
+            except StopIteration:
+                return []
+            mapping = map_headers(header)
+            items = []
+            for row in rows:
+                item = _row_to_item(row, mapping)
+                if item:
+                    items.append(item)
+            return items
+        finally:
+            wb.close()
+
+    # ---------------------------------------------------------- scrittura
+
+    def _write(self, items):
+        wb = Workbook()
+        ws = wb.active
+        ws.title = SHEET_NAME
+        ws.append([HEADERS[f] for f in ALL_FIELDS])
+        for item in items:
+            ws.append([item.get(f, "") for f in ALL_FIELDS])
+        _style_sheet(ws, len(items))
+        tmp = "%s.tmp-%d-%s" % (self.path, os.getpid(), uuid.uuid4().hex[:8])
+        try:
+            wb.save(tmp)
+            os.replace(tmp, self.path)
+        except Exception as exc:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+            raise InventoryError("Impossibile salvare %s:\n%s" % (self.path, exc))
+        finally:
+            wb.close()
+
+    def _apply(self, operation):
+        """Esegue `operation(items)` su dati freschi, dentro il lock, e salva.
+
+        `operation` puo' sollevare InventoryError per annullare tutto.
+        Ritorna il valore restituito da `operation`.
+        """
+        with _Lock(self.path):
+            items = self._read()
+            result = operation(items)
+            items.sort(key=lambda it: (it.get("stanza", ""), it.get("asset_tag", "")))
+            self._write(items)
+            self.items = items
+            self._stamp = self._disk_stamp()
+        return result
+
+    # ---------------------------------------------------------- operazioni
+
+    def add(self, item):
+        item = dict(item)
+        item["asset_tag"] = norm_tag(item.get("asset_tag"))
+        if not item["asset_tag"]:
+            raise InventoryError("L'asset tag e' obbligatorio.")
+
+        def op(items):
+            if any(it["asset_tag"] == item["asset_tag"] for it in items):
+                raise InventoryError(
+                    "L'asset tag %s e' gia' presente nell'inventario." % item["asset_tag"]
+                )
+            self._enforce_iphone_room(item)
+            normalize_state(item, self.stati)
+            _stamp_item(item)
+            items.append(item)
+
+        return self._apply(op)
+
+    def update(self, old_tag, item):
+        old_tag = norm_tag(old_tag)
+        item = dict(item)
+        item["asset_tag"] = norm_tag(item.get("asset_tag"))
+        if not item["asset_tag"]:
+            raise InventoryError("L'asset tag e' obbligatorio.")
+
+        def op(items):
+            index = _index_of(items, old_tag)
+            if index is None:
+                raise InventoryError(
+                    "L'articolo %s non esiste piu': e' stato eliminato da un altro utente."
+                    % old_tag
+                )
+            if item["asset_tag"] != old_tag and _index_of(items, item["asset_tag"]) is not None:
+                raise InventoryError(
+                    "L'asset tag %s e' gia' presente nell'inventario." % item["asset_tag"]
+                )
+            self._enforce_iphone_room(item)
+            normalize_state(item, self.stati)
+            _stamp_item(item)
+            items[index] = item
+
+        return self._apply(op)
+
+    def delete(self, tags):
+        wanted = set(norm_tag(t) for t in tags)
+
+        def op(items):
+            before = len(items)
+            items[:] = [it for it in items if it["asset_tag"] not in wanted]
+            return before - len(items)
+
+        return self._apply(op)
+
+    def move_to_room(self, tags, room):
+        """Sposta i dispositivi selezionati.
+
+        Ritorna (spostati, iphone_lasciati_fermi): gli iPhone non si spostano.
+        """
+        wanted = set(norm_tag(t) for t in tags)
+        room = clean(room)
+
+        def op(items):
+            moved = bloccati = 0
+            for it in items:
+                if it["asset_tag"] not in wanted:
+                    continue
+                if self.iphone_room and is_iphone(it.get("tipo")):
+                    if it.get("stanza") != self.iphone_room:
+                        it["stanza"] = self.iphone_room     # rimette a posto
+                        _stamp_item(it)
+                    bloccati += 1
+                    continue
+                if it.get("stanza") != room:
+                    it["stanza"] = room
+                    _stamp_item(it)
+                    moved += 1
+            return moved, bloccati
+
+        return self._apply(op)
+
+    def lend(self, tag, person):
+        """Registra il prestito di un dispositivo a una persona."""
+        tag = norm_tag(tag)
+        person = clean(person)
+        if not person:
+            raise InventoryError("Indica il nome della persona a cui presti il dispositivo.")
+
+        def op(items):
+            index = _index_of(items, tag)
+            if index is None:
+                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+            item = items[index]
+            if is_on_loan(item):
+                raise InventoryError(
+                    "%s risulta gia' in prestito a %s dal %s."
+                    % (tag, item["prestato_a"], item["prestato_il"]))
+            item["prestato_a"] = person
+            item["prestato_il"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+            normalize_state(item, self.stati)
+            _stamp_item(item)
+            return item["prestato_il"]
+
+        return self._apply(op)
+
+    def give_back(self, tag):
+        """Chiude il prestito e rimette il dispositivo fra i disponibili."""
+        tag = norm_tag(tag)
+
+        def op(items):
+            index = _index_of(items, tag)
+            if index is None:
+                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+            item = items[index]
+            if not is_on_loan(item):
+                raise InventoryError("%s non risulta in prestito." % tag)
+            person = item["prestato_a"]
+            item["prestato_a"] = ""
+            item["prestato_il"] = ""
+            item["stato"] = DISPONIBILE
+            normalize_state(item, self.stati)
+            _stamp_item(item)
+            return person
+
+        return self._apply(op)
+
+    def set_stato(self, tag, stato):
+        """Cambia lo stato di un dispositivo (tendina nell'elenco)."""
+        tag = norm_tag(tag)
+        stato = clean(stato)
+        if stato not in self.stati:
+            raise InventoryError("Stato non previsto: %s." % stato)
+
+        def op(items):
+            index = _index_of(items, tag)
+            if index is None:
+                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+            item = items[index]
+            if is_iphone(item.get("tipo")):
+                raise InventoryError(
+                    "Lo stato degli iPhone e' sempre \"%s\" e non si cambia." % DA_RISPEDIRE)
+            if is_on_loan(item):
+                raise InventoryError(
+                    "%s e' in prestito a %s: registra prima il rientro."
+                    % (tag, item["prestato_a"]))
+            if item.get("stato") == stato:
+                return False
+            item["stato"] = stato
+            _stamp_item(item)
+            return True
+
+        return self._apply(op)
+
+    def set_note(self, tag, note):
+        """Aggiorna soltanto le note (modifica al volo dall'elenco)."""
+        tag = norm_tag(tag)
+        note = clean(note)
+
+        def op(items):
+            index = _index_of(items, tag)
+            if index is None:
+                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+            if items[index].get("note", "") == note:
+                return False
+            items[index]["note"] = note
+            _stamp_item(items[index])
+            return True
+
+        return self._apply(op)
+
+    def import_items(self, incoming, mode="merge"):
+        """mode: 'merge' aggiorna/aggiunge, 'replace' sostituisce tutto."""
+
+        def op(items):
+            added = updated = 0
+            if mode == "replace":
+                items[:] = []
+            index = {it["asset_tag"]: i for i, it in enumerate(items)}
+            for raw in incoming:
+                item = dict(raw)
+                item["asset_tag"] = norm_tag(item.get("asset_tag"))
+                if not item["asset_tag"]:
+                    continue
+                normalize_identity(item)
+                self._enforce_iphone_room(item)
+                normalize_state(item, self.stati)
+                _stamp_item(item)
+                if item["asset_tag"] in index:
+                    items[index[item["asset_tag"]]] = item
+                    updated += 1
+                else:
+                    index[item["asset_tag"]] = len(items)
+                    items.append(item)
+                    added += 1
+            return added, updated
+
+        return self._apply(op)
+
+
+# ------------------------------------------------------------- utilita'
+
+
+def _index_of(items, tag):
+    for i, it in enumerate(items):
+        if it["asset_tag"] == tag:
+            return i
+    return None
+
+
+def _stamp_item(item):
+    item["modificato_il"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+    item["modificato_da"] = current_user()
+
+
+def map_headers(header_row):
+    """Mappa indice colonna -> campo, riconoscendo le intestazioni note."""
+    mapping = {}
+    for idx, cell in enumerate(header_row or ()):
+        name = clean(cell).lower()
+        if not name:
+            continue
+        for field, aliases in HEADER_ALIASES.items():
+            if field in mapping.values():
+                continue
+            if name in aliases:
+                mapping[idx] = field
+                break
+    return mapping
+
+
+def _row_to_item(row, mapping):
+    item = new_item()
+    for idx, field in mapping.items():
+        if idx < len(row):
+            item[field] = norm_tag(row[idx]) if field == "asset_tag" else clean(row[idx])
+    normalize_identity(item)
+    normalize_state(item)
+    return item if item["asset_tag"] else None
+
+
+def rows_from_workbook(path):
+    """Legge un file .xlsx/.xlsm esterno e ritorna (items, righe_scartate)."""
+    try:
+        wb = load_workbook(path, read_only=True, data_only=True)
+    except Exception as exc:
+        raise InventoryError("Impossibile leggere il file:\n%s" % exc)
+    try:
+        ws = wb[SHEET_NAME] if SHEET_NAME in wb.sheetnames else wb.worksheets[0]
+        rows = ws.iter_rows(values_only=True)
+        try:
+            header = next(rows)
+        except StopIteration:
+            return [], 0
+        mapping = map_headers(header)
+        if "asset_tag" not in mapping.values():
+            raise InventoryError(
+                "Nel file non e' stata trovata la colonna \"Asset Tag\".\n"
+                "La prima riga deve contenere le intestazioni delle colonne."
+            )
+        items, skipped = [], 0
+        for row in rows:
+            if row is None or all(c is None or clean(c) == "" for c in row):
+                continue
+            item = _row_to_item(row, mapping)
+            if item:
+                items.append(item)
+            else:
+                skipped += 1
+        return items, skipped
+    finally:
+        wb.close()
+
+
+def _style_sheet(ws, row_count):
+    """Formattazione minima del file dati (l'export di stampa e' piu' curato)."""
+    from openpyxl.styles import Alignment, Font, PatternFill
+
+    fill = PatternFill("solid", fgColor="1F4E79")
+    for cell in ws[1]:
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = fill
+        cell.alignment = Alignment(vertical="center")
+    ws.freeze_panes = "A2"
+    widths = {"asset_tag": 18, "tipo": 12, "modello": 32, "seriale": 20,
+              "imei": 20, "restituito_da": 22, "stanza": 24, "stato": 16,
+              "prestato_a": 24, "prestato_il": 18, "note": 38,
+              "modificato_il": 18, "modificato_da": 24}
+    for i, field in enumerate(ALL_FIELDS, start=1):
+        ws.column_dimensions[ws.cell(row=1, column=i).column_letter].width = widths[field]
+    if row_count:
+        ws.auto_filter.ref = "A1:%s%d" % (
+            ws.cell(row=1, column=len(ALL_FIELDS)).column_letter, row_count + 1)

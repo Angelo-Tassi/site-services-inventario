@@ -1,0 +1,51 @@
+name: Compila l'eseguibile Windows
+
+# Ad ogni tag "v*" costruisce Inventario.exe su una macchina Windows e lo
+# allega alla release: chi scarica trova un file solo, senza prerequisiti.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installa le dipendenze
+        run: python -m pip install --upgrade pip pyinstaller openpyxl
+
+      - name: Compila
+        run: >
+          python -m PyInstaller --noconfirm --clean --onefile --noconsole
+          --name Inventario --collect-submodules openpyxl Inventario.py
+
+      - name: Prepara la cartella da copiare in rete
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path Distribuzione | Out-Null
+          Copy-Item dist\Inventario.exe Distribuzione\
+          Copy-Item "Crea collegamento sul desktop.bat" Distribuzione\
+          Copy-Item README.md Distribuzione\"Come funziona.txt"
+          Compress-Archive -Path Distribuzione\* -DestinationPath Inventario-windows.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Inventario-windows
+          path: Inventario-windows.zip
+
+      - name: Allega alla release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/Inventario.exe
+            Inventario-windows.zip
