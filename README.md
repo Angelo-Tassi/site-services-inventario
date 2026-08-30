@@ -376,7 +376,7 @@ stanza, fino al reset e alla riesportazione. I file si rigenerano con
 .venv/bin/python tests/run_all.py
 ```
 
-Quattordici suite che coprono archivio dati e accessi concorrenti, risoluzione del
+Quindici suite che coprono archivio dati e accessi concorrenti, risoluzione del
 percorso, schermate e colori, scheda di inserimento, prestiti, spedizioni,
 importazione ed esportazione. Girano senza bisogno di una finestra a schermo e
 non toccano i dati reali: ognuna si costruisce il proprio inventario in una
@@ -514,24 +514,24 @@ Dopo il reset si ricarica tutto con *Importa xls...*.
 
 ## Importare dentro una sola stanza
 
-Aperta una stanza, accanto al suo nome c'e' **Importa i dati di questa stanza**.
-Carica dal file **solo la sezione che riguarda quella stanza** e scarta tutto il
-resto, anche se nel foglio ci sono i dispositivi di tutte.
+Ci si arriva in due modi, che si comportano in modo **identico**:
 
-Perche' funzioni, nel foglio ci deve essere una **riga con il nome della
-stanza**: e' lei a dire dove comincia la sezione. Se non c'e', il programma
-**non importa niente** e apre un avviso che spiega di aggiungerla, elencando le
-stanze che ha trovato al suo posto. Va bene anche la forma breve - `KIOSK` per
-*Digital Kiosk* - come per le altre importazioni.
+- da dentro la stanza, con **Importa i dati di questa stanza**, accanto al suo nome;
+- dalla pagina principale, con *Importa xls...* e l'opzione **Una sola stanza**.
 
-Il riepilogo prima della conferma dice quante righe entrano e quante ne vengono
-scartate perche' di altre stanze. Come sempre si sceglie fra *unisci* e
-*sostituisci*, e la sostituzione riguarda solo quella stanza.
+La regola e' una sola, e dipende da cosa c'e' nel foglio:
 
-> Da non confondere con l'opzione **Una sola stanza** della finestra di
-> importazione generale: quella prende **tutte** le righe del file e le mette
-> nella stanza scelta, ignorando i separatori. Questa invece si fida dei
-> separatori e butta via il resto.
+| Il foglio | Cosa succede |
+| --- | --- |
+| **dichiara le stanze** con le righe-separatore | viene caricata solo la sezione della stanza scelta; tutte le altre righe vengono **scartate**, anche se nello stesso file |
+| **non dichiara nessuna stanza** | vale la scelta fatta: tutte le righe finiscono nella stanza indicata |
+| dichiara stanze, ma **non quella scelta** | non viene importato **niente**, e un avviso spiega di aggiungere la riga mancante, elencando le stanze trovate al suo posto |
+
+Va bene anche la forma breve - `KIOSK` per *Digital Kiosk*. Il riepilogo prima
+della conferma dice quante righe entrano, quante ne vengono scartate perche' di
+altre stanze, e - quando il foglio non dichiara stanze - che tutte finiranno
+nella stanza scelta. Come sempre si sceglie fra *unisci* e *sostituisci*, e la
+sostituzione riguarda solo quella stanza.
 
 ## Esportare una sola stanza
 
@@ -588,7 +588,7 @@ ma la scelta di **che cosa** si carica e **come**.
 | | |
 | --- | --- |
 | Tutto l'inventario | il file riguarda l'intero parco dispositivi |
-| Una sola stanza | si sceglie la stanza dalla tendina: **tutte** le righe del file finiscono li'. Eventuali separatori nel foglio vengono riconosciuti e saltati, ma non decidono piu' la stanza |
+| Una sola stanza | si sceglie la stanza dalla tendina, e comandano i separatori: vedi *Importare dentro una sola stanza* |
 
 **Come**
 

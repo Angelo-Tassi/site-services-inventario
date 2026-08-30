@@ -46,16 +46,25 @@ Ripeti esattamente il punto 1. Al termine il messaggio deve dire
 
 1. *Importa xls...* > **Una sola stanza** > `Digital Kiosk` > **Sostituisci**
 2. scegli di nuovo `Inventario_di_prova.xlsx`
-3. il riepilogo avverte che verranno prima eliminati **10** dispositivi
+3. il riepilogo dice **10 righe valide**, **20 righe di altre stanze scartate**,
+   e avverte che verranno prima eliminati **10** dispositivi
 
-**Cosa deve risultare.** Digital Kiosk contiene ora **tutti e 30** i dispositivi
-del file, perche' con la stanza scelta ogni riga ci finisce dentro,
-indipendentemente dai separatori. Le altre due stanze restano vuote. E' il
-comportamento voluto: serve a caricare l'elenco di una stanza da un foglio che
-non dichiara la stanza.
+**Cosa deve risultare.** Digital Kiosk contiene ancora **10** dispositivi, quelli
+elencati sotto la riga `DIGITAL KIOSK`: il foglio dichiara le stanze, quindi
+comandano i separatori e le righe delle altre stanze vengono buttate via. Le
+altre due stanze restano com'erano, con 10 ciascuna.
 
 Nella cartella dei dati deve essere comparso un file
 `Inventario_prima_del_reset_...xlsx`: e' la copia di sicurezza.
+
+### Quando il foglio non dichiara le stanze
+
+Apri `Inventario_di_prova.xlsx`, **cancella tutte e tre le righe-separatore** e
+salva con un altro nome. Reimportalo con **Una sola stanza** > `Digital Kiosk`.
+
+Stavolta il riepilogo dice **30 righe valide** e avverte che *il foglio non
+dichiara stanze: tutte le righe finiranno in Digital Kiosk*. E' il caso in cui
+la scelta dell'utente e' l'unica informazione disponibile.
 
 ## 4. Sostituire tutto
 
@@ -86,8 +95,9 @@ modello, da completare a mano) e uno in Digital Kiosk. L'iPhone **non** entra.
 ## 6. Importare dentro una stanza
 
 Questa e' la prova del pulsante **Importa i dati di questa stanza**, che sta
-accanto al nome della stanza quando la apri. Funziona in modo diverso
-dall'opzione *Una sola stanza* del punto 3: qui comandano i separatori.
+accanto al nome della stanza quando la apri. Deve dare lo **stesso risultato**
+dell'opzione *Una sola stanza* del punto 3: e' la stessa regola, raggiunta da
+due strade diverse.
 
 1. entra in **Digital Kiosk**
 2. premi *Importa i dati di questa stanza*, scegli **Unisci**

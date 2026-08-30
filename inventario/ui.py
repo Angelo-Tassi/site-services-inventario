@@ -37,6 +37,27 @@ def chiave_ordinamento(item, campo):
     return str(valore).lower()
 
 
+def seleziona_per_stanza(items, esito, stanza):
+    """Che cosa importare quando l'importazione riguarda una sola stanza.
+
+    Se il foglio dichiara le stanze con le righe-separatore, comandano quelle:
+    si prende la sezione della stanza scelta e si scarta il resto. Se invece il
+    foglio non dichiara nessuna stanza, e' la scelta dell'utente a valere e
+    tutte le righe finiscono li'.
+
+    Ritorna (righe, scartate, regola), dove regola vale "separatori" o "tutte".
+    Ritorna (None, 0, "mancante") se il foglio dichiara delle stanze ma non
+    quella richiesta: in quel caso non si deve importare niente.
+    """
+    trovate = list(esito.get("stanze_trovate") or [])
+    if not trovate:
+        return list(items), 0, "tutte"
+    if stanza not in trovate:
+        return None, 0, "mancante"
+    miei = [i for i in items if i.get("stanza") == stanza]
+    return miei, len(items) - len(miei), "separatori"
+
+
 def nome_file(testo):
     """Un nome di stanza utilizzabile come nome di file."""
     pulito = "".join(c if c.isalnum() or c in " -_" else "-" for c in str(testo))
@@ -554,9 +575,9 @@ class ImportOptionsDialog(_Modal):
             ttk.Label(body, text="Importa in %s" % stanza_fissa,
                       style="Section.TLabel").pack(anchor="w")
             ttk.Label(body, style="Muted.TLabel", justify="left",
-                      text="Nel foglio ci deve essere una riga con scritto il nome\n"
-                           "della stanza: verranno caricate solo le righe che la\n"
-                           "seguono. Tutto il resto viene scartato.").pack(
+                      text="Se il foglio dichiara le stanze, viene caricata solo la\n"
+                           "sezione di questa stanza e il resto si scarta. Se non le\n"
+                           "dichiara, tutte le righe finiscono qui.").pack(
                 anchor="w", pady=(4, 0))
             ttk.Separator(body, orient="horizontal").pack(fill="x", pady=12)
             self.var_ambito = tk.StringVar(value="stanza")
@@ -585,9 +606,9 @@ class ImportOptionsDialog(_Modal):
         self.combo.pack(side="left")
         self.nota_stanza = ttk.Label(
             body, style="Muted.TLabel", justify="left",
-            text="Tutte le righe del file finiscono nella stanza scelta.\n"
-                 "Eventuali separatori nel foglio vengono riconosciuti e saltati,\n"
-                 "ma non decidono piu' la stanza.")
+            text="Se il foglio dichiara le stanze con le righe-separatore, viene\n"
+                 "caricata solo la sezione della stanza scelta e il resto si scarta.\n"
+                 "Se non le dichiara, tutte le righe finiscono nella stanza scelta.")
         self.nota_stanza.pack(anchor="w", padx=(24, 0), pady=(4, 0))
 
         ttk.Separator(body, orient="horizontal").pack(fill="x", pady=12)
@@ -653,6 +674,9 @@ class ImportDialog(_Modal):
             righe.append("%d iPhone ignorati: si inseriscono solo a mano." % esito["iphone"])
         if esito.get("altre_stanze"):
             righe.append("%d righe di altre stanze scartate." % esito["altre_stanze"])
+        if esito.get("regola") == "tutte" and opzioni.get("stanza"):
+            righe.append("Il foglio non dichiara stanze: tutte le righe finiranno "
+                         "in %s." % opzioni["stanza"])
         ttk.Label(body, text="\n".join(righe), style="Muted.TLabel",
                   justify="left").pack(anchor="w", pady=(2, 8))
 
@@ -1823,16 +1847,34 @@ class App(tk.Tk):
             messagebox.showwarning("Importazione", "Nessuna riga valida trovata nel file.",
                                    parent=self)
             return
+        stanza = opzioni["stanza"]
+        scartati = 0
+        if stanza is not None:
+            items, scartati, regola = seleziona_per_stanza(items, esito, stanza)
+            if regola == "mancante":
+                self._avviso_stanza_mancante(stanza, esito)
+                return
+            if not items:
+                messagebox.showwarning(
+                    "Nessun dispositivo",
+                    "La riga %s c'e', ma sotto non ci sono dispositivi validi.\n"
+                    "Non e' stato importato niente." % stanza, parent=self)
+                return
+            esito = dict(esito)
+            esito["altre_stanze"] = scartati
+            esito["regola"] = regola
         conferma = ImportDialog(self, path, len(items), esito, opzioni,
                                 self.contati_in_eliminazione(opzioni)).show()
         if not conferma:
             return
         risultato = self._run(lambda: self.store.import_items(
-            items, opzioni["mode"], opzioni["stanza"]))
+            items, opzioni["mode"], stanza))
         if not risultato:
             return
         righe = ["Aggiunti: %d" % risultato["aggiunti"],
                  "Aggiornati: %d" % risultato["aggiornati"]]
+        if scartati:
+            righe.append("Scartate %d righe di altre stanze." % scartati)
         if risultato["eliminati"]:
             righe.append("Eliminati prima del caricamento: %d" % risultato["eliminati"])
         if risultato["copia"]:
@@ -1859,24 +1901,10 @@ class App(tk.Tk):
             messagebox.showerror("Importazione non riuscita", str(exc), parent=self)
             return
 
-        if stanza not in esito.get("stanze_trovate", []):
-            trovate = esito.get("stanze_trovate") or []
-            messagebox.showwarning(
-                "Manca la riga della stanza",
-                "Nel foglio non c'e' nessuna riga che indichi %s, quindi non so\n"
-                "quali dispositivi appartengano a questa stanza.\n"
-                "Non e' stato importato niente.\n\n"
-                "Aggiungi al file una riga vuota con scritto soltanto\n\n"
-                "        %s\n\n"
-                "nella prima cella, e sotto elenca i dispositivi della stanza.%s"
-                % (stanza, stanza.upper(),
-                   "\n\nNel file ho trovato invece: %s." % ", ".join(trovate)
-                   if trovate else ""),
-                parent=self)
+        miei, scartati, regola = seleziona_per_stanza(items, esito, stanza)
+        if regola == "mancante":
+            self._avviso_stanza_mancante(stanza, esito)
             return
-
-        miei = [i for i in items if i.get("stanza") == stanza]
-        scartati = len(items) - len(miei)
         if not miei:
             messagebox.showwarning(
                 "Nessun dispositivo",
@@ -1885,6 +1913,7 @@ class App(tk.Tk):
             return
         esito_stanza = dict(esito)
         esito_stanza["altre_stanze"] = scartati
+        esito_stanza["regola"] = regola
         conferma = ImportDialog(self, path, len(miei), esito_stanza, opzioni,
                                 self.contati_in_eliminazione(opzioni)).show()
         if not conferma:
@@ -1904,6 +1933,19 @@ class App(tk.Tk):
             righe.append("Copia di sicurezza del file precedente:")
             righe.append(risultato["copia"])
         messagebox.showinfo("Importazione completata", "\n".join(righe), parent=self)
+
+    def _avviso_stanza_mancante(self, stanza, esito):
+        trovate = esito.get("stanze_trovate") or []
+        messagebox.showwarning(
+            "Manca la riga della stanza",
+            "Il foglio dichiara le stanze con le righe-separatore, ma nessuna\n"
+            "indica %s: non so quali dispositivi siano suoi.\n"
+            "Non e' stato importato niente.\n\n"
+            "Aggiungi al file una riga vuota con scritto soltanto\n\n"
+            "        %s\n\n"
+            "nella prima cella, e sotto elenca i dispositivi della stanza.\n\n"
+            "Nel file ho trovato invece: %s."
+            % (stanza, stanza.upper(), ", ".join(trovate)), parent=self)
 
     def contati_in_eliminazione(self, opzioni):
         """Quanti dispositivi verrebbero rimossi da una sostituzione."""

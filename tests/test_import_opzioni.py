@@ -59,10 +59,12 @@ conf._ok()
 assert conf.result == {"stanza": None, "mode": "replace"}
 
 # ------------------------------------------------ importazione di una sola stanza
+# il foglio non dichiara stanze: la scelta dell'utente vale per tutte le righe
 sorgente = os.path.join(d, "solo_kiosk.xlsx")
 excel_io.export([new_item("IT-0801", "Laptop", "T14 Gen 5", "PF801", DR),
                  new_item("IT-0802", "Tablet", "Dell Latitude", "8H802", BAU)], sorgente)
-items, _ = rows_from_workbook(sorgente, app.cfg["rooms"])
+items, esito_file = rows_from_workbook(sorgente, app.cfg["rooms"])
+assert esito_file["stanze_trovate"] == [], "nessun separatore in questo foglio"
 prima_bau = sum(1 for i in app.store.items if i["stanza"] == BAU)
 risultato = app._run(lambda: app.store.import_items(items, "replace", KIOSK), "ok")
 assert risultato["aggiunti"] == 2 and risultato["eliminati"] == 5, risultato
