@@ -10,6 +10,21 @@ gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 > campo: aspettati aggiustamenti. Segnala qualsiasi cosa non torni aprendo una
 > issue.
 
+## Prima di tutto: come si usa
+
+**[Tenerlo aggiornato, non ricostruirlo](https://angelo-tassi.github.io/site-services-inventario/tenerlo-aggiornato.html)**
+- il metodo di lavoro, prima ancora delle funzioni.
+
+Questo programma non serve a rifare l'inventario prima della review: serve a non
+doverlo rifare mai piu'. Ogni movimento fisico - un dispositivo che entra, esce,
+va in prestito, si guasta, viene rispedito - va registrato **quando avviene, da
+chi lo compie**, in una decina di secondi. Alla review non si prepara niente: si
+esporta e si manda.
+
+Se invece si accumulano i movimenti per tre mesi e si ricostruisce tutto con
+un'importazione, lo sforzo di tenere l'inventario e' sprecato: il file parte
+gia' vecchio, e nessuno sa piu' dove sia finito un dispositivo.
+
 ## Scarica
 
 **[Scarica l'ultima versione](../../releases/latest)** dalla pagina Releases.

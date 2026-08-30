@@ -10,6 +10,21 @@ tracking, import, export and printing in Excel format.
 > the field: expect adjustments. Report anything that looks wrong by opening an
 > issue.
 
+## First of all: how it is meant to be used
+
+**[Keep it current, don't rebuild it](https://angelo-tassi.github.io/site-services-inventario/tenerlo-aggiornato.html?lang=en)**
+- the working method, before any feature.
+
+This program is not for putting the inventory back together before the review:
+it is for never having to do that again. Every physical movement - a device
+coming in, going out, going on loan, breaking down, being shipped back - must be
+recorded **as it happens, by whoever performs it**, in about ten seconds. At
+review time there is nothing to prepare: you export and send.
+
+If instead movements pile up for three months and everything is rebuilt with an
+import, the effort of keeping an inventory is wasted: the file goes off already
+out of date, and nobody knows where a device ended up any more.
+
 ## Download
 
 **[Download the latest version](../../releases/latest)** from the Releases page.

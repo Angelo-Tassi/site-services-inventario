@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tenerlo aggiornato · Site Services Inventario</title>
+<meta name="description" content="Perche' l'inventario si tiene aggiornato a ogni movimento invece di ricostruirlo prima della review, e cosa fare per ogni entrata, uscita, prestito o guasto.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128187;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#E9EDF2; --panel:#FFF; --ink:#14212C; --ink-soft:#55677A; --ink-faint:#7E8FA0;
+  --line:#D3DBE4; --accent:#1F4E79; --accent-strong:#163A5B; --accent-soft:#E3EDF6;
+  --shadow:0 1px 2px rgba(20,33,44,.06),0 14px 40px rgba(20,33,44,.13);
+  --on-accent:#FFFFFF;
+}
+@media (prefers-color-scheme:dark){:root{
+  --ground:#0E1720; --panel:#16222E; --ink:#E6EDF4; --ink-soft:#9FB0C0; --ink-faint:#748899;
+  --line:#263644; --accent:#6FB3E0; --accent-strong:#8CC5EA; --accent-soft:#1B2C3B;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 44px rgba(0,0,0,.55);
+  --on-accent:#0B1520;
+}}
+/* colori reali del programma, uguali in entrambi i temi */
+:root{
+  --w-bg:#EEF2F7; --w-card:#FFF; --w-primary:#1F4E79; --w-text:#1B2733; --w-muted:#6B7A8C;
+  --w-border:#D7E0EA; --w-head:#E7EEF6; --w-row-alt:#F6F9FC; --w-loan-bg:#FDEEEC;
+  --w-loan-fg:#A93226; --w-iphone:#EDF9EF; --w-tablet:#EAF4FD; --w-link:#1A6BA8;
+  --w-ship:#F6EFFB; --w-ship-fg:#6C3483;
+  --w-r1:#2E86C1; --w-r2:#16A085; --w-r3:#8E44AD; --w-r4:#5D6D7E;
+  --w-face:"Segoe UI",-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:var(--ground);color:var(--ink);
+  font:400 16px/1.65 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+a{color:var(--accent)}
+
+header{padding:64px 0 40px}
+.eyebrow{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+h1{margin:0 0 14px;font-family:Archivo,sans-serif;font-weight:700;
+  font-size:clamp(32px,5.2vw,52px);line-height:1.04;letter-spacing:-.022em;text-wrap:balance}
+.lede{margin:0;max-width:60ch;font-size:18px;color:var(--ink-soft)}
+.alpha{display:inline-block;margin-top:18px;padding:7px 12px;border-radius:3px;
+  background:var(--accent-soft);border:1px solid var(--line);
+  font:500 12px/1 "IBM Plex Mono",monospace;color:var(--accent)}
+
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 8px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:14px 22px;border-radius:4px;
+  text-decoration:none;font-weight:600;font-size:15px;border:1px solid transparent}
+.btn.main{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.main:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.btn.alt{background:var(--panel);color:var(--ink);border-color:var(--line)}
+.btn.alt:hover{border-color:var(--accent);color:var(--accent)}
+.note{font-size:14px;color:var(--ink-faint);margin:6px 0 0}
+
+section{padding:44px 0}
+h2{margin:0 0 8px;font-family:Archivo,sans-serif;font-weight:600;font-size:24px;letter-spacing:-.01em}
+.sub{margin:0 0 24px;color:var(--ink-soft);max-width:62ch}
+
+/* finestra del programma */
+.shot{background:var(--w-bg);border:1px solid var(--line);border-radius:7px;
+  box-shadow:var(--shadow);overflow:hidden;font-family:var(--w-face);color:var(--w-text);font-size:13px}
+.bar{background:#DFE6EE;border-bottom:1px solid #CBD6E1;padding:7px 12px;font-size:12px;color:#4B5C6B;
+  display:flex;align-items:center;gap:9px}
+.bar .dot{width:9px;height:9px;border-radius:50%;background:#9FB1C2}
+.bar .sp{flex:1}
+.appbar{background:var(--w-primary);color:#fff;padding:14px 18px;display:flex;
+  align-items:flex-end;gap:16px;flex-wrap:wrap}
+.appbar b{font-size:19px;font-weight:600}
+.appbar .s{color:#BBD4EA;font-size:12px;margin-top:2px}
+.appbar .t{margin-left:auto;color:#BBD4EA;font-size:12px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;padding:11px 16px 4px}
+.tb{background:#fff;border:1px solid var(--w-border);border-radius:3px;
+  padding:7px 12px;font-size:12.5px;color:var(--w-text)}
+.tb.p{background:var(--w-primary);border-color:var(--w-primary);color:#fff;font-weight:600}
+.stage{padding:6px 16px 14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin:8px 0 16px}
+.c{background:#fff;border:1px solid var(--w-border);border-radius:4px;
+  overflow:hidden;color:var(--w-text)}
+.c i{display:block;height:4px}
+.c .b{padding:12px 15px 14px}
+.c .n{font-weight:600;font-size:13.5px}
+.c .q{font-size:32px;font-weight:700;line-height:1.15}
+.c .m{font-size:11.5px;color:var(--w-muted)}
+.c .g{font-size:12px;font-weight:600;color:var(--w-link);margin-top:8px}
+/* superficie chiara fissa: il testo dentro non eredita mai il colore del tema,
+   altrimenti in modalita' scura diventa bianco su bianco */
+.tw{background:#fff;border:1px solid var(--w-border);border-radius:3px;
+  overflow-x:auto;color:var(--w-text)}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th{background:var(--w-head);color:var(--w-primary);font-weight:600;font-size:12px;
+  text-align:left;padding:8px 10px;white-space:nowrap;border-bottom:1px solid var(--w-border)}
+td{padding:7px 10px;font-size:12.5px;border-bottom:1px solid #EDF1F6;
+  white-space:nowrap;color:var(--w-text)}
+tr:nth-child(even){background:var(--w-row-alt)}
+tr.ip,tr.ip:nth-child(even){background:var(--w-iphone)}
+tr.tb2,tr.tb2:nth-child(even){background:var(--w-tablet)}
+tr.ln,tr.ln:nth-child(even){background:var(--w-loan-bg)}
+tr.sp,tr.sp:nth-child(even){background:var(--w-ship)}
+tr.sp td{color:var(--w-ship-fg)}
+tr.ln td{color:var(--w-loan-fg)}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:12px}
+.pill{display:inline-block;background:var(--w-link);color:#fff;border-radius:3px;
+  padding:4px 9px;font-size:11px;font-weight:600}
+.pill.r{background:var(--w-loan-fg)}
+.sel{color:var(--w-link);font-size:14px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:20px}
+.card h3{margin:0 0 7px;font-family:Archivo,sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+.card p{margin:0;font-size:14.5px;color:var(--ink-soft)}
+
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:14px}
+ol.steps li{counter-increment:s;background:var(--panel);border:1px solid var(--line);
+  border-radius:5px;padding:18px 20px 18px 58px;position:relative;font-size:15px;color:var(--ink-soft)}
+ol.steps li::before{content:counter(s);position:absolute;left:20px;top:17px;
+  width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;
+  font:600 13px/24px "IBM Plex Mono",monospace;text-align:center}
+ol.steps b{color:var(--ink)}
+code{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--accent-soft);
+  padding:2px 6px;border-radius:3px}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:5px;
+  padding:16px 18px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;font-size:13px}
+footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
+  color:var(--ink-faint);font-size:14px}
+.lingua{display:flex;justify-content:flex-end;align-items:center;gap:10px;
+  padding-top:26px;font-size:14px;color:var(--ink-soft)}
+.lingua select{font:inherit;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line);border-radius:4px;padding:7px 10px}
+[hidden]{display:none !important}
+
+h3{margin:26px 0 6px;font-family:Archivo,sans-serif;font-size:17px;font-weight:600}
+tr.sep td{background:var(--w-head);color:var(--w-primary)}
+table{min-width:520px}
+.eyebrow a{color:var(--ink-faint);text-decoration:none}
+.eyebrow a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="lingua">
+  <label for="lang">Lingua / Language</label>
+  <select id="lang">
+    <option value="it">Italiano</option>
+    <option value="en">English</option>
+  </select>
+</div>
+<div data-lang="it"><header>
+  <div class="eyebrow"><a href="index.html">← Torna alla pagina del progetto</a></div>
+  <h1>Tenerlo aggiornato, non ricostruirlo</h1>
+  <p class="lede">Questo programma non serve a rifare l'inventario prima della
+    review. Serve a non doverlo rifare mai piu'.</p>
+</header>
+
+<section>
+  <h2>Il punto</h2>
+  <p class="sub">L'inventario non e' un documento che si prepara: e' il riflesso
+    di quello che abbiamo fisicamente in casa, in ogni momento.</p>
+  <div class="grid">
+    <div class="card"><h3>Come si faceva</h3>
+      <p>Per tre mesi si accumulano fogli, messaggi e ricordi. Arriva la review,
+        e qualcuno passa due giorni a ricostruire cosa e' entrato e cosa e'
+        uscito, rincorrendo chi c'era. Il file parte, e il giorno dopo e' gia'
+        vecchio.</p></div>
+    <div class="card"><h3>Come si fa adesso</h3>
+      <p>Ogni movimento fisico viene registrato quando avviene, da chi lo compie,
+        in una manciata di secondi. Alla review non si prepara niente: si preme
+        <i>Esporta xls</i> e si manda.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Le tre regole</h2>
+  <ol class="steps">
+    <li><b>Se il dispositivo si muove, l'inventario si muove.</b> Entra,
+      esce, cambia stanza, va in prestito, torna, si rompe, viene rispedito:
+      ogni movimento fisico ha il suo gesto nel programma.</li>
+    <li><b>Lo registra chi lo fa, mentre lo fa.</b> Non a fine giornata, non
+      "poi lo dico a qualcuno". Chi ha il dispositivo in mano e' l'unico che in
+      quel momento sa il numero di serie, a chi lo sta dando e perche'.</li>
+    <li><b>Nessuno tiene un elenco parallelo.</b> Ne' su carta, ne' in un foglio
+      personale, ne' a memoria. Se l'informazione non e' nel programma, per
+      l'organizzazione non esiste.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Cosa fare, movimento per movimento</h2>
+  <p class="sub">Nessuna di queste operazioni richiede piu' di mezzo minuto. Sono
+    pensate per essere fatte con il dispositivo ancora in mano.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Quello che succede davvero</th><th>Cosa fai nel programma</th><th>Quanto ci vuole</th></tr></thead>
+      <tbody>
+        <tr><td>Arriva un laptop o un tablet nuovo</td><td><b>Aggiungi</b> &rsaquo; scansiona asset tag e seriale, scrivi il modello</td><td>20 secondi</td></tr>
+        <tr><td>Ci consegnano un iPhone</td><td><b>Aggiungi</b> &rsaquo; <i>Iphone</i> &rsaquo; scansiona l'IMEI, scrivi modello e chi lo ha restituito</td><td>20 secondi</td></tr>
+        <tr><td>Presti un laptop del kiosk a un collega</td><td><b>Presta</b> sulla riga del dispositivo, scrivi il nome</td><td>10 secondi</td></tr>
+        <tr><td>Il collega lo riporta</td><td><b>Registra rientro</b> sulla stessa riga</td><td>5 secondi</td></tr>
+        <tr><td>Sposti un dispositivo in un'altra stanza</td><td>spuntalo e usa <b>Sposta in stanza...</b></td><td>10 secondi</td></tr>
+        <tr><td>Un dispositivo si guasta</td><td>doppio clic sulla cella <i>Stato</i> &rsaquo; <i>Guasto in attesa tecnico</i></td><td>5 secondi</td></tr>
+        <tr><td>Un iPhone parte per il servizio telefonia</td><td><b>Conferma spedizione</b> sulla sua riga</td><td>10 secondi</td></tr>
+        <tr><td>Vuoi annotare qualcosa</td><td>doppio clic sulla cella <i>Note</i> e scrivi</td><td>10 secondi</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Tutte si fanno dall'elenco, senza aprire finestre: le note e lo
+    stato si cambiano con un doppio clic, i prestiti e le spedizioni con il
+    pulsante sulla riga.</p>
+</section>
+
+<section>
+  <h2>Perche' deve farlo ogni tecnico</h2>
+  <div class="grid">
+    <div class="card"><h3>L'informazione scade in fretta</h3>
+      <p>Chi ha appena consegnato un portatile sa il nome della persona, l'ora e
+        il numero di serie. Fra due giorni ricordera' "un Lenovo a qualcuno del
+        secondo piano". Fra due mesi, niente.</p></div>
+    <div class="card"><h3>Aggiornare in due e' possibile</h3>
+      <p>Il programma e' fatto perche' piu' persone lo tengano aperto insieme:
+        ogni salvataggio e' protetto e l'elenco si aggiorna da solo. Non c'e'
+        motivo di aspettare che si liberi qualcuno.</p></div>
+    <div class="card"><h3>Chi ha fatto cosa resta scritto</h3>
+      <p>Ogni modifica registra data, ora e utente. Non per controllare le
+        persone: per poter ricostruire un movimento quando i conti non tornano,
+        senza doverlo chiedere in giro.</p></div>
+    <div class="card"><h3>Se lo salta uno, salta per tutti</h3>
+      <p>Basta un dispositivo non registrato perche' alla review i numeri non
+        tornino, e per trovarlo si ricontrolla tutto. Lo sforzo risparmiato da
+        uno lo pagano in dieci.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Quando arriva la review</h2>
+  <p class="sub">Se le tre regole sono state rispettate, non c'e' niente da
+    preparare.</p>
+  <ol class="steps">
+    <li><b>Apri il programma</b> e guarda le schede stanza: i totali sono quelli
+      veri.</li>
+    <li><b>Esporta xls</b>, scegli se vuoi tutto o una stanza sola, in un foglio
+      o in un file per stanza.</li>
+    <li><b>Manda il file.</b> Se chi lo riceve legge inglese, spunta
+      <i>Esporta i file in inglese</i>: intestazioni e stati escono tradotti.</li>
+  </ol>
+  <p class="note">Tempo richiesto: un minuto. Non due giorni.</p>
+</section>
+
+<section>
+  <h2>E allora l'importazione a cosa serve</h2>
+  <p class="sub">A partire, non a mantenere.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Situazione</th><th>Strumento giusto</th></tr></thead>
+      <tbody>
+        <tr><td>Primo caricamento: l'inventario esiste gia' in un foglio Excel</td><td>importazione</td></tr>
+        <tr><td>Arrivo di una fornitura di venti dispositivi, gia' elencati dal fornitore</td><td>importazione in una sola stanza</td></tr>
+        <tr><td>Correzione in blocco: un campo sbagliato su molte righe</td><td>esporta, correggi, reimporta</td></tr>
+        <tr><td>Un dispositivo entra, esce, si guasta, si presta</td><td><b>il programma, sul momento</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Se ti accorgi di usare l'importazione per rimettere in pari
+    settimane di movimenti, l'inventario ha smesso di essere aggiornato: e'
+    tornato a essere un documento da ricostruire.</p>
+</section>
+
+<section>
+  <h2>Come si comincia</h2>
+  <ol class="steps">
+    <li><b>Carica una volta</b> quello che hai gia': dalla
+      <a href="formato-xls.html">guida al formato</a> prepari il file, e con
+      <i>Importa xls</i> lo metti dentro.</li>
+    <li><b>Fai il giro fisico una volta sola</b> e allinea l'inventario alla
+      realta': quel giorno paghi il debito accumulato, e non lo paghi piu'.</li>
+    <li><b>Metti il collegamento sul desktop</b> di chi tocca i dispositivi, e
+      accordatevi sulla prima regola. Da li' in poi si mantiene da solo.</li>
+  </ol>
+</section>
+
+<footer>
+  <div class="wrap" style="padding:0">
+    <a href="index.html">Pagina del progetto</a> ·
+    <a href="formato-xls.html">Come preparare il file Excel</a> ·
+    <a href="https://github.com/Angelo-Tassi/site-services-inventario">Codice</a>
+  </div>
+</footer>
+</div>
+<div data-lang="en" hidden><header>
+  <div class="eyebrow"><a href="index.html?lang=en">← Back to the project page</a></div>
+  <h1>Keep it current, don't rebuild it</h1>
+  <p class="lede">This program is not for putting the inventory back together
+    before the review. It is for never having to do that again.</p>
+</header>
+
+<section>
+  <h2>The point</h2>
+  <p class="sub">The inventory is not a document you prepare: it is the
+    reflection of what we physically hold, at any moment.</p>
+  <div class="grid">
+    <div class="card"><h3>How it used to go</h3>
+      <p>For three months notes, messages and memories pile up. The review comes
+        round, and somebody spends two days reconstructing what came in and what
+        went out, chasing whoever was there. The file goes off, and the next day
+        it is already out of date.</p></div>
+    <div class="card"><h3>How it goes now</h3>
+      <p>Every physical movement is recorded as it happens, by whoever performs
+        it, in a handful of seconds. At review time there is nothing to prepare:
+        you press <i>Export xls</i> and send it.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>The three rules</h2>
+  <ol class="steps">
+    <li><b>If the device moves, the inventory moves.</b> It arrives, it leaves,
+      it changes room, it goes on loan, it comes back, it breaks, it is shipped
+      back: every physical movement has its gesture in the program.</li>
+    <li><b>Whoever does it records it, while doing it.</b> Not at the end of the
+      day, not "I'll tell someone later". The person holding the device is the
+      only one who, at that moment, knows the serial number, who is taking it
+      and why.</li>
+    <li><b>Nobody keeps a parallel list.</b> Not on paper, not in a personal
+      spreadsheet, not in their head. If the information is not in the program,
+      as far as the organisation is concerned it does not exist.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>What to do, movement by movement</h2>
+  <p class="sub">None of these takes more than half a minute. They are meant to
+    be done with the device still in your hand.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>What actually happens</th><th>What you do in the program</th><th>How long</th></tr></thead>
+      <tbody>
+        <tr><td>A new laptop or tablet arrives</td><td><b>Add</b> &rsaquo; scan asset tag and serial, type the model</td><td>20 seconds</td></tr>
+        <tr><td>An iPhone is handed to us</td><td><b>Add</b> &rsaquo; <i>Iphone</i> &rsaquo; scan the IMEI, type model and who returned it</td><td>20 seconds</td></tr>
+        <tr><td>You lend a kiosk laptop to a colleague</td><td><b>Lend</b> on the device's row, type the name</td><td>10 seconds</td></tr>
+        <tr><td>The colleague brings it back</td><td><b>Register return</b> on the same row</td><td>5 seconds</td></tr>
+        <tr><td>You move a device to another room</td><td>tick it and use <b>Move to room...</b></td><td>10 seconds</td></tr>
+        <tr><td>A device breaks down</td><td>double-click the <i>Status</i> cell &rsaquo; <i>Faulty - awaiting technician</i></td><td>5 seconds</td></tr>
+        <tr><td>An iPhone leaves for the phone service</td><td><b>Confirm shipment</b> on its row</td><td>10 seconds</td></tr>
+        <tr><td>You want to note something down</td><td>double-click the <i>Notes</i> cell and write</td><td>10 seconds</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">All of them are done from the list, without opening windows:
+    notes and status change with a double-click, loans and shipments with the
+    button on the row.</p>
+</section>
+
+<section>
+  <h2>Why every technician has to do it</h2>
+  <div class="grid">
+    <div class="card"><h3>The information decays fast</h3>
+      <p>Whoever has just handed over a laptop knows the person's name, the time
+        and the serial number. In two days they will remember "a Lenovo, to
+        somebody on the second floor". In two months, nothing.</p></div>
+    <div class="card"><h3>Two people can update at once</h3>
+      <p>The program is built for several people to keep it open together: every
+        save is protected and the list refreshes by itself. There is no reason to
+        wait for somebody to be free.</p></div>
+    <div class="card"><h3>Who did what stays written</h3>
+      <p>Every change records date, time and user. Not to keep an eye on people:
+        to be able to reconstruct a movement when the numbers do not add up,
+        without having to ask around.</p></div>
+    <div class="card"><h3>If one person skips it, everyone pays</h3>
+      <p>One unrecorded device is enough to make the review numbers wrong, and
+        finding it means checking everything again. The effort one person saves,
+        ten people pay for.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>When the review comes</h2>
+  <p class="sub">If the three rules were followed, there is nothing to prepare.</p>
+  <ol class="steps">
+    <li><b>Open the program</b> and look at the room cards: the totals are the
+      real ones.</li>
+    <li><b>Export xls</b>, choose whether you want everything or a single room,
+      in one sheet or one file per room.</li>
+    <li><b>Send the file.</b> If whoever receives it reads English, tick
+      <i>Export the files in English</i>: headers and statuses come out
+      translated.</li>
+  </ol>
+  <p class="note">Time required: one minute. Not two days.</p>
+</section>
+
+<section>
+  <h2>So what is importing for</h2>
+  <p class="sub">For starting, not for maintaining.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Situation</th><th>The right tool</th></tr></thead>
+      <tbody>
+        <tr><td>First load: the inventory already exists in an Excel sheet</td><td>import</td></tr>
+        <tr><td>A delivery of twenty devices arrives, already listed by the supplier</td><td>import into a single room</td></tr>
+        <tr><td>Bulk correction: one field wrong on many rows</td><td>export, fix, import back</td></tr>
+        <tr><td>A device comes in, goes out, breaks, is lent</td><td><b>the program, on the spot</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">If you find yourself using the import to catch up on weeks of
+    movements, the inventory has stopped being current: it has gone back to being
+    a document to reconstruct.</p>
+</section>
+
+<section>
+  <h2>How to start</h2>
+  <ol class="steps">
+    <li><b>Load once</b> what you already have: the
+      <a href="formato-xls.html?lang=en">format guide</a> shows how to prepare
+      the file, and <i>Import xls</i> puts it in.</li>
+    <li><b>Walk the rooms once</b> and line the inventory up with reality: that
+      day you pay off the accumulated debt, and you never pay it again.</li>
+    <li><b>Put the shortcut on the desktop</b> of everyone who touches the
+      devices, and agree on the first rule. From then on it maintains itself.</li>
+  </ol>
+</section>
+
+<footer>
+  <div class="wrap" style="padding:0">
+    <a href="index.html?lang=en">Project page</a> ·
+    <a href="formato-xls.html?lang=en">How to prepare the Excel file</a> ·
+    <a href="https://github.com/Angelo-Tassi/site-services-inventario/blob/main/README.en.md">Code</a>
+  </div>
+</footer>
+</div>
+</div>
+<script>
+(function () {
+  var scelta = document.getElementById("lang");
+  function applica(codice) {
+    document.querySelectorAll("[data-lang]").forEach(function (b) {
+      b.hidden = b.getAttribute("data-lang") !== codice;
+    });
+    document.documentElement.lang = codice;
+    scelta.value = codice;
+  }
+  function valida(codice) {
+    return codice === "it" || codice === "en" ? codice : null;
+  }
+  // l'indirizzo vince sulla preferenza salvata: un link in inglese porta in inglese
+  var dallUrl = valida(new URLSearchParams(location.search).get("lang"));
+  var salvata = null;
+  try { salvata = valida(localStorage.getItem("lingua")); } catch (e) {}
+  var codice = dallUrl || salvata || "it";
+  applica(codice);
+  if (dallUrl) { try { localStorage.setItem("lingua", dallUrl); } catch (e) {} }
+  scelta.addEventListener("change", function () {
+    applica(scelta.value);
+    try { localStorage.setItem("lingua", scelta.value); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
