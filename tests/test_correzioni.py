@@ -5,8 +5,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fixture
 from inventario.ui import (ACTION_COLUMN, AddChoiceDialog, App, COLONNE_NON_IPHONE,
-                           TypeChoiceDialog, chiave_ordinamento)
-from inventario.store import new_item
+                           ItemDialog, TypeChoiceDialog, chiave_ordinamento)
+from inventario.store import InventoryStore, new_item, valore_visibile
+from inventario import excel_io
+from openpyxl import load_workbook
 
 BAU, KIOSK, DR = fixture.BAU, fixture.KIOSK, fixture.DR
 app = App(fixture.build()); app._initial_load()
@@ -83,5 +85,47 @@ assert ACTION_COLUMN in colonne
 app.show_room(KIOSK)
 for campo in COLONNE_NON_IPHONE:
     assert campo in app._columns(), campo
+
+# ---------------------------------------------- 5. nessun asset tag sugli iPhone
+assert "asset_tag" in COLONNE_NON_IPHONE
+assert valore_visibile(tel, "asset_tag") == "", "non si mostra mai"
+assert valore_visibile(tel, "imei") == "356938035643809"
+assert valore_visibile(app._item_by_tag("IT-0900"), "asset_tag") == "IT-0900"
+
+# nell'elenco generale la cella resta vuota, l'IMEI identifica la riga
+app.show_home()
+colonne = app._columns()
+riga = app.tree.item("356938035643809", "values")
+assert riga[colonne.index("asset_tag")] == "", riga
+assert riga[colonne.index("imei")] == "356938035643809"
+
+# la scheda di un iPhone non ha il campo Asset Tag
+scheda = ItemDialog(app, app.cfg["rooms"], app.cfg["types"], tel,
+                    iphone_room=app.iphone_room(), stati=app.cfg["states"])
+assert "Asset Tag" not in [l for l, _v, _w in scheda.required]
+scheda._cancel()
+
+# non compare nemmeno nel file dati, ma l'identita' sopravvive alla rilettura
+wb = load_workbook(app.store.path); ws = wb.active
+intestazioni = [c.value for c in ws[1]]
+colonna_tag = intestazioni.index("Asset Tag")
+colonna_imei = intestazioni.index("IMEI")
+telefoni = [r for r in ws.iter_rows(min_row=2, values_only=True)
+            if r[colonna_imei] == "356938035643809"]
+assert len(telefoni) == 1 and telefoni[0][colonna_tag] in (None, ""), telefoni
+wb.close()
+app.store.load()
+assert app._item_by_tag("356938035643809") is not None, "l IMEI ricostruisce la chiave"
+assert app.store.set_note("356938035643809", "riletto") is True
+
+# nemmeno nella stampa, dove gli iPhone ci sono
+stampa = excel_io.build_print_file(app.store.items, rooms=app.cfg["rooms"])
+wb = load_workbook(stampa)
+ws = wb.active
+riga_intestazioni = next(r for r in ws.iter_rows(values_only=True) if r and r[0] == "Asset Tag")
+indice = list(riga_intestazioni).index("Asset Tag")
+valori = [r[indice] for r in ws.iter_rows(min_row=2, values_only=True) if r]
+assert "356938035643809" not in [v for v in valori if v], valori
+wb.close()
 app.destroy()
 print("CORREZIONI OK")

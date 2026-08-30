@@ -240,12 +240,26 @@ def normalize_identity(item):
 
 
 def normalize_iphone(item):
-    """Un iPhone non ha numero di serie ne' prestiti: ha l'IMEI e basta."""
+    """Un iPhone ha l'IMEI e basta: niente asset tag, seriale o prestiti.
+
+    L'asset tag resta valorizzato in memoria come chiave interna - serve a
+    identificare la riga in ogni operazione - ma vale sempre l'IMEI e non viene
+    mai mostrato ne' scritto sul file.
+    """
     if is_iphone(item.get("tipo")):
         item["seriale"] = ""
         item["prestato_a"] = ""
         item["prestato_il"] = ""
+        if item.get("imei"):
+            item["asset_tag"] = norm_tag(item["imei"])
     return item
+
+
+def valore_visibile(item, field):
+    """Il valore da mostrare o scrivere: per un iPhone l'asset tag resta vuoto."""
+    if field == "asset_tag" and is_iphone(item.get("tipo")):
+        return ""
+    return item.get(field, "")
 
 
 def normalize_state(item, stati=None):
@@ -458,7 +472,7 @@ class InventoryStore(object):
         ws.title = SHEET_NAME
         ws.append([HEADERS[f] for f in ALL_FIELDS])
         for item in items:
-            ws.append([item.get(f, "") for f in ALL_FIELDS])
+            ws.append([valore_visibile(item, f) for f in ALL_FIELDS])
         _style_sheet(ws, len(items))
         tmp = "%s.tmp-%d-%s" % (self.path, os.getpid(), uuid.uuid4().hex[:8])
         try:

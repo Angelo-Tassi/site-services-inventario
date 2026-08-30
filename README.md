@@ -173,12 +173,16 @@ programma, e solo in ultimo lo si chiede all'utente.
 | Laptop, Tablet, ... | Asset Tag, Modello, Numero di serie, Stanza |
 | iPhone | IMEI, Modello, Restituito da, Stanza |
 
-  Un iPhone **non ha numero di serie e non si presta mai**: al posto del seriale
-  c'e' l'IMEI, e i campi del prestito restano vuoti. La regola e' nell'archivio
-  dati: anche importando o modificando una scheda, quei campi vengono ripuliti,
-  e il tentativo di prestare un iPhone viene rifiutato. Nel contenitore *Iphone*
-  quelle colonne non compaiono affatto: restano nelle altre schermate, dove
-  servono a laptop e tablet.
+  Un iPhone **non ha asset tag**: l'IMEI e' il suo unico identificativo. La
+  colonna *Asset Tag* resta vuota per i telefoni nell'elenco, nella stampa e nel
+  file dati, e non compare affatto nel loro contenitore.
+
+  Un iPhone **non ha numero di serie e non si presta mai**, oltre a non avere
+  asset tag. La regola e' nell'archivio dati: anche importando o modificando una
+  scheda, quei campi vengono ripuliti, e il tentativo di prestare un iPhone viene
+  rifiutato. Nel contenitore *Iphone* le colonne *Asset Tag*, *Numero di serie*,
+  *In prestito a* e *Prestato il* non compaiono affatto: restano nelle altre
+  schermate, dove servono a laptop e tablet.
 
   Scegliendo **iPhone** il modulo si ridisegna: al posto di *Asset Tag* e
   *Numero di serie* compaiono **IMEI** e **Restituito da** (il nome di chi lo ha
@@ -188,10 +192,13 @@ programma, e solo in ultimo lo si chiede all'utente.
   compilato e non modificabile. La stanza si sceglie una volta per tutte da
   *Impostazioni* > *Stanza degli iPhone* (di serie *Site Services BAU*).
 
-  Per un iPhone l'**IMEI fa da identificativo**: viene registrato nella sua
-  colonna e usato anche come asset tag, cosi' il telefono resta univoco e
-  ritrovabile come ogni altro dispositivo. Il tipo e' riconosciuto senza badare
-  a maiuscole e minuscole: *iPhone*, *Iphone* e *IPHONE* sono la stessa cosa.
+  Per un iPhone l'**IMEI fa da identificativo**. Internamente il programma lo usa
+  anche come chiave della riga, cosi' il telefono resta univoco e le operazioni
+  funzionano come per gli altri dispositivi, ma la cosa non si vede da nessuna
+  parte: nel file dati la colonna *Asset Tag* di un iPhone e' vuota, e alla
+  rilettura la chiave viene ricostruita dall'IMEI. Il tipo e' riconosciuto senza
+  badare a maiuscole e minuscole: *iPhone*, *Iphone* e *IPHONE* sono la stessa
+  cosa.
 - **Note modificabili al volo**: doppio clic sulla cella *Note* per correggerla
   direttamente nell'elenco (`Invio` salva, `Esc` annulla). Doppio clic su una
   qualsiasi altra colonna apre la scheda completa.

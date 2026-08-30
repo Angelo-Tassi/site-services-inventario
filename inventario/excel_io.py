@@ -11,7 +11,7 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
 from .store import (ALL_FIELDS, HEADERS, InventoryError, NON_DISPONIBILE,
-                    SPEDITO, STATI, is_iphone)
+                    SPEDITO, STATI, is_iphone, valore_visibile)
 
 PRINT_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
                 "stanza", "stato", "prestato_a", "prestato_il", "spedito_il", "note"]
@@ -63,7 +63,7 @@ def _write_table(ws, items, fields, title=None, subtitle=None):
         on_loan = item.get("stato") == NON_DISPONIBILE
         spedito = item.get("stato") == SPEDITO
         for col, field in enumerate(fields, start=1):
-            cell = ws.cell(row=r, column=col, value=item.get(field, ""))
+            cell = ws.cell(row=r, column=col, value=valore_visibile(item, field))
             cell.border = _BORDER
             cell.alignment = Alignment(vertical="top", wrap_text=(field == "note"))
             if on_loan:

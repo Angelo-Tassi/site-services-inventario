@@ -15,7 +15,8 @@ from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
                     MESI_CONSERVAZIONE,
                     InventoryStore, NON_DISPONIBILE, SPEDITO, clean,
                     is_iphone, is_on_loan, is_shipped, new_item, norm_tag,
-                    puo_essere_eliminato, rows_from_workbook, testo_spedizione)
+                    puo_essere_eliminato, rows_from_workbook, testo_spedizione,
+                    valore_visibile)
 
 NO_ROOM = "(senza stanza)"
 
@@ -43,7 +44,7 @@ CHECK_COLUMN = "_sel"
 ACTION_COLUMN = "_azione"
 # Un iPhone non ha numero di serie e non si presta: nel suo contenitore quelle
 # colonne sarebbero sempre vuote.
-COLONNE_NON_IPHONE = ("seriale", "prestato_a", "prestato_il")
+COLONNE_NON_IPHONE = ("asset_tag", "seriale", "prestato_a", "prestato_il")
 CHECK_ON = "\u25c9"      # cerchio pieno: riga selezionata
 CHECK_OFF = "\u25cb"     # cerchio vuoto
 COLUMN_WIDTHS = {CHECK_COLUMN: 46, ACTION_COLUMN: 150, "asset_tag": 120, "tipo": 75, "modello": 185,
@@ -1163,7 +1164,7 @@ class App(tk.Tk):
                 elif field == ACTION_COLUMN:
                     values.append("")          # il pulsante e' disegnato sopra
                 else:
-                    values.append(item.get(field, ""))
+                    values.append(valore_visibile(item, field))
             tag = self.row_tag(item, i % 2)
             self.tree.insert("", "end", iid=item["asset_tag"], values=values,
                              tags=(tag,) if tag else ())
