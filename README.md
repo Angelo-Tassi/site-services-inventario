@@ -39,9 +39,18 @@ all'inventario.
 ```
 \\server\Condivisa\Inventario\
     Inventario.exe                  il programma
-    Inventario.xlsx                 i dati, apribili anche con Excel
-    inventario_impostazioni.json    stanze, tipi, prestiti, stati
+    Produzione\
+        Inventario.xlsx             l'inventario vero, uno solo per tutti
+        inventario_impostazioni.json  stanze, tipi, prestiti, stati
+    Backup\                        le copie salvate prima di ogni operazione distruttiva
+    Collaudo\                      i file di prova
 ```
+
+**L'inventario e' uno solo, e sta sulla share.** Ogni tecnico apre lo stesso
+file: non esistono copie locali sulle singole postazioni, e ogni modifica -
+un'aggiunta, un prestito, un ripristino - viene scritta subito li' dove la
+vedono tutti. E' il motivo per cui i salvataggi passano da un lock e l'elenco si
+aggiorna da solo ogni quindici secondi.
 
 ## In due parole
 
@@ -609,6 +618,28 @@ Ogni passo di scansione ha il pulsante **"Non riesco a scansionare - inserisci a
 mano"**: cambia la finestra in scrittura manuale per quel solo campo, senza
 perdere i passi gia' fatti e senza uscire dalla procedura. Il campo non puo'
 restare vuoto: se si conferma a vuoto, il programma lo dice e resta li'.
+
+## Tornare indietro dopo un errore
+
+Se un'importazione va storta - dispositivi duplicati, la stanza sbagliata, un
+file che non era quello - non serve rimediare a mano: si torna alla versione
+buona.
+
+**Dalla barra in alto**, il pulsante **Ripristina** propone l'**ultima copia
+salvata**, dicendo di quando e' e quanti dispositivi conteneva rispetto a quelli
+che ci sono adesso. E' il caso piu' frequente: si annulla l'ultima operazione
+distruttiva con due clic.
+
+**Da *Impostazioni* > *Ripristina da una copia...*** si sceglie invece fra tutte
+le copie disponibili, elencate dalla piu' recente con data, ora e numero di
+dispositivi: serve quando l'errore risale a qualche passaggio prima.
+
+Il ripristino **salva prima lo stato attuale** in una nuova copia, quindi anche
+un ripristino sbagliato si annulla. Una copia illeggibile o sparita viene
+rifiutata senza toccare l'inventario.
+
+Il ripristino agisce sull'inventario condiviso: quello che si riporta indietro
+lo vedono tutti i tecnici.
 
 ## Le copie di sicurezza
 

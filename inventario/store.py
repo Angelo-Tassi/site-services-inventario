@@ -612,6 +612,61 @@ class InventoryStore(object):
                 "L'operazione e' stata annullata: nessun dato e' stato toccato." % exc)
         return destinazione
 
+    def copie_disponibili(self, quante=40):
+        """Le copie di sicurezza, dalla piu' recente. (percorso, data, dispositivi)."""
+        from . import config
+
+        cartella = config.backup_dir()
+        if not cartella or not os.path.isdir(cartella):
+            return []
+        trovate = []
+        for nome in os.listdir(cartella):
+            if not nome.lower().endswith(".xlsx") or nome.startswith("~$"):
+                continue
+            percorso = os.path.join(cartella, nome)
+            try:
+                quando = datetime.fromtimestamp(os.path.getmtime(percorso))
+            except OSError:
+                continue
+            trovate.append((percorso, quando))
+        trovate.sort(key=lambda voce: voce[1], reverse=True)
+        elenco = []
+        for percorso, quando in trovate[:quante]:
+            try:
+                quanti = len(InventoryStore(percorso)._read())
+            except InventoryError:
+                continue          # non e' un inventario leggibile: si salta
+            elenco.append((percorso, quando, quanti))
+        return elenco
+
+    def restore(self, percorso):
+        """Riporta l'inventario a una copia di sicurezza.
+
+        Prima di sostituire il file viene salvata una copia dello stato attuale,
+        cosi' anche un ripristino sbagliato si puo' annullare.
+
+        Ritorna (dispositivi ripristinati, copia dello stato precedente).
+        """
+        if not os.path.exists(percorso):
+            raise InventoryError("La copia %s non esiste piu'." % os.path.basename(percorso))
+        try:
+            recuperati = InventoryStore(percorso)._read()
+        except InventoryError as exc:
+            raise InventoryError(
+                "%s non e' un inventario leggibile:\n%s\n\n"
+                "Non e' stato ripristinato niente." % (os.path.basename(percorso), exc))
+
+        with _Lock(self.path):
+            precedente = self.copia_di_sicurezza()
+            try:
+                shutil.copy2(percorso, self.path)
+            except OSError as exc:
+                raise InventoryError(
+                    "Non riesco a ripristinare la copia:\n%s\n\n"
+                    "L'inventario e' rimasto com'era." % exc)
+        self.load()
+        return len(recuperati), precedente
+
     def reset(self):
         """Svuota l'inventario, tenendo solo cio' che non si potrebbe recuperare.
 

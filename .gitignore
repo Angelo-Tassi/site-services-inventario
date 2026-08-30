@@ -15,6 +15,10 @@ Inventario_prima_del_reset_*.xlsx
 Backup/*
 !Backup/.gitignore
 
+# l'inventario di produzione: uno solo, sulla share, mai nel repository
+Produzione/*
+!Produzione/.gitignore
+
 # file generati a runtime (solo nella radice: i dati di esempio restano)
 /avvio.log
 /inventario_percorso.json

@@ -1,0 +1,4 @@
+# L'inventario di produzione vive qui, sulla cartella condivisa: e' uno solo per
+# tutti i tecnici. Non deve mai finire nel repository.
+*
+!.gitignore

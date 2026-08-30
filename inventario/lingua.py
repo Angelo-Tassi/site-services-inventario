@@ -198,6 +198,37 @@ EN = {
     "Una stanza sola sta in un file solo, con il suo nome in testa.":
         "A single room fits in a single file, with its name at the top.",
     "ELIMINA TUTTO": "DELETE EVERYTHING",
+    # --- ripristino
+    'Da quale copia vuoi ripartire?':
+        'Which copy do you want to go back to?',
+    'Dispositivi':
+        'Devices',
+    'File':
+        'File',
+    "In inventario ci sono adesso %d dispositivi. La copia scelta\nprendera' il loro posto; lo stato attuale viene salvato prima,\ncosi' puoi tornare indietro anche da qui.":
+        'There are %d devices in the inventory right now. The chosen copy\nwill take their place; the current state is saved first, so you\ncan step back from here too.',
+    'Inventario ripristinato':
+        'Inventory restored',
+    'Nessuna copia':
+        'No copy',
+    "Non c'e' ancora nessuna copia di sicurezza.\n\nNe viene salvata una a ogni reset e a ogni importazione\nche sostituisce i dati.":
+        'There is no backup copy yet.\n\nOne is saved at every reset and at every import that\nreplaces the data.',
+    'Ripristina':
+        'Restore',
+    'Ripristina da una copia':
+        'Restore from a copy',
+    'Ripristina da una copia...':
+        'Restore from a copy...',
+    "Ripristina l'ultima copia":
+        'Restore the latest copy',
+    "Ripristinati %d dispositivi dalla copia del %s.\n\nLo stato precedente e' stato salvato in:\n%s":
+        '%d devices restored from the copy of %s.\n\nThe previous state was saved in:\n%s',
+    'Salvata il':
+        'Saved on',
+    "Scegli una copia dall'elenco.":
+        'Choose a copy from the list.',
+    "Ultima copia salvata: %s\nContiene %d dispositivi; adesso in inventario ce ne sono %d.\n\nL'inventario di tutti tornera' com'era in quel momento.\nLo stato attuale viene salvato prima, cosi' puoi tornare indietro.\n\nProcedere?":
+        "Latest copy saved: %s\nIt holds %d devices; the inventory currently holds %d.\n\nEveryone's inventory will go back to how it was at that moment.\nThe current state is saved first, so you can step back.\n\nGo ahead?",
     "File Excel": "Excel files",
     "Colonne non riconosciute, il cui contenuto non verra' importato:\n%s\n"
     "Se una di queste e' un dato che ti serve, rinominala come la colonna\n"

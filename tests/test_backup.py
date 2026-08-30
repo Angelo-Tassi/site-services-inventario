@@ -73,4 +73,75 @@ except InventoryError as e:
     assert "annullata" in str(e), str(e)
 s.load()
 assert len(s.items) == prima_del_tentativo, "i dati non devono essere toccati"
-print("BACKUP OK")
+
+# ---------------------------------------------------------------- ripristino
+from inventario.ui import App, RestoreDialog, RoomsDialog
+from tkinter import messagebox
+
+avvisi = []
+messagebox.showinfo = lambda t, m, **k: avvisi.append((t, m))
+messagebox.showwarning = lambda t, m, **k: avvisi.append((t, m))
+
+config.backup_dir = lambda: cartella          # ripristina la vera funzione
+app = App(fixture.build()); app._initial_load()
+partenza = len(app.store.items)
+assert partenza == 13
+
+# una copia dello stato buono, poi un pasticcio
+buona = app.store.copia_di_sicurezza()
+app._run(lambda: app.store.import_items(
+    [new_item("IT-9%02d" % n, "Laptop", "Doppione", "SN%d" % n, KIOSK) for n in range(20)],
+    "merge"), "ok")
+app.store.load()
+assert len(app.store.items) == partenza + 20, len(app.store.items)
+
+# l'elenco delle copie parte dalla piu' recente e sa quanti dispositivi contiene
+copie = app.store.copie_disponibili()
+assert copie, "nessuna copia trovata"
+assert copie[0][0] == buona, copie[0]
+assert copie[0][2] == partenza, copie[0]
+assert all(copie[i][1] >= copie[i + 1][1] for i in range(len(copie) - 1)), "ordine sbagliato"
+
+# la finestra di scelta elenca le copie e restituisce quella selezionata
+dlg = RestoreDialog(app, copie, len(app.store.items))
+righe = dlg.elenco.get_children()
+assert len(righe) == len(copie)
+assert dlg.elenco.selection() == ("0",), "la piu' recente e' gia' selezionata"
+assert str(copie[0][2]) in dlg.elenco.item("0", "values")
+dlg._ok()
+assert dlg.result == buona
+
+# il ripristino riporta indietro e salva lo stato sbagliato
+quanti, precedente = app._run(lambda: app.store.restore(buona), "ok")
+app.store.load()
+assert quanti == partenza and len(app.store.items) == partenza
+assert not any(i["modello"] == "Doppione" for i in app.store.items)
+assert os.path.exists(precedente)
+sbagliato = InventoryStore(precedente); sbagliato.load()
+assert len(sbagliato.items) == partenza + 20, "anche l'errore resta recuperabile"
+
+# una copia illeggibile viene rifiutata senza toccare niente
+finto = os.path.join(cartella, "Inventario_2020-01-01_00-00-00.xlsx")
+open(finto, "w").write("non e' un foglio Excel")
+try:
+    app.store.restore(finto); raise SystemExit("copia illeggibile accettata")
+except InventoryError as e:
+    assert "non e' un inventario leggibile" in str(e), str(e)
+app.store.load()
+assert len(app.store.items) == partenza
+assert all(p != finto for p, _q, _n in app.store.copie_disponibili()), \
+    "una copia illeggibile non va nemmeno elencata"
+
+# e una copia sparita
+try:
+    app.store.restore(os.path.join(cartella, "mai_esistita.xlsx"))
+    raise SystemExit("copia inesistente accettata")
+except InventoryError as e:
+    assert "non esiste" in str(e)
+
+# le impostazioni sanno chiedere il ripristino
+dlg = RoomsDialog(app, app.cfg["rooms"], app.cfg["types"], [KIOSK], BAU, "it")
+dlg._ripristina()
+assert dlg.result == {"ripristina": True}
+app.destroy()
+print("RIPRISTINO OK")

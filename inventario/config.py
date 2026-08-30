@@ -49,6 +49,7 @@ def user_config_path():
 
 
 NOME_BACKUP = "Backup"
+NOME_PRODUZIONE = "Produzione"
 
 
 def backup_dir():
@@ -80,9 +81,26 @@ def backup_dir():
     return None
 
 
+def production_dir():
+    """Cartella dell'inventario di produzione, dentro quella del programma."""
+    return os.path.join(app_dir(), NOME_PRODUZIONE)
+
+
 def default_data_path():
-    """Il file dati accanto al programma: la cartella di rete si basta da sola."""
-    return os.path.join(app_dir(), DATA_FILE_NAME)
+    """Il file dati che il programma apre quando nessuno gli dice altro.
+
+    Sta in `Produzione/` accanto al programma: cosi' l'inventario vero e' uno
+    solo, dentro la cartella condivisa, e non una copia sulla postazione di
+    ciascun tecnico. Le installazioni piu' vecchie, che lo tenevano accanto
+    all'eseguibile, continuano a funzionare.
+    """
+    nuovo = os.path.join(production_dir(), DATA_FILE_NAME)
+    if os.path.exists(nuovo):
+        return nuovo
+    vecchio = os.path.join(app_dir(), DATA_FILE_NAME)
+    if os.path.exists(vecchio):
+        return vecchio
+    return nuovo
 
 
 def _read_config_path(path):

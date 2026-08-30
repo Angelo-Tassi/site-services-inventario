@@ -363,10 +363,16 @@ class RoomsDialog(_Modal):
                  "Gli iPhone vengono registrati sempre nella stanza indicata qui sopra e non si spostano."),
         ).grid(row=4, column=0, columnspan=3, sticky="w", pady=(10, 0))
         buttons = ttk.Frame(body)
-        buttons.grid(row=5, column=0, columnspan=3, sticky="e", pady=(16, 0))
+        buttons.grid(row=5, column=0, columnspan=3, sticky="we", pady=(16, 0))
+        ttk.Button(buttons, text=T("Ripristina da una copia..."),
+                   command=self._ripristina).pack(side="left")
         ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
         ttk.Button(buttons, text=T("Salva"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
+
+    def _ripristina(self):
+        self.result = {"ripristina": True}
+        self.destroy()
 
     def _ok(self):
         rooms = [r.strip() for r in self.text_rooms.get("1.0", "end").splitlines() if r.strip()]
@@ -593,6 +599,61 @@ class ResetDialog(_Modal):
                 % PAROLA_RESET, parent=self)
             return
         self.result = True
+        self.destroy()
+
+
+class RestoreDialog(_Modal):
+    """Scelta della copia di sicurezza da cui ripartire."""
+
+    def __init__(self, parent, copie, quanti_ora):
+        _Modal.__init__(self, parent, T("Ripristina da una copia"))
+        self.copie = copie
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, text=T("Da quale copia vuoi ripartire?"),
+                  style="Section.TLabel").pack(anchor="w")
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text=T("In inventario ci sono adesso %d dispositivi. La copia scelta\n"
+                         "prendera' il loro posto; lo stato attuale viene salvato prima,\n"
+                         "cosi' puoi tornare indietro anche da qui.") % quanti_ora).pack(
+            anchor="w", pady=(4, 12))
+
+        cornice = tk.Frame(body, bg=theme.CARD, highlightthickness=1,
+                           highlightbackground=theme.BORDER)
+        cornice.pack(fill="both", expand=True)
+        self.elenco = ttk.Treeview(cornice, columns=("quando", "quanti", "file"),
+                                   show="headings", selectmode="browse", height=10,
+                                   style="Inv.Treeview")
+        for campo, testo, larghezza in (("quando", T("Salvata il"), 170),
+                                        ("quanti", T("Dispositivi"), 100),
+                                        ("file", T("File"), 260)):
+            self.elenco.heading(campo, text=testo)
+            self.elenco.column(campo, width=larghezza, anchor="w")
+        scorri = ttk.Scrollbar(cornice, orient="vertical", command=self.elenco.yview)
+        self.elenco.configure(yscrollcommand=scorri.set)
+        self.elenco.pack(side="left", fill="both", expand=True)
+        scorri.pack(side="right", fill="y")
+        for indice, (percorso, quando, quanti) in enumerate(copie):
+            self.elenco.insert("", "end", iid=str(indice),
+                               values=(quando.strftime("%d/%m/%Y  %H:%M:%S"), quanti,
+                                       os.path.basename(percorso)))
+        if copie:
+            self.elenco.selection_set("0")
+        self.elenco.bind("<Double-1>", lambda e: self._ok())
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(16, 0))
+        ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Ripristina"), style="Primary.TButton",
+                   command=self._ok).pack(side="right")
+
+    def _ok(self):
+        scelta = self.elenco.selection()
+        if not scelta:
+            messagebox.showwarning(T("Nessuna copia"), T("Scegli una copia dall'elenco."),
+                                   parent=self)
+            return
+        self.result = self.copie[int(scelta[0])][0]
         self.destroy()
 
 
@@ -1026,6 +1087,8 @@ class App(tk.Tk):
         ttk.Button(bar, text=T("Impostazioni"), command=self.on_settings).pack(side="right")
         ttk.Button(bar, text=T("Reset inventario"),
                    command=self.on_reset).pack(side="right", padx=(0, 6))
+        ttk.Button(bar, text=T("Ripristina"),
+                   command=self.on_restore).pack(side="right", padx=(0, 6))
         ttk.Button(bar, text=T("Aggiorna"), command=self.on_refresh).pack(side="right", padx=6)
 
     def _build_filters(self):
@@ -2269,12 +2332,61 @@ class App(tk.Tk):
                       "Ora puoi ricaricare l'inventario con Importa xls...") % copia)
         messagebox.showinfo(T("Inventario svuotato"), messaggio, parent=self)
 
+    def on_restore(self, scegli=False):
+        """Riporta l'inventario a una copia di sicurezza.
+
+        Senza argomenti propone l'ultima copia, che e' il caso di gran lunga piu'
+        frequente: un'importazione andata storta si annulla cosi'. Con
+        scegli=True apre l'elenco completo.
+        """
+        copie = self.store.copie_disponibili()
+        if not copie:
+            messagebox.showinfo(
+                T("Ripristina"),
+                T("Non c'e' ancora nessuna copia di sicurezza.\n\n"
+                  "Ne viene salvata una a ogni reset e a ogni importazione\n"
+                  "che sostituisce i dati."), parent=self)
+            return
+        if scegli:
+            percorso = RestoreDialog(self, copie, len(self.store.items)).show()
+            if not percorso:
+                return
+            quando, quanti = next((q, n) for p, q, n in copie if p == percorso)
+        else:
+            percorso, quando, quanti = copie[0]
+            if not messagebox.askyesno(
+                T("Ripristina l'ultima copia"),
+                T("Ultima copia salvata: %s\n"
+                  "Contiene %d dispositivi; adesso in inventario ce ne sono %d.\n\n"
+                  "L'inventario di tutti tornera' com'era in quel momento.\n"
+                  "Lo stato attuale viene salvato prima, cosi' puoi tornare indietro.\n\n"
+                  "Procedere?")
+                % (quando.strftime("%d/%m/%Y %H:%M:%S"), quanti, len(self.store.items)),
+                parent=self
+            ):
+                return
+        esito = self._run(lambda: self.store.restore(percorso))
+        if not esito:
+            return
+        ripristinati, precedente = esito
+        self._sync_filter_values()
+        self.show_home()
+        messagebox.showinfo(
+            T("Inventario ripristinato"),
+            T("Ripristinati %d dispositivi dalla copia del %s.\n\n"
+              "Lo stato precedente e' stato salvato in:\n%s")
+            % (ripristinati, quando.strftime("%d/%m/%Y %H:%M:%S"), precedente),
+            parent=self)
+
     def on_settings(self):
         result = RoomsDialog(self, self.cfg["rooms"], self.cfg["types"],
                              self.cfg.get("loan_rooms", []),
                              self.cfg.get("iphone_room", ""),
                              lang.corrente()).show()
         if not result:
+            return
+        if result.get("ripristina"):
+            self.on_restore(scegli=True)
             return
         nuova_lingua = result.pop("lingua", lang.corrente())
         try:

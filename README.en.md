@@ -39,9 +39,18 @@ inventory.
 ```
 \\server\Shared\Inventory\
     Inventario.exe                  the program
-    Inventario.xlsx                 the data, openable in Excel too
-    inventario_impostazioni.json    rooms, types, loans, statuses
+    Produzione\
+        Inventario.xlsx             the real inventory, one for everybody
+        inventario_impostazioni.json  rooms, types, loans, statuses
+    Backup\                        copies saved before every destructive operation
+    Collaudo\                      the test files
 ```
+
+**There is one inventory, and it lives on the share.** Every technician opens the
+same file: there are no local copies on individual workstations, and every change
+- an addition, a loan, a restore - is written straight there where everybody sees
+it. That is why saves go through a lock and the list refreshes by itself every
+fifteen seconds.
 
 ## In short
 
@@ -441,6 +450,28 @@ as that room's separator row.
 
 Inside a room there is also the **Export this room to xls** shortcut, which skips
 the window and produces that room's file directly.
+
+## Going back after a mistake
+
+If an import goes wrong - duplicated devices, the wrong room, a file that was
+not the right one - there is no need to fix it by hand: you go back to the good
+version.
+
+**From the toolbar**, the **Restore** button offers the **latest saved copy**,
+telling you when it is from and how many devices it held compared to the ones
+there now. That is the frequent case: the last destructive operation is undone
+in two clicks.
+
+**From *Settings* > *Restore from a copy...*** you choose among all the copies
+available instead, listed newest first with date, time and number of devices:
+useful when the mistake goes back a few steps.
+
+Restoring **saves the current state first** into a new copy, so even a wrong
+restore can be undone. An unreadable or missing copy is refused without touching
+the inventory.
+
+Restoring acts on the shared inventory: what you roll back, every technician
+sees.
 
 ## Backup copies
 
