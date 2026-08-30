@@ -858,7 +858,8 @@ def rows_from_workbook(path, rooms=None):
 
     Ritorna (items, esito), dove esito e' un dizionario con le righe scartate,
     quelle che hanno preso la stanza da un separatore, gli iPhone ignorati, le
-    colonne del file che non sono state riconosciute e le righe senza modello.
+    colonne non riconosciute, le righe senza modello e l'elenco delle stanze
+    per cui e' comparso un separatore.
 
     Se nel foglio compaiono righe-separatore con il nome (o l'abbreviazione) di
     una stanza, tutte le righe successive fino al separatore seguente vengono
@@ -881,6 +882,7 @@ def rows_from_workbook(path, rooms=None):
         tags = tag_stanze(rooms or [])
         items = []
         esito = {"scartate": 0, "da_tag": 0, "iphone": 0, "senza_modello": 0,
+                 "stanze_trovate": [],
                  "colonne_ignorate": [clean(c) for i, c in enumerate(header)
                                       if clean(c) and i not in mapping]}
         stanza_corrente = None
@@ -890,6 +892,8 @@ def rows_from_workbook(path, rooms=None):
             stanza = riga_tag(row, tags)
             if stanza is not None:
                 stanza_corrente = stanza
+                if stanza not in esito["stanze_trovate"]:
+                    esito["stanze_trovate"].append(stanza)
                 continue
             item = _row_to_item(row, mapping)
             if not item:

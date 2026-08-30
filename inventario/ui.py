@@ -542,11 +542,31 @@ class ResetDialog(_Modal):
 class ImportOptionsDialog(_Modal):
     """Primo passo dell'importazione: che cosa si carica, e come."""
 
-    def __init__(self, parent, rooms):
-        _Modal.__init__(self, parent, "Importa da Excel")
+    def __init__(self, parent, rooms, stanza_fissa=None):
+        _Modal.__init__(self, parent,
+                        "Importa in %s" % stanza_fissa if stanza_fissa
+                        else "Importa da Excel")
+        self.stanza_fissa = stanza_fissa
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
 
+        if stanza_fissa:
+            ttk.Label(body, text="Importa in %s" % stanza_fissa,
+                      style="Section.TLabel").pack(anchor="w")
+            ttk.Label(body, style="Muted.TLabel", justify="left",
+                      text="Nel foglio ci deve essere una riga con scritto il nome\n"
+                           "della stanza: verranno caricate solo le righe che la\n"
+                           "seguono. Tutto il resto viene scartato.").pack(
+                anchor="w", pady=(4, 0))
+            ttk.Separator(body, orient="horizontal").pack(fill="x", pady=12)
+            self.var_ambito = tk.StringVar(value="stanza")
+            self.var_stanza = tk.StringVar(value=stanza_fissa)
+            self.combo = None
+        else:
+            self._scelta_ambito(body, rooms)
+        self._scelta_modo(body)
+
+    def _scelta_ambito(self, body, rooms):
         ttk.Label(body, text="Che cosa vuoi caricare",
                   style="Section.TLabel").pack(anchor="w")
         self.var_ambito = tk.StringVar(value="tutto")
@@ -572,6 +592,7 @@ class ImportOptionsDialog(_Modal):
 
         ttk.Separator(body, orient="horizontal").pack(fill="x", pady=12)
 
+    def _scelta_modo(self, body):
         ttk.Label(body, text="Come", style="Section.TLabel").pack(anchor="w")
         self.var_mode = tk.StringVar(value="merge")
         ttk.Radiobutton(body, variable=self.var_mode, value="merge",
@@ -593,6 +614,8 @@ class ImportOptionsDialog(_Modal):
         self._aggiorna()
 
     def _aggiorna(self):
+        if self.combo is None:
+            return
         stato = "readonly" if self.var_ambito.get() == "stanza" else "disabled"
         self.combo.configure(state=stato)
 
@@ -628,6 +651,8 @@ class ImportDialog(_Modal):
                          % esito["da_tag"])
         if esito.get("iphone"):
             righe.append("%d iPhone ignorati: si inseriscono solo a mano." % esito["iphone"])
+        if esito.get("altre_stanze"):
+            righe.append("%d righe di altre stanze scartate." % esito["altre_stanze"])
         ttk.Label(body, text="\n".join(righe), style="Muted.TLabel",
                   justify="left").pack(anchor="w", pady=(2, 8))
 
@@ -1230,6 +1255,8 @@ class App(tk.Tk):
             if self.view == "room":
                 ttk.Button(header, text="Esporta questa stanza in xls",
                            command=self.on_export_room).pack(side="right")
+                ttk.Button(header, text="Importa i dati di questa stanza",
+                           command=self.on_import_room).pack(side="right", padx=(0, 6))
             self.var_section_count = tk.StringVar()
             ttk.Label(header, textvariable=self.var_section_count,
                       style="Muted.TLabel").pack(side="left", padx=(10, 0))
@@ -1806,6 +1833,70 @@ class App(tk.Tk):
             return
         righe = ["Aggiunti: %d" % risultato["aggiunti"],
                  "Aggiornati: %d" % risultato["aggiornati"]]
+        if risultato["eliminati"]:
+            righe.append("Eliminati prima del caricamento: %d" % risultato["eliminati"])
+        if risultato["copia"]:
+            righe.append("")
+            righe.append("Copia di sicurezza del file precedente:")
+            righe.append(risultato["copia"])
+        messagebox.showinfo("Importazione completata", "\n".join(righe), parent=self)
+
+    def on_import_room(self):
+        """Carica dal file solo la sezione che riguarda la stanza aperta."""
+        stanza = self.var_room.get()
+        opzioni = ImportOptionsDialog(self, self.cfg.get("rooms") or [],
+                                      stanza_fissa=stanza).show()
+        if not opzioni:
+            return
+        path = filedialog.askopenfilename(
+            parent=self, title="File da importare in %s" % stanza,
+            filetypes=[("File Excel", "*.xlsx *.xlsm"), ("Tutti i file", "*.*")])
+        if not path:
+            return
+        try:
+            items, esito = rows_from_workbook(path, self.cfg.get("rooms"))
+        except InventoryError as exc:
+            messagebox.showerror("Importazione non riuscita", str(exc), parent=self)
+            return
+
+        if stanza not in esito.get("stanze_trovate", []):
+            trovate = esito.get("stanze_trovate") or []
+            messagebox.showwarning(
+                "Manca la riga della stanza",
+                "Nel foglio non c'e' nessuna riga che indichi %s, quindi non so\n"
+                "quali dispositivi appartengano a questa stanza.\n"
+                "Non e' stato importato niente.\n\n"
+                "Aggiungi al file una riga vuota con scritto soltanto\n\n"
+                "        %s\n\n"
+                "nella prima cella, e sotto elenca i dispositivi della stanza.%s"
+                % (stanza, stanza.upper(),
+                   "\n\nNel file ho trovato invece: %s." % ", ".join(trovate)
+                   if trovate else ""),
+                parent=self)
+            return
+
+        miei = [i for i in items if i.get("stanza") == stanza]
+        scartati = len(items) - len(miei)
+        if not miei:
+            messagebox.showwarning(
+                "Nessun dispositivo",
+                "La riga %s c'e', ma sotto non ci sono dispositivi validi.\n"
+                "Non e' stato importato niente." % stanza, parent=self)
+            return
+        esito_stanza = dict(esito)
+        esito_stanza["altre_stanze"] = scartati
+        conferma = ImportDialog(self, path, len(miei), esito_stanza, opzioni,
+                                self.contati_in_eliminazione(opzioni)).show()
+        if not conferma:
+            return
+        risultato = self._run(lambda: self.store.import_items(
+            miei, opzioni["mode"], stanza))
+        if not risultato:
+            return
+        righe = ["In %s - aggiunti: %d, aggiornati: %d"
+                 % (stanza, risultato["aggiunti"], risultato["aggiornati"])]
+        if scartati:
+            righe.append("Scartate %d righe di altre stanze." % scartati)
         if risultato["eliminati"]:
             righe.append("Eliminati prima del caricamento: %d" % risultato["eliminati"])
         if risultato["copia"]:

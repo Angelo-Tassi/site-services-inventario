@@ -366,8 +366,8 @@ importare - uno regolare con **30 dispositivi, 10 per stanza**, e uno con dentro
 apposta i casi che il programma deve segnalare - e le istruzioni passo passo:
 [**Come testare l'importazione**](Collaudo/README.md).
 
-Sette scenari, dal caricamento iniziale alla sostituzione di una sola stanza,
-fino al reset e alla riesportazione. I file si rigenerano con
+Otto scenari, dal caricamento iniziale all'importazione dentro una singola
+stanza, fino al reset e alla riesportazione. I file si rigenerano con
 `.venv/bin/python tests/genera_file_di_prova.py`.
 
 ## Test automatici
@@ -376,7 +376,7 @@ fino al reset e alla riesportazione. I file si rigenerano con
 .venv/bin/python tests/run_all.py
 ```
 
-Tredici suite che coprono archivio dati e accessi concorrenti, risoluzione del
+Quattordici suite che coprono archivio dati e accessi concorrenti, risoluzione del
 percorso, schermate e colori, scheda di inserimento, prestiti, spedizioni,
 importazione ed esportazione. Girano senza bisogno di una finestra a schermo e
 non toccano i dati reali: ognuna si costruisce il proprio inventario in una
@@ -511,6 +511,27 @@ dice quanti ne ha mantenuti. Se in inventario ci sono solo iPhone protetti, il
 reset avverte che non c'e' niente da eliminare e non fa nulla.
 
 Dopo il reset si ricarica tutto con *Importa xls...*.
+
+## Importare dentro una sola stanza
+
+Aperta una stanza, accanto al suo nome c'e' **Importa i dati di questa stanza**.
+Carica dal file **solo la sezione che riguarda quella stanza** e scarta tutto il
+resto, anche se nel foglio ci sono i dispositivi di tutte.
+
+Perche' funzioni, nel foglio ci deve essere una **riga con il nome della
+stanza**: e' lei a dire dove comincia la sezione. Se non c'e', il programma
+**non importa niente** e apre un avviso che spiega di aggiungerla, elencando le
+stanze che ha trovato al suo posto. Va bene anche la forma breve - `KIOSK` per
+*Digital Kiosk* - come per le altre importazioni.
+
+Il riepilogo prima della conferma dice quante righe entrano e quante ne vengono
+scartate perche' di altre stanze. Come sempre si sceglie fra *unisci* e
+*sostituisci*, e la sostituzione riguarda solo quella stanza.
+
+> Da non confondere con l'opzione **Una sola stanza** della finestra di
+> importazione generale: quella prende **tutte** le righe del file e le mette
+> nella stanza scelta, ignorando i separatori. Questa invece si fida dei
+> separatori e butta via il resto.
 
 ## Esportare una sola stanza
 

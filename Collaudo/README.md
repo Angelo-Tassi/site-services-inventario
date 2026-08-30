@@ -83,7 +83,36 @@ Importa `Inventario_di_prova_con_difetti.xlsx` con **Tutto l'inventario** +
 Confermando, entrano 3 dispositivi: due in Site Services BAU (di cui uno senza
 modello, da completare a mano) e uno in Digital Kiosk. L'iPhone **non** entra.
 
-## 6. Reset e ricarica
+## 6. Importare dentro una stanza
+
+Questa e' la prova del pulsante **Importa i dati di questa stanza**, che sta
+accanto al nome della stanza quando la apri. Funziona in modo diverso
+dall'opzione *Una sola stanza* del punto 3: qui comandano i separatori.
+
+1. entra in **Digital Kiosk**
+2. premi *Importa i dati di questa stanza*, scegli **Unisci**
+3. seleziona `Inventario_di_prova.xlsx`
+
+**Cosa deve risultare.** Il riepilogo dice **10 righe valide** e **20 righe di
+altre stanze scartate**. Entrano solo i dieci dispositivi elencati sotto la riga
+`DIGITAL KIOSK`: quelli di BAU e del magazzino vengono buttati via, anche se
+sono nello stesso foglio.
+
+### La riga della stanza e' obbligatoria
+
+Prendi `Inventario_di_prova.xlsx`, **cancella la riga `DIGITAL KIOSK`** e salva
+con un altro nome. Poi riprova a importarlo dentro Digital Kiosk.
+
+Deve comparire un avviso che dice che nel foglio non c'e' nessuna riga che
+indichi quella stanza, che **non e' stato importato niente**, e che spiega di
+aggiungere una riga vuota con scritto `DIGITAL KIOSK` nella prima cella.
+L'avviso elenca anche le stanze che ha trovato al suo posto. Controlla che
+l'inventario sia rimasto identico.
+
+Prova anche la forma breve: al posto di `DIGITAL KIOSK` scrivi solo `KIOSK`.
+Deve funzionare lo stesso.
+
+## 7. Reset e ricarica
 
 1. *Reset inventario*, scrivi `ELIMINA TUTTO`
 2. controlla il messaggio finale: dice quanti eliminati e dove ha salvato la copia
@@ -92,7 +121,7 @@ modello, da completare a mano) e uno in Digital Kiosk. L'iPhone **non** entra.
 Se prima del reset avevi inserito a mano un iPhone, deve **sopravvivere**: gli
 iPhone non si eliminano e non si reimportano.
 
-## 7. Esportazione di una stanza
+## 8. Esportazione di una stanza
 
 Entra in una stanza e premi **Esporta questa stanza in xls**. Il file deve
 chiamarsi `Inventario_<Nome_stanza>_<data>.xlsx` e, aperto, avere il nome della
