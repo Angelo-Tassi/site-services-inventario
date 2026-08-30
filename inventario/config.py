@@ -48,6 +48,38 @@ def user_config_path():
     return os.path.join(base, "inventario_percorso.json")
 
 
+NOME_BACKUP = "Backup"
+
+
+def backup_dir():
+    """Cartella delle copie di sicurezza, dentro quella del programma.
+
+    Se la cartella del programma e' in sola lettura - capita su una share
+    condivisa - si ripiega accanto al file dati e poi sul profilo utente: una
+    copia deve poter essere scritta, altrimenti l'operazione distruttiva viene
+    annullata.
+    """
+    candidate = [os.path.join(app_dir(), NOME_BACKUP)]
+    percorso = load_data_path()
+    if percorso:
+        candidate.append(os.path.join(os.path.dirname(os.path.abspath(percorso)),
+                                      NOME_BACKUP))
+    base = os.environ.get("APPDATA") or os.path.expanduser("~")
+    candidate.append(os.path.join(base, "Inventario", NOME_BACKUP))
+    for cartella in candidate:
+        try:
+            if not os.path.isdir(cartella):
+                os.makedirs(cartella)
+            prova = os.path.join(cartella, ".scrivibile")
+            with open(prova, "w") as fh:
+                fh.write("")
+            os.remove(prova)
+            return cartella
+        except OSError:
+            continue
+    return None
+
+
 def default_data_path():
     """Il file dati accanto al programma: la cartella di rete si basta da sola."""
     return os.path.join(app_dir(), DATA_FILE_NAME)

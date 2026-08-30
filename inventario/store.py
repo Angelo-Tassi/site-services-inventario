@@ -580,18 +580,36 @@ class InventoryStore(object):
         return self._apply(op)
 
     def copia_di_sicurezza(self):
-        """Duplica il file dati accanto a se stesso, prima di un'operazione grossa."""
-        cartella = os.path.dirname(self.path)
-        nome = "%s_prima_del_reset_%s.xlsx" % (
-            os.path.splitext(os.path.basename(self.path))[0],
-            datetime.now().strftime("%Y%m%d_%H%M%S"))
-        destinazione = os.path.join(cartella, nome)
+        """Salva il file dati nella cartella Backup, prima di un'operazione grossa.
+
+        Il nome porta la data del file salvato, non quella della copia: due
+        reset di fila sullo stesso inventario non producono due file uguali, e
+        cercando una versione si guarda a quando risale il contenuto.
+        """
+        from . import config
+
+        cartella = config.backup_dir()
+        if cartella is None:
+            raise InventoryError(
+                "Non riesco a creare la cartella delle copie di sicurezza.\n\n"
+                "L'operazione e' stata annullata: nessun dato e' stato toccato.")
+        try:
+            quando = datetime.fromtimestamp(os.path.getmtime(self.path))
+        except OSError:
+            quando = datetime.now()
+        radice = os.path.splitext(os.path.basename(self.path))[0]
+        base = "%s_%s" % (radice, quando.strftime("%Y-%m-%d_%H-%M-%S"))
+        destinazione = os.path.join(cartella, base + ".xlsx")
+        contatore = 2
+        while os.path.exists(destinazione):
+            destinazione = os.path.join(cartella, "%s (%d).xlsx" % (base, contatore))
+            contatore += 1
         try:
             shutil.copy2(self.path, destinazione)
         except OSError as exc:
             raise InventoryError(
                 "Non riesco a creare la copia di sicurezza:\n%s\n\n"
-                "Il reset e' stato annullato: nessun dato e' stato toccato." % exc)
+                "L'operazione e' stata annullata: nessun dato e' stato toccato." % exc)
         return destinazione
 
     def reset(self):

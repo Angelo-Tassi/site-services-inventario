@@ -508,6 +508,7 @@ gli scenari descritti nelle istruzioni: se il comportamento cambia, il test
 fallisce e le istruzioni vanno riscritte, cosi' non promettono mai cose che non
 succedono.
 | `.Inventario.xlsx.lock` | presente solo per una frazione di secondo durante un salvataggio |
+| `Backup/` | le copie salvate prima di reset e sostituzioni, una per ogni operazione |
 
 ## Accessi contemporanei
 
@@ -609,6 +610,29 @@ mano"**: cambia la finestra in scrittura manuale per quel solo campo, senza
 perdere i passi gia' fatti e senza uscire dalla procedura. Il campo non puo'
 restare vuoto: se si conferma a vuoto, il programma lo dice e resta li'.
 
+## Le copie di sicurezza
+
+Prima di ogni operazione che cancella dati - il **reset** e ogni **importazione
+in sostituzione**, sull'intero inventario o su una singola stanza - il programma
+duplica il file dati nella cartella **`Backup`**, dentro quella del programma.
+
+Il nome porta **la data del file salvato**, non quella della copia:
+`Inventario_2026-08-31_09-12-45.xlsx`. Cosi' due reset di fila sullo stesso
+inventario non producono due file identici, e cercando una versione si guarda a
+quando risale il contenuto invece che a quando qualcuno ha premuto un pulsante.
+Se una copia con quel nome esiste gia', ne viene aggiunta una numerata.
+
+**Se la copia non riesce, l'operazione si annulla** e non viene toccato niente.
+Se la cartella del programma e' in sola lettura, il programma ripiega su una
+cartella `Backup` accanto al file dati e poi sul profilo utente: una copia deve
+poter essere scritta.
+
+Per recuperare, apri il file di backup con il programma o con Excel: e' un
+inventario completo, non un formato speciale. Le copie **non finiscono mai nel
+repository**: la cartella ha una propria regola che le esclude.
+
+Vanno svuotate a mano ogni tanto: nessuno le cancella al posto tuo.
+
 ## Svuotare l'inventario per ricaricarlo
 
 Il pulsante **Reset inventario**, in alto a destra, serve a ripartire da zero
@@ -618,8 +642,9 @@ Non e' un'operazione che si fa per sbaglio: prima di procedere il programma
 
 1. mostra un avviso con quanti dispositivi verranno eliminati **per tutti gli
    utenti**, e chiede di scrivere per esteso `ELIMINA TUTTO`;
-2. **salva una copia** del file dati nella stessa cartella di rete, con data e
-   ora nel nome (`Inventario_prima_del_reset_20260830_214927.xlsx`);
+2. **salva una copia** del file dati nella cartella **`Backup`**, dentro quella
+   del programma, con la data del file salvato nel nome
+   (`Inventario_2026-08-31_09-12-45.xlsx`);
 3. solo allora svuota l'inventario.
 
 Se la copia di sicurezza non riesce - cartella piena, permessi mancanti - il
@@ -748,8 +773,7 @@ quel momento non e' stato scritto niente: annullando, l'inventario resta com'era
 ### Le protezioni sulla sostituzione
 
 - Prima di ogni sostituzione viene **salvata una copia** del file dati nella
-  cartella di rete, con data e ora nel nome. Se la copia non riesce,
-  l'operazione si annulla.
+  cartella `Backup`. Se la copia non riesce, l'operazione si annulla.
 - Per sostituire **tutto l'inventario** bisogna scrivere per esteso
   `ELIMINA TUTTO`: e' l'operazione piu' distruttiva del programma e riguarda i
   dati di tutti. Per una singola stanza basta la conferma, con il numero di

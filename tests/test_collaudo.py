@@ -61,7 +61,7 @@ assert r["eliminati"] == 10, r
 s.load()
 assert per_stanza(s) == {KIOSK: 30}, per_stanza(s)
 assert r["copia"] and os.path.exists(r["copia"])
-assert "prima_del_reset" in os.path.basename(r["copia"])
+assert os.path.basename(os.path.dirname(r["copia"])) == "Backup", r["copia"]
 
 # ---------------------------------------------------- 4. sostituire tutto
 r = s.import_items(items, "replace", None)

@@ -316,9 +316,9 @@ point nothing has been written: cancelling leaves the inventory as it was.
 
 ### Protections on replacement
 
-- Before every replacement a **copy of the data file** is saved in the network
-  folder, with date and time in the name. If the copy fails, the operation is
-  cancelled.
+- Before every replacement a **copy of the data file** is saved in the `Backup`
+  folder, inside the program folder, carrying the date of the file being saved.
+  If the copy fails, the operation is cancelled.
 - Replacing **the whole inventory** requires typing `DELETE EVERYTHING` in full.
   For a single room the confirmation with the numbers in plain sight is enough.
 - **iPhones are never deleted**, in either mode: they do not come from an
@@ -441,6 +441,28 @@ as that room's separator row.
 
 Inside a room there is also the **Export this room to xls** shortcut, which skips
 the window and produces that room's file directly.
+
+## Backup copies
+
+Before every operation that deletes data - the **reset** and every **replacing
+import**, on the whole inventory or on a single room - the program duplicates
+the data file into the **`Backup`** folder, inside the program folder.
+
+The name carries **the date of the file being saved**, not the date of the copy:
+`Inventario_2026-08-31_09-12-45.xlsx`. That way two resets in a row on the same
+inventory do not produce two identical files, and looking for a version you go
+by when the contents date from rather than when somebody pressed a button. If a
+copy with that name already exists, a numbered one is added.
+
+**If the copy fails, the operation is cancelled** and nothing is touched. If the
+program folder is read-only, the program falls back to a `Backup` folder next to
+the data file, then to the user profile: a copy has to be writable.
+
+To recover, open the backup file with the program or with Excel: it is a
+complete inventory, not a special format. The copies **never end up in the
+repository**: the folder carries its own rule excluding them.
+
+They have to be cleared out by hand now and then: nobody deletes them for you.
 
 ## Emptying the inventory to reload it
 

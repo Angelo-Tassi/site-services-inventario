@@ -1,0 +1,4 @@
+# Le copie di sicurezza restano sul computer di chi le crea: contengono
+# l'inventario reale e non devono finire nel repository.
+*
+!.gitignore

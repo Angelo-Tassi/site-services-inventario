@@ -31,6 +31,10 @@ if not exist "Distribuzione" mkdir "Distribuzione"
 copy /y "dist\Inventario.exe" "Distribuzione\Inventario.exe" >nul
 copy /y "Crea collegamento sul desktop.bat" "Distribuzione\" >nul
 copy /y "README.md" "Distribuzione\Come funziona.txt" >nul
+rem la cartella delle copie di sicurezza esiste gia' quando il programma parte
+if not exist "Distribuzione\Backup" mkdir "Distribuzione\Backup"
+copy /y "Backup\.gitignore" "Distribuzione\Backup\" >nul 2>&1
+
 rem i file di collaudo viaggiano con il programma: servono a provarlo in sede
 if not exist "Distribuzione\Collaudo" mkdir "Distribuzione\Collaudo"
 copy /y "Collaudo\*.xlsx" "Distribuzione\Collaudo\" >nul

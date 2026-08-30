@@ -565,7 +565,7 @@ class ResetDialog(_Modal):
 
         ttk.Label(body, style="Muted.TLabel", justify="left",
                   text=T("Prima di procedere il programma salva una copia del file dati\n"
-                       "nella stessa cartella, con la data di oggi nel nome: se qualcosa\n"
+                       "nella cartella Backup, dentro quella del programma: se qualcosa\n"
                        "va storto, l'inventario si recupera da li'.")).pack(anchor="w")
 
         ttk.Label(body, text=T("Per confermare, scrivi   %s") % PAROLA_RESET).pack(
@@ -743,7 +743,7 @@ class ImportOptionsDialog(_Modal):
                         text=T("Sostituisci: svuota prima, poi carica solo il file")
                         ).pack(anchor="w", pady=(2, 0))
         ttk.Label(body, style="Muted.TLabel", justify="left",
-                  text=T("Prima di una sostituzione viene salvata una copia del file dati.\n"
+                  text=T("Prima di una sostituzione una copia del file dati va in Backup.\n"
                        "Gli iPhone non vengono mai toccati: si inseriscono solo a mano.")
                   ).pack(anchor="w", padx=(24, 0), pady=(4, 0))
 

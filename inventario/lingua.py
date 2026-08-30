@@ -199,6 +199,12 @@ EN = {
         "A single room fits in a single file, with its name at the top.",
     "ELIMINA TUTTO": "DELETE EVERYTHING",
     "File Excel": "Excel files",
+    "Colonne non riconosciute, il cui contenuto non verra' importato:\n%s\n"
+    "Se una di queste e' un dato che ti serve, rinominala come la colonna\n"
+    "corrispondente dell'inventario e riprova.":
+        "Unrecognised columns, whose contents will not be imported:\n%s\n"
+        "If one of these is data you need, rename it like the matching\n"
+        "column of the inventory and try again.",
     "Modello_inventario.xlsx": "Import_template.xlsx",
     "Tutti i file": "All files",
 
@@ -381,10 +387,10 @@ EN = {
         'Each sheet carries the room name at the top,\nwith the date and the number of devices.',
     "Per svuotare l'inventario devi scrivere esattamente:\n\n%s":
         'To empty the inventory you must type exactly:\n\n%s',
-    "Prima di procedere il programma salva una copia del file dati\nnella stessa cartella, con la data di oggi nel nome: se qualcosa\nva storto, l'inventario si recupera da li'.":
-        "Before going ahead the program saves a copy of the data file\nin the same folder, with today's date in the name: if anything\ngoes wrong, the inventory can be recovered from there.",
-    'Prima di una sostituzione viene salvata una copia del file dati.\nGli iPhone non vengono mai toccati: si inseriscono solo a mano.':
-        'A copy of the data file is saved before any replacement.\niPhones are never touched: they are only entered by hand.',
+    "Prima di procedere il programma salva una copia del file dati\nnella cartella Backup, dentro quella del programma: se qualcosa\nva storto, l'inventario si recupera da li'.":
+        "Before going ahead the program saves a copy of the data file\nin the Backup folder, inside the program folder: if anything\ngoes wrong, the inventory can be recovered from there.",
+    'Prima di una sostituzione una copia del file dati va in Backup.\nGli iPhone non vengono mai toccati: si inseriscono solo a mano.':
+        'Before any replacement a copy of the data file goes into Backup.\niPhones are never touched: they are only entered by hand.',
     "Queste stanze con prestito non sono nell'elenco delle stanze:\n%s":
         'These rooms with loans are not in the list of rooms:\n%s',
     'Scegli la stanza.':

@@ -73,8 +73,7 @@ assert sorted(i["asset_tag"] for i in app.store.items) == sorted(protetti)
 
 # la copia di sicurezza contiene tutto quello che c'era prima
 assert os.path.exists(copia), copia
-assert "prima_del_reset" in os.path.basename(copia)
-assert os.path.dirname(copia) == os.path.dirname(app.store.path)
+assert os.path.basename(os.path.dirname(copia)) == "Backup", copia
 wb = load_workbook(copia)
 righe = sum(1 for r in wb.active.iter_rows(min_row=2, values_only=True) if any(r))
 wb.close()

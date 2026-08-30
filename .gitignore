@@ -9,8 +9,11 @@ dist/
 Distribuzione/
 *.spec
 
-# copie di sicurezza prodotte dal programma, ovunque si trovino
+# copie di sicurezza prodotte dal programma: la cartella Backup/ tiene la
+# propria .gitignore, questa copre le versioni vecchie e i file sparsi
 Inventario_prima_del_reset_*.xlsx
+Backup/*
+!Backup/.gitignore
 
 # file generati a runtime (solo nella radice: i dati di esempio restano)
 /avvio.log

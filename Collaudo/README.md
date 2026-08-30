@@ -138,8 +138,9 @@ quelli elencati sotto la riga `DIGITAL KIOSK`: il foglio dichiara le stanze,
 quindi comandano i separatori e le righe delle altre stanze vengono buttate via.
 Le altre due stanze restano com'erano.
 
-Nella cartella dei dati deve essere comparso un file
-`Inventario_prima_del_reset_...xlsx`: e' la copia di sicurezza.
+Nella cartella **`Backup`**, dentro quella del programma, deve essere comparso
+un file `Inventario_<data>.xlsx`: e' la copia di sicurezza, presa prima di
+toccare qualsiasi cosa.
 
 ### Quando il foglio non dichiara le stanze
 
@@ -238,8 +239,8 @@ Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.
 1. premi **Reset inventario**, in alto a destra
 2. l'avviso dice quanti dispositivi verranno eliminati, **per tutti gli utenti**
 3. scrivi per esteso `ELIMINA TUTTO` nella casella, e conferma
-4. il programma salva da solo una copia del file dati nella stessa cartella,
-   con data e ora nel nome, e poi svuota
+4. il programma salva da solo una copia del file dati nella cartella `Backup`,
+   dentro quella del programma, e poi svuota
 5. controlla che le schede stanza siano tutte a zero
 6. ora *Importa xls...* > **Tutto l'inventario** > **Unisci**, e scegli il tuo
    file
@@ -255,8 +256,12 @@ Un passaggio solo, il risultato e' identico.
    eliminati prima di caricare
 5. scrivi per esteso `ELIMINA TUTTO` e conferma
 
-Anche qui la copia di sicurezza viene salvata prima di toccare qualsiasi cosa.
+Anche qui la copia finisce in `Backup` prima che venga toccato qualsiasi cosa.
 Se la copia non riesce, l'operazione si annulla e non viene cambiato niente.
+
+**Se sbagli**, la copia e' li': aprila con il programma o con Excel, e' un
+inventario completo. La cartella `Backup` non viene mai svuotata da sola, quindi
+ogni tanto vale la pena ripulirla.
 
 ## Cosa sopravvive in ogni caso
 

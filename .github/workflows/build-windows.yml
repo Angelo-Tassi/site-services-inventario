@@ -35,6 +35,9 @@ jobs:
           Copy-Item dist\Inventario.exe Distribuzione\
           Copy-Item "Crea collegamento sul desktop.bat" Distribuzione\
           Copy-Item README.md Distribuzione\"Come funziona.txt"
+          # la cartella delle copie esiste gia' quando il programma parte
+          New-Item -ItemType Directory -Force -Path Distribuzione\Backup | Out-Null
+          Copy-Item Backup\.gitignore Distribuzione\Backup\ -ErrorAction SilentlyContinue
           # i file di collaudo viaggiano con il programma
           New-Item -ItemType Directory -Force -Path Distribuzione\Collaudo | Out-Null
           Copy-Item Collaudo\*.xlsx Distribuzione\Collaudo\

@@ -138,8 +138,9 @@ listed under the `DIGITAL KIOSK` row: the sheet declares the rooms, so the
 separators rule and the other rooms' rows are thrown away. The other two rooms
 stay as they were.
 
-A file named `Inventario_prima_del_reset_...xlsx` must have appeared in the data
-folder: that is the backup copy.
+A file named `Inventario_<date>.xlsx` must have appeared in the **`Backup`**
+folder, inside the program folder: that is the backup copy, taken before
+anything was touched.
 
 ### When the sheet declares no rooms
 
@@ -236,8 +237,8 @@ Use this if you want to see the inventory empty before loading.
 1. press **Reset inventory**, at the top right
 2. the warning says how many devices will be deleted, **for every user**
 3. type `DELETE EVERYTHING` in full in the box, and confirm
-4. the program saves a copy of the data file by itself, in the same folder, with
-   date and time in the name, and then empties
+4. the program saves a copy of the data file by itself, in the `Backup` folder
+   inside the program folder, and then empties
 5. check that the room cards are all at zero
 6. now *Import xls...* > **The whole inventory** > **Merge**, and choose your
    file
@@ -253,8 +254,12 @@ One step, identical result.
    before loading
 5. type `DELETE EVERYTHING` in full and confirm
 
-Here too the backup copy is saved before anything is touched. If the copy fails,
-the operation is cancelled and nothing is changed.
+Here too the copy goes into `Backup` before anything is touched. If the copy
+fails, the operation is cancelled and nothing is changed.
+
+**If you get it wrong**, the copy is right there: open it with the program or
+with Excel, it is a complete inventory. The `Backup` folder is never emptied on
+its own, so it is worth clearing it out now and then.
 
 ## What survives either way
 
