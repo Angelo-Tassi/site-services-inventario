@@ -743,19 +743,35 @@ class InventoryStore(object):
 
         return self._apply(op)
 
-    def import_items(self, incoming, mode="merge"):
-        """mode: 'merge' aggiorna/aggiunge, 'replace' sostituisce tutto."""
+    def import_items(self, incoming, mode="merge", stanza=None):
+        """Carica i dispositivi letti da un file.
+
+        mode: 'merge' aggiunge e aggiorna, 'replace' svuota prima di caricare.
+        stanza: se indicata, l'importazione riguarda solo quella stanza - tutte
+            le righe le vengono assegnate, e una sostituzione tocca solo lei.
+
+        Prima di una sostituzione viene salvata una copia del file dati. Gli
+        iPhone non si toccano mai: non arrivano da un'importazione, quindi una
+        sostituzione li cancellerebbe senza possibilita' di recupero.
+
+        Ritorna un dizionario con aggiunti, aggiornati, eliminati e copia.
+        """
 
         def op(items):
-            added = updated = 0
+            esito = {"aggiunti": 0, "aggiornati": 0, "eliminati": 0, "copia": None}
             if mode == "replace":
-                # Gli iPhone non arrivano mai da un'importazione: vanno tenuti,
-                # altrimenti una sostituzione li cancellerebbe.
-                items[:] = [it for it in items if is_iphone(it.get("tipo"))]
+                esito["copia"] = self.copia_di_sicurezza()
+                prima = len(items)
+                items[:] = [it for it in items
+                            if is_iphone(it.get("tipo"))
+                            or (stanza is not None and it.get("stanza") != stanza)]
+                esito["eliminati"] = prima - len(items)
             index = {it["asset_tag"]: i for i, it in enumerate(items)}
             for raw in incoming:
                 item = dict(raw)
                 item["asset_tag"] = norm_tag(item.get("asset_tag"))
+                if stanza is not None:
+                    item["stanza"] = clean(stanza)
                 if not item["asset_tag"]:
                     continue
                 normalize_identity(item)
@@ -764,12 +780,12 @@ class InventoryStore(object):
                 _stamp_item(item)
                 if item["asset_tag"] in index:
                     items[index[item["asset_tag"]]] = item
-                    updated += 1
+                    esito["aggiornati"] += 1
                 else:
                     index[item["asset_tag"]] = len(items)
                     items.append(item)
-                    added += 1
-            return added, updated
+                    esito["aggiunti"] += 1
+            return esito
 
         return self._apply(op)
 

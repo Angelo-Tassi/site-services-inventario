@@ -61,8 +61,8 @@ assert not any(i["tipo"].lower() == "iphone" for i in items)
 p = os.path.join(d, "Inventario.xlsx")
 s = InventoryStore(p, iphone_room=BAU)
 s.create_if_missing()
-aggiunti, aggiornati = s.import_items(items, "replace")
-assert (aggiunti, aggiornati) == (5, 0), (aggiunti, aggiornati)
+e = s.import_items(items, "replace")
+assert (e["aggiunti"], e["aggiornati"]) == (5, 0), e
 s.load()
 conteggi = {}
 for i in s.items:

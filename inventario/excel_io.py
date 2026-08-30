@@ -106,7 +106,7 @@ def _sort_key(item):
 
 
 def export(items, path, group_by_room=False, rooms=None, full=True, for_print=False,
-           con_iphone=False):
+           con_iphone=False, titolo=None):
     """Scrive l'inventario in un file .xlsx.
 
     group_by_room: un foglio per stanza (piu' un foglio con il totale).
@@ -114,6 +114,8 @@ def export(items, path, group_by_room=False, rooms=None, full=True, for_print=Fa
     for_print: aggiunge titolo, intestazioni ripetute e impaginazione A4.
     con_iphone: gli iPhone sono gestiti solo a mano e restano fuori dalle
         esportazioni; la stampa interna invece li include.
+    titolo: se indicato, compare in testa al foglio e ne diventa il nome. Serve
+        all'esportazione di una singola stanza, che deve dichiararsi.
     """
     fields = list(ALL_FIELDS) if (full and not for_print) else list(PRINT_FIELDS)
     if not con_iphone:
@@ -131,6 +133,9 @@ def export(items, path, group_by_room=False, rooms=None, full=True, for_print=Fa
         if for_print:
             title = 'Site Services : Inventario Iphone, Laptop e Tablet' + (" - %s" % room if room else "")
             subtitle = "Stampato il %s - %d dispositivi" % (stamp, len(subset))
+        elif titolo:
+            title = titolo
+            subtitle = "Esportato il %s - %d dispositivi" % (stamp, len(subset))
         header_row = _write_table(ws, subset, sheet_fields, title, subtitle)
         if for_print:
             _setup_print(ws, header_row, sheet_fields,
@@ -144,7 +149,7 @@ def export(items, path, group_by_room=False, rooms=None, full=True, for_print=Fa
         if not wb.sheetnames:
             add_sheet("Inventario", items)
     else:
-        add_sheet("Inventario", items)
+        add_sheet(titolo or "Inventario", items)
 
     try:
         wb.save(path)

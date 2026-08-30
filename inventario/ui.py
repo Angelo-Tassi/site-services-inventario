@@ -539,9 +539,82 @@ class ResetDialog(_Modal):
         self.destroy()
 
 
+class ImportOptionsDialog(_Modal):
+    """Primo passo dell'importazione: che cosa si carica, e come."""
+
+    def __init__(self, parent, rooms):
+        _Modal.__init__(self, parent, "Importa da Excel")
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+
+        ttk.Label(body, text="Che cosa vuoi caricare",
+                  style="Section.TLabel").pack(anchor="w")
+        self.var_ambito = tk.StringVar(value="tutto")
+        ttk.Radiobutton(body, variable=self.var_ambito, value="tutto",
+                        text="Tutto l'inventario",
+                        command=self._aggiorna).pack(anchor="w", pady=(6, 0))
+        ttk.Radiobutton(body, variable=self.var_ambito, value="stanza",
+                        text="Una sola stanza",
+                        command=self._aggiorna).pack(anchor="w", pady=(2, 0))
+
+        riga = ttk.Frame(body)
+        riga.pack(anchor="w", fill="x", padx=(24, 0), pady=(4, 0))
+        self.var_stanza = tk.StringVar(value=rooms[0] if rooms else "")
+        self.combo = ttk.Combobox(riga, textvariable=self.var_stanza, values=rooms,
+                                  state="readonly", width=30)
+        self.combo.pack(side="left")
+        self.nota_stanza = ttk.Label(
+            body, style="Muted.TLabel", justify="left",
+            text="Tutte le righe del file finiscono nella stanza scelta.\n"
+                 "Eventuali separatori nel foglio vengono riconosciuti e saltati,\n"
+                 "ma non decidono piu' la stanza.")
+        self.nota_stanza.pack(anchor="w", padx=(24, 0), pady=(4, 0))
+
+        ttk.Separator(body, orient="horizontal").pack(fill="x", pady=12)
+
+        ttk.Label(body, text="Come", style="Section.TLabel").pack(anchor="w")
+        self.var_mode = tk.StringVar(value="merge")
+        ttk.Radiobutton(body, variable=self.var_mode, value="merge",
+                        text="Unisci: aggiunge i nuovi e aggiorna quelli gia' presenti"
+                        ).pack(anchor="w", pady=(6, 0))
+        ttk.Radiobutton(body, variable=self.var_mode, value="replace",
+                        text="Sostituisci: svuota prima, poi carica solo il file"
+                        ).pack(anchor="w", pady=(2, 0))
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text="Prima di una sostituzione viene salvata una copia del file dati.\n"
+                       "Gli iPhone non vengono mai toccati: si inseriscono solo a mano."
+                  ).pack(anchor="w", padx=(24, 0), pady=(4, 0))
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(16, 0))
+        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text="Scegli il file", style="Primary.TButton",
+                   command=self._ok).pack(side="right")
+        self._aggiorna()
+
+    def _aggiorna(self):
+        stato = "readonly" if self.var_ambito.get() == "stanza" else "disabled"
+        self.combo.configure(state=stato)
+
+    def _ok(self):
+        stanza = self.var_stanza.get() if self.var_ambito.get() == "stanza" else None
+        if self.var_ambito.get() == "stanza" and not stanza:
+            messagebox.showwarning("Stanza mancante", "Scegli la stanza.", parent=self)
+            return
+        self.result = {"stanza": stanza, "mode": self.var_mode.get()}
+        self.destroy()
+
+
 class ImportDialog(_Modal):
-    def __init__(self, parent, path, count, esito=None):
+    """Riepilogo di quello che si sta per caricare, e conferma finale."""
+
+    def __init__(self, parent, path, count, esito=None, opzioni=None,
+                 da_eliminare=0):
         _Modal.__init__(self, parent, "Importa inventario")
+        opzioni = opzioni or {"stanza": None, "mode": "merge"}
+        self.opzioni = opzioni
+        self.sostituzione_totale = (opzioni["mode"] == "replace"
+                                    and opzioni["stanza"] is None)
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
         ttk.Label(body, text=os.path.basename(path),
@@ -563,13 +636,27 @@ class ImportDialog(_Modal):
                               bg=theme.LOAN_BG, fg=theme.LOAN_FG,
                               padx=10, pady=8, wraplength=430)
             avviso.pack(fill="x", pady=(0, 8))
-        self.var_mode = tk.StringVar(value="merge")
-        ttk.Radiobutton(body, variable=self.var_mode, value="merge",
-                        text="Unisci: aggiunge i nuovi e aggiorna quelli con lo stesso asset tag"
-                        ).pack(anchor="w")
-        ttk.Radiobutton(body, variable=self.var_mode, value="replace",
-                        text="Sostituisci: cancella l'inventario attuale e carica solo questi dati"
-                        ).pack(anchor="w", pady=(4, 0))
+        dove = opzioni["stanza"] or "tutto l'inventario"
+        come = ("Sostituzione" if opzioni["mode"] == "replace" else "Unione")
+        tk.Label(body, text="%s  \u2192  %s" % (come, dove), anchor="w",
+                 bg=theme.HEAD_BG, fg=theme.PRIMARY, padx=10, pady=7,
+                 font=self.master.fonts["bold"]).pack(fill="x", pady=(0, 8))
+
+        self.var_conferma = tk.StringVar()
+        if opzioni["mode"] == "replace":
+            testo = ["Verranno prima eliminati %d dispositivi gia' in inventario%s."
+                     % (da_eliminare, "" if opzioni["stanza"] is None
+                        else " in %s" % opzioni["stanza"])]
+            testo.append("Gli iPhone non vengono toccati.")
+            testo.append("Una copia del file dati viene salvata prima di procedere.")
+            tk.Label(body, text="\n".join(testo), justify="left", anchor="w",
+                     bg=theme.LOAN_BG, fg=theme.LOAN_FG, padx=10, pady=8,
+                     wraplength=430).pack(fill="x", pady=(0, 8))
+        if self.sostituzione_totale:
+            ttk.Label(body, text="Per confermare, scrivi   %s" % PAROLA_RESET).pack(
+                anchor="w", pady=(2, 4))
+            ttk.Entry(body, textvariable=self.var_conferma, width=34).pack(fill="x")
+
         buttons = ttk.Frame(body)
         buttons.pack(anchor="e", pady=(16, 0))
         ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
@@ -597,7 +684,14 @@ class ImportDialog(_Modal):
         return messaggi
 
     def _ok(self):
-        self.result = self.var_mode.get()
+        if self.sostituzione_totale and \
+                self.var_conferma.get().strip().upper() != PAROLA_RESET:
+            messagebox.showwarning(
+                "Conferma non valida",
+                "Stai per svuotare l'inventario di tutti.\n\n"
+                "Per procedere scrivi esattamente:\n%s" % PAROLA_RESET, parent=self)
+            return
+        self.result = self.opzioni
         self.destroy()
 
 
@@ -1684,6 +1778,10 @@ class App(tk.Tk):
             excel_io.open_file(percorso)
 
     def on_import(self):
+        """Prima cosa si carica e come, poi il file, poi la conferma."""
+        opzioni = ImportOptionsDialog(self, self.cfg.get("rooms") or []).show()
+        if not opzioni:
+            return
         path = filedialog.askopenfilename(
             parent=self, title="Seleziona il file da importare",
             filetypes=[("File Excel", "*.xlsx *.xlsm"), ("Tutti i file", "*.*")])
@@ -1698,21 +1796,32 @@ class App(tk.Tk):
             messagebox.showwarning("Importazione", "Nessuna riga valida trovata nel file.",
                                    parent=self)
             return
-        mode = ImportDialog(self, path, len(items), esito).show()
-        if not mode:
+        conferma = ImportDialog(self, path, len(items), esito, opzioni,
+                                self.contati_in_eliminazione(opzioni)).show()
+        if not conferma:
             return
-        if mode == "replace" and not messagebox.askyesno(
-            "Conferma sostituzione",
-            "L'inventario attuale (%d dispositivi) verra' sostituito dai %d dal file.\n"
-            "Gli iPhone gia' registrati vengono mantenuti.\n\n"
-            "Procedere?" % (len(self.store.items), len(items)), parent=self
-        ):
+        risultato = self._run(lambda: self.store.import_items(
+            items, opzioni["mode"], opzioni["stanza"]))
+        if not risultato:
             return
-        result = self._run(lambda: self.store.import_items(items, mode))
-        if result:
-            added, updated = result
-            messagebox.showinfo("Importazione completata",
-                                "Aggiunti: %d\nAggiornati: %d" % (added, updated), parent=self)
+        righe = ["Aggiunti: %d" % risultato["aggiunti"],
+                 "Aggiornati: %d" % risultato["aggiornati"]]
+        if risultato["eliminati"]:
+            righe.append("Eliminati prima del caricamento: %d" % risultato["eliminati"])
+        if risultato["copia"]:
+            righe.append("")
+            righe.append("Copia di sicurezza del file precedente:")
+            righe.append(risultato["copia"])
+        messagebox.showinfo("Importazione completata", "\n".join(righe), parent=self)
+
+    def contati_in_eliminazione(self, opzioni):
+        """Quanti dispositivi verrebbero rimossi da una sostituzione."""
+        if opzioni["mode"] != "replace":
+            return 0
+        stanza = opzioni["stanza"]
+        return sum(1 for i in self.store.items
+                   if not is_iphone(i.get("tipo"))
+                   and (stanza is None or i.get("stanza") == stanza))
 
     def on_export_room(self):
         """Esporta il contenuto della stanza aperta, filtri esclusi."""
@@ -1730,7 +1839,7 @@ class App(tk.Tk):
         if not percorso:
             return
         try:
-            excel_io.export(items, percorso, rooms=[stanza])
+            excel_io.export(items, percorso, rooms=[stanza], titolo=stanza)
         except InventoryError as exc:
             messagebox.showerror("Esportazione non riuscita", str(exc), parent=self)
             return

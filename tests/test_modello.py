@@ -58,7 +58,7 @@ assert esito["da_tag"] == 2 and esito["iphone"] == 0
 
 p = os.path.join(d, "Inventario.xlsx")
 s = InventoryStore(p, iphone_room=BAU); s.create_if_missing()
-assert s.import_items(items, "merge") == (2, 0)
+assert s.import_items(items, "merge")["aggiunti"] == 2
 s.load(); assert len(s.items) == 2
 
 # ---- gli iPhone restano fuori da import ed export
@@ -81,7 +81,7 @@ assert "356938035643809" not in valori
 wb.close()
 
 # la sostituzione rifa' l'inventario dal file ma non cancella gli iPhone
-assert s.import_items(items, "replace") == (2, 0)
+assert s.import_items(items, "replace")["aggiunti"] == 2
 s.load()
 assert len(s.items) == 3, [i["asset_tag"] for i in s.items]
 assert any(i["asset_tag"] == "356938035643809" for i in s.items)

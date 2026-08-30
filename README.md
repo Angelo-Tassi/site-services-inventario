@@ -501,6 +501,11 @@ Entrando in una stanza, accanto al suo nome compare **Esporta questa stanza in
 xls**: produce un file con i soli dispositivi di quella stanza, chiamato per
 esempio `Inventario_Digital_Kiosk_20260830.xlsx`.
 
+Il nome della stanza e' anche **dentro** al file, in tre punti: e' il nome del
+foglio, e' scritto in testa alla prima riga, e sotto compare la data di
+esportazione con il numero di dispositivi. Cosi' resta riconoscibile anche se il
+file viene rinominato o stampato.
+
 Esporta la stanza **intera**, non quello che stai vedendo: eventuali ricerche o
 filtri attivi non la riducono. Per esportare esattamente la vista corrente c'e'
 sempre *Esporta xls...* nella barra in alto.
@@ -534,6 +539,44 @@ vengono mantenuti, perche' non potrebbero essere ricaricati da un file.
 
 Restano invece nella **stampa**, che e' consultazione interna, e ovviamente
 nell'inventario a video e nel file dati.
+
+## Come funziona l'importazione
+
+Premendo *Importa xls...* la prima cosa che compare non e' il selettore dei file,
+ma la scelta di **che cosa** si carica e **come**.
+
+**Che cosa**
+
+| | |
+| --- | --- |
+| Tutto l'inventario | il file riguarda l'intero parco dispositivi |
+| Una sola stanza | si sceglie la stanza dalla tendina: **tutte** le righe del file finiscono li'. Eventuali separatori nel foglio vengono riconosciuti e saltati, ma non decidono piu' la stanza |
+
+**Come**
+
+| | |
+| --- | --- |
+| Unisci | aggiunge i nuovi e aggiorna quelli gia' presenti con lo stesso asset tag |
+| Sostituisci | svuota prima, poi carica solo cio' che c'e' nel file |
+
+Le due scelte si combinano: *sostituisci una sola stanza* rifa' da zero il
+contenuto di quella stanza e lascia intatte le altre.
+
+Scelto il file, un riepilogo mostra quante righe sono state lette, cosa e' stato
+ignorato e - per una sostituzione - quanti dispositivi verranno eliminati. Fino a
+quel momento non e' stato scritto niente: annullando, l'inventario resta com'era.
+
+### Le protezioni sulla sostituzione
+
+- Prima di ogni sostituzione viene **salvata una copia** del file dati nella
+  cartella di rete, con data e ora nel nome. Se la copia non riesce,
+  l'operazione si annulla.
+- Per sostituire **tutto l'inventario** bisogna scrivere per esteso
+  `ELIMINA TUTTO`: e' l'operazione piu' distruttiva del programma e riguarda i
+  dati di tutti. Per una singola stanza basta la conferma, con il numero di
+  dispositivi in chiaro.
+- **Gli iPhone non vengono mai eliminati**, in nessuna delle due modalita': non
+  arrivano da un'importazione, quindi una sostituzione li perderebbe per sempre.
 
 ## Se il file ha colonne diverse dalle nostre
 
