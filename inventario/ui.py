@@ -1974,13 +1974,13 @@ class App(tk.Tk):
         """Genera il modello vuoto da compilare e reimportare."""
         percorso = filedialog.asksaveasfilename(
             parent=self, title=T("Salva il modello di inventario"),
-            defaultextension=".xlsx", initialfile="Modello_inventario.xlsx",
+            defaultextension=".xlsx", initialfile=T("Modello_inventario.xlsx"),
             filetypes=[(T("File Excel"), "*.xlsx")])
         if not percorso:
             return
         try:
             excel_io.build_template(percorso, self.cfg.get("rooms", []),
-                                    self.cfg.get("states"))
+                                    self.cfg.get("states"), lingua=lang.corrente())
         except InventoryError as exc:
             messagebox.showerror(T("Modello non creato"), str(exc), parent=self)
             return

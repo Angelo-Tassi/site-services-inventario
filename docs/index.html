@@ -145,7 +145,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.14.2 · alfa</div>
+  <div class="alpha">versione 0.15.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Scarica Inventario.exe</a>
@@ -325,14 +325,14 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.14.2 · alpha</div>
+  <div class="alpha">version 0.15.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Download Inventario.exe</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest">All versions</a>
-    <a class="btn alt" href="Modello_inventario.xlsx" download>Excel template</a>
-    <a class="btn alt" href="formato-xls.html">How to prepare the Excel file</a>
-    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/tree/main/Collaudo">How to test the import</a>
+    <a class="btn alt" href="Import_template.xlsx" download>Excel template</a>
+    <a class="btn alt" href="formato-xls.html?lang=en">How to prepare the Excel file</a>
+    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/blob/main/Collaudo/README.en.md">How to test the import</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/blob/main/README.en.md">Code and documentation</a>
   </div>
   <p class="note">One file, for Windows. It carries Python and every library:
@@ -459,17 +459,17 @@ python Inventario.py</pre>
       <p>Status and notes are changed with a double-click straight in the list,
         without opening any window.</p></div>
     <div class="card"><h3>How to test the import</h3>
-      <p>The <a href="https://github.com/Angelo-Tassi/site-services-inventario/tree/main/Collaudo">Collaudo</a>
+      <p>The <a href="https://github.com/Angelo-Tassi/site-services-inventario/blob/main/Collaudo/README.en.md">Collaudo</a>
         folder holds two ready sheets - 30 devices, 10 per room, plus one full of
         deliberate mistakes - and nine step-by-step checks.</p></div>
     <div class="card"><h3>Starting over</h3>
       <p>A button empties the inventory to reload it from a file, after a confirmation
         typed in full and an automatic backup. iPhones are never touched.</p></div>
     <div class="card"><h3>Excel in and out</h3>
-      <p>Download the <a href="Modello_inventario.xlsx" download>ready-made template</a>,
+      <p>Download the <a href="Import_template.xlsx" download>ready-made template</a>,
         fill it in and import it: a single sheet is split by room by writing
         <code>BAU</code>, <code>KIOSK</code> or <code>DISASTER</code> on an empty row -
-        the <a href="formato-xls.html">format guide</a> explains it with examples.
+        the <a href="formato-xls.html?lang=en">format guide</a> explains it with examples.
         Exporting asks whether you want everything or one room, in one sheet, one sheet
         per room or one file per room.</p></div>
   </div>
@@ -501,16 +501,22 @@ python Inventario.py</pre>
 (function () {
   var scelta = document.getElementById("lang");
   function applica(codice) {
-    document.querySelectorAll("[data-lang]").forEach(function (blocco) {
-      blocco.hidden = blocco.getAttribute("data-lang") !== codice;
+    document.querySelectorAll("[data-lang]").forEach(function (b) {
+      b.hidden = b.getAttribute("data-lang") !== codice;
     });
     document.documentElement.lang = codice;
     scelta.value = codice;
   }
-  var salvata = "it";
-  try { salvata = localStorage.getItem("lingua") || "it"; } catch (e) {}
-  if (salvata !== "it" && salvata !== "en") { salvata = "it"; }
-  applica(salvata);
+  function valida(codice) {
+    return codice === "it" || codice === "en" ? codice : null;
+  }
+  // l'indirizzo vince sulla preferenza salvata: un link in inglese porta in inglese
+  var dallUrl = valida(new URLSearchParams(location.search).get("lang"));
+  var salvata = null;
+  try { salvata = valida(localStorage.getItem("lingua")); } catch (e) {}
+  var codice = dallUrl || salvata || "it";
+  applica(codice);
+  if (dallUrl) { try { localStorage.setItem("lingua", dallUrl); } catch (e) {} }
   scelta.addEventListener("change", function () {
     applica(scelta.value);
     try { localStorage.setItem("lingua", scelta.value); } catch (e) {}

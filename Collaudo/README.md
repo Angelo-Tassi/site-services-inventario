@@ -1,5 +1,7 @@
 # File di prova per il collaudo
 
+*[English version](README.en.md)*
+
 Due fogli Excel pronti da importare, per provare il programma senza toccare
 l'inventario vero.
 

@@ -199,6 +199,7 @@ EN = {
         "A single room fits in a single file, with its name at the top.",
     "ELIMINA TUTTO": "DELETE EVERYTHING",
     "File Excel": "Excel files",
+    "Modello_inventario.xlsx": "Import_template.xlsx",
     "Tutti i file": "All files",
 
     # --- etichette e messaggi con formattazione
@@ -431,7 +432,7 @@ STATI_EN = {
     "Da Rispedire": "To be shipped back",
     "Spedito al servizio telefonia": "Shipped to the phone service",
     "In attesa ritiro": "Awaiting collection",
-    "Guasto in attesa tecnico": "Faulty, awaiting technician",
+    "Guasto in attesa tecnico": "Faulty - awaiting technician",
     "Da rebuildare": "To be rebuilt",
     "Controllare": "To be checked",
 }

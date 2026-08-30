@@ -217,12 +217,74 @@ TEMPLATE_TIPI = ["Laptop", "Tablet"]
 RIGHE_PER_STANZA = 8
 
 
-def build_template(path, rooms, stati=None):
+ISTRUZIONI_IT = [
+    ("Modello di inventario - laptop e tablet", True),
+    ("", False),
+    ('Compila il foglio "Inventario" e importalo dal programma con', False),
+    ("Importa xls...  Le righe azzurre con il nome della stanza sono", False),
+    ("separatori: tutto cio' che scrivi sotto una di esse finisce in", False),
+    ("quella stanza, fino al separatore successivo.", False),
+    ("", False),
+    ("Regole", True),
+    ("- Asset Tag e Modello sono indispensabili; il numero di serie e'", False),
+    ("  vivamente consigliato.", False),
+    ("- L'asset tag identifica il dispositivo: importando due volte lo", False),
+    ("  stesso asset tag, la scheda viene aggiornata invece che duplicata.", False),
+    ("- Tipo e Stato hanno la tendina: usa i valori proposti.", False),
+    ("- Puoi aggiungere righe sotto un separatore, o spostare i separatori.", False),
+    ("- Non cambiare i nomi delle colonne nella prima riga.", False),
+    ("- Le righe lasciate vuote vengono semplicemente ignorate.", False),
+    ("", False),
+    ("Valori ammessi", True),
+    ("TIPI", False),
+    ("STATI", False),
+    ("Le tendine funzionano in Excel e in LibreOffice. Numbers non le", False),
+    ("importa: in quel caso scrivi i valori qui sopra, sono gli stessi.", False),
+    ("", False),
+    ("Gli iPhone non si importano", True),
+    ("Sono gestiti solo a mano dal programma e non compaiono ne' nelle", False),
+    ("importazioni ne' nelle esportazioni. Se ne inserisci qui, vengono", False),
+    ("ignorati.", False),
+]
+
+ISTRUZIONI_EN = [
+    ("Inventory template - laptops and tablets", True),
+    ("", False),
+    ('Fill in the "Inventario" sheet and import it from the program with', False),
+    ("Import xls...  The blue rows carrying a room name are separators:", False),
+    ("everything you write below one of them goes into that room, until", False),
+    ("the next separator.", False),
+    ("", False),
+    ("Rules", True),
+    ("- Asset Tag and Model are required; the serial number is strongly", False),
+    ("  recommended.", False),
+    ("- The asset tag identifies the device: importing the same asset tag", False),
+    ("  twice updates the record instead of duplicating it.", False),
+    ("- Type and Status have dropdowns: use the values offered.", False),
+    ("- You can add rows under a separator, or move the separators.", False),
+    ("- Do not change the column names in the first row.", False),
+    ("- Rows left empty are simply ignored.", False),
+    ("", False),
+    ("Allowed values", True),
+    ("TIPI", False),
+    ("STATI", False),
+    ("The dropdowns work in Excel and LibreOffice. Numbers does not import", False),
+    ("them: in that case type the values above, they are the same.", False),
+    ("", False),
+    ("iPhones are not imported", True),
+    ("They are handled by hand in the program only, and appear neither in", False),
+    ("imports nor in exports. Any you put here will be ignored.", False),
+]
+
+
+def build_template(path, rooms, stati=None, lingua=None):
     """Genera il modello vuoto da compilare e reimportare.
 
     Contiene solo le colonne che servono a laptop e tablet, gia' divise per
     stanza con le righe-separatore, e le tendine sui campi a scelta fissa.
     Gli iPhone non compaiono: si inseriscono a mano dal programma.
+
+    lingua: "en" per intestazioni, tendine e istruzioni in inglese.
     """
     from openpyxl.worksheet.datavalidation import DataValidation
 
@@ -231,7 +293,7 @@ def build_template(path, rooms, stati=None):
     ws = wb.active
     ws.title = "Inventario"
 
-    intestazioni = [HEADERS[f] for f in TEMPLATE_FIELDS]
+    intestazioni = [intestazione(HEADERS[f], lingua) for f in TEMPLATE_FIELDS]
     ws.append(intestazioni)
     for cella in ws[1]:
         cella.font = Font(bold=True, color="FFFFFF")
@@ -259,15 +321,20 @@ def build_template(path, rooms, stati=None):
     ultima = riga - 1
     tipi = DataValidation(type="list", formula1='"%s"' % ",".join(TEMPLATE_TIPI),
                           allow_blank=True, showDropDown=False)
-    tipi.error = "Scegli Laptop o Tablet."
-    tipi.errorTitle = "Tipo non valido"
+    if lingua == "en":
+        tipi.error, tipi.errorTitle = "Choose Laptop or Tablet.", "Invalid type"
+    else:
+        tipi.error, tipi.errorTitle = "Scegli Laptop o Tablet.", "Tipo non valido"
     ws.add_data_validation(tipi)
     tipi.add("B2:B%d" % ultima)
 
-    scelte = DataValidation(type="list", formula1='"%s"' % ",".join(stati),
+    stati_mostrati = [traduci_stato(v, lingua) for v in stati]
+    scelte = DataValidation(type="list", formula1='"%s"' % ",".join(stati_mostrati),
                             allow_blank=True, showDropDown=False)
-    scelte.error = "Scegli uno degli stati previsti."
-    scelte.errorTitle = "Stato non valido"
+    if lingua == "en":
+        scelte.error, scelte.errorTitle = "Choose one of the listed statuses.", "Invalid status"
+    else:
+        scelte.error, scelte.errorTitle = "Scegli uno degli stati previsti.", "Stato non valido"
     ws.add_data_validation(scelte)
     scelte.add("E2:E%d" % ultima)
 
@@ -276,38 +343,13 @@ def build_template(path, rooms, stati=None):
     for i, campo in enumerate(TEMPLATE_FIELDS, start=1):
         ws.column_dimensions[get_column_letter(i)].width = larghezze[campo]
 
-    guida = wb.create_sheet("Istruzioni")
-    testo = [
-        ("Modello di inventario - laptop e tablet", True),
-        ("", False),
-        ("Compila il foglio \"Inventario\" e importalo dal programma con", False),
-        ("Importa xls...  Le righe azzurre con il nome della stanza sono", False),
-        ("separatori: tutto cio' che scrivi sotto una di esse finisce in", False),
-        ("quella stanza, fino al separatore successivo.", False),
-        ("", False),
-        ("Regole", True),
-        ("- Asset Tag e Modello sono indispensabili; il numero di serie e'", False),
-        ("  vivamente consigliato.", False),
-        ("- L'asset tag identifica il dispositivo: importando due volte lo", False),
-        ("  stesso asset tag, la scheda viene aggiornata invece che duplicata.", False),
-        ("- Tipo e Stato hanno la tendina: usa i valori proposti.", False),
-        ("- Puoi aggiungere righe sotto un separatore, o spostare i separatori.", False),
-        ("- Non cambiare i nomi delle colonne nella prima riga.", False),
-        ("- Le righe lasciate vuote vengono semplicemente ignorate.", False),
-        ("", False),
-        ("Valori ammessi", True),
-        ("Tipo:  %s" % ",  ".join(TEMPLATE_TIPI), False),
-        ("Stato: %s" % ",  ".join(stati), False),
-        ("Le tendine funzionano in Excel e in LibreOffice. Numbers non le", False),
-        ("importa: in quel caso scrivi i valori qui sopra, sono gli stessi.", False),
-        ("", False),
-        ("Gli iPhone non si importano", True),
-        ("Sono gestiti solo a mano dal programma e non compaiono ne' nelle", False),
-        ("importazioni ne' nelle esportazioni. Se ne inserisci qui, vengono", False),
-        ("ignorati.", False),
-    ]
+    guida = wb.create_sheet("Istruzioni" if lingua != "en" else "Instructions")
+    testo = list(ISTRUZIONI_EN if lingua == "en" else ISTRUZIONI_IT)
+    etichette = {"TIPI": ("Type:  " if lingua == "en" else "Tipo:  ") + ",  ".join(TEMPLATE_TIPI),
+                 "STATI": ("Status: " if lingua == "en" else "Stato: ")
+                          + ",  ".join(stati_mostrati)}
     for numero, (frase, grassetto) in enumerate(testo, start=1):
-        cella = guida.cell(row=numero, column=1, value=frase)
+        cella = guida.cell(row=numero, column=1, value=etichette.get(frase, frase))
         if grassetto:
             cella.font = Font(bold=True, size=12, color="1F4E79")
     guida.column_dimensions["A"].width = 78

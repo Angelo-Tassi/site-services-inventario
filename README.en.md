@@ -386,9 +386,11 @@ in the on-screen inventory and in the data file.
 To load laptops and tablets in bulk, start from the ready-made template:
 
 - from the program, the **Download the import template** button on the home page,
-  to the right of the *Full inventory* title;
+  to the right of the *Full inventory* title: it comes out in the interface
+  language;
 - from the project page, or directly at
-  [`docs/Modello_inventario.xlsx`](docs/Modello_inventario.xlsx).
+  [`docs/Import_template.xlsx`](docs/Import_template.xlsx) (English) and
+  [`docs/Modello_inventario.xlsx`](docs/Modello_inventario.xlsx) (Italian).
 
 It carries only the columns laptops and tablets need, already split by room by
 the separator rows, with dropdowns on *Type* and *Status* and an *Istruzioni*
@@ -508,7 +510,7 @@ regenerated with `.venv/bin/python tests/genera_esempio.py`.
 The [`Collaudo/`](Collaudo/) folder contains two Excel sheets ready to import -
 a regular one with **30 devices, 10 per room**, and one deliberately carrying the
 cases the program has to report - and nine step-by-step checks in
-[`Collaudo/README.md`](Collaudo/README.md) (Italian), from the first load to
+[`Collaudo/README.en.md`](Collaudo/README.en.md), from the first load to
 importing into a single room, the reset, re-exporting and switching language.
 
 ## Automated tests

@@ -674,9 +674,10 @@ Per caricare in blocco laptop e tablet parti dal modello gia' pronto, che si
 ottiene in due modi:
 
 - dal programma, pulsante **Scarica il modello di importazione** in home, a
-  destra del titolo *Inventario completo*;
+  destra del titolo *Inventario completo*: esce nella lingua dell'interfaccia;
 - dalla pagina del progetto, o direttamente da
-  [`docs/Modello_inventario.xlsx`](docs/Modello_inventario.xlsx).
+  [`docs/Modello_inventario.xlsx`](docs/Modello_inventario.xlsx) (italiano) e
+  [`docs/Import_template.xlsx`](docs/Import_template.xlsx) (inglese).
 
 Contiene solo le colonne che servono a laptop e tablet - *Asset Tag*, *Tipo*,
 *Modello*, *Numero di serie*, *Stato*, *Note* - gia' divise per stanza dalle

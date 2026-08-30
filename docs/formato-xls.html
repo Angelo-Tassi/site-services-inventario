@@ -314,12 +314,12 @@ table{min-width:520px}
 </footer>
 </div>
 <div data-lang="en" hidden><header>
-  <div class="eyebrow"><a href="index.html">← Back to the project page</a></div>
+  <div class="eyebrow"><a href="index.html?lang=en">← Back to the project page</a></div>
   <h1>How to prepare the Excel file</h1>
   <p class="lede">Everything you need to get the data in on the first try, with no
     discarded rows and no columns lost along the way.</p>
   <div class="cta">
-    <a class="btn main" href="Modello_inventario.xlsx" download>Download the ready-made template</a>
+    <a class="btn main" href="Import_template.xlsx" download>Download the ready-made template</a>
   </div>
   <p class="note">The template already carries the right headers, the room
     separators and the dropdowns: starting from it, you do not need to read the rest.</p>
@@ -466,15 +466,15 @@ table{min-width:520px}
 
 <section>
   <h2>Trying it safely</h2>
-  <p class="sub">The <a href="https://github.com/Angelo-Tassi/site-services-inventario/tree/main/Collaudo">Collaudo</a>
+  <p class="sub">The <a href="https://github.com/Angelo-Tassi/site-services-inventario/blob/main/Collaudo/README.en.md">Collaudo</a>
     folder holds two ready sheets - a regular one with 30 devices, ten per room, and one
     deliberately carrying every mistake described here - plus eight step-by-step checks.</p>
 </section>
 
 <footer>
   <div class="wrap" style="padding:0">
-    <a href="index.html">Project page</a> ·
-    <a href="https://github.com/Angelo-Tassi/site-services-inventario">Code</a> ·
+    <a href="index.html?lang=en">Project page</a> ·
+    <a href="https://github.com/Angelo-Tassi/site-services-inventario/blob/main/README.en.md">Code</a> ·
     <a href="https://github.com/Angelo-Tassi/site-services-inventario/issues">Report a problem</a>
   </div>
 </footer>
@@ -490,10 +490,16 @@ table{min-width:520px}
     document.documentElement.lang = codice;
     scelta.value = codice;
   }
-  var salvata = "it";
-  try { salvata = localStorage.getItem("lingua") || "it"; } catch (e) {}
-  if (salvata !== "it" && salvata !== "en") { salvata = "it"; }
-  applica(salvata);
+  function valida(codice) {
+    return codice === "it" || codice === "en" ? codice : null;
+  }
+  // l'indirizzo vince sulla preferenza salvata: un link in inglese porta in inglese
+  var dallUrl = valida(new URLSearchParams(location.search).get("lang"));
+  var salvata = null;
+  try { salvata = valida(localStorage.getItem("lingua")); } catch (e) {}
+  var codice = dallUrl || salvata || "it";
+  applica(codice);
+  if (dallUrl) { try { localStorage.setItem("lingua", dallUrl); } catch (e) {} }
   scelta.addEventListener("change", function () {
     applica(scelta.value);
     try { localStorage.setItem("lingua", scelta.value); } catch (e) {}
