@@ -27,6 +27,7 @@
   --w-bg:#EEF2F7; --w-card:#FFF; --w-primary:#1F4E79; --w-text:#1B2733; --w-muted:#6B7A8C;
   --w-border:#D7E0EA; --w-head:#E7EEF6; --w-row-alt:#F6F9FC; --w-loan-bg:#FBE3E1;
   --w-loan-fg:#A93226; --w-iphone:#E2F4E4; --w-tablet:#FCEEDA; --w-link:#1A6BA8;
+  --w-ship:#EFE3F7; --w-ship-fg:#6C3483;
   --w-r1:#2E86C1; --w-r2:#16A085; --w-r3:#8E44AD; --w-r4:#5D6D7E;
   --w-face:"Segoe UI",-apple-system,"Helvetica Neue",Arial,sans-serif;
 }
@@ -92,6 +93,8 @@ tr:nth-child(even){background:var(--w-row-alt)}
 tr.ip,tr.ip:nth-child(even){background:var(--w-iphone)}
 tr.tb2,tr.tb2:nth-child(even){background:var(--w-tablet)}
 tr.ln,tr.ln:nth-child(even){background:var(--w-loan-bg)}
+tr.sp,tr.sp:nth-child(even){background:var(--w-ship)}
+tr.sp td{color:var(--w-ship-fg)}
 tr.ln td{color:var(--w-loan-fg)}
 .mono{font-family:"IBM Plex Mono",monospace;font-size:12px}
 .pill{display:inline-block;background:var(--w-link);color:#fff;border-radius:3px;
@@ -128,7 +131,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.1.0 · alfa</div>
+  <div class="alpha">versione 0.2.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Scarica Inventario.exe</a>
@@ -206,6 +209,10 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
             <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td>
               <td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td><td>—</td>
               <td>Digital Kiosk</td><td>Non disponibile</td><td>Marco Bianchi</td><td>—</td></tr>
+            <tr class="sp"><td class="sel">◯</td><td class="mono">351234567890123</td><td>Iphone</td>
+              <td>Apple iPhone 13</td><td>—</td><td class="mono">351234567890123</td>
+              <td>Site Services BAU</td><td>Spedito</td><td>—</td>
+              <td>Rispedito il 28/08/2026 10:05</td></tr>
             <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td>
               <td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td><td>—</td>
               <td>Magazzino Disaster Recovery</td><td>Da rebuildare</td><td>—</td><td>Scorta sigillata</td></tr>
@@ -214,9 +221,10 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
       </div>
     </div>
   </div>
-  <p class="note">Verde chiaro gli iPhone, arancione i tablet Dell, rosso i dispositivi
-    in prestito. Nella stanza dei prestiti ogni riga ha il pulsante <i>Presta</i> /
-    <i>Registra rientro</i>.</p>
+  <p class="note">Verde chiaro gli iPhone, arancione i tablet Dell, viola quelli gia'
+    rispediti, rosso quelli in prestito. Ogni riga porta il pulsante che le serve:
+    <i>Presta</i> e <i>Registra rientro</i> nella stanza dei prestiti,
+    <i>SPEDITO</i> nel contenitore degli iPhone.</p>
 </section>
 
 <section>
@@ -234,6 +242,10 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
     <div class="card"><h3>Prestiti</h3>
       <p>Nelle stanze abilitate, un pulsante sulla riga registra nome, data e ora.
         Finche' il dispositivo e' fuori la riga e' rossa e lo stato <i>Non disponibile</i>.</p></div>
+    <div class="card"><h3>Spedizione iPhone</h3>
+      <p>Un pulsante registra giorno e ora della spedizione al servizio telefonia.
+        Il telefono diventa viola e resta consultabile in inventario per tre mesi:
+        prima di quella data non si puo' eliminare.</p></div>
     <div class="card"><h3>Stati e note al volo</h3>
       <p>Stato e note si cambiano con un doppio clic direttamente nell'elenco, senza
         aprire nessuna finestra.</p></div>

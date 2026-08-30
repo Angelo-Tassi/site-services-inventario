@@ -12,8 +12,10 @@ from tkinter import filedialog, messagebox, ttk
 
 from . import config, excel_io, theme
 from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
-                    InventoryStore, NON_DISPONIBILE, clean, is_iphone,
-                    is_on_loan, new_item, norm_tag, rows_from_workbook)
+                    MESI_CONSERVAZIONE,
+                    InventoryStore, NON_DISPONIBILE, SPEDITO, clean,
+                    is_iphone, is_on_loan, is_shipped, new_item, norm_tag,
+                    puo_essere_eliminato, rows_from_workbook, testo_spedizione)
 
 NO_ROOM = "(senza stanza)"
 CHECK_COLUMN = "_sel"
@@ -22,7 +24,7 @@ CHECK_ON = "\u25c9"      # cerchio pieno: riga selezionata
 CHECK_OFF = "\u25cb"     # cerchio vuoto
 COLUMN_WIDTHS = {CHECK_COLUMN: 46, ACTION_COLUMN: 150, "asset_tag": 120, "tipo": 75, "modello": 185,
                  "seriale": 120, "imei": 130, "restituito_da": 135, "stanza": 160,
-                 "stato": 105, "prestato_a": 140, "prestato_il": 120, "note": 180,
+                 "stato": 105, "prestato_a": 140, "prestato_il": 120, "spedito_il": 120, "note": 180,
                  "modificato_il": 120, "modificato_da": 145}
 REFRESH_MS = 15000
 
@@ -502,6 +504,8 @@ class App(tk.Tk):
         """Il colore della riga: prestito, poi tipo, poi la banda alternata."""
         if is_on_loan(item):
             return "loan"
+        if is_shipped(item):
+            return "spedito_alt" if dispari else "spedito"
         if is_iphone(item.get("tipo")):
             return "iphone_alt" if dispari else "iphone"
         if self.is_dell_tablet(item):
@@ -526,12 +530,19 @@ class App(tk.Tk):
         return (self.view == "room"
                 and self.var_room.get() in self.cfg.get("loan_rooms", []))
 
+    def ship_column_visible(self):
+        """La colonna Spedizione esiste solo nel contenitore degli iPhone."""
+        return self.view == "type" and is_iphone(self.var_type.get())
+
+    def action_column_visible(self):
+        return self.loan_column_visible() or self.ship_column_visible()
+
     def can_lend(self, item):
         return item.get("stanza") in self.cfg.get("loan_rooms", [])
 
     def _columns(self):
         colonne = [CHECK_COLUMN]
-        if self.loan_column_visible():
+        if self.action_column_visible():
             colonne.append(ACTION_COLUMN)
         return colonne + list(ALL_FIELDS)
 
@@ -549,7 +560,8 @@ class App(tk.Tk):
                             stretch=False)
                 continue
             if field == ACTION_COLUMN:
-                tree.heading(field, text="Prestito")
+                tree.heading(field, text="Spedizione" if self.ship_column_visible()
+                             else "Prestito")
                 tree.column(field, width=COLUMN_WIDTHS[field], anchor="center",
                             stretch=False)
                 continue
@@ -571,6 +583,9 @@ class App(tk.Tk):
         scroll.pack(side="right", fill="y")
         tree.tag_configure("odd", background=theme.ROW_ALT)
         tree.tag_configure("loan", background=theme.LOAN_BG, foreground=theme.LOAN_FG)
+        tree.tag_configure("spedito", background=theme.SHIP_ROW, foreground=theme.SHIP_FG)
+        tree.tag_configure("spedito_alt", background=theme.SHIP_ROW_ALT,
+                           foreground=theme.SHIP_FG)
         tree.tag_configure("iphone", background=theme.IPHONE_ROW)
         tree.tag_configure("iphone_alt", background=theme.IPHONE_ROW_ALT)
         tree.tag_configure("tablet", background=theme.TABLET_ROW)
@@ -590,7 +605,7 @@ class App(tk.Tk):
 
     def _sync_row_buttons(self):
         """Disegna un vero pulsante sulla cella Prestito delle righe visibili."""
-        if self.tree is None or not self.loan_column_visible():
+        if self.tree is None or not self.action_column_visible():
             return
         if not hasattr(self, "_row_buttons"):
             self._row_buttons = {}
@@ -601,7 +616,7 @@ class App(tk.Tk):
         vive = set()
         for tag in self.tree.get_children():
             item = self._item_by_tag(tag)
-            if item is None or not self.can_lend(item):
+            if item is None or not self.action_label(item):
                 continue
             try:
                 box = self.tree.bbox(tag, indice)
@@ -610,9 +625,11 @@ class App(tk.Tk):
             if not box:                       # riga fuori dalla parte visibile
                 continue
             vive.add(tag)
-            rientro = is_on_loan(item)
             testo = self.action_label(item)
-            stile = "RowBack.TButton" if rientro else "Row.TButton"
+            if self.ship_column_visible():
+                stile = "RowShip.TButton"
+            else:
+                stile = "RowBack.TButton" if is_on_loan(item) else "Row.TButton"
             button = self._row_buttons.get(tag)
             if button is None:
                 button = ttk.Button(self.tree, text=testo, style=stile, takefocus=False,
@@ -632,7 +649,9 @@ class App(tk.Tk):
         if item is None:
             return
         self.tree.selection_set([tag])
-        if is_on_loan(item):
+        if self.ship_column_visible():
+            self.on_ship(tag)
+        elif is_on_loan(item):
             self.on_give_back(tag)
         else:
             self.on_lend(tag)
@@ -655,7 +674,11 @@ class App(tk.Tk):
         return tag, columns[index]
 
     def action_label(self, item):
-        """Testo del pulsante di prestito per una riga."""
+        """Testo del pulsante sulla riga, secondo la schermata in cui siamo."""
+        if self.ship_column_visible():
+            if not is_iphone(item.get("tipo")) or is_shipped(item):
+                return ""
+            return "SPEDITO"
         if not self.can_lend(item):
             return ""
         return "Registra rientro" if is_on_loan(item) else "Presta"
@@ -1101,6 +1124,19 @@ class App(tk.Tk):
         if not tags:
             return
         item = self._item_by_tag(tags[0])
+        if item is not None:
+            libero, sblocco = puo_essere_eliminato(item)
+            if not libero:
+                messagebox.showwarning(
+                    "Eliminazione non consentita",
+                    "%s\n\n%s\n\n"
+                    "Il dispositivo e' stato rispedito al servizio telefonia il %s e\n"
+                    "va conservato in inventario per consultazione.\n\n"
+                    "Potrai eliminarlo a partire dal %s."
+                    % (tags[0], item.get("modello", ""), item["spedito_il"],
+                       sblocco.strftime("%d/%m/%Y")),
+                    parent=self)
+                return
         question = "Eliminare %s dall'inventario?" % tags[0]
         if item and item.get("modello"):
             question = "Eliminare %s - %s dall'inventario?" % (tags[0], item["modello"])
@@ -1153,6 +1189,36 @@ class App(tk.Tk):
         if when:
             self.var_status.set("%s prestato a %s il %s.     %s"
                                 % (tag, person, when, self.var_status.get()))
+
+    def on_ship(self, tag=None):
+        """Registra la spedizione dell'iPhone al servizio telefonia."""
+        tag = tag or self._single_selection("Spedizione")
+        if not tag:
+            return
+        item = self._item_by_tag(tag)
+        if item is None:
+            return
+        if not is_iphone(item.get("tipo")):
+            messagebox.showinfo("Spedizione",
+                                "La spedizione al servizio telefonia riguarda solo gli iPhone.",
+                                parent=self)
+            return
+        if is_shipped(item):
+            messagebox.showinfo("Spedizione",
+                                "%s risulta gia' spedito il %s." % (tag, item["spedito_il"]),
+                                parent=self)
+            return
+        if not messagebox.askyesno(
+            "Conferma spedizione",
+            "%s - %s\n\nRegistrare la spedizione al servizio telefonia?\n\n"
+            "Data e ora vengono registrate adesso. Il dispositivo resta in\n"
+            "inventario per consultazione per %d mesi, poi potra' essere eliminato."
+            % (tag, item.get("modello", ""), MESI_CONSERVAZIONE), parent=self
+        ):
+            return
+        testo = self._run(lambda: self.store.ship(tag))
+        if testo:
+            messagebox.showinfo("Spedizione registrata", testo, parent=self)
 
     def on_give_back(self, tag=None):
         """Chiude il prestito: il dispositivo torna disponibile."""

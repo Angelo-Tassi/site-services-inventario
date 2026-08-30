@@ -22,6 +22,9 @@ IPHONE_ROW = "#E2F4E4"  # riga di un iPhone
 IPHONE_ROW_ALT = "#D8EFDB"
 TABLET_ROW = "#FCEEDA"  # riga di un tablet Dell
 TABLET_ROW_ALT = "#F8E5CB"
+SHIP_ROW = "#EFE3F7"    # riga di un dispositivo rispedito
+SHIP_ROW_ALT = "#E7D7F2"
+SHIP_FG = "#6C3483"
 
 ROOM_COLORS = ["#2E86C1", "#16A085", "#8E44AD", "#D68910", "#C0392B"]
 IPHONE_COLOR = "#5D6D7E"   # scheda di comodo, non una stanza vera
@@ -94,6 +97,10 @@ def apply(root):
                     font=(family, 9, "bold"), borderwidth=0, relief="flat",
                     padding=(6, 2), focuscolor=LINK)
     style.map("Row.TButton", background=[("active", PRIMARY), ("pressed", PRIMARY)])
+    style.configure("RowShip.TButton", background=SHIP_FG, foreground="#FFFFFF",
+                    font=(family, 9, "bold"), borderwidth=0, relief="flat",
+                    padding=(6, 2), focuscolor=SHIP_FG)
+    style.map("RowShip.TButton", background=[("active", "#552D69"), ("pressed", "#552D69")])
     style.configure("RowBack.TButton", background=LOAN_FG, foreground="#FFFFFF",
                     font=(family, 9, "bold"), borderwidth=0, relief="flat",
                     padding=(6, 2), focuscolor=LOAN_FG)

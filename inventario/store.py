@@ -13,6 +13,7 @@ Sicurezza sugli accessi concorrenti:
     os.replace(), quindi il file non resta mai a meta'.
 """
 
+import calendar
 import getpass
 import json
 import os
@@ -27,7 +28,7 @@ from openpyxl import Workbook, load_workbook
 SHEET_NAME = "Inventario"
 
 FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
-          "stanza", "stato", "prestato_a", "prestato_il", "note"]
+          "stanza", "stato", "prestato_a", "prestato_il", "spedito_il", "note"]
 
 # Per un iPhone l'identita' e' l'IMEI, non l'asset tag aziendale.
 TIPO_IPHONE = "iphone"
@@ -36,6 +37,17 @@ DISPONIBILE = "Disponibile"
 NON_DISPONIBILE = "Non disponibile"
 # Gli iPhone in nostro possesso sono sempre in attesa di essere rispediti.
 DA_RISPEDIRE = "Da Rispedire"
+# ...finche' non partono davvero per il servizio telefonia.
+SPEDITO = "Spedito"
+
+# Un dispositivo spedito resta consultabile in inventario per tre mesi.
+MESI_CONSERVAZIONE = 3
+
+TESTO_SPEDIZIONE = (
+    "Il dispositivo e' stato rispedito al servizio telefonia il %s. "
+    "Resta in inventario per consultazione fino al %s, data dalla quale potra' "
+    "essere eliminato."
+)
 
 # Stati scegliibili a mano. Gli altri due sono automatici: NON_DISPONIBILE
 # mentre c'e' un prestito in corso, DA_RISPEDIRE per gli iPhone.
@@ -60,6 +72,7 @@ HEADERS = {
     "stato": "Stato",
     "prestato_a": "In prestito a",
     "prestato_il": "Prestato il",
+    "spedito_il": "Spedito il",
     "note": "Note",
     "modificato_il": "Ultima modifica",
     "modificato_da": "Modificato da",
@@ -81,6 +94,8 @@ HEADER_ALIASES = {
                    "utilizzatore", "borrower", "assigned to"],
     "prestato_il": ["prestato il", "data prestito", "in prestito dal",
                     "loan date", "borrowed on"],
+    "spedito_il": ["spedito il", "data spedizione", "rispedito il",
+                   "shipped on"],
     "note": ["note", "nota", "commenti", "notes"],
     "modificato_il": ["ultima modifica", "modificato il", "data"],
     "modificato_da": ["modificato da", "utente"],
@@ -96,6 +111,20 @@ class InventoryError(Exception):
 
 class LockBusy(InventoryError):
     pass
+
+
+class BloccoConservazione(InventoryError):
+    """Un dispositivo spedito non si elimina prima dei tre mesi di conservazione."""
+
+    def __init__(self, item, sblocco):
+        self.item = item
+        self.sblocco = sblocco
+        InventoryError.__init__(
+            self,
+            "%s e' stato rispedito al servizio telefonia il %s.\n\n"
+            "Va conservato in inventario per consultazione: potrai eliminarlo\n"
+            "a partire dal %s."
+            % (item["asset_tag"], item["spedito_il"], sblocco.strftime("%d/%m/%Y")))
 
 
 def current_user():
@@ -127,7 +156,8 @@ def is_iphone(tipo):
 
 
 def new_item(asset_tag="", tipo="", modello="", seriale="", stanza="", note="",
-             prestato_a="", prestato_il="", imei="", restituito_da="", stato=""):
+             prestato_a="", prestato_il="", imei="", restituito_da="", stato="",
+             spedito_il=""):
     item = {
         "asset_tag": norm_tag(asset_tag),
         "tipo": clean(tipo),
@@ -139,6 +169,7 @@ def new_item(asset_tag="", tipo="", modello="", seriale="", stanza="", note="",
         "stato": clean(stato),
         "prestato_a": clean(prestato_a),
         "prestato_il": clean(prestato_il),
+        "spedito_il": clean(spedito_il),
         "note": clean(note),
         "modificato_il": "",
         "modificato_da": "",
@@ -162,7 +193,7 @@ def normalize_state(item, stati=None):
     """
     ammessi = list(stati or STATI)
     if is_iphone(item.get("tipo")):
-        item["stato"] = DA_RISPEDIRE
+        item["stato"] = SPEDITO if item.get("spedito_il") else DA_RISPEDIRE
     elif item.get("prestato_a"):
         item["stato"] = NON_DISPONIBILE
     elif clean(item.get("stato")) not in ammessi:
@@ -172,6 +203,46 @@ def normalize_state(item, stati=None):
 
 def is_on_loan(item):
     return bool(item.get("prestato_a"))
+
+
+def is_shipped(item):
+    return bool(item.get("spedito_il"))
+
+
+def _somma_mesi(quando, mesi):
+    anno = quando.year + (quando.month - 1 + mesi) // 12
+    mese = (quando.month - 1 + mesi) % 12 + 1
+    giorno = min(quando.day, calendar.monthrange(anno, mese)[1])
+    return quando.replace(year=anno, month=mese, day=giorno)
+
+
+def eliminabile_dal(item):
+    """Data dalla quale un dispositivo spedito puo' essere eliminato, o None."""
+    quando = clean(item.get("spedito_il"))
+    if not quando:
+        return None
+    for formato in ("%d/%m/%Y %H:%M", "%d/%m/%Y"):
+        try:
+            return _somma_mesi(datetime.strptime(quando, formato), MESI_CONSERVAZIONE)
+        except ValueError:
+            continue
+    return None
+
+
+def puo_essere_eliminato(item, adesso=None):
+    """(True/False, data di sblocco). Un dispositivo mai spedito e' sempre eliminabile."""
+    sblocco = eliminabile_dal(item)
+    if sblocco is None:
+        return True, None
+    return (adesso or datetime.now()) >= sblocco, sblocco
+
+
+def testo_spedizione(item):
+    """La frase da mostrare accanto a un dispositivo spedito."""
+    sblocco = eliminabile_dal(item)
+    if sblocco is None:
+        return ""
+    return TESTO_SPEDIZIONE % (item["spedito_il"], sblocco.strftime("%d/%m/%Y"))
 
 
 class _Lock(object):
@@ -391,12 +462,41 @@ class InventoryStore(object):
         return self._apply(op)
 
     def delete(self, tags):
+        """Elimina i dispositivi, salvo quelli spediti da meno di tre mesi."""
         wanted = set(norm_tag(t) for t in tags)
 
         def op(items):
+            for it in items:
+                if it["asset_tag"] not in wanted:
+                    continue
+                libero, sblocco = puo_essere_eliminato(it)
+                if not libero:
+                    raise BloccoConservazione(it, sblocco)
             before = len(items)
             items[:] = [it for it in items if it["asset_tag"] not in wanted]
             return before - len(items)
+
+        return self._apply(op)
+
+    def ship(self, tag):
+        """Registra la spedizione al servizio telefonia."""
+        tag = norm_tag(tag)
+
+        def op(items):
+            index = _index_of(items, tag)
+            if index is None:
+                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+            item = items[index]
+            if not is_iphone(item.get("tipo")):
+                raise InventoryError(
+                    "La spedizione al servizio telefonia riguarda solo gli iPhone.")
+            if is_shipped(item):
+                raise InventoryError(
+                    "%s risulta gia' spedito il %s." % (tag, item["spedito_il"]))
+            item["spedito_il"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+            normalize_state(item, self.stati)
+            _stamp_item(item)
+            return testo_spedizione(item)
 
         return self._apply(op)
 
@@ -485,8 +585,9 @@ class InventoryStore(object):
                 raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
             item = items[index]
             if is_iphone(item.get("tipo")):
+                atteso = SPEDITO if is_shipped(item) else DA_RISPEDIRE
                 raise InventoryError(
-                    "Lo stato degli iPhone e' sempre \"%s\" e non si cambia." % DA_RISPEDIRE)
+                    "Lo stato degli iPhone e' sempre \"%s\" e non si cambia." % atteso)
             if is_on_loan(item):
                 raise InventoryError(
                     "%s e' in prestito a %s: registra prima il rientro."
@@ -631,7 +732,7 @@ def _style_sheet(ws, row_count):
     ws.freeze_panes = "A2"
     widths = {"asset_tag": 18, "tipo": 12, "modello": 32, "seriale": 20,
               "imei": 20, "restituito_da": 22, "stanza": 24, "stato": 16,
-              "prestato_a": 24, "prestato_il": 18, "note": 38,
+              "prestato_a": 24, "prestato_il": 18, "spedito_il": 18, "note": 38,
               "modificato_il": 18, "modificato_da": 24}
     for i, field in enumerate(ALL_FIELDS, start=1):
         ws.column_dimensions[ws.cell(row=1, column=i).column_letter].width = widths[field]

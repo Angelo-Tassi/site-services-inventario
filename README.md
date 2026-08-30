@@ -147,10 +147,10 @@ programma, e solo in ultimo lo si chiede all'utente.
   serie**, **IMEI**, **Restituito da**, **Stanza**, **Stato**, **In prestito a**,
   **Prestato il** e **Note**, piu' data e autore dell'ultima modifica.
   L'asset tag e' la chiave univoca dell'inventario.
-- **Righe colorate per tipo**, sempre, sia nell'inventario completo sia dentro
-  le stanze: verde chiaro per gli iPhone, arancione chiaro per i tablet Dell.
-  Un dispositivo in prestito resta rosso: lo stato del prestito ha la
-  precedenza sul colore del tipo. I tablet Dell si riconoscono dal modello, che
+- **Righe colorate**, sempre, sia nell'inventario completo sia dentro le stanze:
+  verde chiaro gli iPhone, arancione chiaro i tablet Dell, **viola i dispositivi
+  gia' rispediti**, rosso quelli in prestito. In caso di sovrapposizione vince
+  l'informazione piu' urgente: prestito, poi spedizione, poi tipo. I tablet Dell si riconoscono dal modello, che
   deve contenere la parola *Dell* (come *Dell Latitude 7320 Detachable*).
 - **Selezione con la casella**: la prima colonna dell'elenco e' una casella di
   spunta. Si lavora **su un dispositivo alla volta**: spuntandone un altro il
@@ -222,9 +222,35 @@ stato risulta **Non disponibile**; l'evidenziazione si ritrova anche nei file
 esportati e stampati. Il nome di chi ha in prestito un dispositivo e' incluso
 nella ricerca, quindi basta digitare il cognome per trovare cosa ha in mano.
 
-Due stati sono automatici e vincono su tutto: **Non disponibile** mentre c'e' un
-prestito in corso, **Da Rispedire** per tutti gli iPhone. Registrato il rientro,
+Tre stati sono automatici e vincono su tutto: **Non disponibile** mentre c'e' un
+prestito in corso, **Da Rispedire** per gli iPhone ancora in casa e **Spedito**
+per quelli gia' rispediti. Registrato il rientro,
 il dispositivo torna *Disponibile*. Vedi *Stati* qui sotto per gli altri.
+
+## Spedizione degli iPhone
+
+Nel contenitore **Iphone** ogni telefono non ancora rispedito ha sul proprio rigo
+il pulsante **SPEDITO**, da premere quando parte davvero verso il servizio
+telefonia. La colonna compare solo li': nelle stanze non c'e'.
+
+Alla conferma il programma registra **giorno e ora** nella colonna *Spedito il*,
+porta lo stato a *Spedito*, colora la riga di **viola** e mostra la frase che
+resta valida per il dispositivo:
+
+> Il dispositivo e' stato rispedito al servizio telefonia il *gg/mm/aaaa hh:mm*.
+> Resta in inventario per consultazione fino al *gg/mm/aaaa*, data dalla quale
+> potra' essere eliminato.
+
+### I tre mesi di conservazione
+
+Un dispositivo spedito **non si puo' eliminare per tre mesi** dalla data di
+spedizione: resta visibile in inventario per eventuali consultazioni. Se qualcuno
+prova a cancellarlo, compare un avviso che dice a partire da quale data sara'
+possibile, e l'eliminazione non avviene. Passati i tre mesi il blocco cade da
+solo e il dispositivo si elimina normalmente.
+
+Il vincolo e' nell'archivio dati, non nell'interfaccia: vale anche per una
+cancellazione tentata da un'altra schermata.
 
 ## Stati
 
@@ -243,9 +269,9 @@ momento **senza aprire nessuna finestra**: doppio clic sulla cella *Stato*
 nell'elenco e si sceglie dalla tendina che compare al suo posto. Funziona da
 ogni schermata: inventario completo, singola stanza, contenitore iPhone.
 
-Restano fuori dalla scelta manuale i due stati automatici: un dispositivo **in
+Restano fuori dalla scelta manuale gli stati automatici: un dispositivo **in
 prestito** e' *Non disponibile* e lo stato torna modificabile solo dopo il
-rientro; un **iPhone** e' sempre *Da Rispedire*. In entrambi i casi la tendina
+rientro; un **iPhone** e' *Da Rispedire* finche' non viene spedito, poi *Spedito*. In entrambi i casi la tendina
 appare gia' compilata e bloccata, con la spiegazione accanto, e provando a
 cambiarla dall'elenco il programma lo dice nella barra di stato in fondo, senza
 aprire finestre.
@@ -280,6 +306,17 @@ set INVENTARIO_FILE=Esempio\Inventario.xlsx && python Inventario.py
 | `Inventario.exe` | il programma; da solo, senza prerequisiti |
 | `Inventario.xlsx` | i dati; e' gia' l'inventario, apribile in Excel |
 | `inventario_impostazioni.json` | stanze, tipi, stanze con prestito, stanza degli iPhone, stati |
+
+## Test
+
+```bash
+.venv/bin/python tests/run_all.py
+```
+
+Cinque suite che coprono archivio dati e accessi concorrenti, risoluzione del
+percorso, schermate e colori, scheda di inserimento e spedizioni. Girano senza
+bisogno di una finestra a schermo e non toccano i dati reali: ognuna si
+costruisce il proprio inventario in una cartella temporanea.
 | `.Inventario.xlsx.lock` | presente solo per una frazione di secondo durante un salvataggio |
 
 ## Accessi contemporanei

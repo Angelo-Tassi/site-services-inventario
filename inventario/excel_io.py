@@ -10,19 +10,22 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-from .store import ALL_FIELDS, HEADERS, InventoryError, NON_DISPONIBILE
+from .store import (ALL_FIELDS, HEADERS, InventoryError, NON_DISPONIBILE,
+                    SPEDITO)
 
 PRINT_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
-                "stanza", "stato", "prestato_a", "prestato_il", "note"]
+                "stanza", "stato", "prestato_a", "prestato_il", "spedito_il", "note"]
 PRINT_WIDTHS = {"asset_tag": 16, "tipo": 10, "modello": 26, "seriale": 16,
                 "imei": 18, "restituito_da": 20, "stanza": 22, "stato": 14,
-                "prestato_a": 20, "prestato_il": 15, "note": 26,
+                "prestato_a": 20, "prestato_il": 15, "spedito_il": 15, "note": 24,
                 "modificato_il": 18, "modificato_da": 24}
 
 _HEADER_FILL = PatternFill("solid", fgColor="1F4E79")
 _BAND_FILL = PatternFill("solid", fgColor="F2F6FA")
 _LOAN_FILL = PatternFill("solid", fgColor="FBE3E1")
 _LOAN_TEXT = "A93226"
+_SHIP_FILL = PatternFill("solid", fgColor="EEE3F6")
+_SHIP_TEXT = "6C3483"
 _THIN = Side(style="thin", color="B7C4D2")
 _BORDER = Border(left=_THIN, right=_THIN, top=_THIN, bottom=_THIN)
 
@@ -58,6 +61,7 @@ def _write_table(ws, items, fields, title=None, subtitle=None):
     for i, item in enumerate(items):
         r = header_row + 1 + i
         on_loan = item.get("stato") == NON_DISPONIBILE
+        spedito = item.get("stato") == SPEDITO
         for col, field in enumerate(fields, start=1):
             cell = ws.cell(row=r, column=col, value=item.get(field, ""))
             cell.border = _BORDER
@@ -65,6 +69,9 @@ def _write_table(ws, items, fields, title=None, subtitle=None):
             if on_loan:
                 cell.fill = _LOAN_FILL
                 cell.font = Font(color=_LOAN_TEXT)
+            elif spedito:
+                cell.fill = _SHIP_FILL
+                cell.font = Font(color=_SHIP_TEXT)
             elif i % 2:
                 cell.fill = _BAND_FILL
 
