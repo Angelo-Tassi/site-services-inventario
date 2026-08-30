@@ -47,9 +47,9 @@ ACTION_COLUMN = "_azione"
 COLONNE_NON_IPHONE = ("asset_tag", "seriale", "prestato_a", "prestato_il")
 CHECK_ON = "\u25c9"      # cerchio pieno: riga selezionata
 CHECK_OFF = "\u25cb"     # cerchio vuoto
-COLUMN_WIDTHS = {CHECK_COLUMN: 46, ACTION_COLUMN: 150, "asset_tag": 120, "tipo": 75, "modello": 185,
+COLUMN_WIDTHS = {CHECK_COLUMN: 46, ACTION_COLUMN: 175, "asset_tag": 120, "tipo": 75, "modello": 185,
                  "seriale": 120, "imei": 130, "restituito_da": 135, "stanza": 160,
-                 "stato": 105, "prestato_a": 140, "prestato_il": 120, "spedito_il": 120, "note": 180,
+                 "stato": 185, "prestato_a": 140, "prestato_il": 120, "spedito_il": 120, "note": 180,
                  "modificato_il": 120, "modificato_da": 145}
 REFRESH_MS = 15000
 
@@ -853,7 +853,7 @@ class App(tk.Tk):
         if self.ship_column_visible():
             if not is_iphone(item.get("tipo")) or is_shipped(item):
                 return ""
-            return "SPEDITO"
+            return "Conferma spedizione"
         if not self.can_lend(item):
             return ""
         return "Registra rientro" if is_on_loan(item) else "Presta"
@@ -1380,9 +1380,9 @@ class App(tk.Tk):
                     "%s - %s\n\n"
                     "Questo iPhone non e' ancora stato rispedito al servizio\n"
                     "telefonia, quindi non puo' essere eliminato dall'inventario.\n\n"
-                    "Registra prima la spedizione con il pulsante SPEDITO, nel\n"
-                    "contenitore Iphone. Da quel momento restera' consultabile\n"
-                    "per %d mesi, e poi potra' essere eliminato."
+                    "Registra prima la spedizione con il pulsante Conferma\n"
+                    "spedizione, nel contenitore Iphone. Da quel momento restera'\n"
+                    "consultabile per %d mesi, e poi potra' essere eliminato."
                     % (tags[0], item.get("modello", ""), MESI_CONSERVAZIONE),
                     parent=self)
                 return

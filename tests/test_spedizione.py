@@ -31,7 +31,7 @@ assert app.action_label(app._item_by_tag("IT-0106")) == "Presta"
 app.show_iphones()
 assert app.ship_column_visible()
 assert app.tree.heading(ACTION_COLUMN)["text"] == "Spedizione", app.tree.heading(ACTION_COLUMN)
-assert app.action_label(app._item_by_tag("356938035643809")) == "SPEDITO"
+assert app.action_label(app._item_by_tag("356938035643809")) == "Conferma spedizione"
 
 # --- prima della spedizione: verde, Da Rispedire, eliminabile
 tel = app._item_by_tag("356938035643809")
@@ -50,13 +50,13 @@ app.tree.selection_set(["356938035643809"])
 app.on_delete()
 assert avvisi[-1][0] == "Eliminazione non consentita", avvisi
 assert "non e' ancora stato rispedito" in avvisi[-1][1], avvisi[-1][1]
-assert "SPEDITO" in avvisi[-1][1]
+assert "Conferma spedizione" in avvisi[-1][1].replace("Conferma\nspedizione", "Conferma spedizione")
 assert app._item_by_tag("356938035643809") is not None
 
 # --- spedizione
 testo = app._run(lambda: app.store.ship("356938035643809"), "ok")
 tel = app._item_by_tag("356938035643809")
-assert tel["stato"] == SPEDITO, tel["stato"]
+assert tel["stato"] == SPEDITO == "Spedito al servizio telefonia", tel["stato"]
 assert tel["spedito_il"], tel
 assert "servizio telefonia" in testo and "consultazione" in testo, testo
 sblocco = eliminabile_dal(tel)
@@ -67,8 +67,12 @@ print("frase:", testo)
 # --- riga viola, e niente piu' pulsante su quella riga
 assert app.tree.item("356938035643809", "tags")[0].replace("_alt", "") == "spedito", \
     app.tree.item("356938035643809", "tags")
+# lo stato per esteso si legge anche nell'elenco
+colonne = app._columns()
+assert app.tree.item("356938035643809", "values")[colonne.index("stato")] == \
+    "Spedito al servizio telefonia"
 assert app.action_label(tel) == ""
-assert app.action_label(app._item_by_tag("351234567890123")) == "SPEDITO"   # l'altro no
+assert app.action_label(app._item_by_tag("351234567890123")) == "Conferma spedizione"
 assert str(app.tree.tag_configure("spedito", "background")) == theme.SHIP_ROW
 
 # --- resta visibile ovunque

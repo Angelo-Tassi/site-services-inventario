@@ -150,8 +150,8 @@ programma, e solo in ultimo lo si chiede all'utente.
   **Prestato il** e **Note**, piu' data e autore dell'ultima modifica.
   L'asset tag e' la chiave univoca dell'inventario.
 - **Righe colorate**, sempre, sia nell'inventario completo sia dentro le stanze:
-  verde chiaro gli iPhone, arancione chiaro i tablet Dell, **viola i dispositivi
-  gia' rispediti**, rosso quelli in prestito. In caso di sovrapposizione vince
+  verde chiaro gli iPhone, azzurro i tablet Dell, viola i dispositivi gia'
+  rispediti, rosso quelli in prestito. In caso di sovrapposizione vince
   l'informazione piu' urgente: prestito, poi spedizione, poi tipo. I tablet Dell si riconoscono dal modello, che
   deve contenere la parola *Dell* (come *Dell Latitude 7320 Detachable*).
 - **Selezione con la casella**: la prima colonna dell'elenco e' una casella di
@@ -248,18 +248,18 @@ esportati e stampati. Il nome di chi ha in prestito un dispositivo e' incluso
 nella ricerca, quindi basta digitare il cognome per trovare cosa ha in mano.
 
 Tre stati sono automatici e vincono su tutto: **Non disponibile** mentre c'e' un
-prestito in corso, **Da Rispedire** per gli iPhone ancora in casa e **Spedito**
-per quelli gia' rispediti. Registrato il rientro,
+prestito in corso, **Da Rispedire** per gli iPhone ancora in casa e **Spedito al
+servizio telefonia** per quelli gia' partiti. Registrato il rientro,
 il dispositivo torna *Disponibile*. Vedi *Stati* qui sotto per gli altri.
 
 ## Spedizione degli iPhone
 
 Nel contenitore **Iphone** ogni telefono non ancora rispedito ha sul proprio rigo
-il pulsante **SPEDITO**, da premere quando parte davvero verso il servizio
-telefonia. La colonna compare solo li': nelle stanze non c'e'.
+il pulsante **Conferma spedizione**, da premere quando parte davvero verso il
+servizio telefonia. La colonna compare solo li': nelle stanze non c'e'.
 
 Alla conferma il programma registra **giorno e ora** nella colonna *Spedito il*,
-porta lo stato a *Spedito*, colora la riga di **viola** e mostra la frase che
+porta lo stato a *Spedito al servizio telefonia*, colora la riga di **viola** e mostra la frase che
 resta valida per il dispositivo:
 
 > Il dispositivo e' stato rispedito al servizio telefonia il *gg/mm/aaaa hh:mm*.
@@ -303,7 +303,8 @@ ogni schermata: inventario completo, singola stanza, contenitore iPhone.
 
 Restano fuori dalla scelta manuale gli stati automatici: un dispositivo **in
 prestito** e' *Non disponibile* e lo stato torna modificabile solo dopo il
-rientro; un **iPhone** e' *Da Rispedire* finche' non viene spedito, poi *Spedito*. In entrambi i casi la tendina
+rientro; un **iPhone** e' *Da Rispedire* finche' non viene spedito, poi *Spedito al
+servizio telefonia*. In entrambi i casi la tendina
 appare gia' compilata e bloccata, con la spiegazione accanto, e provando a
 cambiarla dall'elenco il programma lo dice nella barra di stato in fondo, senza
 aprire finestre.

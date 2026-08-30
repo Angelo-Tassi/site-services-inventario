@@ -38,7 +38,7 @@ NON_DISPONIBILE = "Non disponibile"
 # Gli iPhone in nostro possesso sono sempre in attesa di essere rispediti.
 DA_RISPEDIRE = "Da Rispedire"
 # ...finche' non partono davvero per il servizio telefonia.
-SPEDITO = "Spedito"
+SPEDITO = "Spedito al servizio telefonia"
 
 # Un dispositivo spedito resta consultabile in inventario per tre mesi.
 MESI_CONSERVAZIONE = 3
@@ -162,8 +162,8 @@ class BloccoIphoneNonSpedito(InventoryError):
             self,
             "%s non e' ancora stato rispedito al servizio telefonia\n"
             "e non puo' essere eliminato dall'inventario.\n\n"
-            "Registra prima la spedizione con il pulsante SPEDITO, nel\n"
-            "contenitore Iphone. Da quel momento restera' consultabile per\n"
+            "Registra prima la spedizione con il pulsante Conferma spedizione,\n"
+            "nel contenitore Iphone. Da quel momento restera' consultabile per\n"
             "%d mesi, e poi potra' essere eliminato."
             % (item["asset_tag"], MESI_CONSERVAZIONE))
 
@@ -847,7 +847,7 @@ def _style_sheet(ws, row_count):
         cell.alignment = Alignment(vertical="center")
     ws.freeze_panes = "A2"
     widths = {"asset_tag": 18, "tipo": 12, "modello": 32, "seriale": 20,
-              "imei": 20, "restituito_da": 22, "stanza": 24, "stato": 16,
+              "imei": 20, "restituito_da": 22, "stanza": 24, "stato": 26,
               "prestato_a": 24, "prestato_il": 18, "spedito_il": 18, "note": 38,
               "modificato_il": 20, "modificato_da": 24}
     for i, field in enumerate(ALL_FIELDS, start=1):

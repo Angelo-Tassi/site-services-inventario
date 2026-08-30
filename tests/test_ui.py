@@ -86,6 +86,8 @@ app.show_room(BAU)
 assert colore("356938035643809") == "iphone" and colore("IT-0104") == "tablet"
 assert str(app.tree.tag_configure("iphone", "background")) == theme.IPHONE_ROW
 assert str(app.tree.tag_configure("tablet", "background")) == theme.TABLET_ROW
+# azzurro, per non confondersi con il rosso dei prestiti
+assert theme.TABLET_ROW.upper().startswith("#EAF4"), theme.TABLET_ROW
 
 # ---- ordinamento e filtri
 app.show_home()

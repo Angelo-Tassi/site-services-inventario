@@ -2,8 +2,7 @@
   "rooms": [
     "Site Services BAU",
     "Digital Kiosk",
-    "Magazzino Disaster Recovery",
-    "Stanza ATA"
+    "Magazzino Disaster Recovery"
   ],
   "types": [
     "Laptop",

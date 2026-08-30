@@ -16,7 +16,7 @@ from .store import (ALL_FIELDS, HEADERS, InventoryError, NON_DISPONIBILE,
 PRINT_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
                 "stanza", "stato", "prestato_a", "prestato_il", "spedito_il", "note"]
 PRINT_WIDTHS = {"asset_tag": 16, "tipo": 10, "modello": 26, "seriale": 16,
-                "imei": 18, "restituito_da": 20, "stanza": 22, "stato": 14,
+                "imei": 18, "restituito_da": 20, "stanza": 22, "stato": 24,
                 "prestato_a": 20, "prestato_il": 15, "spedito_il": 15, "note": 24,
                 "modificato_il": 18, "modificato_da": 24}
 
