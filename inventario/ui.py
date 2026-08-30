@@ -1126,10 +1126,22 @@ class App(tk.Tk):
         item = self._item_by_tag(tags[0])
         if item is not None:
             libero, sblocco = puo_essere_eliminato(item)
+            if not libero and sblocco is None:
+                messagebox.showwarning(
+                    "Eliminazione non consentita",
+                    "%s - %s\n\n"
+                    "Questo iPhone non e' ancora stato rispedito al servizio\n"
+                    "telefonia, quindi non puo' essere eliminato dall'inventario.\n\n"
+                    "Registra prima la spedizione con il pulsante SPEDITO, nel\n"
+                    "contenitore Iphone. Da quel momento restera' consultabile\n"
+                    "per %d mesi, e poi potra' essere eliminato."
+                    % (tags[0], item.get("modello", ""), MESI_CONSERVAZIONE),
+                    parent=self)
+                return
             if not libero:
                 messagebox.showwarning(
                     "Eliminazione non consentita",
-                    "%s\n\n%s\n\n"
+                    "%s - %s\n\n"
                     "Il dispositivo e' stato rispedito al servizio telefonia il %s e\n"
                     "va conservato in inventario per consultazione.\n\n"
                     "Potrai eliminarlo a partire dal %s."

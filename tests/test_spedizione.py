@@ -5,7 +5,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fixture
 from tkinter import messagebox
 from inventario import theme
-from inventario.store import (BloccoConservazione, DA_RISPEDIRE, InventoryError,
+from inventario.store import (BloccoConservazione, BloccoIphoneNonSpedito,
+                              DA_RISPEDIRE, InventoryError,
                               MESI_CONSERVAZIONE, SPEDITO, eliminabile_dal, new_item,
                               puo_essere_eliminato, testo_spedizione)
 from inventario.ui import ACTION_COLUMN, App
@@ -36,7 +37,21 @@ assert app.action_label(app._item_by_tag("356938035643809")) == "SPEDITO"
 tel = app._item_by_tag("356938035643809")
 assert tel["stato"] == DA_RISPEDIRE and tel["spedito_il"] == ""
 assert app.tree.item("356938035643809", "tags")[0].replace("_alt", "") == "iphone"
-assert puo_essere_eliminato(tel)[0] is True
+
+# --- un iPhone non ancora rispedito non si elimina mai
+libero, sblocco = puo_essere_eliminato(tel)
+assert libero is False and sblocco is None, (libero, sblocco)
+try:
+    app.store.delete(["356938035643809"]); raise SystemExit("iPhone non spedito eliminato")
+except BloccoIphoneNonSpedito as e:
+    print("non spedito:", str(e).replace(chr(10), " "))
+avvisi.clear()
+app.tree.selection_set(["356938035643809"])
+app.on_delete()
+assert avvisi[-1][0] == "Eliminazione non consentita", avvisi
+assert "non e' ancora stato rispedito" in avvisi[-1][1], avvisi[-1][1]
+assert "SPEDITO" in avvisi[-1][1]
+assert app._item_by_tag("356938035643809") is not None
 
 # --- spedizione
 testo = app._run(lambda: app.store.ship("356938035643809"), "ok")
@@ -96,7 +111,11 @@ app._run(lambda: app.store.update("356938035643809", scaduto), "ok")
 assert app._run(lambda: app.store.delete(["356938035643809"]), "ok") == 1
 assert app._item_by_tag("356938035643809") is None
 
-# --- un dispositivo mai spedito si elimina sempre
+# --- laptop e tablet si eliminano sempre, la regola vale solo per gli iPhone
 assert puo_essere_eliminato(app._item_by_tag("IT-0101"))[0] is True
+assert app._run(lambda: app.store.delete(["IT-0102"]), "ok") == 1
+
+# --- l'altro iPhone, mai spedito, resta protetto
+assert puo_essere_eliminato(app._item_by_tag("351234567890123")) == (False, None)
 app.destroy()
 print("SPEDIZIONE OK")

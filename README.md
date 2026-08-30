@@ -241,16 +241,23 @@ resta valida per il dispositivo:
 > Resta in inventario per consultazione fino al *gg/mm/aaaa*, data dalla quale
 > potra' essere eliminato.
 
-### I tre mesi di conservazione
+### Quando un iPhone si puo' eliminare
 
-Un dispositivo spedito **non si puo' eliminare per tre mesi** dalla data di
-spedizione: resta visibile in inventario per eventuali consultazioni. Se qualcuno
-prova a cancellarlo, compare un avviso che dice a partire da quale data sara'
-possibile, e l'eliminazione non avviene. Passati i tre mesi il blocco cade da
-solo e il dispositivo si elimina normalmente.
+Un iPhone si elimina soltanto dopo essere stato rispedito, e comunque non prima
+di tre mesi da quella data. Sono due blocchi distinti, con due avvisi diversi:
 
-Il vincolo e' nell'archivio dati, non nell'interfaccia: vale anche per una
-cancellazione tentata da un'altra schermata.
+| Situazione | Cosa succede provando a eliminarlo |
+| --- | --- |
+| Non ancora rispedito | Avviso: va prima registrata la spedizione con il pulsante *SPEDITO*. Non esiste ancora una data di sblocco. |
+| Rispedito da meno di tre mesi | Avviso con la data esatta a partire dalla quale sara' possibile. |
+| Rispedito da piu' di tre mesi | Si elimina normalmente. |
+
+Nel frattempo il telefono resta visibile in inventario per eventuali
+consultazioni. Passati i tre mesi il blocco cade da solo.
+
+La regola vale **solo per gli iPhone**: laptop e tablet si eliminano sempre. Il
+vincolo e' nell'archivio dati, non nell'interfaccia, quindi non c'e' schermata da
+cui aggirarlo.
 
 ## Stati
 

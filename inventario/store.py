@@ -113,6 +113,21 @@ class LockBusy(InventoryError):
     pass
 
 
+class BloccoIphoneNonSpedito(InventoryError):
+    """Un iPhone si elimina solo dopo essere stato rispedito."""
+
+    def __init__(self, item):
+        self.item = item
+        InventoryError.__init__(
+            self,
+            "%s non e' ancora stato rispedito al servizio telefonia\n"
+            "e non puo' essere eliminato dall'inventario.\n\n"
+            "Registra prima la spedizione con il pulsante SPEDITO, nel\n"
+            "contenitore Iphone. Da quel momento restera' consultabile per\n"
+            "%d mesi, e poi potra' essere eliminato."
+            % (item["asset_tag"], MESI_CONSERVAZIONE))
+
+
 class BloccoConservazione(InventoryError):
     """Un dispositivo spedito non si elimina prima dei tre mesi di conservazione."""
 
@@ -230,7 +245,14 @@ def eliminabile_dal(item):
 
 
 def puo_essere_eliminato(item, adesso=None):
-    """(True/False, data di sblocco). Un dispositivo mai spedito e' sempre eliminabile."""
+    """(True/False, data di sblocco).
+
+    Un iPhone non ancora rispedito non si elimina mai: va prima registrata la
+    spedizione, e da quel momento restano tre mesi di conservazione. In quel
+    caso la data di sblocco e' None, perche' non e' ancora determinabile.
+    """
+    if is_iphone(item.get("tipo")) and not is_shipped(item):
+        return False, None
     sblocco = eliminabile_dal(item)
     if sblocco is None:
         return True, None
@@ -470,8 +492,11 @@ class InventoryStore(object):
                 if it["asset_tag"] not in wanted:
                     continue
                 libero, sblocco = puo_essere_eliminato(it)
-                if not libero:
-                    raise BloccoConservazione(it, sblocco)
+                if libero:
+                    continue
+                if sblocco is None:
+                    raise BloccoIphoneNonSpedito(it)
+                raise BloccoConservazione(it, sblocco)
             before = len(items)
             items[:] = [it for it in items if it["asset_tag"] not in wanted]
             return before - len(items)
