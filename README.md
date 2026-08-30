@@ -385,8 +385,40 @@ Piu' persone possono tenere aperta l'applicazione insieme.
 - Un lock rimasto appeso (PC spento a meta' salvataggio) viene ignorato e
   rimosso dopo 2 minuti.
 
-Perche' funzioni, gli utenti devono avere permessi di **lettura e scrittura**
-sulla cartella (non solo sul file): l'applicazione vi crea file temporanei.
+## Permessi da dare sulla cartella di rete
+
+Non c'e' nessuna installazione: si copia l'eseguibile e basta. Servono pero' due
+permessi diversi, su due oggetti diversi.
+
+| Oggetto | Permesso NTFS | Perche' |
+| --- | --- | --- |
+| `Inventario.exe` | **Lettura ed esecuzione** | senza il diritto di esecuzione Windows non avvia un programma, nemmeno se e' leggibile |
+| la **cartella** | **Modifica** | il programma vi crea, sostituisce ed elimina file, non solo scrive dentro `Inventario.xlsx` |
+
+Il permesso *Modifica* sulla cartella serve perche' ogni salvataggio comporta tre
+operazioni, non una:
+
+1. crea il file di lock `.Inventario.xlsx.lock`, e poi **lo elimina**;
+2. scrive un file temporaneo `Inventario.xlsx.tmp-...`;
+3. **sostituisce** `Inventario.xlsx` con il temporaneo.
+
+Dare solo *Scrittura* sul file `Inventario.xlsx` non basta: mancherebbero la
+creazione e l'eliminazione di file nella cartella, e i salvataggi fallirebbero.
+Anche la condivisione SMB, non solo NTFS, deve concedere la scrittura: fra i due
+vince il piu' restrittivo.
+
+**Utenti in sola lettura.** Chi ha solo *Lettura ed esecuzione* apre il programma
+e consulta l'inventario senza problemi; fallisce appena prova a modificare
+qualcosa. E' un modo legittimo di dare accesso in consultazione. La preferenza sul
+percorso del file, che l'applicazione salverebbe accanto a se stessa, in quel caso
+finisce nel profilo dell'utente.
+
+**Due cose che capitano su Windows.** Un eseguibile aperto da un percorso di rete
+puo' far comparire l'avviso *"Aprire il file? L'autore non e' verificabile"*: si
+evita aggiungendo il server ai siti *Intranet locale* nelle opzioni Internet.
+E in alcuni ambienti l'esecuzione da share e' vietata da criteri di sicurezza
+(AppLocker o criteri di restrizione software): in quel caso il permesso NTFS c'e'
+ma il programma non parte lo stesso, e serve un'eccezione dagli amministratori.
 
 Se qualcuno tiene `Inventario.xlsx` aperto in Excel, i salvataggi possono
 fallire perche' Windows blocca il file: chiudere Excel e riprovare. Per
