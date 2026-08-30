@@ -2,6 +2,8 @@
 import os, sys, tempfile, threading
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from openpyxl import Workbook, load_workbook
+from inventario import lingua as lang
+lang.imposta(lang.ITALIANO)
 from inventario import excel_io
 from inventario.store import (ALL_FIELDS, DISPONIBILE, HEADERS, InventoryError,
                               InventoryStore, NON_DISPONIBILE, new_item,

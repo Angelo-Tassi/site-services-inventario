@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formato dei file Excel · Site Services Inventario</title>
+<meta name="description" content="Come preparare un file Excel perche' venga importato senza errori: colonne riconosciute, righe-separatore per dividere le stanze, esempi ed errori da evitare.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128187;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#E9EDF2; --panel:#FFF; --ink:#14212C; --ink-soft:#55677A; --ink-faint:#7E8FA0;
+  --line:#D3DBE4; --accent:#1F4E79; --accent-strong:#163A5B; --accent-soft:#E3EDF6;
+  --shadow:0 1px 2px rgba(20,33,44,.06),0 14px 40px rgba(20,33,44,.13);
+  --on-accent:#FFFFFF;
+}
+@media (prefers-color-scheme:dark){:root{
+  --ground:#0E1720; --panel:#16222E; --ink:#E6EDF4; --ink-soft:#9FB0C0; --ink-faint:#748899;
+  --line:#263644; --accent:#6FB3E0; --accent-strong:#8CC5EA; --accent-soft:#1B2C3B;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 44px rgba(0,0,0,.55);
+  --on-accent:#0B1520;
+}}
+/* colori reali del programma, uguali in entrambi i temi */
+:root{
+  --w-bg:#EEF2F7; --w-card:#FFF; --w-primary:#1F4E79; --w-text:#1B2733; --w-muted:#6B7A8C;
+  --w-border:#D7E0EA; --w-head:#E7EEF6; --w-row-alt:#F6F9FC; --w-loan-bg:#FDEEEC;
+  --w-loan-fg:#A93226; --w-iphone:#EDF9EF; --w-tablet:#EAF4FD; --w-link:#1A6BA8;
+  --w-ship:#F6EFFB; --w-ship-fg:#6C3483;
+  --w-r1:#2E86C1; --w-r2:#16A085; --w-r3:#8E44AD; --w-r4:#5D6D7E;
+  --w-face:"Segoe UI",-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:var(--ground);color:var(--ink);
+  font:400 16px/1.65 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+a{color:var(--accent)}
+
+header{padding:64px 0 40px}
+.eyebrow{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+h1{margin:0 0 14px;font-family:Archivo,sans-serif;font-weight:700;
+  font-size:clamp(32px,5.2vw,52px);line-height:1.04;letter-spacing:-.022em;text-wrap:balance}
+.lede{margin:0;max-width:60ch;font-size:18px;color:var(--ink-soft)}
+.alpha{display:inline-block;margin-top:18px;padding:7px 12px;border-radius:3px;
+  background:var(--accent-soft);border:1px solid var(--line);
+  font:500 12px/1 "IBM Plex Mono",monospace;color:var(--accent)}
+
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 8px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:14px 22px;border-radius:4px;
+  text-decoration:none;font-weight:600;font-size:15px;border:1px solid transparent}
+.btn.main{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.main:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.btn.alt{background:var(--panel);color:var(--ink);border-color:var(--line)}
+.btn.alt:hover{border-color:var(--accent);color:var(--accent)}
+.note{font-size:14px;color:var(--ink-faint);margin:6px 0 0}
+
+section{padding:44px 0}
+h2{margin:0 0 8px;font-family:Archivo,sans-serif;font-weight:600;font-size:24px;letter-spacing:-.01em}
+.sub{margin:0 0 24px;color:var(--ink-soft);max-width:62ch}
+
+/* finestra del programma */
+.shot{background:var(--w-bg);border:1px solid var(--line);border-radius:7px;
+  box-shadow:var(--shadow);overflow:hidden;font-family:var(--w-face);color:var(--w-text);font-size:13px}
+.bar{background:#DFE6EE;border-bottom:1px solid #CBD6E1;padding:7px 12px;font-size:12px;color:#4B5C6B;
+  display:flex;align-items:center;gap:9px}
+.bar .dot{width:9px;height:9px;border-radius:50%;background:#9FB1C2}
+.bar .sp{flex:1}
+.appbar{background:var(--w-primary);color:#fff;padding:14px 18px;display:flex;
+  align-items:flex-end;gap:16px;flex-wrap:wrap}
+.appbar b{font-size:19px;font-weight:600}
+.appbar .s{color:#BBD4EA;font-size:12px;margin-top:2px}
+.appbar .t{margin-left:auto;color:#BBD4EA;font-size:12px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;padding:11px 16px 4px}
+.tb{background:#fff;border:1px solid var(--w-border);border-radius:3px;padding:7px 12px;font-size:12.5px}
+.tb.p{background:var(--w-primary);border-color:var(--w-primary);color:#fff;font-weight:600}
+.stage{padding:6px 16px 14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin:8px 0 16px}
+.c{background:#fff;border:1px solid var(--w-border);border-radius:4px;overflow:hidden}
+.c i{display:block;height:4px}
+.c .b{padding:12px 15px 14px}
+.c .n{font-weight:600;font-size:13.5px}
+.c .q{font-size:32px;font-weight:700;line-height:1.15}
+.c .m{font-size:11.5px;color:var(--w-muted)}
+.c .g{font-size:12px;font-weight:600;color:var(--w-link);margin-top:8px}
+.tw{background:#fff;border:1px solid var(--w-border);border-radius:3px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th{background:var(--w-head);color:var(--w-primary);font-weight:600;font-size:12px;
+  text-align:left;padding:8px 10px;white-space:nowrap;border-bottom:1px solid var(--w-border)}
+td{padding:7px 10px;font-size:12.5px;border-bottom:1px solid #EDF1F6;white-space:nowrap}
+tr:nth-child(even){background:var(--w-row-alt)}
+tr.ip,tr.ip:nth-child(even){background:var(--w-iphone)}
+tr.tb2,tr.tb2:nth-child(even){background:var(--w-tablet)}
+tr.ln,tr.ln:nth-child(even){background:var(--w-loan-bg)}
+tr.sp,tr.sp:nth-child(even){background:var(--w-ship)}
+tr.sp td{color:var(--w-ship-fg)}
+tr.ln td{color:var(--w-loan-fg)}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:12px}
+.pill{display:inline-block;background:var(--w-link);color:#fff;border-radius:3px;
+  padding:4px 9px;font-size:11px;font-weight:600}
+.pill.r{background:var(--w-loan-fg)}
+.sel{color:var(--w-link);font-size:14px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:20px}
+.card h3{margin:0 0 7px;font-family:Archivo,sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+.card p{margin:0;font-size:14.5px;color:var(--ink-soft)}
+
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:14px}
+ol.steps li{counter-increment:s;background:var(--panel);border:1px solid var(--line);
+  border-radius:5px;padding:18px 20px 18px 58px;position:relative;font-size:15px;color:var(--ink-soft)}
+ol.steps li::before{content:counter(s);position:absolute;left:20px;top:17px;
+  width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;
+  font:600 13px/24px "IBM Plex Mono",monospace;text-align:center}
+ol.steps b{color:var(--ink)}
+code{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--accent-soft);
+  padding:2px 6px;border-radius:3px}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:5px;
+  padding:16px 18px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;font-size:13px}
+footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
+  color:var(--ink-faint);font-size:14px}
+.lingua{display:flex;justify-content:flex-end;align-items:center;gap:10px;
+  padding-top:26px;font-size:14px;color:var(--ink-soft)}
+.lingua select{font:inherit;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line);border-radius:4px;padding:7px 10px}
+[hidden]{display:none !important}
+
+h3{margin:26px 0 6px;font-family:Archivo,sans-serif;font-size:17px;font-weight:600}
+tr.sep td{background:var(--w-head);color:var(--w-primary)}
+table{min-width:520px}
+.eyebrow a{color:var(--ink-faint);text-decoration:none}
+.eyebrow a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="lingua">
+  <label for="lang">Lingua / Language</label>
+  <select id="lang">
+    <option value="it">Italiano</option>
+    <option value="en">English</option>
+  </select>
+</div>
+<div data-lang="it"><header>
+  <div class="eyebrow"><a href="index.html">← Torna alla pagina del progetto</a></div>
+  <h1>Come preparare il file Excel</h1>
+  <p class="lede">Tutto quello che serve per far entrare i dati al primo colpo,
+    senza righe scartate e senza colonne perse per strada.</p>
+  <div class="cta">
+    <a class="btn main" href="Modello_inventario.xlsx" download>Scarica il modello già pronto</a>
+  </div>
+  <p class="note">Il modello ha già le intestazioni giuste, i separatori di stanza
+    e le tendine: partendo da lì non serve leggere il resto.</p>
+</header>
+
+<section>
+  <h2>La regola in tre righe</h2>
+  <ol class="steps">
+    <li><b>Una riga di intestazione</b> con i nomi delle colonne. Può non essere la
+      prima: il programma la cerca nelle prime dodici righe, quindi un titolo sopra
+      la tabella non dà fastidio.</li>
+    <li><b>Una riga per dispositivo</b>, sotto l'intestazione.</li>
+    <li><b>Serve almeno l'identificativo</b>: l'<i>Asset Tag</i>, oppure l'<i>IMEI</i>
+      se stai catalogando telefoni. Senza, la riga viene scartata.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Le colonne riconosciute</h2>
+  <p class="sub">Il nome va scritto in una di queste forme. Maiuscole, minuscole e
+    spazi in più non contano: <code>  ASSET TAG </code> e <code>asset tag</code> sono
+    la stessa cosa. Le colonne che non riconosce vengono ignorate, e prima di
+    importare il programma te le elenca.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Dato</th><th>Come puoi chiamarlo</th><th>Obbligatorio</th></tr></thead>
+      <tbody>
+        <tr><td><b>Asset Tag</b></td><td class="mono">Asset Tag · Asset · Tag · Etichetta · Inventario</td><td>sì*</td></tr>
+        <tr><td><b>Tipo</b></td><td class="mono">Tipo · Tipologia · Categoria · Type · Device type</td><td>consigliato</td></tr>
+        <tr><td><b>Modello</b></td><td class="mono">Modello · Model · Descrizione · Dispositivo · Device</td><td>consigliato</td></tr>
+        <tr><td><b>Numero di serie</b></td><td class="mono">Numero di serie · Seriale · Serial · Serial number · S/N · SN · Matricola · Service tag</td><td>consigliato</td></tr>
+        <tr><td><b>IMEI</b></td><td class="mono">IMEI · IMEI/MEID · MEID · Codice IMEI</td><td>sì*</td></tr>
+        <tr><td><b>Stanza</b></td><td class="mono">Stanza · Room · Locale · Ubicazione · Posizione · Location</td><td>no</td></tr>
+        <tr><td><b>Stato</b></td><td class="mono">Stato · Status · Disponibilità</td><td>no</td></tr>
+        <tr><td><b>Note</b></td><td class="mono">Note · Nota · Commenti · Notes</td><td>no</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">* Basta uno dei due: asset tag <b>oppure</b> IMEI. Se mancano
+    entrambi l'importazione si ferma con un messaggio, e non entra niente.</p>
+</section>
+
+<section>
+  <h2>Esempio minimo</h2>
+  <p class="sub">Quattro colonne bastano. La stanza si sceglie nella finestra di
+    importazione.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Asset Tag</th><th>Tipo</th><th>Modello</th><th>Numero di serie</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">IT-0101</td><td>Laptop</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
+        <tr><td class="mono">IT-0102</td><td>Laptop</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF5K9M3E</td></tr>
+        <tr><td class="mono">IT-0104</td><td>Tablet</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Dividere per stanza: le righe-separatore</h2>
+  <p class="sub">Se il foglio contiene i dispositivi di più stanze, non serve una
+    colonna <i>Stanza</i>: basta spezzare l'elenco.</p>
+  <p>Una riga con <b>una sola cella scritta</b>, contenente il nome di una stanza,
+    assegna quella stanza a <b>tutte le righe che seguono</b>, fino al separatore
+    successivo.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Asset Tag</th><th>Tipo</th><th>Modello</th><th>Numero di serie</th></tr></thead>
+      <tbody>
+        <tr class="sep"><td class="mono"><b>BAU</b></td><td></td><td></td><td></td></tr>
+        <tr><td class="mono">IT-0101</td><td>Laptop</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
+        <tr><td class="mono">IT-0104</td><td>Tablet</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
+        <tr class="sep"><td class="mono"><b>KIOSK</b></td><td></td><td></td><td></td></tr>
+        <tr><td class="mono">IT-0106</td><td>Laptop</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF5K9M8F</td></tr>
+        <tr class="sep"><td class="mono"><b>DISASTER</b></td><td></td><td></td><td></td></tr>
+        <tr><td class="mono">DR-0201</td><td>Laptop</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4B7T1J</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Cosa puoi scrivere nel separatore</h3>
+  <p class="sub">I nomi validi si ricavano dalle stanze configurate: vale il nome
+    completo e ogni parola che non sia ambigua.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Scrivi</th><th>Finisce in</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">BAU · SITE · SERVICES · SITE SERVICES BAU</td><td>Site Services BAU</td></tr>
+        <tr><td class="mono">KIOSK · DIGITAL · DIGITAL KIOSK</td><td>Digital Kiosk</td></tr>
+        <tr><td class="mono">DISASTER · RECOVERY · MAGAZZINO · MAGAZZINO DISASTER RECOVERY</td><td>Magazzino Disaster Recovery</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Maiuscole e due punti finali non contano: <code>KIOSK</code>,
+    <code>kiosk</code> e <code>Kiosk:</code> sono uguali. Se rinomini una stanza, i
+    nomi validi si aggiornano da soli.</p>
+</section>
+
+<section>
+  <h2>Errori da evitare</h2>
+  <div class="grid">
+    <div class="card"><h3>Due celle sulla riga del separatore</h3>
+      <p>Una riga con più di una cella scritta <b>non</b> è un separatore: viene
+        letta come un dispositivo. Lascia scritta solo la prima cella.</p></div>
+    <div class="card"><h3>Colonne rinominate</h3>
+      <p>Se chiami il modello <i>Descrizione articolo</i>, quel dato non entra.
+        Il programma ti elenca le colonne che non ha capito prima di importare:
+        rinominale come nella tabella qui sopra e riprova.</p></div>
+    <div class="card"><h3>Asset tag ripetuti</h3>
+      <p>Due righe con lo stesso asset tag non creano due dispositivi: la seconda
+        aggiorna la prima. È utile per correggere in blocco, ma attenzione se non
+        era voluto.</p></div>
+    <div class="card"><h3>iPhone nel foglio</h3>
+      <p>Vengono sempre ignorati, e il programma dice quanti. I telefoni si
+        inseriscono solo a mano: hanno l'IMEI al posto dell'asset tag e regole
+        proprie di spedizione.</p></div>
+    <div class="card"><h3>Stati inventati</h3>
+      <p>Uno stato che non è fra quelli previsti viene riportato a
+        <i>Disponibile</i>. Gli stati validi sono elencati nel foglio
+        <i>Istruzioni</i> del modello.</p></div>
+    <div class="card"><h3>Celle formattate come numeri</h3>
+      <p>Un asset tag come <code>0012</code> in Excel diventa <code>12</code>.
+        Formatta la colonna come <b>testo</b> prima di incollare, se i codici
+        cominciano per zero.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Cosa succede a ogni riga</h2>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Nel file</th><th>Risultato</th></tr></thead>
+      <tbody>
+        <tr><td>Riga completa</td><td>importata</td></tr>
+        <tr><td>Riga vuota</td><td>saltata, non conta come scartata</td></tr>
+        <tr><td>Senza asset tag né IMEI</td><td>scartata, e te lo dice</td></tr>
+        <tr><td>Senza modello</td><td>importata, campo vuoto da completare a mano</td></tr>
+        <tr><td>Tipo iPhone</td><td>ignorata</td></tr>
+        <tr><td>Colonne in più</td><td>ignorate, elencate prima di importare</td></tr>
+        <tr><td>Titolo sopra la tabella</td><td>saltato</td></tr>
+        <tr><td>Più fogli nel file</td><td>letti tutti; un foglio intitolato come una stanza vale da separatore</td></tr>
+        <tr><td>Foglio senza tabella</td><td>ignorato</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Finché non confermi non viene scritto niente: il riepilogo mostra
+    tutti questi conteggi e puoi ancora annullare.</p>
+</section>
+
+<section>
+  <h2>Provare senza rischi</h2>
+  <p class="sub">Nella cartella <a href="https://github.com/Angelo-Tassi/site-services-inventario/tree/main/Collaudo">Collaudo</a>
+    trovi due fogli pronti - uno regolare con 30 dispositivi, dieci per stanza, e uno
+    con dentro apposta tutti gli errori descritti qui - e otto prove passo passo.</p>
+</section>
+
+<footer>
+  <div class="wrap" style="padding:0">
+    <a href="index.html">Pagina del progetto</a> ·
+    <a href="https://github.com/Angelo-Tassi/site-services-inventario">Codice</a> ·
+    <a href="https://github.com/Angelo-Tassi/site-services-inventario/issues">Segnala un problema</a>
+  </div>
+</footer>
+</div>
+<div data-lang="en" hidden><header>
+  <div class="eyebrow"><a href="index.html">← Back to the project page</a></div>
+  <h1>How to prepare the Excel file</h1>
+  <p class="lede">Everything you need to get the data in on the first try, with no
+    discarded rows and no columns lost along the way.</p>
+  <div class="cta">
+    <a class="btn main" href="Modello_inventario.xlsx" download>Download the ready-made template</a>
+  </div>
+  <p class="note">The template already carries the right headers, the room
+    separators and the dropdowns: starting from it, you do not need to read the rest.</p>
+</header>
+
+<section>
+  <h2>The rule in three lines</h2>
+  <ol class="steps">
+    <li><b>One header row</b> with the column names. It need not be the first one:
+      the program looks for it in the first twelve rows, so a title above the table
+      does no harm.</li>
+    <li><b>One row per device</b>, below the header.</li>
+    <li><b>An identifier is required</b>: the <i>Asset Tag</i>, or the <i>IMEI</i>
+      if you are listing phones. Without it the row is discarded.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>The recognised columns</h2>
+  <p class="sub">The name must be written in one of these forms. Case and extra
+    spaces do not matter: <code>  ASSET TAG </code> and <code>asset tag</code> are the
+    same thing. Columns it does not recognise are ignored, and the program lists them
+    for you before importing.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Field</th><th>What you can call it</th><th>Required</th></tr></thead>
+      <tbody>
+        <tr><td><b>Asset Tag</b></td><td class="mono">Asset Tag · Asset · Tag · Etichetta · Inventario</td><td>yes*</td></tr>
+        <tr><td><b>Type</b></td><td class="mono">Type · Device type · Tipo · Tipologia · Categoria</td><td>recommended</td></tr>
+        <tr><td><b>Model</b></td><td class="mono">Model · Device · Modello · Descrizione · Dispositivo</td><td>recommended</td></tr>
+        <tr><td><b>Serial number</b></td><td class="mono">Serial number · Serial · S/N · SN · Service tag · Numero di serie · Seriale · Matricola</td><td>recommended</td></tr>
+        <tr><td><b>IMEI</b></td><td class="mono">IMEI · IMEI/MEID · MEID · Codice IMEI</td><td>yes*</td></tr>
+        <tr><td><b>Room</b></td><td class="mono">Room · Location · Stanza · Locale · Ubicazione · Posizione</td><td>no</td></tr>
+        <tr><td><b>Status</b></td><td class="mono">Status · Stato · Disponibilità</td><td>no</td></tr>
+        <tr><td><b>Notes</b></td><td class="mono">Notes · Note · Nota · Commenti</td><td>no</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">* Either one is enough: asset tag <b>or</b> IMEI. If both are
+    missing the import stops with a message, and nothing goes in.</p>
+</section>
+
+<section>
+  <h2>Minimal example</h2>
+  <p class="sub">Four columns are enough. The room is chosen in the import window.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Asset Tag</th><th>Type</th><th>Model</th><th>Serial number</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">IT-0101</td><td>Laptop</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
+        <tr><td class="mono">IT-0102</td><td>Laptop</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF5K9M3E</td></tr>
+        <tr><td class="mono">IT-0104</td><td>Tablet</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Splitting by room: the separator rows</h2>
+  <p class="sub">If the sheet holds devices from several rooms, you do not need a
+    <i>Room</i> column: just break the list up.</p>
+  <p>A row with <b>a single cell filled in</b>, containing a room name, assigns that
+    room to <b>every row that follows</b>, until the next separator.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Asset Tag</th><th>Type</th><th>Model</th><th>Serial number</th></tr></thead>
+      <tbody>
+        <tr class="sep"><td class="mono"><b>BAU</b></td><td></td><td></td><td></td></tr>
+        <tr><td class="mono">IT-0101</td><td>Laptop</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
+        <tr><td class="mono">IT-0104</td><td>Tablet</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
+        <tr class="sep"><td class="mono"><b>KIOSK</b></td><td></td><td></td><td></td></tr>
+        <tr><td class="mono">IT-0106</td><td>Laptop</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF5K9M8F</td></tr>
+        <tr class="sep"><td class="mono"><b>DISASTER</b></td><td></td><td></td><td></td></tr>
+        <tr><td class="mono">DR-0201</td><td>Laptop</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4B7T1J</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>What you can write in a separator</h3>
+  <p class="sub">The valid names come from the configured rooms: the full name works,
+    and so does any word that is unambiguous.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Write</th><th>Goes into</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">BAU · SITE · SERVICES · SITE SERVICES BAU</td><td>Site Services BAU</td></tr>
+        <tr><td class="mono">KIOSK · DIGITAL · DIGITAL KIOSK</td><td>Digital Kiosk</td></tr>
+        <tr><td class="mono">DISASTER · RECOVERY · MAGAZZINO · MAGAZZINO DISASTER RECOVERY</td><td>Magazzino Disaster Recovery</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Case and a trailing colon do not matter: <code>KIOSK</code>,
+    <code>kiosk</code> and <code>Kiosk:</code> are the same. If you rename a room, the
+    valid names follow along.</p>
+</section>
+
+<section>
+  <h2>Mistakes to avoid</h2>
+  <div class="grid">
+    <div class="card"><h3>Two cells on the separator row</h3>
+      <p>A row with more than one cell filled in is <b>not</b> a separator: it is read
+        as a device. Leave only the first cell written.</p></div>
+    <div class="card"><h3>Renamed columns</h3>
+      <p>If you call the model <i>Item description</i>, that data does not go in. The
+        program lists the columns it did not understand before importing: rename them
+        as in the table above and try again.</p></div>
+    <div class="card"><h3>Repeated asset tags</h3>
+      <p>Two rows with the same asset tag do not create two devices: the second one
+        updates the first. Handy for bulk corrections, but watch out if it was not
+        intended.</p></div>
+    <div class="card"><h3>iPhones in the sheet</h3>
+      <p>They are always ignored, and the program says how many. Phones are entered by
+        hand only: they carry an IMEI instead of an asset tag and have their own
+        shipment rules.</p></div>
+    <div class="card"><h3>Made-up statuses</h3>
+      <p>A status that is not among the expected ones is reset to <i>Available</i>.
+        The valid statuses are listed in the <i>Istruzioni</i> sheet of the template.</p></div>
+    <div class="card"><h3>Cells formatted as numbers</h3>
+      <p>An asset tag like <code>0012</code> becomes <code>12</code> in Excel. Format
+        the column as <b>text</b> before pasting, if your codes start with a zero.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>What happens to each row</h2>
+  <div class="tw">
+    <table>
+      <thead><tr><th>In the file</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Complete row</td><td>imported</td></tr>
+        <tr><td>Empty row</td><td>skipped, not counted as discarded</td></tr>
+        <tr><td>No asset tag and no IMEI</td><td>discarded, and reported</td></tr>
+        <tr><td>No model</td><td>imported, field left empty to fill in by hand</td></tr>
+        <tr><td>Type iPhone</td><td>ignored</td></tr>
+        <tr><td>Extra columns</td><td>ignored, listed before importing</td></tr>
+        <tr><td>Title above the table</td><td>skipped</td></tr>
+        <tr><td>Several sheets</td><td>all read; a sheet named after a room counts as a separator</td></tr>
+        <tr><td>Sheet with no table</td><td>ignored</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Nothing is written until you confirm: the summary shows all these
+    counts and you can still cancel.</p>
+</section>
+
+<section>
+  <h2>Trying it safely</h2>
+  <p class="sub">The <a href="https://github.com/Angelo-Tassi/site-services-inventario/tree/main/Collaudo">Collaudo</a>
+    folder holds two ready sheets - a regular one with 30 devices, ten per room, and one
+    deliberately carrying every mistake described here - plus eight step-by-step checks.</p>
+</section>
+
+<footer>
+  <div class="wrap" style="padding:0">
+    <a href="index.html">Project page</a> ·
+    <a href="https://github.com/Angelo-Tassi/site-services-inventario">Code</a> ·
+    <a href="https://github.com/Angelo-Tassi/site-services-inventario/issues">Report a problem</a>
+  </div>
+</footer>
+</div>
+</div>
+<script>
+(function () {
+  var scelta = document.getElementById("lang");
+  function applica(codice) {
+    document.querySelectorAll("[data-lang]").forEach(function (b) {
+      b.hidden = b.getAttribute("data-lang") !== codice;
+    });
+    document.documentElement.lang = codice;
+    scelta.value = codice;
+  }
+  var salvata = "it";
+  try { salvata = localStorage.getItem("lingua") || "it"; } catch (e) {}
+  if (salvata !== "it" && salvata !== "en") { salvata = "it"; }
+  applica(salvata);
+  scelta.addEventListener("change", function () {
+    applica(scelta.value);
+    try { localStorage.setItem("lingua", scelta.value); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

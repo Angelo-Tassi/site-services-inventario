@@ -1,6 +1,8 @@
 """Come si determina il percorso del file dati."""
 import json, os, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from inventario import lingua as lang
+lang.imposta(lang.ITALIANO)
 from inventario import config
 from inventario.store import InventoryStore
 

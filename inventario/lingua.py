@@ -198,6 +198,82 @@ EN = {
     "Una stanza sola sta in un file solo, con il suo nome in testa.":
         "A single room fits in a single file, with its name at the top.",
     "ELIMINA TUTTO": "DELETE EVERYTHING",
+    "File Excel": "Excel files",
+    "Tutti i file": "All files",
+
+    # --- etichette e messaggi con formattazione
+    '  %d iPhone lasciati in %s.':
+        '  %d iPhones left in %s.',
+    '  |  visualizzati: %d':
+        '  |  shown: %d',
+    ' di %d':
+        ' of %d',
+    ' e altre %d':
+        ' and %d more',
+    ' in %s':
+        ' in %s',
+    '%d dispositivi     %s':
+        '%d devices     %s',
+    '%d dispositivi  (%s)%s     File: %s':
+        '%d devices  (%s)%s     File: %s',
+    '%d dispositivi di %s':
+        '%d devices from %s',
+    "%s e' in prestito a %s: registra prima il rientro.":
+        '%s is on loan to %s: register the return first.',
+    '%s prestato a %s il %s.     %s':
+        '%s lent to %s on %s.     %s',
+    '%s rientrato da %s.     %s':
+        '%s returned by %s.     %s',
+    '%s: %s.':
+        '%s: %s.',
+    ', un foglio per stanza':
+        ', one sheet per room',
+    'Aggiunto %s.':
+        '%s added.',
+    'Elenco ricaricato.':
+        'List reloaded.',
+    "Eliminare %s - %s dall'inventario?":
+        'Delete %s - %s from the inventory?',
+    "Eliminare %s dall'inventario?":
+        'Delete %s from the inventory?',
+    'Eliminato %s.':
+        '%s deleted.',
+    'Gli iPhone non vengono toccati.':
+        'iPhones are not touched.',
+    'Inventario aggiornato da un altro utente.':
+        'Inventory updated by another user.',
+    "L'inventario":
+        'The inventory',
+    'Lo stato degli iPhone e\' sempre "%s".':
+        'iPhones are always "%s".',
+    'Nessuno spostamento.':
+        'Nothing moved.',
+    'Nota aggiornata su %s.':
+        'Note updated on %s.',
+    'Salvato %s.':
+        '%s saved.',
+    'Sostituzione':
+        'Replacement',
+    'Sposta %s in:':
+        'Move %s to:',
+    'Spostati %d dispositivi in %s.':
+        '%d devices moved to %s.',
+    'Stampa inviata alla stampante predefinita.     ':
+        'Sent to the default printer.     ',
+    'Una copia del file dati viene salvata prima di procedere.':
+        'A copy of the data file is saved before going ahead.',
+    'Unione':
+        'Merge',
+    "Verranno prima eliminati %d dispositivi gia' in inventario%s.":
+        '%d devices already in the inventory%s will be deleted first.',
+    'altre/nessuna: %d':
+        'other/none: %d',
+    "tutto l'inventario":
+        'the whole inventory',
+    'nessun dispositivo':
+        'no devices',
+    '%d in prestito':
+        '%d on loan',
     "Verranno eliminati %d dispositivi, per tutti gli utenti.":
         "%d devices will be deleted, for every user.",
     "L'operazione non si annulla dal programma.":

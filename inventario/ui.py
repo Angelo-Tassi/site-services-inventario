@@ -20,7 +20,19 @@ from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
                     puo_essere_eliminato, rows_from_workbook, testo_spedizione,
                     valore_visibile)
 
-NO_ROOM = "(senza stanza)"
+NO_ROOM_IT = "(senza stanza)"
+
+
+def NO_ROOM():
+    return T(NO_ROOM_IT)
+
+
+def TUTTE():
+    return T("Tutte")
+
+
+def TUTTI():
+    return T("Tutti")
 
 
 CAMPI_DATA = ("modificato_il", "prestato_il", "spedito_il")
@@ -128,7 +140,8 @@ class ItemDialog(_Modal):
     """
 
     def __init__(self, parent, rooms, types, item=None, iphone_room=None, stati=None):
-        _Modal.__init__(self, parent, "Modifica dispositivo" if item else "Nuovo dispositivo")
+        _Modal.__init__(self, parent, T("Modifica dispositivo") if item
+                        else T("Nuovo dispositivo"))
         item = item or new_item(stanza=rooms[0] if rooms else "")
         # Gli iPhone non si prestano: nessun dato di prestito da conservare.
         self._loan = ("", "") if is_iphone(item.get("tipo")) \
@@ -193,13 +206,13 @@ class ItemDialog(_Modal):
             child.destroy()
 
         if self.is_iphone():
-            righe = [("IMEI *", self.var_imei),
-                     ("Modello *", self.var_modello),
-                     ("Restituito da *", self.var_restituito)]
+            righe = [(T("IMEI *"), self.var_imei),
+                     (T("Modello *"), self.var_modello),
+                     (T("Restituito da *"), self.var_restituito)]
         else:
-            righe = [("Asset Tag *", self.var_tag),
-                     ("Modello *", self.var_modello),
-                     ("Numero di serie *", self.var_seriale)]
+            righe = [(T("Asset Tag *"), self.var_tag),
+                     (T("Modello *"), self.var_modello),
+                     (T("Numero di serie *"), self.var_seriale)]
 
         self.required = []
         for riga, (etichetta, var) in enumerate(righe):
@@ -244,9 +257,9 @@ class ItemDialog(_Modal):
                                                         sticky="we", pady=5)
         riga += 1
         if stato_widget == "disabled":
-            motivo = ("Gli iPhone non si prestano: lo stato lo decide la spedizione."
+            motivo = (T("Gli iPhone non si prestano: lo stato lo decide la spedizione.")
                       if self.is_iphone()
-                      else "In prestito: lo stato torna modificabile dopo il rientro.")
+                      else T("In prestito: lo stato torna modificabile dopo il rientro."))
             ttk.Label(self.fields, style="Muted.TLabel", text=motivo).grid(
                 row=riga, column=1, sticky="w")
             riga += 1
@@ -419,7 +432,8 @@ class AddChoiceDialog(_Modal):
     """Come aggiungere un dispositivo: a mano o leggendo i codici a barre."""
 
     def __init__(self, parent, iphone=False):
-        _Modal.__init__(self, parent, "Aggiungi iPhone" if iphone else "Aggiungi dispositivo")
+        _Modal.__init__(self, parent, T("Aggiungi iPhone") if iphone
+                        else T("Aggiungi dispositivo"))
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
         ttk.Label(body, text=T("Come vuoi aggiungerlo?"),
@@ -427,11 +441,11 @@ class AddChoiceDialog(_Modal):
         if iphone:
             aiuto = (T("La scansione legge l'IMEI dal codice a barre: un iPhone non\n"
                      "ha asset tag ne' numero di serie."))
-            etichetta = "Scansiona l'IMEI con il lettore di codici"
+            etichetta = T("Scansiona l'IMEI con il lettore di codici")
         else:
             aiuto = (T("La scansione compila asset tag e numero di serie con il\n"
                      "lettore di codici a barre."))
-            etichetta = "Scansiona con il lettore di codici"
+            etichetta = T("Scansiona con il lettore di codici")
         ttk.Label(body, style="Muted.TLabel", text=aiuto).pack(anchor="w", pady=(4, 14))
 
         def scegli(modo):
@@ -492,11 +506,11 @@ class ScanDialog(_Modal):
 
     def _aggiorna(self):
         if self.manuale:
-            self.var_titolo.set("Scrivi %s" % self.campo)
-            self.var_aiuto.set("Digita il valore e premi Invio.")
+            self.var_titolo.set(T("Scrivi %s") % self.campo)
+            self.var_aiuto.set(T("Digita il valore e premi Invio."))
             self.btn_manuale.pack_forget()
         else:
-            self.var_titolo.set("Scansiona %s" % self.campo)
+            self.var_titolo.set(T("Scansiona %s") % self.campo)
             self.var_aiuto.set(T("Inquadra il codice: il lettore compila il campo e\n"
                                "conferma da solo. Puoi anche digitarlo."))
 
@@ -616,7 +630,7 @@ class ExportOptionsDialog(_Modal):
             ("fogli", "Un foglio per ogni stanza, nello stesso file"),
             ("file", "Un file separato per ogni stanza"),
         ):
-            b = ttk.Radiobutton(body, variable=self.var_forma, value=valore, text=testo)
+            b = ttk.Radiobutton(body, variable=self.var_forma, value=valore, text=T(testo))
             b.pack(anchor="w", pady=(6 if valore == "unico" else 2, 0))
             self.scelte_forma.append(b)
         self.nota = ttk.Label(body, style="Muted.TLabel", justify="left",
@@ -650,8 +664,8 @@ class ExportOptionsDialog(_Modal):
             b.configure(state="disabled" if singola else "normal")
         self.nota.configure(
             text=T("Una stanza sola sta in un file solo, con il suo nome in testa.")
-            if singola else "Ogni foglio porta in testa il nome della stanza,\n"
-                            "la data e il numero di dispositivi.")
+            if singola else T("Ogni foglio porta in testa il nome della stanza,\n"
+                              "la data e il numero di dispositivi."))
 
     def _ok(self):
         if self.var_ambito.get() == "stanza":
@@ -671,8 +685,8 @@ class ImportOptionsDialog(_Modal):
 
     def __init__(self, parent, rooms, stanza_fissa=None):
         _Modal.__init__(self, parent,
-                        "Importa in %s" % stanza_fissa if stanza_fissa
-                        else "Importa da Excel")
+                        T("Importa in %s") % stanza_fissa if stanza_fissa
+                        else T("Importa da Excel"))
         self.stanza_fissa = stanza_fissa
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
@@ -791,19 +805,19 @@ class ImportDialog(_Modal):
                               bg=theme.LOAN_BG, fg=theme.LOAN_FG,
                               padx=10, pady=8, wraplength=430)
             avviso.pack(fill="x", pady=(0, 8))
-        dove = opzioni["stanza"] or "tutto l'inventario"
-        come = ("Sostituzione" if opzioni["mode"] == "replace" else "Unione")
+        dove = opzioni["stanza"] or T("tutto l'inventario")
+        come = T("Sostituzione") if opzioni["mode"] == "replace" else T("Unione")
         tk.Label(body, text=T("%s  \u2192  %s") % (come, dove), anchor="w",
                  bg=theme.HEAD_BG, fg=theme.PRIMARY, padx=10, pady=7,
                  font=self.master.fonts["bold"]).pack(fill="x", pady=(0, 8))
 
         self.var_conferma = tk.StringVar()
         if opzioni["mode"] == "replace":
-            testo = ["Verranno prima eliminati %d dispositivi gia' in inventario%s."
+            testo = [T("Verranno prima eliminati %d dispositivi gia' in inventario%s.")
                      % (da_eliminare, "" if opzioni["stanza"] is None
-                        else " in %s" % opzioni["stanza"])]
-            testo.append("Gli iPhone non vengono toccati.")
-            testo.append("Una copia del file dati viene salvata prima di procedere.")
+                        else T(" in %s") % opzioni["stanza"])]
+            testo.append(T("Gli iPhone non vengono toccati."))
+            testo.append(T("Una copia del file dati viene salvata prima di procedere."))
             tk.Label(body, text=T("\n").join(testo), justify="left", anchor="w",
                      bg=theme.LOAN_BG, fg=theme.LOAN_FG, padx=10, pady=8,
                      wraplength=430).pack(fill="x", pady=(0, 8))
@@ -826,11 +840,11 @@ class ImportDialog(_Modal):
         if ignorate:
             elenco = ", ".join(ignorate[:6])
             if len(ignorate) > 6:
-                elenco += " e altre %d" % (len(ignorate) - 6)
+                elenco += T(" e altre %d") % (len(ignorate) - 6)
             messaggi.append(
-                "Colonne non riconosciute, il cui contenuto non verra' importato:\n%s\n"
-                "Se una di queste e' un dato che ti serve, rinominala come la colonna\n"
-                "corrispondente dell'inventario e riprova." % elenco)
+                T("Colonne non riconosciute, il cui contenuto non verra' importato:\n%s\n"
+                  "Se una di queste e' un dato che ti serve, rinominala come la colonna\n"
+                  "corrispondente dell'inventario e riprova.") % elenco)
         senza = esito.get("senza_modello")
         if senza:
             messaggi.append(
@@ -904,7 +918,7 @@ class RoomCard(tk.Frame):
 class App(tk.Tk):
     def __init__(self, data_path):
         tk.Tk.__init__(self)
-        self.title('Site Services : Inventario Iphone, Laptop e Tablet')
+        self.title(T("Site Services : Inventario Iphone, Laptop e Tablet"))
         self.geometry("1220x720")
         self.minsize(980, 560)
 
@@ -933,6 +947,16 @@ class App(tk.Tk):
 
     # ------------------------------------------------------------ layout
 
+    def _cambia_lingua(self, _event=None):
+        """La tendina nell'intestazione: cambia lingua e ridisegna la finestra."""
+        scelte = dict((nome, codice) for nome, codice in lang.LINGUE)
+        nuova = scelte.get(self.var_lingua.get(), lang.ITALIANO)
+        if nuova == lang.corrente():
+            return
+        lang.imposta(nuova)
+        config.save_language(nuova)
+        self.ricostruisci()
+
     def ricostruisci(self):
         """Ridisegna tutta la finestra: serve dopo un cambio di lingua."""
         self._clear_row_buttons()
@@ -957,14 +981,26 @@ class App(tk.Tk):
         head.pack(fill="x")
         left = ttk.Frame(head, style="Head.TFrame")
         left.pack(side="left")
-        ttk.Label(left, text='Site Services : Inventario Iphone, Laptop e Tablet',
+        ttk.Label(left, text=T("Site Services : Inventario Iphone, Laptop e Tablet"),
                   style="HeadTitle.TLabel").pack(anchor="w")
-        self.var_subtitle = tk.StringVar(value="Laptop e tablet in nostro possesso")
+        self.var_subtitle = tk.StringVar(value=T("Laptop e tablet in nostro possesso"))
         ttk.Label(left, textvariable=self.var_subtitle,
                   style="HeadSub.TLabel").pack(anchor="w", pady=(2, 0))
+        destra = ttk.Frame(head, style="Head.TFrame")
+        destra.pack(side="right")
+        scelta = ttk.Frame(destra, style="Head.TFrame")
+        scelta.pack(anchor="e")
+        ttk.Label(scelta, text=T("Lingua"), style="HeadSub.TLabel").pack(side="left",
+                                                                        padx=(0, 6))
+        self.var_lingua = tk.StringVar(value=lang.nome_lingua(lang.corrente()))
+        combo = ttk.Combobox(scelta, textvariable=self.var_lingua,
+                             values=[nome for nome, _ in lang.LINGUE],
+                             state="readonly", width=11)
+        combo.pack(side="left")
+        combo.bind("<<ComboboxSelected>>", self._cambia_lingua)
         self.var_head_count = tk.StringVar(value="")
-        ttk.Label(head, textvariable=self.var_head_count,
-                  style="HeadSub.TLabel").pack(side="right")
+        ttk.Label(destra, textvariable=self.var_head_count,
+                  style="HeadSub.TLabel").pack(anchor="e", pady=(6, 0))
 
     def _build_toolbar(self):
         bar = ttk.Frame(self, padding=(16, 12, 16, 4))
@@ -979,14 +1015,14 @@ class App(tk.Tk):
             ("Elimina", self.on_delete),
             ("Sposta in stanza...", self.on_move),
         ):
-            ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 6))
+            ttk.Button(bar, text=T(text), command=command).pack(side="left", padx=(0, 6))
         ttk.Separator(bar, orient="vertical").pack(side="left", fill="y", padx=10)
         for text, command in (
             ("Importa xls...", self.on_import),
             ("Esporta xls...", self.on_export),
             ("Stampa", self.on_print),
         ):
-            ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 6))
+            ttk.Button(bar, text=T(text), command=command).pack(side="left", padx=(0, 6))
         ttk.Button(bar, text=T("Impostazioni"), command=self.on_settings).pack(side="right")
         ttk.Button(bar, text=T("Reset inventario"),
                    command=self.on_reset).pack(side="right", padx=(0, 6))
@@ -1003,13 +1039,13 @@ class App(tk.Tk):
 
         self.label_room = ttk.Label(bar, text=T("Stanza"))
         self.label_room.pack(side="left")
-        self.var_room = tk.StringVar(value="Tutte")
+        self.var_room = tk.StringVar(value=TUTTE())
         self.combo_room = ttk.Combobox(bar, textvariable=self.var_room, state="readonly", width=20)
         self.combo_room.pack(side="left", padx=(6, 16))
         self.combo_room.bind("<<ComboboxSelected>>", self._on_room_filter)
 
         ttk.Label(bar, text=T("Tipo")).pack(side="left")
-        self.var_type = tk.StringVar(value="Tutti")
+        self.var_type = tk.StringVar(value=TUTTI())
         self.combo_type = ttk.Combobox(bar, textvariable=self.var_type, state="readonly", width=14)
         self.combo_type.pack(side="left", padx=(6, 16))
         self.combo_type.bind("<<ComboboxSelected>>", self._on_type_filter)
@@ -1102,7 +1138,7 @@ class App(tk.Tk):
                 continue
             if field == ACTION_COLUMN:
                 tree.heading(field, text=T("Spedizione") if self.ship_column_visible()
-                             else "Prestito")
+                             else T("Prestito"))
                 tree.column(field, width=COLUMN_WIDTHS[field], anchor="center",
                             stretch=False)
                 continue
@@ -1220,10 +1256,10 @@ class App(tk.Tk):
         if self.ship_column_visible():
             if not is_iphone(item.get("tipo")) or is_shipped(item):
                 return ""
-            return "Conferma spedizione"
+            return T("Conferma spedizione")
         if not self.can_lend(item):
             return ""
-        return "Registra rientro" if is_on_loan(item) else "Presta"
+        return T("Registra rientro") if is_on_loan(item) else T("Presta")
 
     def _on_select(self, _event=None):
         """Tiene il segno di spunta allineato alla riga selezionata."""
@@ -1275,10 +1311,10 @@ class App(tk.Tk):
         if item is None:
             return
         if is_iphone(item.get("tipo")):
-            self._segnala("Lo stato degli iPhone e' sempre \"%s\"." % DA_RISPEDIRE)
+            self._segnala(T("Lo stato degli iPhone e' sempre \"%s\".") % traduci_stato(DA_RISPEDIRE))
             return
         if is_on_loan(item):
-            self._segnala("%s e' in prestito a %s: registra prima il rientro."
+            self._segnala(T("%s e' in prestito a %s: registra prima il rientro.")
                           % (tag, item["prestato_a"]))
             return
         stati = list(self.cfg.get("states") or [])
@@ -1304,7 +1340,7 @@ class App(tk.Tk):
             combo.destroy()
             if salva and scelto != item.get("stato"):
                 self._run(lambda: self.store.set_stato(tag, scelto),
-                          "%s: %s." % (tag, scelto))
+                          T("%s: %s.") % (tag, scelto))
 
         combo.bind("<<ComboboxSelected>>", lambda e: chiudi(True))
         combo.bind("<Escape>", lambda e: chiudi(False))
@@ -1341,7 +1377,7 @@ class App(tk.Tk):
             entry.destroy()
             if save:
                 self._run(lambda: self.store.set_note(tag, text),
-                          "Nota aggiornata su %s." % tag)
+                          T("Nota aggiornata su %s.") % tag)
 
         entry.bind("<Return>", lambda e: close(True))
         entry.bind("<Escape>", lambda e: close(False))
@@ -1357,17 +1393,17 @@ class App(tk.Tk):
 
     def show_home(self):
         self.view = "home"
-        self.var_room.set("Tutte")
-        self.var_type.set("Tutti")      # il contenitore iPhone lascia il filtro impostato
-        self.var_subtitle.set("Laptop e tablet in nostro possesso")
+        self.var_room.set(TUTTE())
+        self.var_type.set(TUTTI())      # il contenitore iPhone lascia il filtro impostato
+        self.var_subtitle.set(T("Laptop e tablet in nostro possesso"))
         self.btn_home.state(["disabled"])
         self._render()
 
     def show_room(self, room):
         self.view = "room"
         self.var_room.set(room)
-        self.var_type.set("Tutti")
-        self.var_subtitle.set("Inventario di %s" % room)
+        self.var_type.set(TUTTI())
+        self.var_subtitle.set(T("Inventario di %s") % room)
         self.btn_home.state(["!disabled"])
         self._render()
 
@@ -1377,9 +1413,9 @@ class App(tk.Tk):
         if not tipo:
             return
         self.view = "type"
-        self.var_room.set("Tutte")
+        self.var_room.set(TUTTE())
         self.var_type.set(tipo)
-        self.var_subtitle.set("Telefoni in nostro possesso - registrati in %s"
+        self.var_subtitle.set(T("Telefoni in nostro possesso - registrati in %s")
                               % self.iphone_room())
         self.btn_home.state(["!disabled"])
         self._render()
@@ -1429,11 +1465,11 @@ class App(tk.Tk):
                 key = item.get("tipo") or "altro"
                 counts[key] = counts.get(key, 0) + 1
             breakdown = "  ·  ".join(
-                "%d %s" % (n, k.lower()) for k, n in sorted(counts.items())) or "nessun dispositivo"
+                "%d %s" % (n, k.lower()) for k, n in sorted(counts.items())) or T("nessun dispositivo")
             on_loan = sum(1 for i in subset if is_on_loan(i))
             note = ""
             if name in self.cfg.get("loan_rooms", []):
-                note = ("%d in prestito" % on_loan) if on_loan else "nessun prestito in corso"
+                note = (T("%d in prestito") % on_loan) if on_loan else T("nessun prestito in corso")
             card = RoomCard(strip, self.fonts, name, len(subset), breakdown,
                             theme.ROOM_COLORS[column % len(theme.ROOM_COLORS)],
                             lambda r=name: self.show_room(r), note=note,
@@ -1446,9 +1482,9 @@ class App(tk.Tk):
             telefoni = [i for i in self.store.items if is_iphone(i.get("tipo"))]
             column = len(rooms)
             card = RoomCard(strip, self.fonts, tipo, len(telefoni),
-                            "tutti i telefoni, ovunque siano registrati",
+                            T("tutti i telefoni, ovunque siano registrati"),
                             theme.IPHONE_COLOR, self.show_iphones,
-                            note="anche in %s" % self.iphone_room())
+                            note=T("anche in %s") % self.iphone_room())
             card.grid(row=0, column=column, sticky="nsew", padx=(14, 0))
             strip.columnconfigure(column, weight=1, uniform="cards")
 
@@ -1471,16 +1507,16 @@ class App(tk.Tk):
             room = item.get("stanza", "")
             if room and room not in rooms:
                 rooms.append(room)
-        self.combo_room["values"] = ["Tutte"] + rooms + [NO_ROOM]
+        self.combo_room["values"] = [TUTTE()] + rooms + [NO_ROOM()]
         if self.var_room.get() not in self.combo_room["values"]:
-            self.var_room.set("Tutte")
-        self.combo_type["values"] = ["Tutti"] + list(self.cfg["types"])
+            self.var_room.set(TUTTE())
+        self.combo_type["values"] = [TUTTI()] + list(self.cfg["types"])
         if self.var_type.get() not in self.combo_type["values"]:
-            self.var_type.set("Tutti")
+            self.var_type.set(TUTTI())
 
     def _on_room_filter(self, _event=None):
         room = self.var_room.get()
-        if room in ("Tutte", NO_ROOM):
+        if room in (TUTTE(), NO_ROOM()):
             if self.view in ("room", "type"):
                 self.show_home()
                 return
@@ -1501,12 +1537,12 @@ class App(tk.Tk):
         tipo = self.var_type.get()
         result = []
         for item in self.store.items:
-            if room == NO_ROOM:
+            if room == NO_ROOM():
                 if item.get("stanza"):
                     continue
-            elif room != "Tutte" and item.get("stanza") != room:
+            elif room != TUTTE() and item.get("stanza") != room:
                 continue
-            if tipo != "Tutti" and item.get("tipo") != tipo:
+            if tipo != TUTTI() and item.get("tipo") != tipo:
                 continue
             if text and not any(
                 text in str(item.get(f, "")).lower()
@@ -1558,16 +1594,16 @@ class App(tk.Tk):
                 1 for i in self.store.items if i.get("stanza") == room)))
         others = sum(1 for i in self.store.items if i.get("stanza") not in self.cfg["rooms"])
         if others:
-            parts.append("altre/nessuna: %d" % others)
-        self.var_head_count.set("%d dispositivi     %s" % (total, "     ".join(parts)))
+            parts.append(T("altre/nessuna: %d") % others)
+        self.var_head_count.set(T("%d dispositivi     %s") % (total, "     ".join(parts)))
         if getattr(self, "var_section_count", None) is not None:
-            label = "%d dispositivi" % len(self.visible)
+            label = T("%d dispositivi") % len(self.visible)
             if len(self.visible) != total:
-                label += " di %d" % total
+                label += T(" di %d") % total
             self.var_section_count.set(label)
-        shown = "" if len(self.visible) == total else "  |  visualizzati: %d" % len(self.visible)
+        shown = "" if len(self.visible) == total else T("  |  visualizzati: %d") % len(self.visible)
         self.var_status.set(
-            "%d dispositivi  (%s)%s     File: %s"
+            T("%d dispositivi  (%s)%s     File: %s")
             % (total, ", ".join(parts), shown, self.store.path)
         )
 
@@ -1589,10 +1625,10 @@ class App(tk.Tk):
     def reset_filters(self):
         self.var_search.set("")
         if self.view == "room":
-            self.var_type.set("Tutti")
+            self.var_type.set(TUTTI())
         elif self.view != "type":          # nella vista iPhone il tipo e' la vista
-            self.var_type.set("Tutti")
-            self.var_room.set("Tutte")
+            self.var_type.set(TUTTI())
+            self.var_room.set(TUTTE())
         self.refresh_table()
 
     def selected_tags(self):
@@ -1619,7 +1655,7 @@ class App(tk.Tk):
     def _auto_refresh(self):
         try:
             if self.store.changed_on_disk():
-                self._reload("Inventario aggiornato da un altro utente.")
+                self._reload(T("Inventario aggiornato da un altro utente."))
         except Exception:
             pass
         self.after(REFRESH_MS, self._auto_refresh)
@@ -1644,7 +1680,7 @@ class App(tk.Tk):
     # ------------------------------------------------------------ azioni
 
     def on_refresh(self):
-        self._reload("Elenco ricaricato.")
+        self._reload(T("Elenco ricaricato."))
 
     def on_add(self):
         """Prima cosa si aggiunge, poi come: a mano o con il lettore di codici."""
@@ -1675,7 +1711,7 @@ class App(tk.Tk):
 
     def on_new_barcode_iphone(self, tipo=None):
         """Un solo codice da leggere: l'IMEI. Il resto si scrive nella scheda."""
-        imei = ScanDialog(self, "IMEI", "l'IMEI del telefono", 1, 1).show()
+        imei = ScanDialog(self, T("IMEI"), T("l'IMEI del telefono"), 1, 1).show()
         if not imei:
             return
         preset = new_item(tipo=tipo or self.iphone_type(), imei=imei,
@@ -1684,7 +1720,7 @@ class App(tk.Tk):
                           iphone_room=self.iphone_room(),
                           stati=self.cfg.get("states")).show()
         if item:
-            self._run(lambda: self.store.add(item), "Aggiunto %s." % item["asset_tag"])
+            self._run(lambda: self.store.add(item), T("Aggiunto %s.") % item["asset_tag"])
 
     def stanza_predefinita(self):
         if self.view == "room":
@@ -1696,13 +1732,13 @@ class App(tk.Tk):
 
     def on_new_barcode(self, tipo=None):
         """Asset tag e seriale con il lettore, poi il modello a mano."""
-        tag = ScanDialog(self, "Asset tag", "l'asset tag", 1, 3).show()
+        tag = ScanDialog(self, T("Asset tag"), T("l'asset tag"), 1, 3).show()
         if not tag:
             return
-        seriale = ScanDialog(self, "Numero di serie", "il numero di serie", 2, 3).show()
+        seriale = ScanDialog(self, T("Numero di serie"), T("il numero di serie"), 2, 3).show()
         if not seriale:
             return
-        modello = ScanDialog(self, "Modello", "il modello del dispositivo", 3, 3,
+        modello = ScanDialog(self, T("Modello"), T("il modello del dispositivo"), 3, 3,
                              manuale=True).show()
         if not modello:
             return
@@ -1714,7 +1750,7 @@ class App(tk.Tk):
                           iphone_room=self.iphone_room(),
                           stati=self.cfg.get("states")).show()
         if item:
-            self._run(lambda: self.store.add(item), "Aggiunto %s." % item["asset_tag"])
+            self._run(lambda: self.store.add(item), T("Aggiunto %s.") % item["asset_tag"])
 
     def on_new(self, tipo=None):
         rooms = self.cfg["rooms"]
@@ -1725,7 +1761,7 @@ class App(tk.Tk):
                           iphone_room=self.iphone_room(),
                           stati=self.cfg.get("states")).show()
         if item:
-            self._run(lambda: self.store.add(item), "Aggiunto %s." % item["asset_tag"])
+            self._run(lambda: self.store.add(item), T("Aggiunto %s.") % item["asset_tag"])
 
     def on_edit(self):
         items = self.selected_items()
@@ -1740,7 +1776,7 @@ class App(tk.Tk):
                             stati=self.cfg.get("states")).show()
         if edited:
             self._run(lambda: self.store.update(old["asset_tag"], edited),
-                      "Salvato %s." % edited["asset_tag"])
+                      T("Salvato %s.") % edited["asset_tag"])
 
     def on_delete(self):
         tags = self.selected_tags()
@@ -1772,12 +1808,12 @@ class App(tk.Tk):
                        sblocco.strftime("%d/%m/%Y")),
                     parent=self)
                 return
-        question = "Eliminare %s dall'inventario?" % tags[0]
+        question = T("Eliminare %s dall'inventario?") % tags[0]
         if item and item.get("modello"):
-            question = "Eliminare %s - %s dall'inventario?" % (tags[0], item["modello"])
+            question = T("Eliminare %s - %s dall'inventario?") % (tags[0], item["modello"])
         if not messagebox.askyesno(T("Conferma eliminazione"), question, parent=self):
             return
-        self._run(lambda: self.store.delete(tags), "Eliminato %s." % tags[0])
+        self._run(lambda: self.store.delete(tags), T("Eliminato %s.") % tags[0])
 
     def on_move(self):
         tags = self.selected_tags()
@@ -1791,21 +1827,21 @@ class App(tk.Tk):
                 T("Gli iPhone restano sempre in %s e non possono essere spostati.")
                 % self.iphone_room(), parent=self)
             return
-        room = self._ask_room("Sposta %s in:" % tags[0])
+        room = self._ask_room(T("Sposta %s in:") % tags[0])
         if not room:
             return
         esito = self._run(lambda: self.store.move_to_room(tags, room))
         if esito:
             spostati, bloccati = esito
-            messaggio = "Spostati %d dispositivi in %s." % (spostati, room) if spostati \
-                else "Nessuno spostamento."
+            messaggio = T("Spostati %d dispositivi in %s.") % (spostati, room) if spostati \
+                else T("Nessuno spostamento.")
             if bloccati:
-                messaggio += "  %d iPhone lasciati in %s." % (bloccati, self.iphone_room())
+                messaggio += T("  %d iPhone lasciati in %s.") % (bloccati, self.iphone_room())
             self.var_status.set(messaggio + "     " + self.var_status.get())
 
     def on_lend(self, tag=None):
         """Registra il prestito del dispositivo a una persona."""
-        tag = tag or self._single_selection("Presta")
+        tag = tag or self._single_selection(T("Presta"))
         if not tag:
             return
         item = self._item_by_tag(tag)
@@ -1822,12 +1858,12 @@ class App(tk.Tk):
             return
         when = self._run(lambda: self.store.lend(tag, person))
         if when:
-            self.var_status.set("%s prestato a %s il %s.     %s"
+            self.var_status.set(T("%s prestato a %s il %s.     %s")
                                 % (tag, person, when, self.var_status.get()))
 
     def on_ship(self, tag=None):
         """Registra la spedizione dell'iPhone al servizio telefonia."""
-        tag = tag or self._single_selection("Spedizione")
+        tag = tag or self._single_selection(T("Spedizione"))
         if not tag:
             return
         item = self._item_by_tag(tag)
@@ -1857,7 +1893,7 @@ class App(tk.Tk):
 
     def on_give_back(self, tag=None):
         """Chiude il prestito: il dispositivo torna disponibile."""
-        tag = tag or self._single_selection("Rientro")
+        tag = tag or self._single_selection(T("Rientro"))
         if not tag:
             return
         item = self._item_by_tag(tag)
@@ -1873,7 +1909,7 @@ class App(tk.Tk):
             return
         person = self._run(lambda: self.store.give_back(tag))
         if person:
-            self.var_status.set("%s rientrato da %s.     %s"
+            self.var_status.set(T("%s rientrato da %s.     %s")
                                 % (tag, person, self.var_status.get()))
 
     def _single_selection(self, action):
@@ -1885,7 +1921,7 @@ class App(tk.Tk):
         return tags[0]
 
     def _ask_person(self, item):
-        dialog = _Modal(self, "Presta dispositivo")
+        dialog = _Modal(self, T("Presta dispositivo"))
         body = ttk.Frame(dialog, padding=18)
         body.pack(fill="both", expand=True)
         ttk.Label(body, text=T("%s - %s") % (item["asset_tag"], item.get("modello", "")),
@@ -1915,7 +1951,7 @@ class App(tk.Tk):
         return dialog.show()
 
     def _ask_room(self, prompt):
-        dialog = _Modal(self, "Scegli stanza")
+        dialog = _Modal(self, T("Scegli stanza"))
         body = ttk.Frame(dialog, padding=18)
         body.pack(fill="both", expand=True)
         ttk.Label(body, text=prompt).pack(anchor="w", pady=(0, 8))
@@ -1939,7 +1975,7 @@ class App(tk.Tk):
         percorso = filedialog.asksaveasfilename(
             parent=self, title=T("Salva il modello di inventario"),
             defaultextension=".xlsx", initialfile="Modello_inventario.xlsx",
-            filetypes=[("File Excel", "*.xlsx")])
+            filetypes=[(T("File Excel"), "*.xlsx")])
         if not percorso:
             return
         try:
@@ -1964,7 +2000,7 @@ class App(tk.Tk):
             return
         path = filedialog.askopenfilename(
             parent=self, title=T("Seleziona il file da importare"),
-            filetypes=[("File Excel", "*.xlsx *.xlsm"), ("Tutti i file", "*.*")])
+            filetypes=[(T("File Excel"), "*.xlsx *.xlsm"), (T("Tutti i file"), "*.*")])
         if not path:
             return
         try:
@@ -2000,15 +2036,15 @@ class App(tk.Tk):
             items, opzioni["mode"], stanza))
         if not risultato:
             return
-        righe = ["Aggiunti: %d" % risultato["aggiunti"],
-                 "Aggiornati: %d" % risultato["aggiornati"]]
+        righe = [T("Aggiunti: %d") % risultato["aggiunti"],
+                 T("Aggiornati: %d") % risultato["aggiornati"]]
         if scartati:
-            righe.append("Scartate %d righe di altre stanze." % scartati)
+            righe.append(T("Scartate %d righe di altre stanze.") % scartati)
         if risultato["eliminati"]:
-            righe.append("Eliminati prima del caricamento: %d" % risultato["eliminati"])
+            righe.append(T("Eliminati prima del caricamento: %d") % risultato["eliminati"])
         if risultato["copia"]:
             righe.append("")
-            righe.append("Copia di sicurezza del file precedente:")
+            righe.append(T("Copia di sicurezza del file precedente:"))
             righe.append(risultato["copia"])
         messagebox.showinfo(T("Importazione completata"), "\n".join(righe), parent=self)
 
@@ -2021,7 +2057,7 @@ class App(tk.Tk):
             return
         path = filedialog.askopenfilename(
             parent=self, title=T("File da importare in %s") % stanza,
-            filetypes=[("File Excel", "*.xlsx *.xlsm"), ("Tutti i file", "*.*")])
+            filetypes=[(T("File Excel"), "*.xlsx *.xlsm"), (T("Tutti i file"), "*.*")])
         if not path:
             return
         try:
@@ -2051,15 +2087,15 @@ class App(tk.Tk):
             miei, opzioni["mode"], stanza))
         if not risultato:
             return
-        righe = ["In %s - aggiunti: %d, aggiornati: %d"
+        righe = [T("In %s - aggiunti: %d, aggiornati: %d")
                  % (stanza, risultato["aggiunti"], risultato["aggiornati"])]
         if scartati:
-            righe.append("Scartate %d righe di altre stanze." % scartati)
+            righe.append(T("Scartate %d righe di altre stanze.") % scartati)
         if risultato["eliminati"]:
-            righe.append("Eliminati prima del caricamento: %d" % risultato["eliminati"])
+            righe.append(T("Eliminati prima del caricamento: %d") % risultato["eliminati"])
         if risultato["copia"]:
             righe.append("")
-            righe.append("Copia di sicurezza del file precedente:")
+            righe.append(T("Copia di sicurezza del file precedente:"))
             righe.append(risultato["copia"])
         messagebox.showinfo(T("Importazione completata"), "\n".join(righe), parent=self)
 
@@ -2097,7 +2133,7 @@ class App(tk.Tk):
             parent=self, title=T("Esporta %s") % stanza, defaultextension=".xlsx",
             initialfile="Inventario_%s_%s.xlsx" % (
                 nome_file(stanza), datetime.now().strftime("%Y%m%d")),
-            filetypes=[("File Excel", "*.xlsx")])
+            filetypes=[(T("File Excel"), "*.xlsx")])
         if not percorso:
             return
         try:
@@ -2127,7 +2163,7 @@ class App(tk.Tk):
             messagebox.showinfo(
                 T("Esporta"),
                 T("%s non contiene dispositivi da esportare.")
-                % (stanza or "L'inventario"), parent=self)
+                % (stanza or T("L'inventario")), parent=self)
             return
 
         if forma == "file":
@@ -2161,7 +2197,7 @@ class App(tk.Tk):
             proposto = "Inventario_%s.xlsx" % datetime.now().strftime("%Y%m%d")
         percorso = filedialog.asksaveasfilename(
             parent=self, title=T("Esporta inventario"), defaultextension=".xlsx",
-            initialfile=proposto, filetypes=[("File Excel", "*.xlsx")])
+            initialfile=proposto, filetypes=[(T("File Excel"), "*.xlsx")])
         if not percorso:
             return
         try:
@@ -2171,10 +2207,10 @@ class App(tk.Tk):
         except InventoryError as exc:
             messagebox.showerror(T("Esportazione non riuscita"), str(exc), parent=self)
             return
-        descrizione = ("%d dispositivi di %s" % (len(items), stanza) if stanza
-                       else "%d dispositivi" % len(items))
+        descrizione = (T("%d dispositivi di %s") % (len(items), stanza) if stanza
+                       else T("%d dispositivi") % len(items))
         if forma == "fogli":
-            descrizione += ", un foglio per stanza"
+            descrizione += T(", un foglio per stanza")
         if messagebox.askyesno(
             T("Esportazione completata"),
             T("%s esportati in:\n%s\n\nAprirlo ora?") % (descrizione, percorso),
@@ -2199,7 +2235,7 @@ class App(tk.Tk):
             messagebox.showerror(T("Stampa non riuscita"), str(exc), parent=self)
             return
         if printed:
-            self.var_status.set("Stampa inviata alla stampante predefinita.     "
+            self.var_status.set(T("Stampa inviata alla stampante predefinita.     ")
                                 + self.var_status.get())
         else:
             messagebox.showinfo(
@@ -2284,12 +2320,12 @@ def choose_data_file(root):
         return filedialog.askopenfilename(
             parent=root, title=T("Seleziona il file inventario"),
             initialdir=cartella,
-            filetypes=[("File Excel", "*.xlsx")]) or None
+            filetypes=[(T("File Excel"), "*.xlsx")]) or None
     return filedialog.asksaveasfilename(
         parent=root, title=T("Crea il file inventario"),
         defaultextension=".xlsx", initialdir=cartella,
         initialfile=config.DATA_FILE_NAME,
-        filetypes=[("File Excel", "*.xlsx")]) or None
+        filetypes=[(T("File Excel"), "*.xlsx")]) or None
 
 
 def main():

@@ -2,7 +2,12 @@
 import os, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from inventario import config
+from inventario import lingua as lang
 from inventario.store import InventoryStore, new_item
+
+# Le suite partono sempre in italiano: la lingua e' una preferenza salvata sul
+# computer, e non deve cambiare l'esito dei test.
+lang.imposta(lang.ITALIANO)
 
 BAU, KIOSK, DR = "Site Services BAU", "Digital Kiosk", "Magazzino Disaster Recovery"
 TIPO_IPHONE = "Iphone"

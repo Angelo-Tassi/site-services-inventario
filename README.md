@@ -720,6 +720,19 @@ quel momento non e' stato scritto niente: annullando, l'inventario resta com'era
 - **Gli iPhone non vengono mai eliminati**, in nessuna delle due modalita': non
   arrivano da un'importazione, quindi una sostituzione li perderebbe per sempre.
 
+## Come preparare il file Excel
+
+La guida completa, con esempi e tabelle, sta in una pagina a parte:
+**[Come preparare il file Excel](https://angelo-tassi.github.io/site-services-inventario/formato-xls.html)**
+(sorgente: [`docs/formato-xls.html`](docs/formato-xls.html)). Copre i nomi
+riconosciuti per ogni colonna, le righe-separatore per dividere le stanze, gli
+errori piu' frequenti e cosa succede a ogni riga.
+
+In breve: una riga di intestazione con i nomi delle colonne, una riga per
+dispositivo, e almeno l'**Asset Tag** (o l'**IMEI** per i telefoni). Il resto e'
+facoltativo. Partendo dal
+[modello](docs/Modello_inventario.xlsx) non serve nemmeno leggerla.
+
 ## Se il file ha colonne diverse dalle nostre
 
 L'importazione e' tollerante e non si blocca per un file "sporco". Ecco

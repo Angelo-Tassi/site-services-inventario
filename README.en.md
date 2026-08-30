@@ -338,6 +338,19 @@ The recognised tags come **from the configured room names**: the full name works
 and so does any single word that is unambiguous. Case and a trailing colon do not
 matter. A row with more than one filled cell is never a separator.
 
+### How to prepare the Excel file
+
+The complete guide, with examples and tables, lives on its own page:
+**[How to prepare the Excel file](https://angelo-tassi.github.io/site-services-inventario/formato-xls.html)**
+(source: [`docs/formato-xls.html`](docs/formato-xls.html)). It covers the names
+recognised for each column, the separator rows that split the rooms, the most
+common mistakes and what happens to every row.
+
+In short: one header row with the column names, one row per device, and at least
+the **Asset Tag** (or the **IMEI** for phones). Everything else is optional.
+Starting from the [template](docs/Modello_inventario.xlsx) you do not even need
+to read it.
+
 ### When the file has different columns
 
 | In the file | What the program does |
