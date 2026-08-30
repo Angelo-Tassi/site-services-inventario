@@ -331,6 +331,24 @@ Su Windows, dal Prompt dei comandi nella cartella dell'applicazione:
 set INVENTARIO_FILE=Esempio\Inventario.xlsx && python Inventario.py
 ```
 
+## Aprire i file su Mac con Numbers
+
+Tutti i file prodotti - inventario, esportazioni, modello, stampa - sono
+**.xlsx standard** (Office Open XML). Numbers li apre con un doppio clic: non
+serve conversione, e formule non ce ne sono. Lo stesso vale per LibreOffice e
+Google Fogli.
+
+Due cose da sapere quando si passa da Numbers:
+
+- Numbers **non importa le tendine** di *Tipo* e *Stato* del modello. I valori
+  ammessi restano scritti nel foglio *Istruzioni*: vanno digitati a mano, uguali.
+- Numbers salva nel proprio formato **.numbers**, che il programma non legge. Per
+  reimportare un file modificato con Numbers usa *Archivio > Esporta con nome >
+  Excel*.
+
+Impaginazione di stampa, filtri automatici e righe di intestazione ripetute sono
+impostazioni di Excel: Numbers le ignora, ma i dati restano identici.
+
 ## Cosa c'e' nella cartella di rete
 
 | File | Contenuto |
