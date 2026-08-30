@@ -302,7 +302,7 @@ tranne la lingua, che e' una preferenza personale del singolo computer.
 | **Tipi di dispositivo** | le voci della tendina *Tipo*, una per riga |
 | **Stanze con prestito** | in quali stanze compare la colonna *Prestito*. Devono essere nomi presenti fra le stanze |
 | **Stanza degli iPhone** | dove finiscono i telefoni, sempre |
-| **Lingua** | Italiano o English. Cambia tutto: interfaccia, colonne, stati |
+| **Lingua** | Italiano o English. La stessa tendina e' anche nell'intestazione della finestra |
 
 ### Creare o rinominare una stanza
 
@@ -350,9 +350,10 @@ non si toccano.
 
 ## Lingua
 
-La tendina **Lingua** nelle impostazioni passa fra italiano e inglese. Cambia
-tutto: pulsanti, messaggi, avvisi, nomi delle colonne nell'elenco e negli
-stati. Il programma si ridisegna subito, senza riavviare.
+La tendina **Lingua** sta in due punti: nell'**intestazione** della finestra,
+accanto al titolo in alto a destra, e in **Impostazioni**. Passa fra italiano e
+inglese e cambia tutto: pulsanti, messaggi, avvisi, nomi delle colonne
+nell'elenco e negli stati. Il programma si ridisegna subito, senza riavviare.
 
 La scelta e' **personale del computer**: chi lavora sullo stesso inventario da
 un altro PC puo' tenerlo in italiano. I dati nel file restano sempre in italiano
@@ -451,8 +452,8 @@ importare - uno regolare con **30 dispositivi, 10 per stanza**, e uno con dentro
 apposta i casi che il programma deve segnalare - e le istruzioni passo passo:
 [**Come testare l'importazione**](Collaudo/README.md).
 
-Otto scenari, dal caricamento iniziale all'importazione dentro una singola
-stanza, fino al reset e alla riesportazione. I file si rigenerano con
+Nove scenari, dal caricamento iniziale all'importazione dentro una singola
+stanza, fino al reset, alla riesportazione e al cambio di lingua. I file si rigenerano con
 `.venv/bin/python tests/genera_file_di_prova.py`.
 
 ## Test automatici

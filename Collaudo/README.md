@@ -14,6 +14,10 @@ Si rigenerano con:
 .venv/bin/python tests/genera_file_di_prova.py
 ```
 
+Se devi preparare un file tuo invece di usare questi, la guida completa al
+formato e' qui:
+**[Come preparare il file Excel](https://angelo-tassi.github.io/site-services-inventario/formato-xls.html)**.
+
 ## Prima di cominciare
 
 Fai le prove su un inventario **finto**, non su quello della cartella di rete.
@@ -155,6 +159,23 @@ xls**: stesso risultato dell'opzione *Una sola stanza*. In nessuna forma devono
 comparire iPhone.
 
 ---
+
+## 9. La lingua
+
+Cambia lingua dalla tendina **Lingua** in alto a destra nell'intestazione, e
+controlla che diventi inglese **tutto**: pulsanti della barra, intestazioni delle
+colonne, testo delle schede stanza, barra di stato in fondo, e i messaggi che
+compaiono premendo *Elimina*, *Sposta in stanza* o *Reset inventario* senza aver
+spuntato niente.
+
+Poi torna in italiano dalla stessa tendina, oppure da *Impostazioni*: sono la
+stessa cosa. La scelta resta anche riaprendo il programma.
+
+**Esportazione in inglese restando in italiano.** Con l'interfaccia in italiano,
+*Esporta xls...* e spunta **Esporta i file in inglese**: nel file le intestazioni
+e gli stati devono essere in inglese, mentre i nomi delle stanze restano come li
+hai scritti. Reimporta quel file: deve entrare senza errori e gli stati devono
+tornare in italiano.
 
 ## Se qualcosa non torna
 

@@ -106,7 +106,12 @@ assert "Exported on" in ws["A2"].value, ws["A2"].value
 assert ws["A1"].value in STANZE, "il nome della stanza non si traduce"
 wb.close()
 
-# ---- la lingua si ricorda
+# ---- la lingua si ricorda, senza toccare la configurazione vera
+finta_cartella = tempfile.mkdtemp()
+config.app_dir = lambda: finta_cartella
+config.load_language = fixture.load_language_reale   # qui la si prova sul serio
+os.environ["APPDATA"] = tempfile.mkdtemp()
+assert config.load_language() == "it", "senza preferenza salvata si parte in italiano"
 config.save_language("en")
 assert config.load_language() == "en"
 config.save_language("it")

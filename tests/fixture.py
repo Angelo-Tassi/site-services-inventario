@@ -5,9 +5,12 @@ from inventario import config
 from inventario import lingua as lang
 from inventario.store import InventoryStore, new_item
 
-# Le suite partono sempre in italiano: la lingua e' una preferenza salvata sul
-# computer, e non deve cambiare l'esito dei test.
+# Le suite partono sempre in italiano e non leggono mai la configurazione vera:
+# la lingua e' una preferenza salvata sul computer e non deve cambiare l'esito
+# dei test, ne' i test devono modificarla.
 lang.imposta(lang.ITALIANO)
+load_language_reale = config.load_language          # per chi vuole provarla davvero
+config.load_language = lambda: lang.ITALIANO
 
 BAU, KIOSK, DR = "Site Services BAU", "Digital Kiosk", "Magazzino Disaster Recovery"
 TIPO_IPHONE = "Iphone"

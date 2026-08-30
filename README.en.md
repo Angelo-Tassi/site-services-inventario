@@ -156,7 +156,7 @@ which is a personal preference of the single computer.
 | **Device types** | the entries of the *Type* dropdown, one per line |
 | **Rooms with loans** | where the *Loan* column appears. They must be names present among the rooms |
 | **iPhone room** | where phones always end up |
-| **Language** | Italiano or English. It changes everything: interface, columns, statuses |
+| **Language** | Italiano or English. The same dropdown is also in the window header |
 
 ### Creating or renaming a room
 
@@ -201,9 +201,10 @@ statuses - *Not available*, *To be shipped back*, *Shipped to the phone service*
 
 ## Language
 
-The **Language** dropdown in the settings switches between Italian and English.
-It changes everything: buttons, messages, warnings, column names in the list and
-the statuses. The program redraws itself immediately, no restart.
+The **Language** dropdown sits in two places: in the window **header**, beside
+the title at the top right, and in **Settings**. It switches between Italian and
+English and changes everything: buttons, messages, warnings, column names in the
+list and the statuses. The program redraws itself immediately, no restart.
 
 The choice belongs **to the computer**: someone working on the same inventory
 from another PC can keep it in Italian. The data in the file always stays in
@@ -491,8 +492,9 @@ safely, use *Export xls...*.
 
 The [`Collaudo/`](Collaudo/) folder contains two Excel sheets ready to import -
 a regular one with **30 devices, 10 per room**, and one deliberately carrying the
-cases the program has to report - and step-by-step instructions in
-[`Collaudo/README.md`](Collaudo/README.md) (Italian).
+cases the program has to report - and nine step-by-step checks in
+[`Collaudo/README.md`](Collaudo/README.md) (Italian), from the first load to
+importing into a single room, the reset, re-exporting and switching language.
 
 ## Automated tests
 
