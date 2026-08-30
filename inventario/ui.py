@@ -18,6 +18,11 @@ from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
                     puo_essere_eliminato, rows_from_workbook, testo_spedizione)
 
 NO_ROOM = "(senza stanza)"
+
+
+def item_stato_iphone(spedito):
+    return SPEDITO if spedito else DA_RISPEDIRE
+
 CHECK_COLUMN = "_sel"
 ACTION_COLUMN = "_azione"
 CHECK_ON = "\u25c9"      # cerchio pieno: riga selezionata
@@ -68,10 +73,13 @@ class ItemDialog(_Modal):
     def __init__(self, parent, rooms, types, item=None, iphone_room=None, stati=None):
         _Modal.__init__(self, parent, "Modifica dispositivo" if item else "Nuovo dispositivo")
         item = item or new_item(stanza=rooms[0] if rooms else "")
-        self._loan = (item.get("prestato_a", ""), item.get("prestato_il", ""))
+        # Gli iPhone non si prestano: nessun dato di prestito da conservare.
+        self._loan = ("", "") if is_iphone(item.get("tipo")) \
+            else (item.get("prestato_a", ""), item.get("prestato_il", ""))
         self.rooms = rooms
         self.iphone_room = iphone_room or (rooms[0] if rooms else "")
         self.stati = list(stati or [])
+        self._item_spedito = bool(item.get("spedito_il"))
 
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
@@ -164,8 +172,8 @@ class ItemDialog(_Modal):
 
         ttk.Label(self.fields, text="Stato").grid(row=riga, column=0, sticky="w", pady=5)
         if self.is_iphone():
-            self.var_stato.set(DA_RISPEDIRE)
-            valori, stato_widget = [DA_RISPEDIRE], "disabled"
+            self.var_stato.set(item_stato_iphone(self._item_spedito))
+            valori, stato_widget = [self.var_stato.get()], "disabled"
         elif self._loan[0]:
             self.var_stato.set(NON_DISPONIBILE)
             valori, stato_widget = [NON_DISPONIBILE], "disabled"
@@ -178,7 +186,8 @@ class ItemDialog(_Modal):
                                                         sticky="we", pady=5)
         riga += 1
         if stato_widget == "disabled":
-            motivo = ("Gli iPhone sono sempre \"%s\"." % DA_RISPEDIRE if self.is_iphone()
+            motivo = ("Gli iPhone non si prestano: lo stato lo decide la spedizione."
+                      if self.is_iphone()
                       else "In prestito: lo stato torna modificabile dopo il rientro.")
             ttk.Label(self.fields, style="Muted.TLabel", text=motivo).grid(
                 row=riga, column=1, sticky="w")
@@ -302,6 +311,107 @@ class RoomsDialog(_Modal):
         self.result = {"rooms": rooms, "types": types or ["Laptop", "Tablet"],
                        "loan_rooms": loans,
                        "iphone_room": stanza_iphone or rooms[0]}
+        self.destroy()
+
+
+class AddChoiceDialog(_Modal):
+    """Come aggiungere un dispositivo: a mano o leggendo i codici a barre."""
+
+    def __init__(self, parent):
+        _Modal.__init__(self, parent, "Aggiungi dispositivo")
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, text="Come vuoi aggiungerlo?",
+                  style="Section.TLabel").pack(anchor="w")
+        ttk.Label(body, style="Muted.TLabel",
+                  text="La scansione compila asset tag e numero di serie con il\n"
+                       "lettore di codici a barre. Per gli iPhone usa l'inserimento\n"
+                       "manuale: hanno l'IMEI al posto dell'asset tag.").pack(
+            anchor="w", pady=(4, 14))
+
+        def scegli(modo):
+            self.result = modo
+            self.destroy()
+
+        ttk.Button(body, text="Scansiona con il lettore di codici",
+                   style="Primary.TButton",
+                   command=lambda: scegli("barcode")).pack(fill="x", pady=(0, 8))
+        ttk.Button(body, text="Inserimento manuale",
+                   command=lambda: scegli("manuale")).pack(fill="x")
+        ttk.Button(body, text="Annulla", command=self._cancel).pack(anchor="e", pady=(14, 0))
+
+
+class ScanDialog(_Modal):
+    """Un passo della procedura con lettore: si legge il codice, oppure si scrive.
+
+    Il lettore di codici si comporta come una tastiera: scrive nel campo e
+    conferma da solo. Se non riesce a leggere, l'operatore passa alla scrittura
+    a mano con il pulsante dedicato, senza perdere quello che ha gia' inserito.
+    """
+
+    def __init__(self, parent, titolo, campo, passo, totale, manuale=False,
+                 valore=""):
+        _Modal.__init__(self, parent, titolo)
+        self.campo = campo
+        self.manuale = manuale
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+
+        ttk.Label(body, text="Passo %d di %d" % (passo, totale),
+                  style="Muted.TLabel").pack(anchor="w")
+        self.var_titolo = tk.StringVar()
+        ttk.Label(body, textvariable=self.var_titolo,
+                  style="Section.TLabel").pack(anchor="w", pady=(2, 2))
+        self.var_aiuto = tk.StringVar()
+        ttk.Label(body, textvariable=self.var_aiuto, style="Muted.TLabel",
+                  justify="left").pack(anchor="w", pady=(0, 10))
+
+        self.var_valore = tk.StringVar(value=valore)
+        self.entry = ttk.Entry(body, textvariable=self.var_valore, width=36,
+                               font=(theme.pick_family(self), 13))
+        self.entry.pack(fill="x")
+
+        self.btn_manuale = ttk.Button(
+            body, text="Non riesco a scansionare - inserisci a mano",
+            command=self.passa_a_manuale)
+        self.btn_manuale.pack(anchor="w", pady=(10, 0))
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(14, 0))
+        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text="Avanti", style="Primary.TButton",
+                   command=self._ok).pack(side="right")
+
+        self.bind("<Return>", lambda e: self._ok())
+        self._aggiorna()
+        self.entry.focus_set()
+
+    def _aggiorna(self):
+        if self.manuale:
+            self.var_titolo.set("Scrivi %s" % self.campo)
+            self.var_aiuto.set("Digita il valore e premi Invio.")
+            self.btn_manuale.pack_forget()
+        else:
+            self.var_titolo.set("Scansiona %s" % self.campo)
+            self.var_aiuto.set("Inquadra il codice: il lettore compila il campo e\n"
+                               "conferma da solo. Puoi anche digitarlo.")
+
+    def passa_a_manuale(self):
+        self.manuale = True
+        self._aggiorna()
+        self.entry.focus_set()
+
+    def _ok(self):
+        valore = self.var_valore.get().strip()
+        if not valore:
+            messagebox.showwarning(
+                "Campo vuoto",
+                "%s non puo' restare vuoto.\n\n"
+                "Riprova la scansione, oppure usa il pulsante per inserirlo a mano."
+                % self.campo.capitalize(), parent=self)
+            self.entry.focus_set()
+            return
+        self.result = valore
         self.destroy()
 
 
@@ -443,8 +553,8 @@ class App(tk.Tk):
         self.btn_home = ttk.Button(bar, text="‹  Home", style="Ghost.TButton",
                                    command=self.show_home)
         self.btn_home.pack(side="left", padx=(0, 10))
-        ttk.Button(bar, text="Nuovo", style="Primary.TButton",
-                   command=self.on_new).pack(side="left", padx=(0, 6))
+        ttk.Button(bar, text="Aggiungi", style="Primary.TButton",
+                   command=self.on_add).pack(side="left", padx=(0, 6))
         for text, command in (
             ("Modifica", self.on_edit),
             ("Elimina", self.on_delete),
@@ -492,7 +602,7 @@ class App(tk.Tk):
                   anchor="w", padding=(16, 6)).pack(fill="x")
 
     def _bind_keys(self):
-        self.bind("<Control-n>", lambda e: self.on_new())
+        self.bind("<Control-n>", lambda e: self.on_add())
         self.bind("<Control-f>", lambda e: self.entry_search.focus_set())
         self.bind("<Control-p>", lambda e: self.on_print())
         self.bind("<F5>", lambda e: self.on_refresh())
@@ -1100,6 +1210,45 @@ class App(tk.Tk):
 
     def on_refresh(self):
         self._reload("Elenco ricaricato.")
+
+    def on_add(self):
+        """Chiede se inserire a mano o con il lettore di codici."""
+        modo = AddChoiceDialog(self).show()
+        if modo == "manuale":
+            self.on_new()
+        elif modo == "barcode":
+            self.on_new_barcode()
+
+    def stanza_predefinita(self):
+        if self.view == "room":
+            return self.var_room.get()
+        if self.view == "type":
+            return self.iphone_room()
+        rooms = self.cfg.get("rooms") or []
+        return rooms[0] if rooms else ""
+
+    def on_new_barcode(self):
+        """Asset tag e seriale con il lettore, poi il modello a mano."""
+        tag = ScanDialog(self, "Asset tag", "l'asset tag", 1, 3).show()
+        if not tag:
+            return
+        seriale = ScanDialog(self, "Numero di serie", "il numero di serie", 2, 3).show()
+        if not seriale:
+            return
+        modello = ScanDialog(self, "Modello", "il modello del dispositivo", 3, 3,
+                             manuale=True).show()
+        if not modello:
+            return
+        tipi = self.cfg.get("types") or []
+        preset = new_item(
+            asset_tag=tag, seriale=seriale, modello=modello,
+            tipo=next((t for t in tipi if not is_iphone(t)), ""),
+            stanza=self.stanza_predefinita())
+        item = ItemDialog(self, self.cfg["rooms"], self.cfg["types"], preset,
+                          iphone_room=self.iphone_room(),
+                          stati=self.cfg.get("states")).show()
+        if item:
+            self._run(lambda: self.store.add(item), "Aggiunto %s." % item["asset_tag"])
 
     def on_new(self):
         rooms = self.cfg["rooms"]

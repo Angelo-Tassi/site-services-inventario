@@ -239,6 +239,15 @@ def normalize_identity(item):
     return item
 
 
+def normalize_iphone(item):
+    """Un iPhone non ha numero di serie ne' prestiti: ha l'IMEI e basta."""
+    if is_iphone(item.get("tipo")):
+        item["seriale"] = ""
+        item["prestato_a"] = ""
+        item["prestato_il"] = ""
+    return item
+
+
 def normalize_state(item, stati=None):
     """Mette a posto lo stato.
 
@@ -247,6 +256,7 @@ def normalize_state(item, stati=None):
     stato scelto dall'utente, purche' sia fra quelli previsti.
     """
     ammessi = list(stati or STATI)
+    normalize_iphone(item)
     if is_iphone(item.get("tipo")):
         item["stato"] = SPEDITO if item.get("spedito_il") else DA_RISPEDIRE
     elif item.get("prestato_a"):
@@ -604,6 +614,8 @@ class InventoryStore(object):
             if index is None:
                 raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
             item = items[index]
+            if is_iphone(item.get("tipo")):
+                raise InventoryError("Gli iPhone non vengono dati in prestito.")
             if is_on_loan(item):
                 raise InventoryError(
                     "%s risulta gia' in prestito a %s dal %s."

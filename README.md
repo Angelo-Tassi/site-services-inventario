@@ -162,14 +162,21 @@ programma, e solo in ultimo lo si chiede all'utente.
   Kiosk). Nell'inventario completo, nelle altre stanze e nel contenitore iPhone
   la prima colonna e' soltanto la casella di selezione, senza intestazione.
   Vedi la sezione dedicata piu' sotto.
-- **Nuovo** apre la scheda di inserimento, con il **tipo in cima**: e' lui a
-  decidere quali campi vengono chiesti. Se manca un dato obbligatorio il
+- **Aggiungi** chiede prima come procedere: **inserimento manuale** oppure
+  **scansione con il lettore di codici a barre** (vedi piu' sotto). L'inserimento
+  manuale apre la scheda, con il **tipo in cima**: e' lui a decidere quali campi
+  vengono chiesti. Se manca un dato obbligatorio il
   programma elenca quali e non inserisce nulla finche' non sono compilati.
 
 | Tipo | Campi obbligatori |
 | --- | --- |
 | Laptop, Tablet, ... | Asset Tag, Modello, Numero di serie, Stanza |
 | iPhone | IMEI, Modello, Restituito da, Stanza |
+
+  Un iPhone **non ha numero di serie e non si presta mai**: al posto del seriale
+  c'e' l'IMEI, e i campi del prestito restano vuoti. La regola e' nell'archivio
+  dati: anche importando o modificando una scheda, quei campi vengono ripuliti,
+  e il tentativo di prestare un iPhone viene rifiutato.
 
   Scegliendo **iPhone** il modulo si ridisegna: al posto di *Asset Tag* e
   *Numero di serie* compaiono **IMEI** e **Restituito da** (il nome di chi lo ha
@@ -357,7 +364,7 @@ consultare i dati in Excel senza rischi, usa *Esporta xls...*.
 
 | Tasto | Azione |
 | --- | --- |
-| `Ctrl+N` | nuovo dispositivo |
+| `Ctrl+N` | aggiungi dispositivo |
 | `Ctrl+F` | vai alla casella di ricerca |
 | `Ctrl+P` | stampa la vista corrente |
 | `Esc` | torna alla home |
@@ -367,6 +374,33 @@ consultare i dati in Excel senza rischi, usa *Esporta xls...*.
 | doppio clic sulle note | modifica la nota nell'elenco |
 | doppio clic sullo stato | tendina per cambiare stato nell'elenco |
 | doppio clic altrove | apre la scheda del dispositivo |
+
+## Aggiungere con il lettore di codici a barre
+
+Premendo **Aggiungi** si sceglie fra inserimento manuale e scansione. La
+scansione e' pensata per laptop e tablet, che hanno le etichette con il codice;
+per gli iPhone si usa l'inserimento manuale, perche' hanno l'IMEI al posto
+dell'asset tag.
+
+La procedura ha tre passi, numerati in alto nella finestra:
+
+1. **Scansiona l'asset tag**
+2. **Scansiona il numero di serie**
+3. **Scrivi il modello** del dispositivo, che sull'etichetta non c'e'
+
+Al termine si apre la scheda gia' compilata: restano da confermare tipo, stanza
+e stato, poi *Salva*. La stanza proposta e' quella che stai guardando.
+
+I lettori di codici a barre si comportano come una tastiera: scrivono nel campo
+e confermano da soli, quindi si passa da un codice all'altro senza toccare il
+mouse.
+
+### Se il codice non si legge
+
+Ogni passo di scansione ha il pulsante **"Non riesco a scansionare - inserisci a
+mano"**: cambia la finestra in scrittura manuale per quel solo campo, senza
+perdere i passi gia' fatti e senza uscire dalla procedura. Il campo non puo'
+restare vuoto: se si conferma a vuoto, il programma lo dice e resta li'.
 
 ## Il modello di importazione
 
