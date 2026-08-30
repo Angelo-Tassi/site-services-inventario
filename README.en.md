@@ -507,11 +507,15 @@ regenerated with `.venv/bin/python tests/genera_esempio.py`.
 
 ## Trying the import
 
-The [`Collaudo/`](Collaudo/) folder contains two Excel sheets ready to import -
-a regular one with **30 devices, 10 per room**, and one deliberately carrying the
-cases the program has to report - and nine step-by-step checks in
-[`Collaudo/README.en.md`](Collaudo/README.en.md), from the first load to
-importing into a single room, the reset, re-exporting and switching language.
+The **`Collaudo/`** folder travels with the program: in the Windows package it
+sits next to `Inventario.exe`. It contains two Excel sheets ready to import - a
+regular one with **30 devices, 10 per room**, and one deliberately carrying the
+cases the program has to report - and step-by-step instructions in
+[`Collaudo/README.en.md`](Collaudo/README.en.md).
+
+The checks are run on the included files, with nothing copied anywhere else. The
+instructions also explain **how to load the final inventory** once the trial is
+over: reset first, or an import that replaces everything.
 
 ## Automated tests
 

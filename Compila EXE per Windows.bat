@@ -31,6 +31,11 @@ if not exist "Distribuzione" mkdir "Distribuzione"
 copy /y "dist\Inventario.exe" "Distribuzione\Inventario.exe" >nul
 copy /y "Crea collegamento sul desktop.bat" "Distribuzione\" >nul
 copy /y "README.md" "Distribuzione\Come funziona.txt" >nul
+rem i file di collaudo viaggiano con il programma: servono a provarlo in sede
+if not exist "Distribuzione\Collaudo" mkdir "Distribuzione\Collaudo"
+copy /y "Collaudo\*.xlsx" "Distribuzione\Collaudo\" >nul
+copy /y "Collaudo\README.md" "Distribuzione\Collaudo\" >nul
+copy /y "Collaudo\README.en.md" "Distribuzione\Collaudo\" >nul
 
 echo.
 echo ===========================================================================

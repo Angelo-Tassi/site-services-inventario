@@ -2,39 +2,98 @@
 
 *[English version](README.en.md)*
 
-Due fogli Excel pronti da importare, per provare il programma senza toccare
-l'inventario vero.
+Questa cartella fa parte del programma e viaggia con lui: serve a provare
+l'importazione con dati finti, prima di caricare l'inventario vero.
 
-| File | Contenuto |
-| --- | --- |
-| `Inventario_di_prova.xlsx` | 30 dispositivi, **10 per stanza**, divisi dalle righe-separatore. Tutto regolare. |
-| `Inventario_di_prova_con_difetti.xlsx` | Lo stesso impianto, ma con dentro apposta i casi che il programma deve segnalare. |
+## Dove sono i file
 
-Si rigenerano con:
+Sono nella cartella **`Collaudo`**, accanto a `Inventario.exe`:
 
-```bash
-.venv/bin/python tests/genera_file_di_prova.py
+```
+\\server\Condivisa\Inventario\
+    Inventario.exe
+    Collaudo\
+        Inventario_di_prova.xlsx
+        Inventario_di_prova_con_difetti.xlsx
+        README.md            questo documento
+        README.en.md         la versione inglese
 ```
 
-Se devi preparare un file tuo invece di usare questi, la guida completa al
-formato e' qui:
-**[Come preparare il file Excel](https://angelo-tassi.github.io/site-services-inventario/formato-xls.html)**.
+Se hai scaricato lo zip `Inventario-windows.zip` dalla pagina Releases, la
+cartella `Collaudo` e' gia' dentro. Se lavori dai sorgenti, e' `Collaudo/` nella
+radice del progetto.
 
-## Prima di cominciare
+Quando ti verra' chiesto di scegliere un file, punta qui: **non serve copiare
+niente altrove**.
 
-Fai le prove su un inventario **finto**, non su quello della cartella di rete.
-Il modo piu' rapido e' creare una cartella vuota, copiarci `Inventario.exe` e
-aprirlo: al primo avvio propone di creare li' un `Inventario.xlsx` nuovo.
+## Cosa contengono
+
+### `Inventario_di_prova.xlsx` - 30 dispositivi, tutto regolare
+
+Un foglio unico chiamato *Inventario*, con l'intestazione delle colonne nella
+prima riga e i dispositivi divisi in tre blocchi dalle righe-separatore
+azzurre: `SITE SERVICES BAU`, `DIGITAL KIOSK`, `MAGAZZINO DISASTER RECOVERY`.
+Dieci dispositivi per blocco.
+
+| Colonna | Contenuto |
+| --- | --- |
+| Asset Tag | `IT-BAU-101` ... `IT-KSK-210` ... `IT-DRC-310`, uno per ogni stanza |
+| Tipo | sette Laptop e tre Tablet per stanza |
+| Modello | Lenovo ThinkPad T14 Gen 4 e Gen 5, Dell Latitude 7320 Detachable e 7230 Rugged Extreme |
+| Numero di serie | seriali plausibili, tutti diversi |
+| Stato | un misto dei cinque stati, per vedere come si comportano |
+| Note | alcune compilate, altre vuote |
+
+Nessun iPhone: i telefoni si inseriscono solo a mano.
+
+### `Inventario_di_prova_con_difetti.xlsx` - i casi da segnalare
+
+Stessa impostazione, ma con dentro **apposta** tutto quello che il programma
+deve saper riconoscere e dire. Oltre ai due separatori ci sono sei righe:
+
+| Cosa c'e' | Cosa deve fare il programma |
+| --- | --- |
+| Tre colonne in piu': `Costo`, `Fornitore`, `Centro di costo` | ignorarle, ed elencarle prima di importare |
+| Una riga senza modello (`IT-BAU-902`) | importarla lo stesso, dicendo quante ne mancano |
+| Una riga senza asset tag ne' IMEI | scartarla e contarla |
+| Una riga di tipo `Iphone`, con IMEI | ignorarla: i telefoni non si importano |
+| Una riga completamente vuota | saltarla senza contarla |
+| I separatori scritti in forma breve, `BAU` e `KIOSK` | riconoscerli lo stesso |
+
+Sono i file usati anche dai test automatici: se il comportamento del programma
+cambia, i test falliscono e queste istruzioni vengono riscritte. Si rigenerano
+con `.venv/bin/python tests/genera_file_di_prova.py`.
+
+## Dove va l'inventario vero
+
+**Non in questa cartella, e nemmeno accanto al programma.** La cartella del
+programma contiene l'applicazione e i dati di prova: e' un posto dove i file
+vengono sostituiti a ogni aggiornamento.
+
+Mentre provi, tieni il file da caricare in una cartella tua - per esempio
+**Documenti\Inventario** sul computer del tecnico che sta importando. A regime,
+l'inventario definitivo va nella cartella di rete condivisa, che e' quella che
+il programma apre normalmente.
+
+Il percorso del file che il programma usa si sceglie al primo avvio e resta
+memorizzato in `inventario_percorso.json`, accanto all'eseguibile. Per
+cambiarlo, cancella quel file e riavvia.
 
 ---
 
 # Come testare l'importazione
 
-## 1. Caricamento iniziale
+Le prove che seguono lavorano sull'inventario che il programma sta usando in
+quel momento. Falle prima di caricare i dati definitivi: al punto 7 si svuota
+tutto, quindi e' il momento giusto per provare mentre l'inventario e' ancora
+finto.
+
+## 1. Primo caricamento
 
 1. *Importa xls...*
 2. **Tutto l'inventario** + **Unisci**, poi *Scegli il file*
-3. seleziona `Inventario_di_prova.xlsx`
+3. apri la cartella `Collaudo` accanto al programma e scegli
+   `Inventario_di_prova.xlsx`
 4. il riepilogo deve dire **30 righe valide** e **30 righe hanno preso la stanza
    dai separatori**
 5. conferma con *Importa*
@@ -55,34 +114,24 @@ Ripeti esattamente il punto 1. Al termine il messaggio deve dire
 3. il riepilogo dice **10 righe valide**, **20 righe di altre stanze scartate**,
    e avverte che verranno prima eliminati **10** dispositivi
 
-**Cosa deve risultare.** Digital Kiosk contiene ancora **10** dispositivi, quelli
-elencati sotto la riga `DIGITAL KIOSK`: il foglio dichiara le stanze, quindi
-comandano i separatori e le righe delle altre stanze vengono buttate via. Le
-altre due stanze restano com'erano, con 10 ciascuna.
+**Cosa deve risultare.** Digital Kiosk contiene ancora **10** dispositivi,
+quelli elencati sotto la riga `DIGITAL KIOSK`: il foglio dichiara le stanze,
+quindi comandano i separatori e le righe delle altre stanze vengono buttate via.
+Le altre due stanze restano com'erano.
 
 Nella cartella dei dati deve essere comparso un file
 `Inventario_prima_del_reset_...xlsx`: e' la copia di sicurezza.
 
 ### Quando il foglio non dichiara le stanze
 
-Apri `Inventario_di_prova.xlsx`, **cancella tutte e tre le righe-separatore** e
-salva con un altro nome. Reimportalo con **Una sola stanza** > `Digital Kiosk`.
+Apri `Inventario_di_prova.xlsx`, **cancella le tre righe-separatore** e salva
+con un altro nome nella tua cartella di lavoro. Reimportalo con **Una sola
+stanza** > `Digital Kiosk`.
 
 Stavolta il riepilogo dice **30 righe valide** e avverte che *il foglio non
-dichiara stanze: tutte le righe finiranno in Digital Kiosk*. E' il caso in cui
-la scelta dell'utente e' l'unica informazione disponibile.
+dichiara stanze: tutte le righe finiranno in Digital Kiosk*.
 
-## 4. Sostituire tutto
-
-1. *Importa xls...* > **Tutto l'inventario** > **Sostituisci**
-2. scegli `Inventario_di_prova.xlsx`
-3. il riepilogo chiede di scrivere `ELIMINA TUTTO`
-
-Prova prima a confermare **senza** scriverlo, o scrivendo "si": deve rifiutare e
-restare aperto. Poi scrivi la frase e conferma: si torna ai 30 dispositivi
-distribuiti 10, 10 e 10.
-
-## 5. Le segnalazioni sui file imperfetti
+## 4. Le segnalazioni sui file imperfetti
 
 Importa `Inventario_di_prova_con_difetti.xlsx` con **Tutto l'inventario** +
 **Unisci**. Il riepilogo deve mostrare, tutte insieme:
@@ -95,92 +144,116 @@ Importa `Inventario_di_prova_con_difetti.xlsx` con **Tutto l'inventario** +
   `Centro di costo`
 - l'avviso che **1 riga non ha il modello**
 
-Confermando, entrano 3 dispositivi: due in Site Services BAU (di cui uno senza
-modello, da completare a mano) e uno in Digital Kiosk. L'iPhone **non** entra.
+Confermando entrano 3 dispositivi, di cui uno senza modello da completare a
+mano. L'iPhone **non** entra.
 
-## 6. Importare dentro una stanza
+## 5. Importare dentro una stanza
 
-Questa e' la prova del pulsante **Importa i dati di questa stanza**, che sta
-accanto al nome della stanza quando la apri. Deve dare lo **stesso risultato**
-dell'opzione *Una sola stanza* del punto 3: e' la stessa regola, raggiunta da
-due strade diverse.
+Il pulsante **Importa i dati di questa stanza** sta accanto al nome della stanza
+quando la apri. Deve dare lo **stesso risultato** del punto 3: e' la stessa
+regola, raggiunta da due strade diverse.
 
 1. entra in **Digital Kiosk**
 2. premi *Importa i dati di questa stanza*, scegli **Unisci**
 3. seleziona `Inventario_di_prova.xlsx`
 
 **Cosa deve risultare.** Il riepilogo dice **10 righe valide** e **20 righe di
-altre stanze scartate**. Entrano solo i dieci dispositivi elencati sotto la riga
-`DIGITAL KIOSK`: quelli di BAU e del magazzino vengono buttati via, anche se
-sono nello stesso foglio.
+altre stanze scartate**.
 
 ### La riga della stanza e' obbligatoria
 
 Prendi `Inventario_di_prova.xlsx`, **cancella la riga `DIGITAL KIOSK`** e salva
-con un altro nome. Poi riprova a importarlo dentro Digital Kiosk.
-
-Deve comparire un avviso che dice che nel foglio non c'e' nessuna riga che
-indichi quella stanza, che **non e' stato importato niente**, e che spiega di
-aggiungere una riga vuota con scritto `DIGITAL KIOSK` nella prima cella.
-L'avviso elenca anche le stanze che ha trovato al suo posto. Controlla che
-l'inventario sia rimasto identico.
+con un altro nome. Riprova a importarlo dentro Digital Kiosk: deve comparire un
+avviso che dice che nel foglio non c'e' nessuna riga per quella stanza, che
+**non e' stato importato niente**, e che spiega di aggiungere una riga vuota con
+scritto `DIGITAL KIOSK` nella prima cella. Controlla che l'inventario sia
+rimasto identico.
 
 Prova anche la forma breve: al posto di `DIGITAL KIOSK` scrivi solo `KIOSK`.
 Deve funzionare lo stesso.
 
-## 7. Reset e ricarica
-
-1. *Reset inventario*, scrivi `ELIMINA TUTTO`
-2. controlla il messaggio finale: dice quanti eliminati e dove ha salvato la copia
-3. reimporta `Inventario_di_prova.xlsx`
-
-Se prima del reset avevi inserito a mano un iPhone, deve **sopravvivere**: gli
-iPhone non si eliminano e non si reimportano.
-
-## 8. Esportazione
+## 6. Esportazione
 
 Con l'inventario carico dal punto 1, prova le tre forme da *Esporta xls...*.
 
 **Un unico elenco.** Un foglio solo con tutti e 30 i dispositivi.
 
-**Un foglio per ogni stanza.** Un file con tre fogli, uno per stanza, 10
-dispositivi ciascuno. Apri ogni foglio e controlla che in **A1** ci sia il nome
-della stanza, sotto la data di esportazione, e che la colonna *Stanza* ci sia e
-riporti sempre la stessa stanza. Era questo il difetto della versione
-precedente: il foglio non diceva di chi era.
+**Un foglio per ogni stanza.** Un file con tre fogli, 10 dispositivi ciascuno.
+In ogni foglio, **A1** deve contenere il nome della stanza, sotto la data di
+esportazione, e la colonna *Stanza* deve esserci e riportare sempre la stessa
+stanza.
 
 **Un file separato per ogni stanza.** Scegli una cartella: devono uscire tre
-file `Inventario_<Nome_stanza>_<data>.xlsx`, ciascuno con la sua stanza in A1.
+file `Inventario_<Nome_stanza>_<data>.xlsx`.
 
 Poi la controprova: **reimporta** il file con i tre fogli, con *Tutto
-l'inventario* + *Unisci*. Deve leggerli tutti e tre e riconoscere 30
-dispositivi, perche' il nome del foglio vale come riga-separatore.
+l'inventario* + *Unisci*. Deve leggerli tutti e riconoscere 30 dispositivi.
 
-Infine, entra in una stanza e usa la scorciatoia **Esporta questa stanza in
-xls**: stesso risultato dell'opzione *Una sola stanza*. In nessuna forma devono
-comparire iPhone.
+## 7. La lingua
+
+Cambia lingua dalla tendina **Lingua** in alto a destra nell'intestazione, e
+controlla che diventi inglese **tutto**: pulsanti, intestazioni delle colonne,
+schede stanza, barra di stato, e i messaggi che compaiono premendo *Elimina* o
+*Sposta in stanza* senza aver spuntato niente. Poi torna in italiano.
+
+Con l'interfaccia in italiano, prova *Esporta xls...* spuntando **Esporta i file
+in inglese**: nel file intestazioni e stati devono essere in inglese, mentre i
+nomi delle stanze restano come li hai scritti. Reimporta quel file: deve entrare
+senza errori e gli stati devono tornare in italiano.
 
 ---
 
-## 9. La lingua
+# Caricare l'inventario definitivo
 
-Cambia lingua dalla tendina **Lingua** in alto a destra nell'intestazione, e
-controlla che diventi inglese **tutto**: pulsanti della barra, intestazioni delle
-colonne, testo delle schede stanza, barra di stato in fondo, e i messaggi che
-compaiono premendo *Elimina*, *Sposta in stanza* o *Reset inventario* senza aver
-spuntato niente.
+Finito il collaudo, l'inventario e' pieno di dati finti. Prima di caricare
+quelli veri va svuotato, altrimenti i due si mescolano: i dispositivi di prova
+resterebbero dentro insieme ai tuoi.
 
-Poi torna in italiano dalla stessa tendina, oppure da *Impostazioni*: sono la
-stessa cosa. La scelta resta anche riaprendo il programma.
+Ci sono due modi. Fanno la stessa cosa; cambia solo quando avviene lo
+svuotamento.
 
-**Esportazione in inglese restando in italiano.** Con l'interfaccia in italiano,
-*Esporta xls...* e spunta **Esporta i file in inglese**: nel file le intestazioni
-e gli stati devono essere in inglese, mentre i nomi delle stanze restano come li
-hai scritti. Reimporta quel file: deve entrare senza errori e gli stati devono
-tornare in italiano.
+## Modo A - reset, poi importazione
+
+Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.
+
+1. premi **Reset inventario**, in alto a destra
+2. l'avviso dice quanti dispositivi verranno eliminati, **per tutti gli utenti**
+3. scrivi per esteso `ELIMINA TUTTO` nella casella, e conferma
+4. il programma salva da solo una copia del file dati nella stessa cartella,
+   con data e ora nel nome, e poi svuota
+5. controlla che le schede stanza siano tutte a zero
+6. ora *Importa xls...* > **Tutto l'inventario** > **Unisci**, e scegli il tuo
+   file
+
+## Modo B - importazione che sostituisce tutto
+
+Un passaggio solo, il risultato e' identico.
+
+1. *Importa xls...*
+2. **Tutto l'inventario** + **Sostituisci**
+3. scegli il tuo file
+4. il riepilogo dice quante righe ha letto e quanti dispositivi verranno
+   eliminati prima di caricare
+5. scrivi per esteso `ELIMINA TUTTO` e conferma
+
+Anche qui la copia di sicurezza viene salvata prima di toccare qualsiasi cosa.
+Se la copia non riesce, l'operazione si annulla e non viene cambiato niente.
+
+## Cosa sopravvive in ogni caso
+
+**Gli iPhone non vengono mai eliminati**, ne' dal reset ne' da una sostituzione,
+in nessuno stato. Non arrivano da un'importazione - si inseriscono solo a mano -
+quindi cancellarli qui vorrebbe dire perderli per sempre. Il programma dice
+quanti ne ha mantenuti.
+
+Se durante il collaudo hai inserito iPhone finti, eliminali a mano prima di
+partire: registra la spedizione con *Conferma spedizione*, e potrai eliminarli
+tre mesi dopo. In alternativa, fai il collaudo senza inserire iPhone.
+
+---
 
 ## Se qualcosa non torna
 
-Segnala il problema con: quale punto stavi facendo, cosa ti aspettavi, cosa e'
-successo, e se puoi la schermata del riepilogo. Su Mac, il diario di avvio e' in
-`avvio.log` nella cartella del programma.
+Segnala il problema con: a quale punto eri, cosa ti aspettavi, cosa e'
+successo, e se puoi la schermata del riepilogo. Su macOS il diario di avvio e'
+in `avvio.log` nella cartella del programma.

@@ -462,14 +462,17 @@ impostazioni di Excel: Numbers le ignora, ma i dati restano identici.
 
 ## Provare l'importazione
 
-La cartella [`Collaudo/`](Collaudo/) contiene due fogli Excel pronti da
-importare - uno regolare con **30 dispositivi, 10 per stanza**, e uno con dentro
-apposta i casi che il programma deve segnalare - e le istruzioni passo passo:
+La cartella **`Collaudo/`** viaggia con il programma: nel pacchetto Windows sta
+accanto a `Inventario.exe`. Contiene due fogli Excel pronti da importare - uno
+regolare con **30 dispositivi, 10 per stanza**, e uno con dentro apposta i casi
+che il programma deve segnalare - e le istruzioni passo passo:
 [**Come testare l'importazione**](Collaudo/README.md).
 
-Nove scenari, dal caricamento iniziale all'importazione dentro una singola
-stanza, fino al reset, alla riesportazione e al cambio di lingua. I file si rigenerano con
-`.venv/bin/python tests/genera_file_di_prova.py`.
+Le prove si fanno con i file inclusi, senza copiare niente altrove. Le
+istruzioni spiegano anche **come caricare l'inventario definitivo** una volta
+finito il collaudo: prima il reset, oppure l'importazione che sostituisce tutto.
+
+I file si rigenerano con `.venv/bin/python tests/genera_file_di_prova.py`.
 
 ## Test automatici
 

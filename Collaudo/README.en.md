@@ -2,39 +2,97 @@
 
 *[Versione italiana](README.md)*
 
-Two Excel sheets ready to import, to try the program without touching the real
-inventory.
+This folder is part of the program and travels with it: it is there to try the
+import with fake data, before loading the real inventory.
 
-| File | Contents |
-| --- | --- |
-| `Inventario_di_prova.xlsx` | 30 devices, **10 per room**, split by the separator rows. All regular. |
-| `Inventario_di_prova_con_difetti.xlsx` | The same layout, but deliberately carrying the cases the program has to report. |
+## Where the files are
 
-They are regenerated with:
+They are in the **`Collaudo`** folder, next to `Inventario.exe`:
 
-```bash
-.venv/bin/python tests/genera_file_di_prova.py
+```
+\\server\Shared\Inventory\
+    Inventario.exe
+    Collaudo\
+        Inventario_di_prova.xlsx
+        Inventario_di_prova_con_difetti.xlsx
+        README.md            the Italian version
+        README.en.md         this document
 ```
 
-If you need to prepare a file of your own instead of using these, the full
-format guide is here:
-**[How to prepare the Excel file](https://angelo-tassi.github.io/site-services-inventario/formato-xls.html?lang=en)**.
+If you downloaded `Inventario-windows.zip` from the Releases page, the
+`Collaudo` folder is already inside. Working from source, it is `Collaudo/` in
+the project root.
 
-## Before you start
+When you are asked to choose a file, point here: **nothing needs to be copied
+anywhere else**.
 
-Run the trials on a **fake** inventory, not on the one in the network folder.
-The quickest way is to create an empty folder, copy `Inventario.exe` into it and
-open it: on first run it offers to create a new `Inventario.xlsx` there.
+## What they contain
+
+### `Inventario_di_prova.xlsx` - 30 devices, all regular
+
+A single sheet called *Inventario*, with the column headers in the first row and
+the devices split into three blocks by the blue separator rows:
+`SITE SERVICES BAU`, `DIGITAL KIOSK`, `MAGAZZINO DISASTER RECOVERY`. Ten devices
+per block.
+
+| Column | Contents |
+| --- | --- |
+| Asset Tag | `IT-BAU-101` ... `IT-KSK-210` ... `IT-DRC-310`, one series per room |
+| Type | seven Laptops and three Tablets per room |
+| Model | Lenovo ThinkPad T14 Gen 4 and Gen 5, Dell Latitude 7320 Detachable and 7230 Rugged Extreme |
+| Serial number | plausible serials, all different |
+| Status | a mix of the five statuses, to see how they behave |
+| Notes | some filled in, some empty |
+
+No iPhones: phones are entered by hand only.
+
+### `Inventario_di_prova_con_difetti.xlsx` - the cases to be reported
+
+Same layout, but carrying **on purpose** everything the program has to
+recognise and tell you about. Besides the two separators there are six rows:
+
+| What is in it | What the program must do |
+| --- | --- |
+| Three extra columns: `Costo`, `Fornitore`, `Centro di costo` | ignore them, and list them before importing |
+| A row with no model (`IT-BAU-902`) | import it anyway, saying how many are missing one |
+| A row with neither asset tag nor IMEI | discard it and count it |
+| A row of type `Iphone`, with an IMEI | ignore it: phones are not imported |
+| A completely empty row | skip it without counting it |
+| The separators written in short form, `BAU` and `KIOSK` | recognise them all the same |
+
+These are the same files the automated tests use: if the program's behaviour
+changes, the tests fail and these instructions get rewritten. They are
+regenerated with `.venv/bin/python tests/genera_file_di_prova.py`.
+
+## Where the real inventory goes
+
+**Not in this folder, and not next to the program either.** The program folder
+holds the application and the test data: it is a place where files are replaced
+at every update.
+
+While you are trying things out, keep the file you are about to load in a folder
+of your own - for example **Documents\Inventory** on the computer of the
+technician doing the import. In production, the final inventory belongs in the
+shared network folder, which is the one the program normally opens.
+
+The path the program uses is chosen on first run and remembered in
+`inventario_percorso.json`, next to the executable. To change it, delete that
+file and restart.
 
 ---
 
 # How to test the import
 
+The checks below work on whatever inventory the program is currently using. Do
+them before loading the final data: step 7 empties everything, so this is the
+right moment to try while the inventory is still fake.
+
 ## 1. First load
 
 1. *Import xls...*
 2. **The whole inventory** + **Merge**, then *Choose the file*
-3. select `Inventario_di_prova.xlsx`
+3. open the `Collaudo` folder next to the program and pick
+   `Inventario_di_prova.xlsx`
 4. the summary must say **30 valid rows** and **30 rows took their room from the
    separators**
 5. confirm with *Import*
@@ -58,31 +116,21 @@ counts up.
 **What you should get.** Digital Kiosk still holds **10** devices, the ones
 listed under the `DIGITAL KIOSK` row: the sheet declares the rooms, so the
 separators rule and the other rooms' rows are thrown away. The other two rooms
-stay as they were, with 10 each.
+stay as they were.
 
 A file named `Inventario_prima_del_reset_...xlsx` must have appeared in the data
 folder: that is the backup copy.
 
 ### When the sheet declares no rooms
 
-Open `Inventario_di_prova.xlsx`, **delete all three separator rows** and save
-under another name. Import it again with **A single room** > `Digital Kiosk`.
+Open `Inventario_di_prova.xlsx`, **delete the three separator rows** and save
+under another name in your own working folder. Import it again with **A single
+room** > `Digital Kiosk`.
 
 This time the summary says **30 valid rows** and warns that *the sheet declares
-no rooms: every row will go into Digital Kiosk*. That is the case where your
-choice is the only information available.
+no rooms: every row will go into Digital Kiosk*.
 
-## 4. Replacing everything
-
-1. *Import xls...* > **The whole inventory** > **Replace**
-2. choose `Inventario_di_prova.xlsx`
-3. the summary asks you to type `DELETE EVERYTHING`
-
-Try confirming **without** typing it first, or typing "yes": it must refuse and
-stay open. Then type the phrase and confirm: you are back to 30 devices spread
-10, 10 and 10.
-
-## 5. The warnings on imperfect files
+## 4. The warnings on imperfect files
 
 Import `Inventario_di_prova_con_difetti.xlsx` with **The whole inventory** +
 **Merge**. The summary must show, all together:
@@ -95,90 +143,114 @@ Import `Inventario_di_prova_con_difetti.xlsx` with **The whole inventory** +
   `Centro di costo`
 - the warning that **1 row has no model**
 
-On confirmation 3 devices go in: two in Site Services BAU (one of them without a
-model, to be filled in by hand) and one in Digital Kiosk. The iPhone does **not**
-go in.
+On confirmation 3 devices go in, one of them without a model to be filled in by
+hand. The iPhone does **not** go in.
 
-## 6. Importing into a room
+## 5. Importing into a room
 
-This is the trial of the **Import this room's data** button, next to the room
-name once you open it. It must give the **same result** as the *A single room*
-option of step 3: it is the same rule, reached two different ways.
+The **Import this room's data** button sits next to the room name once you open
+it. It must give the **same result** as step 3: the same rule, reached two
+different ways.
 
 1. enter **Digital Kiosk**
 2. press *Import this room's data*, choose **Merge**
 3. select `Inventario_di_prova.xlsx`
 
 **What you should get.** The summary says **10 valid rows** and **20 rows from
-other rooms discarded**. Only the ten devices listed under the `DIGITAL KIOSK`
-row go in: those of BAU and the warehouse are thrown away, even though they are
-in the same sheet.
+other rooms discarded**.
 
 ### The room row is required
 
 Take `Inventario_di_prova.xlsx`, **delete the `DIGITAL KIOSK` row** and save
-under another name. Then try importing it into Digital Kiosk.
-
-A warning must appear saying that no row in the sheet names that room, that
-**nothing was imported**, and explaining to add an otherwise empty row with
-`DIGITAL KIOSK` in the first cell. The warning also lists the rooms it found
-instead. Check that the inventory is unchanged.
+under another name. Try importing it into Digital Kiosk again: a warning must
+appear saying no row in the sheet names that room, that **nothing was imported**,
+and explaining to add an otherwise empty row with `DIGITAL KIOSK` in the first
+cell. Check that the inventory is unchanged.
 
 Try the short form too: instead of `DIGITAL KIOSK` write just `KIOSK`. It must
 work the same.
 
-## 7. Reset and reload
-
-1. *Reset inventory*, type `DELETE EVERYTHING`
-2. check the final message: it says how many were deleted and where it saved the
-   backup
-3. import `Inventario_di_prova.xlsx` again
-
-If you had added an iPhone by hand before the reset, it must **survive**:
-iPhones are never deleted and never reimported.
-
-## 8. Exporting
+## 6. Exporting
 
 With the inventory loaded from step 1, try the three forms from *Export xls...*.
 
 **A single list.** One sheet with all 30 devices.
 
-**One sheet per room.** One file with three sheets, one per room, 10 devices
-each. Open each sheet and check that **A1** carries the room name, the export
-date below it, and that the *Room* column is there and always reports the same
-room.
+**One sheet per room.** One file with three sheets, 10 devices each. In every
+sheet, **A1** must carry the room name, the export date below it, and the *Room*
+column must be there reporting always the same room.
 
 **A separate file for each room.** Pick a folder: three files
-`Inventario_<Room_name>_<date>.xlsx` must come out, each with its room in A1.
+`Inventario_<Room_name>_<date>.xlsx` must come out.
 
-Then the counter-check: **import back** the file with the three sheets, with *The
-whole inventory* + *Merge*. It must read all three and recognise 30 devices,
-because the sheet name counts as a separator row.
+Then the counter-check: **import back** the file with the three sheets, with
+*The whole inventory* + *Merge*. It must read them all and recognise 30 devices.
 
-Finally, enter a room and use the **Export this room to xls** shortcut: same
-result as the *A single room* option. No iPhone must appear in any form.
-
-## 9. Language
+## 7. Language
 
 Switch language from the **Language** dropdown at the top right of the header,
-and check that **everything** turns Italian or English: toolbar buttons, column
-headers, room card text, the status bar at the bottom, and the messages that
-appear when pressing *Delete*, *Move to room* or *Reset inventory* without having
-ticked anything.
+and check that **everything** changes: buttons, column headers, room cards, the
+status bar, and the messages that appear when pressing *Delete* or *Move to
+room* without having ticked anything. Then switch back.
 
-Then switch back from the same dropdown, or from *Settings*: they are the same
-thing. The choice survives reopening the program.
+With the interface in Italian, try *Export xls...* ticking **Export the files in
+English**: in the file, headers and statuses must be in English, while the room
+names stay exactly as you wrote them. Import that file back: it must go in
+without errors and the statuses must return to Italian.
 
-**Exporting in English while working in Italian.** With the interface in Italian,
-*Export xls...* and tick **Export the files in English**: in the file the headers
-and statuses must be in English, while the room names stay exactly as you wrote
-them. Import that file back: it must go in without errors and the statuses must
-return to Italian.
+---
+
+# Loading the final inventory
+
+Once the trial is over, the inventory is full of fake data. It has to be emptied
+before loading the real thing, or the two get mixed: the test devices would stay
+in alongside yours.
+
+There are two ways. They do the same thing; only the moment of the emptying
+differs.
+
+## Way A - reset, then import
+
+Use this if you want to see the inventory empty before loading.
+
+1. press **Reset inventory**, at the top right
+2. the warning says how many devices will be deleted, **for every user**
+3. type `DELETE EVERYTHING` in full in the box, and confirm
+4. the program saves a copy of the data file by itself, in the same folder, with
+   date and time in the name, and then empties
+5. check that the room cards are all at zero
+6. now *Import xls...* > **The whole inventory** > **Merge**, and choose your
+   file
+
+## Way B - an import that replaces everything
+
+One step, identical result.
+
+1. *Import xls...*
+2. **The whole inventory** + **Replace**
+3. choose your file
+4. the summary says how many rows it read and how many devices will be deleted
+   before loading
+5. type `DELETE EVERYTHING` in full and confirm
+
+Here too the backup copy is saved before anything is touched. If the copy fails,
+the operation is cancelled and nothing is changed.
+
+## What survives either way
+
+**iPhones are never deleted**, neither by the reset nor by a replacement, in any
+state. They do not come from an import - they are entered by hand only - so
+deleting them here would mean losing them for good. The program says how many it
+kept.
+
+If you added fake iPhones during the trial, remove them by hand before starting:
+record the shipment with *Confirm shipment*, and you will be able to delete them
+three months later. Alternatively, run the trial without adding any iPhone.
 
 ---
 
 ## If something does not add up
 
 Report the problem with: which step you were on, what you expected, what
-happened, and if you can a screenshot of the summary. On macOS, the startup log
+happened, and if you can a screenshot of the summary. On macOS the startup log
 is in `avvio.log` in the program folder.
