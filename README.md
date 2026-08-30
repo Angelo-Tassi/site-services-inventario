@@ -1,6 +1,10 @@
 # Site Services : Inventario Iphone, Laptop e Tablet
 
-*[English version](README.en.md)*
+### [Apri la pagina del progetto](https://angelo-tassi.github.io/site-services-inventario/) &nbsp;·&nbsp; [Scarica il programma](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe) &nbsp;·&nbsp; [English](README.en.md)
+
+> **Pagina del progetto:** <https://angelo-tassi.github.io/site-services-inventario/>
+> Da li' si scarica il programma, il modello Excel e si leggono le guide, in
+> italiano e in inglese.
 
 Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
