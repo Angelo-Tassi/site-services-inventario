@@ -500,6 +500,31 @@ vengono mantenuti, perche' non potrebbero essere ricaricati da un file.
 Restano invece nella **stampa**, che e' consultazione interna, e ovviamente
 nell'inventario a video e nel file dati.
 
+## Se il file ha colonne diverse dalle nostre
+
+L'importazione e' tollerante e non si blocca per un file "sporco". Ecco
+esattamente cosa succede.
+
+| Nel file | Cosa fa il programma |
+| --- | --- |
+| Colonne in piu' (costo, fornitore, centro di costo...) | le ignora e **te le elenca** prima di importare |
+| Nomi con maiuscole o spazi diversi | li riconosce lo stesso: `  ASSET TAG `, `tipo`, `MoDeLLo`, `s/n` vanno bene |
+| Due colonne per lo stesso dato | usa la prima e segnala la seconda fra quelle ignorate |
+| Manca il **modello** | importa lo stesso e ti dice quante righe restano senza |
+| Manca l'**asset tag** (o l'IMEI) | si ferma con un errore e non importa niente |
+| Righe vuote | le salta senza contarle |
+| Righe senza identificativo | le conta come scartate e va avanti |
+
+Il punto delicato sono le **colonne non riconosciute**: se il tuo file chiama il
+modello *Descrizione articolo*, quel dato verrebbe perso in silenzio. Per questo
+la finestra di importazione, prima di chiederti conferma, mostra un riquadro con
+i nomi delle colonne che non ha capito e ti invita a rinominarle. Rinominare
+l'intestazione nel foglio e riprovare e' sufficiente: nessun dato va perso,
+perche' finche' non confermi non viene scritto niente.
+
+Il modo piu' sicuro di non incontrare il problema e' partire dal
+[modello](docs/Modello_inventario.xlsx), che ha gia' le intestazioni giuste.
+
 ## Dividere per stanza un inventario unico
 
 Se hai un solo foglio Excel con tutti i dispositivi e nessuna colonna *Stanza*,

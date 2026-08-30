@@ -486,7 +486,13 @@ class ImportDialog(_Modal):
         if esito.get("iphone"):
             righe.append("%d iPhone ignorati: si inseriscono solo a mano." % esito["iphone"])
         ttk.Label(body, text="\n".join(righe), style="Muted.TLabel",
-                  justify="left").pack(anchor="w", pady=(2, 12))
+                  justify="left").pack(anchor="w", pady=(2, 8))
+
+        for testo in self._avvertenze(esito):
+            avviso = tk.Label(body, text=testo, justify="left", anchor="w",
+                              bg=theme.LOAN_BG, fg=theme.LOAN_FG,
+                              padx=10, pady=8, wraplength=430)
+            avviso.pack(fill="x", pady=(0, 8))
         self.var_mode = tk.StringVar(value="merge")
         ttk.Radiobutton(body, variable=self.var_mode, value="merge",
                         text="Unisci: aggiunge i nuovi e aggiorna quelli con lo stesso asset tag"
@@ -499,6 +505,26 @@ class ImportDialog(_Modal):
         ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
         ttk.Button(buttons, text="Importa", style="Primary.TButton",
                    command=self._ok).pack(side="right")
+
+    @staticmethod
+    def _avvertenze(esito):
+        """Cosa il file conteneva e il programma non ha potuto usare."""
+        messaggi = []
+        ignorate = esito.get("colonne_ignorate") or []
+        if ignorate:
+            elenco = ", ".join(ignorate[:6])
+            if len(ignorate) > 6:
+                elenco += " e altre %d" % (len(ignorate) - 6)
+            messaggi.append(
+                "Colonne non riconosciute, il cui contenuto non verra' importato:\n%s\n"
+                "Se una di queste e' un dato che ti serve, rinominala come la colonna\n"
+                "corrispondente dell'inventario e riprova." % elenco)
+        senza = esito.get("senza_modello")
+        if senza:
+            messaggi.append(
+                "%d righe non hanno il modello del dispositivo: verranno importate\n"
+                "con quel campo vuoto, da completare a mano." % senza)
+        return messaggi
 
     def _ok(self):
         self.result = self.var_mode.get()
