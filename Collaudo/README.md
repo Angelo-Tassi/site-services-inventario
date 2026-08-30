@@ -209,6 +209,18 @@ file `Inventario_<Nome_stanza>_<data>.xlsx`.
 Poi la controprova: **reimporta** il file con i tre fogli, con *Tutto
 l'inventario* + *Unisci*. Deve leggerli tutti e riconoscere 30 dispositivi.
 
+### L'invio per e-mail
+
+Ogni esportazione finisce con la stessa domanda. Scegli **Invia per e-mail con
+Outlook**: deve aprirsi un messaggio nuovo con il file gia' allegato, da
+compilare e mandare tu. Chiudi il messaggio senza inviarlo, e' solo una prova.
+
+Ripeti con l'esportazione **in un file per ogni stanza**: stavolta l'allegato
+deve essere un unico archivio `.zip` con dentro i tre file.
+
+Se sul computer non c'e' Outlook, deve comparire un avviso che lo dice e che
+ricorda che il file e' stato creato comunque: verifica che ci sia davvero.
+
 ## 7. Tornare indietro da un errore
 
 E' la prova che serve davvero in sede: sbagliare un'importazione e rimediare.

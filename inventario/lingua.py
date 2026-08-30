@@ -198,6 +198,34 @@ EN = {
     "Una stanza sola sta in un file solo, con il suo nome in testa.":
         "A single room fits in a single file, with its name at the top.",
     "ELIMINA TUTTO": "DELETE EVERYTHING",
+    # --- invio per e-mail
+    'Invia per e-mail con Outlook':
+        'Send by e-mail with Outlook',
+    "Apre un messaggio nuovo con il file gia' allegato:\ndestinatario e testo li scrivi tu, l'invio resta a te.":
+        'It opens a new message with the file already attached:\nrecipient and text are yours to write, sending stays with you.',
+    'Apri il file':
+        'Open the file',
+    'Ho finito':
+        "I'm done",
+    '\n... e altri %d':
+        '\n... and %d more',
+    'Invio per e-mail':
+        'Sending by e-mail',
+    'Messaggio aperto in Outlook con %s allegato.     ':
+        'Message opened in Outlook with %s attached.     ',
+    '%d file scritti in:\n%s':
+        '%d files written to:\n%s',
+    '%s esportati in:\n%s':
+        '%s exported to:\n%s',
+    '%d dispositivi di %s esportati in:\n%s':
+        '%d devices from %s exported to:\n%s',
+    "Non c'e' nessun file da allegare.":
+        'There is no file to attach.',
+    "Outlook non e' stato trovato su questo computer.\n\nIl file e' stato creato lo stesso: allegalo a mano al messaggio.":
+        'Outlook was not found on this computer.\n\nThe file was created anyway: attach it to the message by hand.',
+    "Non riesco ad aprire Outlook:\n%s\n\nIl file e' stato creato lo stesso: allegalo a mano.":
+        'I cannot open Outlook:\n%s\n\nThe file was created anyway: attach it by hand.',
+
     # --- ripristino
     'Da quale copia vuoi ripartire?':
         'Which copy do you want to go back to?',

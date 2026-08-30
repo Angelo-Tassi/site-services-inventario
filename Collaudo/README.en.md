@@ -207,6 +207,18 @@ column must be there reporting always the same room.
 Then the counter-check: **import back** the file with the three sheets, with
 *The whole inventory* + *Merge*. It must read them all and recognise 30 devices.
 
+### Sending by e-mail
+
+Every export ends with the same question. Choose **Send by e-mail with
+Outlook**: a new message must open with the file already attached, for you to
+fill in and send. Close the message without sending it, this is only a check.
+
+Repeat with the export **into one file per room**: this time the attachment must
+be a single `.zip` archive holding the three files.
+
+If Outlook is not on that computer, a warning must appear saying so and
+reminding you that the file was created anyway: check that it really is there.
+
 ## 7. Going back from a mistake
 
 This is the check that really matters on site: getting an import wrong and

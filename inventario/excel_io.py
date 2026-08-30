@@ -3,6 +3,7 @@
 import os
 import subprocess
 import sys
+import zipfile
 import tempfile
 from datetime import datetime
 
@@ -361,6 +362,76 @@ def build_template(path, rooms, stati=None, lingua=None):
     finally:
         wb.close()
     return path
+
+
+def _percorso_outlook():
+    """Dove sta outlook.exe su questo computer, o None."""
+    if not sys.platform.startswith("win"):
+        return None
+    try:
+        import winreg
+    except ImportError:
+        return None
+    chiavi = (
+        (winreg.HKEY_LOCAL_MACHINE,
+         r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\OUTLOOK.EXE"),
+        (winreg.HKEY_CURRENT_USER,
+         r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\OUTLOOK.EXE"),
+    )
+    for radice, percorso in chiavi:
+        try:
+            with winreg.OpenKey(radice, percorso) as chiave:
+                valore = winreg.QueryValueEx(chiave, "")[0]
+            if valore and os.path.exists(valore):
+                return valore
+        except OSError:
+            continue
+    # installazioni che non registrano App Paths
+    for base in (os.environ.get("ProgramFiles", ""),
+                 os.environ.get("ProgramFiles(x86)", "")):
+        if not base:
+            continue
+        for ufficio in ("root\\Office16", "Office16", "Office15", "Office14"):
+            candidato = os.path.join(base, "Microsoft Office", ufficio, "OUTLOOK.EXE")
+            if os.path.exists(candidato):
+                return candidato
+    return None
+
+
+def outlook_disponibile():
+    return _percorso_outlook() is not None
+
+
+def allega_a_outlook(percorsi):
+    """Apre un nuovo messaggio di Outlook con i file gia' allegati.
+
+    Outlook accetta un allegato solo dalla riga di comando: se i file sono piu'
+    di uno vengono raccolti in un archivio zip, che e' anche piu' comodo da
+    spedire. Ritorna il percorso di cio' che e' stato allegato.
+    """
+    percorsi = [p for p in percorsi if p and os.path.exists(p)]
+    if not percorsi:
+        raise InventoryError("Non c'e' nessun file da allegare.")
+    outlook = _percorso_outlook()
+    if outlook is None:
+        raise InventoryError(
+            "Outlook non e' stato trovato su questo computer.\n\n"
+            "Il file e' stato creato lo stesso: allegalo a mano al messaggio.")
+    if len(percorsi) == 1:
+        allegato = percorsi[0]
+    else:
+        nome = "Inventario_%s.zip" % datetime.now().strftime("%Y%m%d_%H%M%S")
+        allegato = os.path.join(os.path.dirname(percorsi[0]), nome)
+        with zipfile.ZipFile(allegato, "w", zipfile.ZIP_DEFLATED) as archivio:
+            for percorso in percorsi:
+                archivio.write(percorso, os.path.basename(percorso))
+    try:
+        subprocess.Popen([outlook, "/a", allegato])
+    except OSError as exc:
+        raise InventoryError(
+            "Non riesco ad aprire Outlook:\n%s\n\n"
+            "Il file e' stato creato lo stesso: allegalo a mano." % exc)
+    return allegato
 
 
 def send_to_printer(path):

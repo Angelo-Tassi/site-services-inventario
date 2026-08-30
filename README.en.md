@@ -508,6 +508,23 @@ as that room's separator row.
 Inside a room there is also the **Export this room to xls** shortcut, which skips
 the window and produces that room's file directly.
 
+### Sending it by e-mail
+
+Every export, whichever form you chose, ends with the same question: **Send by
+e-mail with Outlook**, *Open the file*, or nothing.
+
+Choosing to send opens a **new Outlook message with the file already attached**.
+Recipient, subject and text are yours to write, and sending stays with you: the
+program prepares the message and stops there. If the export produced several
+files - one per room - they are collected into a **zip archive**, because Outlook
+accepts a single attachment from the command line.
+
+If Outlook is not installed on that computer, the program says so and reminds you
+that **the file was created anyway**: just attach it by hand.
+
+There is no menu entry for sending: it is an option at the end of the export,
+because what you send is what you have just produced.
+
 ## Going back after a mistake
 
 If an import goes wrong - duplicated devices, the wrong room, a file that was

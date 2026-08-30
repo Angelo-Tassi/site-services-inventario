@@ -602,6 +602,40 @@ class ResetDialog(_Modal):
         self.destroy()
 
 
+class EsportazioneFattaDialog(_Modal):
+    """Cosa fare del file appena esportato: mandarlo, aprirlo, o niente."""
+
+    def __init__(self, parent, descrizione, percorsi):
+        _Modal.__init__(self, parent, T("Esportazione completata"))
+        self.percorsi = list(percorsi)
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, text=descrizione, style="Section.TLabel",
+                  wraplength=420, justify="left").pack(anchor="w")
+
+        elenco = "\n".join(os.path.basename(p) for p in self.percorsi[:6])
+        if len(self.percorsi) > 6:
+            elenco += T("\n... e altri %d") % (len(self.percorsi) - 6)
+        ttk.Label(body, text=elenco, style="Muted.TLabel",
+                  justify="left").pack(anchor="w", pady=(6, 14))
+
+        ttk.Button(body, text=T("Invia per e-mail con Outlook"),
+                   style="Primary.TButton",
+                   command=lambda: self._scegli("email")).pack(fill="x")
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text=T("Apre un messaggio nuovo con il file gia' allegato:\n"
+                         "destinatario e testo li scrivi tu, l'invio resta a te.")).pack(
+            anchor="w", padx=(6, 0), pady=(4, 10))
+        ttk.Button(body, text=T("Apri il file"),
+                   command=lambda: self._scegli("apri")).pack(fill="x")
+        ttk.Button(body, text=T("Ho finito"),
+                   command=self._cancel).pack(fill="x", pady=(8, 0))
+
+    def _scegli(self, azione):
+        self.result = azione
+        self.destroy()
+
+
 class RestoreDialog(_Modal):
     """Scelta della copia di sicurezza da cui ripartire."""
 
@@ -2184,6 +2218,21 @@ class App(tk.Tk):
                    if not is_iphone(i.get("tipo"))
                    and (stanza is None or i.get("stanza") == stanza))
 
+    def fine_esportazione(self, descrizione, percorsi, cartella=None):
+        """Chiude ogni esportazione offrendo invio, apertura, o niente."""
+        azione = EsportazioneFattaDialog(self, descrizione, percorsi).show()
+        if azione == "email":
+            try:
+                allegato = excel_io.allega_a_outlook(percorsi)
+            except InventoryError as exc:
+                messagebox.showwarning(T("Invio per e-mail"), str(exc), parent=self)
+                return
+            self.var_status.set(
+                T("Messaggio aperto in Outlook con %s allegato.     ")
+                % os.path.basename(allegato) + self.var_status.get())
+        elif azione == "apri":
+            excel_io.open_file(cartella or percorsi[0])
+
     def on_export_room(self):
         """Esporta il contenuto della stanza aperta, filtri esclusi."""
         stanza = self.var_room.get()
@@ -2205,12 +2254,9 @@ class App(tk.Tk):
         except InventoryError as exc:
             messagebox.showerror(T("Esportazione non riuscita"), str(exc), parent=self)
             return
-        if messagebox.askyesno(
-            T("Esportazione completata"),
-            T("%d dispositivi di %s esportati in:\n%s\n\nAprirlo ora?")
-            % (len(items), stanza, percorso), parent=self
-        ):
-            excel_io.open_file(percorso)
+        self.fine_esportazione(
+            T("%d dispositivi di %s esportati in:\n%s") % (len(items), stanza, percorso),
+            [percorso])
 
     def on_export(self):
         """Prima cosa esportare e in che forma, poi dove salvarlo."""
@@ -2244,13 +2290,9 @@ class App(tk.Tk):
                 messagebox.showinfo(T("Esporta"), T("Nessuna stanza contiene dispositivi."),
                                     parent=self)
                 return
-            elenco = "\n".join(os.path.basename(p) for p in scritti)
-            if messagebox.askyesno(
-                T("Esportazione completata"),
-                T("%d file scritti in:\n%s\n\n%s\n\nAprire la cartella?")
-                % (len(scritti), cartella, elenco), parent=self
-            ):
-                excel_io.open_file(cartella)
+            self.fine_esportazione(
+                T("%d file scritti in:\n%s") % (len(scritti), cartella),
+                scritti, cartella=cartella)
             return
 
         if stanza:
@@ -2274,12 +2316,8 @@ class App(tk.Tk):
                        else T("%d dispositivi") % len(items))
         if forma == "fogli":
             descrizione += T(", un foglio per stanza")
-        if messagebox.askyesno(
-            T("Esportazione completata"),
-            T("%s esportati in:\n%s\n\nAprirlo ora?") % (descrizione, percorso),
-            parent=self
-        ):
-            excel_io.open_file(percorso)
+        self.fine_esportazione(
+            T("%s esportati in:\n%s") % (descrizione, percorso), [percorso])
 
     def on_print(self):
         items = self.filtered_items()

@@ -740,6 +740,23 @@ la riga-separatore di quella stanza.
 Dentro una stanza c'e' anche la scorciatoia **Esporta questa stanza in xls**, che
 salta la finestra e produce direttamente il file di quella stanza.
 
+### Mandarlo per e-mail
+
+Ogni esportazione, qualunque forma abbia scelto, finisce con la stessa domanda:
+**Invia per e-mail con Outlook**, *Apri il file*, oppure niente.
+
+Scegliendo l'invio si apre un **messaggio nuovo di Outlook con il file gia'
+allegato**. Destinatario, oggetto e testo li scrivi tu, e l'invio resta tuo: il
+programma prepara il messaggio e si ferma li'. Se l'esportazione ha prodotto piu'
+file - un file per stanza - vengono raccolti in un **archivio zip**, perche'
+Outlook accetta un allegato solo dalla riga di comando.
+
+Se Outlook non e' installato su quel computer, il programma lo dice e ricorda
+che **il file e' stato creato lo stesso**: basta allegarlo a mano.
+
+Non c'e' nessuna voce di menu per l'invio: e' un'opzione in coda
+all'esportazione, perche' si manda quello che si e' appena prodotto.
+
 Esporta la stanza **intera**, non quello che stai vedendo: eventuali ricerche o
 filtri attivi non la riducono. Per esportare esattamente la vista corrente c'e'
 sempre *Esporta xls...* nella barra in alto.
