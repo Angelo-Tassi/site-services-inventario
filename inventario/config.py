@@ -61,6 +61,36 @@ def _read_config_path(path):
         return None
 
 
+def load_language():
+    """La lingua e' una preferenza personale: sta accanto al programma o nel profilo."""
+    for sorgente in (local_config_path(), user_config_path()):
+        try:
+            with open(sorgente, "r", encoding="utf-8") as fh:
+                lingua = json.load(fh).get("lingua")
+        except (OSError, ValueError):
+            continue
+        if lingua:
+            return lingua
+    return "it"
+
+
+def save_language(lingua):
+    for target in (local_config_path(), user_config_path()):
+        try:
+            try:
+                with open(target, "r", encoding="utf-8") as fh:
+                    dati = json.load(fh)
+            except (OSError, ValueError):
+                dati = {}
+            dati["lingua"] = lingua
+            with open(target, "w", encoding="utf-8") as fh:
+                json.dump(dati, fh, indent=2, ensure_ascii=False)
+            return target
+        except OSError:
+            continue
+    return None
+
+
 def load_data_path():
     """Percorso del file dati da usare, oppure None se va ancora scelto."""
     path = os.environ.get("INVENTARIO_FILE")

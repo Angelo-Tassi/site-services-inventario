@@ -121,17 +121,31 @@ pre{background:var(--panel);border:1px solid var(--line);border-radius:5px;
   padding:16px 18px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;font-size:13px}
 footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   color:var(--ink-faint);font-size:14px}
+.lingua{display:flex;justify-content:flex-end;align-items:center;gap:10px;
+  padding-top:26px;font-size:14px;color:var(--ink-soft)}
+.lingua select{font:inherit;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line);border-radius:4px;padding:7px 10px}
+[hidden]{display:none !important}
 </style>
 </head>
 <body>
 <div class="wrap">
+<div class="lingua">
+  <label for="lang">Lingua / Language</label>
+  <select id="lang">
+    <option value="it">Italiano</option>
+    <option value="en">English</option>
+  </select>
+</div>
+
+<div data-lang="it">
 
 <header>
   <div class="eyebrow">Site Services · strumento interno</div>
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.12.0 · alfa</div>
+  <div class="alpha">versione 0.13.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Scarica Inventario.exe</a>
@@ -290,5 +304,197 @@ python Inventario.py</pre>
 </footer>
 
 </div>
+<div data-lang="en" hidden><header>
+  <div class="eyebrow">Site Services · internal tool</div>
+  <h1>iPhone, Laptop and Tablet Inventory</h1>
+  <p class="lede">The devices we physically hold, split by room, with loans
+    tracked and the inventory staying an ordinary Excel file on the network folder.</p>
+  <div class="alpha">version 0.13.0 · alpha</div>
+
+  <div class="cta">
+    <a class="btn main" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Download Inventario.exe</a>
+    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest">All versions</a>
+    <a class="btn alt" href="Modello_inventario.xlsx" download>Excel template</a>
+    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/tree/main/Collaudo">How to test the import</a>
+    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/blob/main/README.en.md">Code and documentation</a>
+  </div>
+  <p class="note">One file, for Windows. It carries Python and every library:
+    nothing has to be installed on the PCs. The Excel template is for loading
+    laptops and tablets already recorded elsewhere.</p>
+</header>
+
+<section>
+  <h2>Getting it running</h2>
+  <p class="sub">Three steps, once. After that, people just double-click.</p>
+  <ol class="steps">
+    <li><b>Copy <code>Inventario.exe</code> into the shared network folder.</b>
+      The one the people who need the inventory can already reach. The executable
+      needs <i>Read and execute</i>, the folder needs <i>Modify</i>: the program
+      creates and replaces files there, it does not merely write inside the
+      inventory.</li>
+    <li><b>Open it.</b> On first run it offers to create <code>Inventario.xlsx</code>
+      right beside it: that is both the store and the inventory you open in Excel.</li>
+    <li><b>Put a shortcut on the desktops.</b> Right-click the executable &rsaquo;
+      <i>Send to</i> &rsaquo; <i>Desktop</i>. Or use
+      <code>Crea collegamento sul desktop.bat</code>, included in the package.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>What it looks like</h2>
+  <p class="sub">The home page shows one card per room with its count, plus the
+    container gathering every iPhone. Below, the full inventory.</p>
+
+  <div class="shot">
+    <div class="bar"><span class="dot"></span><span>Site Services : iPhone, Laptop and Tablet Inventory</span><span class="sp"></span><span>— □ ×</span></div>
+    <div class="appbar">
+      <div><b>Site Services : iPhone, Laptop and Tablet Inventory</b>
+        <div class="s">Laptops and tablets we hold</div></div>
+      <div class="t">14 devices &nbsp;&nbsp; Site Services BAU: 6 &nbsp;&nbsp; Digital Kiosk: 5 &nbsp;&nbsp; Magazzino DR: 3</div>
+    </div>
+    <div class="tools">
+      <span class="tb">‹ Home</span><span class="tb p">Add</span><span class="tb">Edit</span>
+      <span class="tb">Delete</span><span class="tb">Move to room…</span>
+      <span class="tb">Import xls…</span><span class="tb">Export xls…</span><span class="tb">Print</span>
+    </div>
+    <div class="stage">
+      <div class="cards">
+        <div class="c"><i style="background:var(--w-r1)"></i><div class="b">
+          <div class="n">Site Services BAU</div><div class="q" style="color:var(--w-r1)">6</div>
+          <div class="m">3 laptop · 2 tablet · 1 iphone</div><div class="g">Open the inventory ›</div></div></div>
+        <div class="c"><i style="background:var(--w-r2)"></i><div class="b">
+          <div class="n">Digital Kiosk</div><div class="q" style="color:var(--w-r2)">5</div>
+          <div class="m">3 laptop · 2 tablet</div>
+          <div class="m" style="color:var(--w-loan-fg);font-weight:600">2 on loan</div>
+          <div class="g">Open the inventory ›</div></div></div>
+        <div class="c"><i style="background:var(--w-r3)"></i><div class="b">
+          <div class="n">Magazzino Disaster Recovery</div><div class="q" style="color:var(--w-r3)">3</div>
+          <div class="m">2 laptop · 1 tablet</div><div class="g">Open the inventory ›</div></div></div>
+        <div class="c"><i style="background:var(--w-r4)"></i><div class="b">
+          <div class="n">Iphone</div><div class="q" style="color:var(--w-r4)">1</div>
+          <div class="m">all phones</div><div class="m">also in Site Services BAU</div>
+          <div class="g">Open the inventory ›</div></div></div>
+      </div>
+      <div class="tw">
+        <table>
+          <thead><tr><th></th><th>Asset Tag</th><th>Type</th><th>Model</th>
+            <th>Serial number</th><th>IMEI</th><th>Room</th><th>Status</th>
+            <th>On loan to</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td>
+              <td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td><td>—</td>
+              <td>Site Services BAU</td><td>Available</td><td>—</td><td>Reception desk</td></tr>
+            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td>
+              <td>Apple iPhone 14</td><td>—</td><td class="mono">356938035643809</td>
+              <td>Site Services BAU</td><td>To be shipped back</td><td>—</td><td>Returned by M. Bianchi</td></tr>
+            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td>
+              <td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td><td>—</td>
+              <td>Site Services BAU</td><td>To be checked</td><td>—</td><td>With keyboard and stylus</td></tr>
+            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td>
+              <td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td><td>—</td>
+              <td>Digital Kiosk</td><td>Not available</td><td>Marco Bianchi</td><td>—</td></tr>
+            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td>
+              <td>Apple iPhone 13</td><td>—</td><td class="mono">351234567890123</td>
+              <td>Site Services BAU</td><td>Shipped to the phone service</td><td>—</td>
+              <td>Shipped on 28/08/2026 10:05</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td>
+              <td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td><td>—</td>
+              <td>Magazzino Disaster Recovery</td><td>To be rebuilt</td><td>—</td><td>Sealed spare</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <p class="note">Light green for iPhones, blue for Dell tablets, purple for
+    those already shipped back, red for those on loan. Each row carries the button
+    it needs: <i>Lend</i> and <i>Register return</i> in the room with loans,
+    <i>Confirm shipment</i> in the iPhone container.</p>
+</section>
+
+<section>
+  <h2>What it can do</h2>
+  <div class="grid">
+    <div class="card"><h3>No server</h3>
+      <p>The data lives in a single <code>.xlsx</code> on the network folder: it is
+        both the store and the inventory you open in Excel. No database, no service
+        to keep running.</p></div>
+    <div class="card"><h3>Folder permissions</h3>
+      <p>Whoever can reach the folder can use the inventory. No separate user list,
+        no extra password.</p></div>
+    <div class="card"><h3>Several people at once</h3>
+      <p>Every save goes through an exclusive lock and rewrites the file atomically.
+        The on-screen list refreshes by itself when somebody else saves.</p></div>
+    <div class="card"><h3>Loans</h3>
+      <p>In the rooms that allow it, a button on the row records name, date and time.
+        While the device is out the row is red and the status is <i>Not available</i>.</p></div>
+    <div class="card"><h3>Italian and English</h3>
+      <p>A dropdown in the settings translates the whole interface, the columns and
+        the statuses. Files can be exported in English even while working in Italian.</p></div>
+    <div class="card"><h3>Barcode reader</h3>
+      <p>When adding a device you can scan the asset tag and serial number - or the
+        IMEI, for an iPhone - and type only the model. If a barcode will not read, a
+        button switches that field to typing.</p></div>
+    <div class="card"><h3>iPhone shipment</h3>
+      <p>A button records day and time of the shipment to the phone service. The phone
+        turns purple and stays available for reference for three months. An iPhone can
+        only be deleted after the shipment, and never before those months are up.</p></div>
+    <div class="card"><h3>How to test the import</h3>
+      <p>The <a href="https://github.com/Angelo-Tassi/site-services-inventario/tree/main/Collaudo">Collaudo</a>
+        folder holds two ready sheets - 30 devices, 10 per room, plus one full of
+        deliberate mistakes - and eight step-by-step checks.</p></div>
+    <div class="card"><h3>Starting over</h3>
+      <p>A button empties the inventory to reload it from a file, after a confirmation
+        typed in full and an automatic backup. iPhones are never touched.</p></div>
+    <div class="card"><h3>Excel in and out</h3>
+      <p>Download the <a href="Modello_inventario.xlsx" download>ready-made template</a>,
+        fill it in and import it: a single sheet is split by room by writing
+        <code>BAU</code>, <code>KIOSK</code> or <code>DISASTER</code> on an empty row.
+        Exporting asks whether you want everything or one room, in one sheet, one sheet
+        per room or one file per room.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Building it yourself</h2>
+  <p class="sub">Not needed if you download the release: the executable is built
+    automatically by GitHub Actions on a Windows machine at every version.</p>
+  <pre>git clone https://github.com/Angelo-Tassi/site-services-inventario.git
+cd site-services-inventario
+pip install -r requirements.txt
+python Inventario.py</pre>
+  <p class="note">On Windows there is also <code>Compila EXE per Windows.bat</code>,
+    which does everything by itself. On macOS you need a Python with Tk 8.6 or newer:
+    the one from python.org works.</p>
+</section>
+
+<footer>
+  <div class="wrap" style="padding:0">
+    Site Services internal tool · alpha version ·
+    <a href="https://github.com/Angelo-Tassi/site-services-inventario/issues">report a problem</a>
+  </div>
+</footer>
+</div>
+</div>
+
+<script>
+(function () {
+  var scelta = document.getElementById("lang");
+  function applica(codice) {
+    document.querySelectorAll("[data-lang]").forEach(function (blocco) {
+      blocco.hidden = blocco.getAttribute("data-lang") !== codice;
+    });
+    document.documentElement.lang = codice;
+    scelta.value = codice;
+  }
+  var salvata = "it";
+  try { salvata = localStorage.getItem("lingua") || "it"; } catch (e) {}
+  if (salvata !== "it" && salvata !== "en") { salvata = "it"; }
+  applica(salvata);
+  scelta.addEventListener("change", function () {
+    applica(scelta.value);
+    try { localStorage.setItem("lingua", scelta.value); } catch (e) {}
+  });
+})();
+</script>
 </body>
 </html>

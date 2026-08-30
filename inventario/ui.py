@@ -11,6 +11,8 @@ from datetime import datetime
 from tkinter import filedialog, messagebox, ttk
 
 from . import config, excel_io, theme
+from . import lingua as lang
+from .lingua import T, intestazione, stato as traduci_stato
 from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
                     MESI_CONSERVAZIONE,
                     InventoryStore, NON_DISPONIBILE, SPEDITO, clean,
@@ -62,6 +64,14 @@ def nome_file(testo):
     """Un nome di stanza utilizzabile come nome di file."""
     pulito = "".join(c if c.isalnum() or c in " -_" else "-" for c in str(testo))
     return "_".join(pulito.split()) or "stanza"
+
+
+def stato_canonico(scelto, stati):
+    """Dalla voce mostrata nella tendina al valore italiano da salvare."""
+    for valore in stati:
+        if traduci_stato(valore) == scelto:
+            return valore
+    return scelto
 
 
 def item_stato_iphone(spedito):
@@ -143,7 +153,7 @@ class ItemDialog(_Modal):
                                       (self.stati[0] if self.stati else ""))
 
         # --- il tipo, in cima: cambiandolo cambia il modulo
-        ttk.Label(body, text="Tipo *").grid(row=0, column=0, sticky="w", pady=5)
+        ttk.Label(body, text=T("Tipo *")).grid(row=0, column=0, sticky="w", pady=5)
         combo_tipo = ttk.Combobox(body, textvariable=self.var_tipo, values=types,
                                   state="readonly", width=32)
         combo_tipo.grid(row=0, column=1, sticky="we", pady=5)
@@ -156,13 +166,13 @@ class ItemDialog(_Modal):
         self.fields.columnconfigure(1, weight=1)
 
         ttk.Label(body, style="Muted.TLabel",
-                  text="I campi contrassegnati con * sono obbligatori.").grid(
+                  text=T("I campi contrassegnati con * sono obbligatori.")).grid(
             row=3, column=0, columnspan=2, sticky="w", pady=(10, 0))
 
         buttons = ttk.Frame(body)
         buttons.grid(row=4, column=0, columnspan=2, sticky="e", pady=(14, 0))
-        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
-        ttk.Button(buttons, text="Salva", style="Primary.TButton",
+        ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Salva"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
 
         self.text_note = None
@@ -199,7 +209,7 @@ class ItemDialog(_Modal):
             self.required.append((etichetta.rstrip(" *"), var, entry))
 
         riga = len(righe)
-        ttk.Label(self.fields, text="Stanza *").grid(row=riga, column=0, sticky="w", pady=5)
+        ttk.Label(self.fields, text=T("Stanza *")).grid(row=riga, column=0, sticky="w", pady=5)
         if self.is_iphone():
             # Gli iPhone appartengono sempre alla loro stanza: campo mostrato ma bloccato.
             self.var_stanza.set(self.iphone_room)
@@ -213,21 +223,22 @@ class ItemDialog(_Modal):
         riga += 1
         if self.is_iphone():
             ttk.Label(self.fields, style="Muted.TLabel",
-                      text="Gli iPhone restano sempre in %s." % self.iphone_room).grid(
+                      text=T("Gli iPhone restano sempre in %s.") % self.iphone_room).grid(
                 row=riga, column=1, sticky="w")
             riga += 1
 
-        ttk.Label(self.fields, text="Stato").grid(row=riga, column=0, sticky="w", pady=5)
+        ttk.Label(self.fields, text=T("Stato")).grid(row=riga, column=0, sticky="w", pady=5)
         if self.is_iphone():
-            self.var_stato.set(item_stato_iphone(self._item_spedito))
+            self.var_stato.set(traduci_stato(item_stato_iphone(self._item_spedito)))
             valori, stato_widget = [self.var_stato.get()], "disabled"
         elif self._loan[0]:
-            self.var_stato.set(NON_DISPONIBILE)
-            valori, stato_widget = [NON_DISPONIBILE], "disabled"
+            self.var_stato.set(traduci_stato(NON_DISPONIBILE))
+            valori, stato_widget = [self.var_stato.get()], "disabled"
         else:
             if self.var_stato.get() not in self.stati and self.stati:
                 self.var_stato.set(self.stati[0])
-            valori, stato_widget = self.stati, "readonly"
+            valori, stato_widget = [traduci_stato(v) for v in self.stati], "readonly"
+            self.var_stato.set(traduci_stato(self.var_stato.get()))
         ttk.Combobox(self.fields, textvariable=self.var_stato, values=valori,
                      state=stato_widget, width=32).grid(row=riga, column=1,
                                                         sticky="we", pady=5)
@@ -240,7 +251,7 @@ class ItemDialog(_Modal):
                 row=riga, column=1, sticky="w")
             riga += 1
 
-        ttk.Label(self.fields, text="Note").grid(row=riga, column=0, sticky="nw", pady=5)
+        ttk.Label(self.fields, text=T("Note")).grid(row=riga, column=0, sticky="nw", pady=5)
         self.text_note = tk.Text(self.fields, width=34, height=4, wrap="word",
                                  relief="solid", borderwidth=1, highlightthickness=0,
                                  bg=theme.CARD, fg=theme.TEXT)
@@ -262,10 +273,10 @@ class ItemDialog(_Modal):
         missing = self.missing_fields()
         if missing:
             messagebox.showerror(
-                "Dati mancanti",
-                "Il dispositivo non e\' stato inserito.\n"
+                T("Dati mancanti"),
+                T("Il dispositivo non e\' stato inserito.\n"
                 "Mancano questi dati obbligatori:\n\n%s\n\n"
-                "Compilali e premi di nuovo Salva."
+                "Compilali e premi di nuovo Salva.")
                 % "\n".join("  \u2022  " + label for label in missing),
                 parent=self)
             for label, var, widget in self.required:
@@ -279,7 +290,7 @@ class ItemDialog(_Modal):
             modello=self.var_modello.get(),
             stanza=self.var_stanza.get(),
             note=self.text_note.get("1.0", "end"),
-            stato=self.var_stato.get(),
+            stato=stato_canonico(self.var_stato.get(), self.stati),
             prestato_a=self._loan[0],
             prestato_il=self._loan[1],
         )
@@ -297,13 +308,13 @@ class ItemDialog(_Modal):
 class RoomsDialog(_Modal):
     """Impostazioni condivise: nomi delle stanze e tipi di dispositivo."""
 
-    def __init__(self, parent, rooms, types, loan_rooms, iphone_room=""):
-        _Modal.__init__(self, parent, "Impostazioni inventario")
+    def __init__(self, parent, rooms, types, loan_rooms, iphone_room="", lingua=None):
+        _Modal.__init__(self, parent, T("Impostazioni inventario"))
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
-        ttk.Label(body, text="Stanze (una per riga)").grid(row=0, column=0, sticky="w")
-        ttk.Label(body, text="Tipi di dispositivo").grid(row=0, column=1, sticky="w", padx=(14, 0))
-        ttk.Label(body, text="Stanze con prestito").grid(row=0, column=2, sticky="w", padx=(14, 0))
+        ttk.Label(body, text=T("Stanze (una per riga)")).grid(row=0, column=0, sticky="w")
+        ttk.Label(body, text=T("Tipi di dispositivo")).grid(row=0, column=1, sticky="w", padx=(14, 0))
+        ttk.Label(body, text=T("Stanze con prestito")).grid(row=0, column=2, sticky="w", padx=(14, 0))
         opts = dict(relief="solid", borderwidth=1, highlightthickness=0,
                     bg=theme.CARD, fg=theme.TEXT)
         self.text_rooms = tk.Text(body, width=26, height=8, **opts)
@@ -315,23 +326,33 @@ class RoomsDialog(_Modal):
         self.text_loans = tk.Text(body, width=26, height=8, **opts)
         self.text_loans.insert("1.0", "\n".join(loan_rooms))
         self.text_loans.grid(row=1, column=2, sticky="nsew", padx=(14, 0), pady=(4, 0))
+        riga_lingua = ttk.Frame(body)
+        riga_lingua.grid(row=2, column=0, columnspan=3, sticky="w", pady=(12, 0))
+        ttk.Label(riga_lingua, text=T("Lingua")).pack(side="left")
+        self.var_lingua = tk.StringVar(value=lang.nome_lingua(lingua or lang.corrente()))
+        ttk.Combobox(riga_lingua, textvariable=self.var_lingua,
+                     values=[nome for nome, _ in lang.LINGUE], state="readonly",
+                     width=18).pack(side="left", padx=(10, 0))
+        ttk.Label(riga_lingua, style="Muted.TLabel",
+                  text=T("Vale solo per questo computer.")).pack(side="left", padx=(10, 0))
+
         riga_iphone = ttk.Frame(body)
-        riga_iphone.grid(row=2, column=0, columnspan=3, sticky="w", pady=(12, 0))
-        ttk.Label(riga_iphone, text="Stanza degli iPhone").pack(side="left")
+        riga_iphone.grid(row=3, column=0, columnspan=3, sticky="w", pady=(10, 0))
+        ttk.Label(riga_iphone, text=T("Stanza degli iPhone")).pack(side="left")
         self.var_iphone_room = tk.StringVar(value=iphone_room or (rooms[0] if rooms else ""))
         ttk.Combobox(riga_iphone, textvariable=self.var_iphone_room, values=rooms,
                      width=30).pack(side="left", padx=(10, 0))
 
         ttk.Label(
             body, style="Muted.TLabel",
-            text="Le impostazioni sono salvate accanto al file dati e valgono per tutti gli utenti.\n"
+            text=T("Le impostazioni sono salvate accanto al file dati e valgono per tutti gli utenti.\n"
                  "Nelle stanze con prestito ogni riga dell'elenco ha il pulsante Presta / Registra rientro.\n"
-                 "Gli iPhone vengono registrati sempre nella stanza indicata qui sopra e non si spostano.",
-        ).grid(row=3, column=0, columnspan=3, sticky="w", pady=(10, 0))
+                 "Gli iPhone vengono registrati sempre nella stanza indicata qui sopra e non si spostano."),
+        ).grid(row=4, column=0, columnspan=3, sticky="w", pady=(10, 0))
         buttons = ttk.Frame(body)
-        buttons.grid(row=4, column=0, columnspan=3, sticky="e", pady=(16, 0))
-        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
-        ttk.Button(buttons, text="Salva", style="Primary.TButton",
+        buttons.grid(row=5, column=0, columnspan=3, sticky="e", pady=(16, 0))
+        ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Salva"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
 
     def _ok(self):
@@ -339,25 +360,27 @@ class RoomsDialog(_Modal):
         types = [t.strip() for t in self.text_types.get("1.0", "end").splitlines() if t.strip()]
         loans = [r.strip() for r in self.text_loans.get("1.0", "end").splitlines() if r.strip()]
         if not rooms:
-            messagebox.showwarning("Dato mancante", "Indica almeno una stanza.", parent=self)
+            messagebox.showwarning(T("Dato mancante"), T("Indica almeno una stanza."), parent=self)
             return
         unknown = [r for r in loans if r not in rooms]
         if unknown:
             messagebox.showwarning(
-                "Stanza sconosciuta",
-                "Queste stanze con prestito non sono nell'elenco delle stanze:\n%s"
+                T("Stanza sconosciuta"),
+                T("Queste stanze con prestito non sono nell'elenco delle stanze:\n%s")
                 % ", ".join(unknown), parent=self)
             return
         stanza_iphone = self.var_iphone_room.get().strip()
         if stanza_iphone and stanza_iphone not in rooms:
             messagebox.showwarning(
-                "Stanza sconosciuta",
-                "La stanza degli iPhone (%s) non e' nell'elenco delle stanze."
+                T("Stanza sconosciuta"),
+                T("La stanza degli iPhone (%s) non e' nell'elenco delle stanze.")
                 % stanza_iphone, parent=self)
             return
+        scelta = dict((nome, codice) for nome, codice in lang.LINGUE)
         self.result = {"rooms": rooms, "types": types or ["Laptop", "Tablet"],
                        "loan_rooms": loans,
-                       "iphone_room": stanza_iphone or rooms[0]}
+                       "iphone_room": stanza_iphone or rooms[0],
+                       "lingua": scelta.get(self.var_lingua.get(), lang.ITALIANO)}
         self.destroy()
 
 
@@ -365,22 +388,22 @@ class TypeChoiceDialog(_Modal):
     """Primo passo di Aggiungi: che cosa si sta inserendo."""
 
     def __init__(self, parent, types, predefinito=""):
-        _Modal.__init__(self, parent, "Aggiungi dispositivo")
+        _Modal.__init__(self, parent, T("Aggiungi dispositivo"))
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
-        ttk.Label(body, text="Che cosa vuoi aggiungere?",
+        ttk.Label(body, text=T("Che cosa vuoi aggiungere?"),
                   style="Section.TLabel").pack(anchor="w")
         ttk.Label(body, style="Muted.TLabel",
-                  text="Il tipo decide i campi da compilare e cosa si puo'\n"
-                       "leggere con il lettore di codici.").pack(anchor="w", pady=(4, 12))
+                  text=T("Il tipo decide i campi da compilare e cosa si puo'\n"
+                       "leggere con il lettore di codici.")).pack(anchor="w", pady=(4, 12))
         self.var_tipo = tk.StringVar(value=predefinito or (types[0] if types else ""))
         combo = ttk.Combobox(body, textvariable=self.var_tipo, values=types,
                              state="readonly", width=30)
         combo.pack(fill="x")
         buttons = ttk.Frame(body)
         buttons.pack(anchor="e", pady=(16, 0))
-        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
-        ttk.Button(buttons, text="Avanti", style="Primary.TButton",
+        ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Avanti"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
         self.bind("<Return>", lambda e: self._ok())
         combo.focus_set()
@@ -399,15 +422,15 @@ class AddChoiceDialog(_Modal):
         _Modal.__init__(self, parent, "Aggiungi iPhone" if iphone else "Aggiungi dispositivo")
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
-        ttk.Label(body, text="Come vuoi aggiungerlo?",
+        ttk.Label(body, text=T("Come vuoi aggiungerlo?"),
                   style="Section.TLabel").pack(anchor="w")
         if iphone:
-            aiuto = ("La scansione legge l'IMEI dal codice a barre: un iPhone non\n"
-                     "ha asset tag ne' numero di serie.")
+            aiuto = (T("La scansione legge l'IMEI dal codice a barre: un iPhone non\n"
+                     "ha asset tag ne' numero di serie."))
             etichetta = "Scansiona l'IMEI con il lettore di codici"
         else:
-            aiuto = ("La scansione compila asset tag e numero di serie con il\n"
-                     "lettore di codici a barre.")
+            aiuto = (T("La scansione compila asset tag e numero di serie con il\n"
+                     "lettore di codici a barre."))
             etichetta = "Scansiona con il lettore di codici"
         ttk.Label(body, style="Muted.TLabel", text=aiuto).pack(anchor="w", pady=(4, 14))
 
@@ -417,9 +440,9 @@ class AddChoiceDialog(_Modal):
 
         ttk.Button(body, text=etichetta, style="Primary.TButton",
                    command=lambda: scegli("barcode")).pack(fill="x", pady=(0, 8))
-        ttk.Button(body, text="Inserimento manuale",
+        ttk.Button(body, text=T("Inserimento manuale"),
                    command=lambda: scegli("manuale")).pack(fill="x")
-        ttk.Button(body, text="Annulla", command=self._cancel).pack(anchor="e", pady=(14, 0))
+        ttk.Button(body, text=T("Annulla"), command=self._cancel).pack(anchor="e", pady=(14, 0))
 
 
 class ScanDialog(_Modal):
@@ -438,7 +461,7 @@ class ScanDialog(_Modal):
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
 
-        ttk.Label(body, text="Passo %d di %d" % (passo, totale),
+        ttk.Label(body, text=T("Passo %d di %d") % (passo, totale),
                   style="Muted.TLabel").pack(anchor="w")
         self.var_titolo = tk.StringVar()
         ttk.Label(body, textvariable=self.var_titolo,
@@ -453,14 +476,14 @@ class ScanDialog(_Modal):
         self.entry.pack(fill="x")
 
         self.btn_manuale = ttk.Button(
-            body, text="Non riesco a scansionare - inserisci a mano",
+            body, text=T("Non riesco a scansionare - inserisci a mano"),
             command=self.passa_a_manuale)
         self.btn_manuale.pack(anchor="w", pady=(10, 0))
 
         buttons = ttk.Frame(body)
         buttons.pack(anchor="e", pady=(14, 0))
-        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
-        ttk.Button(buttons, text="Avanti", style="Primary.TButton",
+        ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Avanti"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
 
         self.bind("<Return>", lambda e: self._ok())
@@ -474,8 +497,8 @@ class ScanDialog(_Modal):
             self.btn_manuale.pack_forget()
         else:
             self.var_titolo.set("Scansiona %s" % self.campo)
-            self.var_aiuto.set("Inquadra il codice: il lettore compila il campo e\n"
-                               "conferma da solo. Puoi anche digitarlo.")
+            self.var_aiuto.set(T("Inquadra il codice: il lettore compila il campo e\n"
+                               "conferma da solo. Puoi anche digitarlo."))
 
     def passa_a_manuale(self):
         self.manuale = True
@@ -486,9 +509,9 @@ class ScanDialog(_Modal):
         valore = self.var_valore.get().strip()
         if not valore:
             messagebox.showwarning(
-                "Campo vuoto",
-                "%s non puo' restare vuoto.\n\n"
-                "Riprova la scansione, oppure usa il pulsante per inserirlo a mano."
+                T("Campo vuoto"),
+                T("%s non puo' restare vuoto.\n\n"
+                "Riprova la scansione, oppure usa il pulsante per inserirlo a mano.")
                 % self.campo.capitalize(), parent=self)
             self.entry.focus_set()
             return
@@ -507,32 +530,31 @@ class ResetDialog(_Modal):
     """
 
     def __init__(self, parent, da_eliminare, protetti):
-        _Modal.__init__(self, parent, "Reset dell'inventario")
+        _Modal.__init__(self, parent, T("Reset dell'inventario"))
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
 
-        tk.Label(body, text="Stai per svuotare l'inventario condiviso",
+        tk.Label(body, text=T("Stai per svuotare l'inventario condiviso"),
                  bg=theme.LOAN_FG, fg="#FFFFFF", font=self.master.fonts["card_title"],
                  padx=12, pady=9, anchor="w").pack(fill="x")
 
-        righe = ["Verranno eliminati %d dispositivi, per tutti gli utenti." % da_eliminare,
-                 "L'operazione non si annulla dal programma."]
+        righe = [T("Verranno eliminati %d dispositivi, per tutti gli utenti.") % da_eliminare,
+                 T("L'operazione non si annulla dal programma.")]
         if protetti:
             righe.append("")
-            righe.append("Restano dentro %d iPhone protetti: non ancora rispediti, o"
+            righe.append(T("Restano dentro %d iPhone: il reset non li elimina mai,\n"
+                           "perche' non potrebbero essere ricaricati da un file.")
                          % protetti)
-            righe.append("rispediti da meno di %d mesi. Non possono essere eliminati."
-                         % MESI_CONSERVAZIONE)
-        tk.Label(body, text="\n".join(righe), justify="left", anchor="w",
+        tk.Label(body, text=T("\n").join(righe), justify="left", anchor="w",
                  bg=theme.LOAN_BG, fg=theme.LOAN_FG, padx=12, pady=10).pack(
             fill="x", pady=(0, 10))
 
         ttk.Label(body, style="Muted.TLabel", justify="left",
-                  text="Prima di procedere il programma salva una copia del file dati\n"
+                  text=T("Prima di procedere il programma salva una copia del file dati\n"
                        "nella stessa cartella, con la data di oggi nel nome: se qualcosa\n"
-                       "va storto, l'inventario si recupera da li'.").pack(anchor="w")
+                       "va storto, l'inventario si recupera da li'.")).pack(anchor="w")
 
-        ttk.Label(body, text="Per confermare, scrivi   %s" % PAROLA_RESET).pack(
+        ttk.Label(body, text=T("Per confermare, scrivi   %s") % PAROLA_RESET).pack(
             anchor="w", pady=(14, 4))
         self.var_conferma = tk.StringVar()
         entry = ttk.Entry(body, textvariable=self.var_conferma, width=34)
@@ -540,8 +562,8 @@ class ResetDialog(_Modal):
 
         buttons = ttk.Frame(body)
         buttons.pack(anchor="e", pady=(16, 0))
-        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
-        ttk.Button(buttons, text="Svuota l'inventario",
+        ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Svuota l'inventario"),
                    command=self._ok).pack(side="right")
         self.bind("<Return>", lambda e: self._ok())
         entry.focus_set()
@@ -552,8 +574,8 @@ class ResetDialog(_Modal):
     def _ok(self):
         if not self.parola_giusta():
             messagebox.showwarning(
-                "Conferma non valida",
-                "Per svuotare l'inventario devi scrivere esattamente:\n\n%s"
+                T("Conferma non valida"),
+                T("Per svuotare l'inventario devi scrivere esattamente:\n\n%s")
                 % PAROLA_RESET, parent=self)
             return
         self.result = True
@@ -564,18 +586,18 @@ class ExportOptionsDialog(_Modal):
     """Primo passo dell'esportazione: che cosa si esporta, e in che forma."""
 
     def __init__(self, parent, rooms):
-        _Modal.__init__(self, parent, "Esporta in Excel")
+        _Modal.__init__(self, parent, T("Esporta in Excel"))
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
 
-        ttk.Label(body, text="Che cosa vuoi esportare",
+        ttk.Label(body, text=T("Che cosa vuoi esportare"),
                   style="Section.TLabel").pack(anchor="w")
         self.var_ambito = tk.StringVar(value="tutto")
         ttk.Radiobutton(body, variable=self.var_ambito, value="tutto",
-                        text="Tutto l'inventario",
+                        text=T("Tutto l'inventario"),
                         command=self._aggiorna).pack(anchor="w", pady=(6, 0))
         ttk.Radiobutton(body, variable=self.var_ambito, value="stanza",
-                        text="Una sola stanza",
+                        text=T("Una sola stanza"),
                         command=self._aggiorna).pack(anchor="w", pady=(2, 0))
         riga = ttk.Frame(body)
         riga.pack(anchor="w", fill="x", padx=(24, 0), pady=(4, 0))
@@ -586,7 +608,7 @@ class ExportOptionsDialog(_Modal):
 
         ttk.Separator(body, orient="horizontal").pack(fill="x", pady=12)
 
-        ttk.Label(body, text="In che forma", style="Section.TLabel").pack(anchor="w")
+        ttk.Label(body, text=T("In che forma"), style="Section.TLabel").pack(anchor="w")
         self.var_forma = tk.StringVar(value="unico")
         self.scelte_forma = []
         for valore, testo in (
@@ -598,16 +620,28 @@ class ExportOptionsDialog(_Modal):
             b.pack(anchor="w", pady=(6 if valore == "unico" else 2, 0))
             self.scelte_forma.append(b)
         self.nota = ttk.Label(body, style="Muted.TLabel", justify="left",
-                              text="Ogni foglio porta in testa il nome della stanza,\n"
-                                   "la data e il numero di dispositivi.")
+                              text=T("Ogni foglio porta in testa il nome della stanza,\n"
+                                   "la data e il numero di dispositivi."))
         self.nota.pack(anchor="w", padx=(24, 0), pady=(6, 0))
+
+        ttk.Separator(body, orient="horizontal").pack(fill="x", pady=12)
+        self.var_inglese = tk.BooleanVar(value=lang.corrente() == lang.INGLESE)
+        ttk.Checkbutton(body, variable=self.var_inglese,
+                        text=T("Esporta i file in inglese")).pack(anchor="w")
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text=T("Intestazioni e stati in inglese. Nomi delle stanze e dei\n"
+                         "tipi restano come li hai scritti tu.")).pack(
+            anchor="w", padx=(24, 0), pady=(4, 0))
 
         buttons = ttk.Frame(body)
         buttons.pack(anchor="e", pady=(16, 0))
-        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
-        ttk.Button(buttons, text="Avanti", style="Primary.TButton",
+        ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Avanti"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
         self._aggiorna()
+
+    def _lingua(self):
+        return lang.INGLESE if self.var_inglese.get() else lang.ITALIANO
 
     def _aggiorna(self):
         singola = self.var_ambito.get() == "stanza"
@@ -615,18 +649,20 @@ class ExportOptionsDialog(_Modal):
         for b in self.scelte_forma:
             b.configure(state="disabled" if singola else "normal")
         self.nota.configure(
-            text="Una stanza sola sta in un file solo, con il suo nome in testa."
+            text=T("Una stanza sola sta in un file solo, con il suo nome in testa.")
             if singola else "Ogni foglio porta in testa il nome della stanza,\n"
                             "la data e il numero di dispositivi.")
 
     def _ok(self):
         if self.var_ambito.get() == "stanza":
             if not self.var_stanza.get():
-                messagebox.showwarning("Stanza mancante", "Scegli la stanza.", parent=self)
+                messagebox.showwarning(T("Stanza mancante"), T("Scegli la stanza."), parent=self)
                 return
-            self.result = {"stanza": self.var_stanza.get(), "forma": "unico"}
+            self.result = {"stanza": self.var_stanza.get(), "forma": "unico",
+                           "lingua": self._lingua()}
         else:
-            self.result = {"stanza": None, "forma": self.var_forma.get()}
+            self.result = {"stanza": None, "forma": self.var_forma.get(),
+                           "lingua": self._lingua()}
         self.destroy()
 
 
@@ -642,12 +678,12 @@ class ImportOptionsDialog(_Modal):
         body.pack(fill="both", expand=True)
 
         if stanza_fissa:
-            ttk.Label(body, text="Importa in %s" % stanza_fissa,
+            ttk.Label(body, text=T("Importa in %s") % stanza_fissa,
                       style="Section.TLabel").pack(anchor="w")
             ttk.Label(body, style="Muted.TLabel", justify="left",
-                      text="Se il foglio dichiara le stanze, viene caricata solo la\n"
+                      text=T("Se il foglio dichiara le stanze, viene caricata solo la\n"
                            "sezione di questa stanza e il resto si scarta. Se non le\n"
-                           "dichiara, tutte le righe finiscono qui.").pack(
+                           "dichiara, tutte le righe finiscono qui.")).pack(
                 anchor="w", pady=(4, 0))
             ttk.Separator(body, orient="horizontal").pack(fill="x", pady=12)
             self.var_ambito = tk.StringVar(value="stanza")
@@ -658,14 +694,14 @@ class ImportOptionsDialog(_Modal):
         self._scelta_modo(body)
 
     def _scelta_ambito(self, body, rooms):
-        ttk.Label(body, text="Che cosa vuoi caricare",
+        ttk.Label(body, text=T("Che cosa vuoi caricare"),
                   style="Section.TLabel").pack(anchor="w")
         self.var_ambito = tk.StringVar(value="tutto")
         ttk.Radiobutton(body, variable=self.var_ambito, value="tutto",
-                        text="Tutto l'inventario",
+                        text=T("Tutto l'inventario"),
                         command=self._aggiorna).pack(anchor="w", pady=(6, 0))
         ttk.Radiobutton(body, variable=self.var_ambito, value="stanza",
-                        text="Una sola stanza",
+                        text=T("Una sola stanza"),
                         command=self._aggiorna).pack(anchor="w", pady=(2, 0))
 
         riga = ttk.Frame(body)
@@ -676,31 +712,31 @@ class ImportOptionsDialog(_Modal):
         self.combo.pack(side="left")
         self.nota_stanza = ttk.Label(
             body, style="Muted.TLabel", justify="left",
-            text="Se il foglio dichiara le stanze con le righe-separatore, viene\n"
+            text=T("Se il foglio dichiara le stanze con le righe-separatore, viene\n"
                  "caricata solo la sezione della stanza scelta e il resto si scarta.\n"
-                 "Se non le dichiara, tutte le righe finiscono nella stanza scelta.")
+                 "Se non le dichiara, tutte le righe finiscono nella stanza scelta."))
         self.nota_stanza.pack(anchor="w", padx=(24, 0), pady=(4, 0))
 
         ttk.Separator(body, orient="horizontal").pack(fill="x", pady=12)
 
     def _scelta_modo(self, body):
-        ttk.Label(body, text="Come", style="Section.TLabel").pack(anchor="w")
+        ttk.Label(body, text=T("Come"), style="Section.TLabel").pack(anchor="w")
         self.var_mode = tk.StringVar(value="merge")
         ttk.Radiobutton(body, variable=self.var_mode, value="merge",
-                        text="Unisci: aggiunge i nuovi e aggiorna quelli gia' presenti"
+                        text=T("Unisci: aggiunge i nuovi e aggiorna quelli gia' presenti")
                         ).pack(anchor="w", pady=(6, 0))
         ttk.Radiobutton(body, variable=self.var_mode, value="replace",
-                        text="Sostituisci: svuota prima, poi carica solo il file"
+                        text=T("Sostituisci: svuota prima, poi carica solo il file")
                         ).pack(anchor="w", pady=(2, 0))
         ttk.Label(body, style="Muted.TLabel", justify="left",
-                  text="Prima di una sostituzione viene salvata una copia del file dati.\n"
-                       "Gli iPhone non vengono mai toccati: si inseriscono solo a mano."
+                  text=T("Prima di una sostituzione viene salvata una copia del file dati.\n"
+                       "Gli iPhone non vengono mai toccati: si inseriscono solo a mano.")
                   ).pack(anchor="w", padx=(24, 0), pady=(4, 0))
 
         buttons = ttk.Frame(body)
         buttons.pack(anchor="e", pady=(16, 0))
-        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
-        ttk.Button(buttons, text="Scegli il file", style="Primary.TButton",
+        ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Scegli il file"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
         self._aggiorna()
 
@@ -713,7 +749,7 @@ class ImportOptionsDialog(_Modal):
     def _ok(self):
         stanza = self.var_stanza.get() if self.var_ambito.get() == "stanza" else None
         if self.var_ambito.get() == "stanza" and not stanza:
-            messagebox.showwarning("Stanza mancante", "Scegli la stanza.", parent=self)
+            messagebox.showwarning(T("Stanza mancante"), T("Scegli la stanza."), parent=self)
             return
         self.result = {"stanza": stanza, "mode": self.var_mode.get()}
         self.destroy()
@@ -724,7 +760,7 @@ class ImportDialog(_Modal):
 
     def __init__(self, parent, path, count, esito=None, opzioni=None,
                  da_eliminare=0):
-        _Modal.__init__(self, parent, "Importa inventario")
+        _Modal.__init__(self, parent, T("Importa inventario"))
         opzioni = opzioni or {"stanza": None, "mode": "merge"}
         self.opzioni = opzioni
         self.sostituzione_totale = (opzioni["mode"] == "replace"
@@ -745,9 +781,9 @@ class ImportDialog(_Modal):
         if esito.get("altre_stanze"):
             righe.append("%d righe di altre stanze scartate." % esito["altre_stanze"])
         if esito.get("regola") == "tutte" and opzioni.get("stanza"):
-            righe.append("Il foglio non dichiara stanze: tutte le righe finiranno "
-                         "in %s." % opzioni["stanza"])
-        ttk.Label(body, text="\n".join(righe), style="Muted.TLabel",
+            righe.append(T("Il foglio non dichiara stanze: tutte le righe finiranno "
+                         "in %s.") % opzioni["stanza"])
+        ttk.Label(body, text=T("\n").join(righe), style="Muted.TLabel",
                   justify="left").pack(anchor="w", pady=(2, 8))
 
         for testo in self._avvertenze(esito):
@@ -757,7 +793,7 @@ class ImportDialog(_Modal):
             avviso.pack(fill="x", pady=(0, 8))
         dove = opzioni["stanza"] or "tutto l'inventario"
         come = ("Sostituzione" if opzioni["mode"] == "replace" else "Unione")
-        tk.Label(body, text="%s  \u2192  %s" % (come, dove), anchor="w",
+        tk.Label(body, text=T("%s  \u2192  %s") % (come, dove), anchor="w",
                  bg=theme.HEAD_BG, fg=theme.PRIMARY, padx=10, pady=7,
                  font=self.master.fonts["bold"]).pack(fill="x", pady=(0, 8))
 
@@ -768,18 +804,18 @@ class ImportDialog(_Modal):
                         else " in %s" % opzioni["stanza"])]
             testo.append("Gli iPhone non vengono toccati.")
             testo.append("Una copia del file dati viene salvata prima di procedere.")
-            tk.Label(body, text="\n".join(testo), justify="left", anchor="w",
+            tk.Label(body, text=T("\n").join(testo), justify="left", anchor="w",
                      bg=theme.LOAN_BG, fg=theme.LOAN_FG, padx=10, pady=8,
                      wraplength=430).pack(fill="x", pady=(0, 8))
         if self.sostituzione_totale:
-            ttk.Label(body, text="Per confermare, scrivi   %s" % PAROLA_RESET).pack(
+            ttk.Label(body, text=T("Per confermare, scrivi   %s") % PAROLA_RESET).pack(
                 anchor="w", pady=(2, 4))
             ttk.Entry(body, textvariable=self.var_conferma, width=34).pack(fill="x")
 
         buttons = ttk.Frame(body)
         buttons.pack(anchor="e", pady=(16, 0))
-        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
-        ttk.Button(buttons, text="Importa", style="Primary.TButton",
+        ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Importa"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
 
     @staticmethod
@@ -806,9 +842,9 @@ class ImportDialog(_Modal):
         if self.sostituzione_totale and \
                 self.var_conferma.get().strip().upper() != PAROLA_RESET:
             messagebox.showwarning(
-                "Conferma non valida",
-                "Stai per svuotare l'inventario di tutti.\n\n"
-                "Per procedere scrivi esattamente:\n%s" % PAROLA_RESET, parent=self)
+                T("Conferma non valida"),
+                T("Stai per svuotare l'inventario di tutti.\n\n"
+                "Per procedere scrivi esattamente:\n%s") % PAROLA_RESET, parent=self)
             return
         self.result = self.opzioni
         self.destroy()
@@ -844,7 +880,7 @@ class RoomCard(tk.Frame):
                              fg=note_color or theme.MUTED, font=fonts["small"], anchor="w")
         if note:
             self.note.pack(fill="x", pady=(4, 0))
-        link = tk.Label(inner, text="Apri l'inventario  ›", bg=theme.CARD,
+        link = tk.Label(inner, text=T("Apri l'inventario  ›"), bg=theme.CARD,
                         fg=theme.ACCENT, font=fonts["bold"], anchor="w")
         link.pack(fill="x", pady=(10, 0))
 
@@ -872,6 +908,7 @@ class App(tk.Tk):
         self.geometry("1220x720")
         self.minsize(980, 560)
 
+        lang.imposta(config.load_language())
         self.fonts = theme.apply(self)
         self.cfg = config.load_shared_config(data_path)
         self.store = InventoryStore(data_path,
@@ -896,6 +933,25 @@ class App(tk.Tk):
 
     # ------------------------------------------------------------ layout
 
+    def ricostruisci(self):
+        """Ridisegna tutta la finestra: serve dopo un cambio di lingua."""
+        self._clear_row_buttons()
+        for figlio in self.winfo_children():
+            figlio.destroy()
+        self.title(T("Site Services : Inventario Iphone, Laptop e Tablet"))
+        self.cfg = config.load_shared_config(self.store.path)
+        self.store.iphone_room = self.cfg.get("iphone_room")
+        self.store.stati = list(self.cfg.get("states") or [])
+        self.tree = None
+        self._build_header()
+        self._build_toolbar()
+        self._build_filters()
+        self.body = ttk.Frame(self, padding=(16, 4, 16, 8))
+        self.body.pack(fill="both", expand=True)
+        self._build_status()
+        self._sync_filter_values()
+        self.show_home()
+
     def _build_header(self):
         head = ttk.Frame(self, style="Head.TFrame", padding=(20, 14))
         head.pack(fill="x")
@@ -913,10 +969,10 @@ class App(tk.Tk):
     def _build_toolbar(self):
         bar = ttk.Frame(self, padding=(16, 12, 16, 4))
         bar.pack(fill="x")
-        self.btn_home = ttk.Button(bar, text="‹  Home", style="Ghost.TButton",
+        self.btn_home = ttk.Button(bar, text=T("‹  Home"), style="Ghost.TButton",
                                    command=self.show_home)
         self.btn_home.pack(side="left", padx=(0, 10))
-        ttk.Button(bar, text="Aggiungi", style="Primary.TButton",
+        ttk.Button(bar, text=T("Aggiungi"), style="Primary.TButton",
                    command=self.on_add).pack(side="left", padx=(0, 6))
         for text, command in (
             ("Modifica", self.on_edit),
@@ -931,34 +987,34 @@ class App(tk.Tk):
             ("Stampa", self.on_print),
         ):
             ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 6))
-        ttk.Button(bar, text="Impostazioni", command=self.on_settings).pack(side="right")
-        ttk.Button(bar, text="Reset inventario",
+        ttk.Button(bar, text=T("Impostazioni"), command=self.on_settings).pack(side="right")
+        ttk.Button(bar, text=T("Reset inventario"),
                    command=self.on_reset).pack(side="right", padx=(0, 6))
-        ttk.Button(bar, text="Aggiorna", command=self.on_refresh).pack(side="right", padx=6)
+        ttk.Button(bar, text=T("Aggiorna"), command=self.on_refresh).pack(side="right", padx=6)
 
     def _build_filters(self):
         bar = ttk.Frame(self, padding=(16, 4))
         bar.pack(fill="x")
-        ttk.Label(bar, text="Cerca").pack(side="left")
+        ttk.Label(bar, text=T("Cerca")).pack(side="left")
         self.var_search = tk.StringVar()
         self.var_search.trace_add("write", lambda *a: self.refresh_table())
         self.entry_search = ttk.Entry(bar, textvariable=self.var_search, width=34)
         self.entry_search.pack(side="left", padx=(6, 16))
 
-        self.label_room = ttk.Label(bar, text="Stanza")
+        self.label_room = ttk.Label(bar, text=T("Stanza"))
         self.label_room.pack(side="left")
         self.var_room = tk.StringVar(value="Tutte")
         self.combo_room = ttk.Combobox(bar, textvariable=self.var_room, state="readonly", width=20)
         self.combo_room.pack(side="left", padx=(6, 16))
         self.combo_room.bind("<<ComboboxSelected>>", self._on_room_filter)
 
-        ttk.Label(bar, text="Tipo").pack(side="left")
+        ttk.Label(bar, text=T("Tipo")).pack(side="left")
         self.var_type = tk.StringVar(value="Tutti")
         self.combo_type = ttk.Combobox(bar, textvariable=self.var_type, state="readonly", width=14)
         self.combo_type.pack(side="left", padx=(6, 16))
         self.combo_type.bind("<<ComboboxSelected>>", self._on_type_filter)
 
-        ttk.Button(bar, text="Azzera filtri", command=self.reset_filters).pack(side="left")
+        ttk.Button(bar, text=T("Azzera filtri"), command=self.reset_filters).pack(side="left")
 
     def _build_status(self):
         self.var_status = tk.StringVar()
@@ -1040,12 +1096,12 @@ class App(tk.Tk):
                             selectmode="browse", style="Inv.Treeview")
         for field in columns:
             if field == CHECK_COLUMN:
-                tree.heading(field, text="")
+                tree.heading(field, text=T(""))
                 tree.column(field, width=COLUMN_WIDTHS[field], anchor="center",
                             stretch=False)
                 continue
             if field == ACTION_COLUMN:
-                tree.heading(field, text="Spedizione" if self.ship_column_visible()
+                tree.heading(field, text=T("Spedizione") if self.ship_column_visible()
                              else "Prestito")
                 tree.column(field, width=COLUMN_WIDTHS[field], anchor="center",
                             stretch=False)
@@ -1053,7 +1109,7 @@ class App(tk.Tk):
             arrow = ""
             if field == self.sort_field:
                 arrow = "  ▾" if self.sort_reverse else "  ▴"
-            tree.heading(field, text=HEADERS[field] + arrow,
+            tree.heading(field, text=intestazione(HEADERS[field]) + arrow,
                          command=lambda f=field: self.sort_by(f))
             tree.column(field, width=COLUMN_WIDTHS[field], anchor="w",
                         stretch=(field in ("modello", "note")))
@@ -1232,8 +1288,9 @@ class App(tk.Tk):
         box = self.tree.bbox(tag, colonne.index("stato"))
         if not box:
             return
-        var = tk.StringVar(value=item.get("stato") or stati[0])
-        combo = ttk.Combobox(self.tree, textvariable=var, values=stati,
+        var = tk.StringVar(value=traduci_stato(item.get("stato") or stati[0]))
+        combo = ttk.Combobox(self.tree, textvariable=var,
+                             values=[traduci_stato(v) for v in stati],
                              state="readonly", font=self.fonts["base"])
         combo.place(x=box[0], y=box[1], width=box[2], height=box[3])
         combo.focus_set()
@@ -1243,7 +1300,7 @@ class App(tk.Tk):
             if fatto["chiuso"]:
                 return
             fatto["chiuso"] = True
-            scelto = var.get()
+            scelto = stato_canonico(var.get(), stati)
             combo.destroy()
             if salva and scelto != item.get("stato"):
                 self._run(lambda: self.store.set_stato(tag, scelto),
@@ -1333,12 +1390,12 @@ class App(tk.Tk):
             self._render_cards()
             header = ttk.Frame(self.body)
             header.pack(fill="x", pady=(18, 8))
-            ttk.Label(header, text="Inventario completo",
+            ttk.Label(header, text=T("Inventario completo"),
                       style="Section.TLabel").pack(side="left")
             self.var_section_count = tk.StringVar()
             ttk.Label(header, textvariable=self.var_section_count,
                       style="Muted.TLabel").pack(side="left", padx=(10, 0))
-            ttk.Button(header, text="Scarica il modello di importazione",
+            ttk.Button(header, text=T("Scarica il modello di importazione"),
                        command=self.on_template).pack(side="right")
         else:
             header = ttk.Frame(self.body)
@@ -1347,9 +1404,9 @@ class App(tk.Tk):
             ttk.Label(header, text=titolo,
                       style="Section.TLabel").pack(side="left")
             if self.view == "room":
-                ttk.Button(header, text="Esporta questa stanza in xls",
+                ttk.Button(header, text=T("Esporta questa stanza in xls"),
                            command=self.on_export_room).pack(side="right")
-                ttk.Button(header, text="Importa i dati di questa stanza",
+                ttk.Button(header, text=T("Importa i dati di questa stanza"),
                            command=self.on_import_room).pack(side="right", padx=(0, 6))
             self.var_section_count = tk.StringVar()
             ttk.Label(header, textvariable=self.var_section_count,
@@ -1402,7 +1459,7 @@ class App(tk.Tk):
             self.store.create_if_missing()
             self.store.load()
         except InventoryError as exc:
-            messagebox.showerror("Errore", str(exc), parent=self)
+            messagebox.showerror(T("Errore"), str(exc), parent=self)
             self.destroy()
             return
         self._sync_filter_values()
@@ -1479,6 +1536,8 @@ class App(tk.Tk):
                     values.append(CHECK_ON if item["asset_tag"] in scelti else CHECK_OFF)
                 elif field == ACTION_COLUMN:
                     values.append("")          # il pulsante e' disegnato sopra
+                elif field == "stato":
+                    values.append(traduci_stato(valore_visibile(item, field)))
                 else:
                     values.append(valore_visibile(item, field))
             tag = self.row_tag(item, i % 2)
@@ -1524,7 +1583,7 @@ class App(tk.Tk):
                 arrow = ""
                 if name == self.sort_field:
                     arrow = "  ▾" if self.sort_reverse else "  ▴"
-                self.tree.heading(name, text=HEADERS[name] + arrow)
+                self.tree.heading(name, text=intestazione(HEADERS[name]) + arrow)
         self.refresh_table()
 
     def reset_filters(self):
@@ -1547,7 +1606,7 @@ class App(tk.Tk):
         try:
             self.store.load()
         except InventoryError as exc:
-            messagebox.showerror("Errore", str(exc), parent=self)
+            messagebox.showerror(T("Errore"), str(exc), parent=self)
             return
         self.cfg = config.load_shared_config(self.store.path)
         self.store.iphone_room = self.cfg.get("iphone_room")
@@ -1570,7 +1629,7 @@ class App(tk.Tk):
         try:
             result = action()
         except InventoryError as exc:
-            messagebox.showerror("Operazione non riuscita", str(exc), parent=self)
+            messagebox.showerror(T("Operazione non riuscita"), str(exc), parent=self)
             self._reload()
             return None
         self._sync_filter_values()
@@ -1591,8 +1650,8 @@ class App(tk.Tk):
         """Prima cosa si aggiunge, poi come: a mano o con il lettore di codici."""
         tipi = self.cfg.get("types") or []
         if not tipi:
-            messagebox.showinfo("Aggiungi",
-                                "Non ci sono tipi di dispositivo configurati.", parent=self)
+            messagebox.showinfo(T("Aggiungi"),
+                                T("Non ci sono tipi di dispositivo configurati."), parent=self)
             return
         tipo = TypeChoiceDialog(self, tipi, self.tipo_predefinito()).show()
         if not tipo:
@@ -1671,8 +1730,8 @@ class App(tk.Tk):
     def on_edit(self):
         items = self.selected_items()
         if len(items) != 1:
-            messagebox.showinfo("Modifica",
-                                "Spunta il dispositivo da modificare, oppure fai doppio clic sulla riga.",
+            messagebox.showinfo(T("Modifica"),
+                                T("Spunta il dispositivo da modificare, oppure fai doppio clic sulla riga."),
                                 parent=self)
             return
         old = items[0]
@@ -1692,23 +1751,23 @@ class App(tk.Tk):
             libero, sblocco = puo_essere_eliminato(item)
             if not libero and sblocco is None:
                 messagebox.showwarning(
-                    "Eliminazione non consentita",
-                    "%s - %s\n\n"
+                    T("Eliminazione non consentita"),
+                    T("%s - %s\n\n"
                     "Questo iPhone non e' ancora stato rispedito al servizio\n"
                     "telefonia, quindi non puo' essere eliminato dall'inventario.\n\n"
                     "Registra prima la spedizione con il pulsante Conferma\n"
                     "spedizione, nel contenitore Iphone. Da quel momento restera'\n"
-                    "consultabile per %d mesi, e poi potra' essere eliminato."
+                    "consultabile per %d mesi, e poi potra' essere eliminato.")
                     % (tags[0], item.get("modello", ""), MESI_CONSERVAZIONE),
                     parent=self)
                 return
             if not libero:
                 messagebox.showwarning(
-                    "Eliminazione non consentita",
-                    "%s - %s\n\n"
+                    T("Eliminazione non consentita"),
+                    T("%s - %s\n\n"
                     "Il dispositivo e' stato rispedito al servizio telefonia il %s e\n"
                     "va conservato in inventario per consultazione.\n\n"
-                    "Potrai eliminarlo a partire dal %s."
+                    "Potrai eliminarlo a partire dal %s.")
                     % (tags[0], item.get("modello", ""), item["spedito_il"],
                        sblocco.strftime("%d/%m/%Y")),
                     parent=self)
@@ -1716,20 +1775,20 @@ class App(tk.Tk):
         question = "Eliminare %s dall'inventario?" % tags[0]
         if item and item.get("modello"):
             question = "Eliminare %s - %s dall'inventario?" % (tags[0], item["modello"])
-        if not messagebox.askyesno("Conferma eliminazione", question, parent=self):
+        if not messagebox.askyesno(T("Conferma eliminazione"), question, parent=self):
             return
         self._run(lambda: self.store.delete(tags), "Eliminato %s." % tags[0])
 
     def on_move(self):
         tags = self.selected_tags()
         if not tags:
-            messagebox.showinfo("Sposta", "Spunta il dispositivo da spostare.", parent=self)
+            messagebox.showinfo(T("Sposta"), T("Spunta il dispositivo da spostare."), parent=self)
             return
         telefoni = [t for t in tags if is_iphone((self._item_by_tag(t) or {}).get("tipo"))]
         if telefoni and len(telefoni) == len(tags):
             messagebox.showinfo(
-                "Sposta",
-                "Gli iPhone restano sempre in %s e non possono essere spostati."
+                T("Sposta"),
+                T("Gli iPhone restano sempre in %s e non possono essere spostati.")
                 % self.iphone_room(), parent=self)
             return
         room = self._ask_room("Sposta %s in:" % tags[0])
@@ -1754,8 +1813,8 @@ class App(tk.Tk):
             return
         if not self.can_lend(item):
             messagebox.showinfo(
-                "Prestito",
-                "La gestione dei prestiti e' attiva solo per: %s."
+                T("Prestito"),
+                T("La gestione dei prestiti e' attiva solo per: %s.")
                 % ", ".join(self.cfg.get("loan_rooms") or ["nessuna stanza"]), parent=self)
             return
         person = self._ask_person(item)
@@ -1775,26 +1834,26 @@ class App(tk.Tk):
         if item is None:
             return
         if not is_iphone(item.get("tipo")):
-            messagebox.showinfo("Spedizione",
-                                "La spedizione al servizio telefonia riguarda solo gli iPhone.",
+            messagebox.showinfo(T("Spedizione"),
+                                T("La spedizione al servizio telefonia riguarda solo gli iPhone."),
                                 parent=self)
             return
         if is_shipped(item):
-            messagebox.showinfo("Spedizione",
-                                "%s risulta gia' spedito il %s." % (tag, item["spedito_il"]),
+            messagebox.showinfo(T("Spedizione"),
+                                T("%s risulta gia' spedito il %s.") % (tag, item["spedito_il"]),
                                 parent=self)
             return
         if not messagebox.askyesno(
-            "Conferma spedizione",
-            "%s - %s\n\nRegistrare la spedizione al servizio telefonia?\n\n"
+            T("Conferma spedizione"),
+            T("%s - %s\n\nRegistrare la spedizione al servizio telefonia?\n\n"
             "Data e ora vengono registrate adesso. Il dispositivo resta in\n"
-            "inventario per consultazione per %d mesi, poi potra' essere eliminato."
+            "inventario per consultazione per %d mesi, poi potra' essere eliminato.")
             % (tag, item.get("modello", ""), MESI_CONSERVAZIONE), parent=self
         ):
             return
         testo = self._run(lambda: self.store.ship(tag))
         if testo:
-            messagebox.showinfo("Spedizione registrata", testo, parent=self)
+            messagebox.showinfo(T("Spedizione registrata"), testo, parent=self)
 
     def on_give_back(self, tag=None):
         """Chiude il prestito: il dispositivo torna disponibile."""
@@ -1803,11 +1862,11 @@ class App(tk.Tk):
             return
         item = self._item_by_tag(tag)
         if item is None or not is_on_loan(item):
-            messagebox.showinfo("Rientro", "Il dispositivo non risulta in prestito.", parent=self)
+            messagebox.showinfo(T("Rientro"), T("Il dispositivo non risulta in prestito."), parent=self)
             return
         if not messagebox.askyesno(
-            "Registra rientro",
-            "%s - %s\n\nIn prestito a %s dal %s.\nRegistrare il rientro?"
+            T("Registra rientro"),
+            T("%s - %s\n\nIn prestito a %s dal %s.\nRegistrare il rientro?")
             % (tag, item.get("modello", ""), item["prestato_a"], item["prestato_il"]),
             parent=self
         ):
@@ -1820,7 +1879,7 @@ class App(tk.Tk):
     def _single_selection(self, action):
         tags = self.selected_tags()
         if len(tags) != 1:
-            messagebox.showinfo(action, "Spunta il dispositivo su cui vuoi agire.",
+            messagebox.showinfo(action, T("Spunta il dispositivo su cui vuoi agire."),
                                 parent=self)
             return None
         return tags[0]
@@ -1829,11 +1888,11 @@ class App(tk.Tk):
         dialog = _Modal(self, "Presta dispositivo")
         body = ttk.Frame(dialog, padding=18)
         body.pack(fill="both", expand=True)
-        ttk.Label(body, text="%s - %s" % (item["asset_tag"], item.get("modello", "")),
+        ttk.Label(body, text=T("%s - %s") % (item["asset_tag"], item.get("modello", "")),
                   style="Section.TLabel").pack(anchor="w")
-        ttk.Label(body, text="Data e ora del prestito vengono registrate in automatico.",
+        ttk.Label(body, text=T("Data e ora del prestito vengono registrate in automatico."),
                   style="Muted.TLabel").pack(anchor="w", pady=(2, 12))
-        ttk.Label(body, text="Nome della persona").pack(anchor="w")
+        ttk.Label(body, text=T("Nome della persona")).pack(anchor="w")
         var = tk.StringVar()
         entry = ttk.Entry(body, textvariable=var, width=34)
         entry.pack(fill="x", pady=(4, 0))
@@ -1842,14 +1901,14 @@ class App(tk.Tk):
 
         def ok():
             if not var.get().strip():
-                messagebox.showwarning("Campo mancante",
-                                       "Indica il nome della persona.", parent=dialog)
+                messagebox.showwarning(T("Campo mancante"),
+                                       T("Indica il nome della persona."), parent=dialog)
                 return
             dialog.result = var.get().strip()
             dialog.destroy()
 
-        ttk.Button(buttons, text="Annulla", command=dialog._cancel).pack(side="right", padx=6)
-        ttk.Button(buttons, text="Registra prestito", style="Primary.TButton",
+        ttk.Button(buttons, text=T("Annulla"), command=dialog._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Registra prestito"), style="Primary.TButton",
                    command=ok).pack(side="right")
         dialog.bind("<Return>", lambda e: ok())
         entry.focus_set()
@@ -1870,15 +1929,15 @@ class App(tk.Tk):
             dialog.result = var.get()
             dialog.destroy()
 
-        ttk.Button(buttons, text="Annulla", command=dialog._cancel).pack(side="right", padx=6)
-        ttk.Button(buttons, text="Sposta", style="Primary.TButton",
+        ttk.Button(buttons, text=T("Annulla"), command=dialog._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Sposta"), style="Primary.TButton",
                    command=ok).pack(side="right")
         return dialog.show()
 
     def on_template(self):
         """Genera il modello vuoto da compilare e reimportare."""
         percorso = filedialog.asksaveasfilename(
-            parent=self, title="Salva il modello di inventario",
+            parent=self, title=T("Salva il modello di inventario"),
             defaultextension=".xlsx", initialfile="Modello_inventario.xlsx",
             filetypes=[("File Excel", "*.xlsx")])
         if not percorso:
@@ -1887,14 +1946,14 @@ class App(tk.Tk):
             excel_io.build_template(percorso, self.cfg.get("rooms", []),
                                     self.cfg.get("states"))
         except InventoryError as exc:
-            messagebox.showerror("Modello non creato", str(exc), parent=self)
+            messagebox.showerror(T("Modello non creato"), str(exc), parent=self)
             return
         if messagebox.askyesno(
-            "Modello creato",
-            "%s\n\nCompila il foglio \"Inventario\" e reimportalo con\n"
+            T("Modello creato"),
+            T("%s\n\nCompila il foglio \"Inventario\" e reimportalo con\n"
             "Importa xls...  Le righe con il nome della stanza dividono\n"
             "l'elenco: quello che scrivi sotto finisce in quella stanza.\n\n"
-            "Aprirlo ora?" % percorso, parent=self
+            "Aprirlo ora?") % percorso, parent=self
         ):
             excel_io.open_file(percorso)
 
@@ -1904,17 +1963,17 @@ class App(tk.Tk):
         if not opzioni:
             return
         path = filedialog.askopenfilename(
-            parent=self, title="Seleziona il file da importare",
+            parent=self, title=T("Seleziona il file da importare"),
             filetypes=[("File Excel", "*.xlsx *.xlsm"), ("Tutti i file", "*.*")])
         if not path:
             return
         try:
             items, esito = rows_from_workbook(path, self.cfg.get("rooms"))
         except InventoryError as exc:
-            messagebox.showerror("Importazione non riuscita", str(exc), parent=self)
+            messagebox.showerror(T("Importazione non riuscita"), str(exc), parent=self)
             return
         if not items:
-            messagebox.showwarning("Importazione", "Nessuna riga valida trovata nel file.",
+            messagebox.showwarning(T("Importazione"), T("Nessuna riga valida trovata nel file."),
                                    parent=self)
             return
         stanza = opzioni["stanza"]
@@ -1926,9 +1985,9 @@ class App(tk.Tk):
                 return
             if not items:
                 messagebox.showwarning(
-                    "Nessun dispositivo",
-                    "La riga %s c'e', ma sotto non ci sono dispositivi validi.\n"
-                    "Non e' stato importato niente." % stanza, parent=self)
+                    T("Nessun dispositivo"),
+                    T("La riga %s c'e', ma sotto non ci sono dispositivi validi.\n"
+                    "Non e' stato importato niente.") % stanza, parent=self)
                 return
             esito = dict(esito)
             esito["altre_stanze"] = scartati
@@ -1951,7 +2010,7 @@ class App(tk.Tk):
             righe.append("")
             righe.append("Copia di sicurezza del file precedente:")
             righe.append(risultato["copia"])
-        messagebox.showinfo("Importazione completata", "\n".join(righe), parent=self)
+        messagebox.showinfo(T("Importazione completata"), "\n".join(righe), parent=self)
 
     def on_import_room(self):
         """Carica dal file solo la sezione che riguarda la stanza aperta."""
@@ -1961,14 +2020,14 @@ class App(tk.Tk):
         if not opzioni:
             return
         path = filedialog.askopenfilename(
-            parent=self, title="File da importare in %s" % stanza,
+            parent=self, title=T("File da importare in %s") % stanza,
             filetypes=[("File Excel", "*.xlsx *.xlsm"), ("Tutti i file", "*.*")])
         if not path:
             return
         try:
             items, esito = rows_from_workbook(path, self.cfg.get("rooms"))
         except InventoryError as exc:
-            messagebox.showerror("Importazione non riuscita", str(exc), parent=self)
+            messagebox.showerror(T("Importazione non riuscita"), str(exc), parent=self)
             return
 
         miei, scartati, regola = seleziona_per_stanza(items, esito, stanza)
@@ -1977,9 +2036,9 @@ class App(tk.Tk):
             return
         if not miei:
             messagebox.showwarning(
-                "Nessun dispositivo",
-                "La riga %s c'e', ma sotto non ci sono dispositivi validi.\n"
-                "Non e' stato importato niente." % stanza, parent=self)
+                T("Nessun dispositivo"),
+                T("La riga %s c'e', ma sotto non ci sono dispositivi validi.\n"
+                "Non e' stato importato niente.") % stanza, parent=self)
             return
         esito_stanza = dict(esito)
         esito_stanza["altre_stanze"] = scartati
@@ -2002,19 +2061,19 @@ class App(tk.Tk):
             righe.append("")
             righe.append("Copia di sicurezza del file precedente:")
             righe.append(risultato["copia"])
-        messagebox.showinfo("Importazione completata", "\n".join(righe), parent=self)
+        messagebox.showinfo(T("Importazione completata"), "\n".join(righe), parent=self)
 
     def _avviso_stanza_mancante(self, stanza, esito):
         trovate = esito.get("stanze_trovate") or []
         messagebox.showwarning(
-            "Manca la riga della stanza",
-            "Il foglio dichiara le stanze con le righe-separatore, ma nessuna\n"
+            T("Manca la riga della stanza"),
+            T("Il foglio dichiara le stanze con le righe-separatore, ma nessuna\n"
             "indica %s: non so quali dispositivi siano suoi.\n"
             "Non e' stato importato niente.\n\n"
             "Aggiungi al file una riga vuota con scritto soltanto\n\n"
             "        %s\n\n"
             "nella prima cella, e sotto elenca i dispositivi della stanza.\n\n"
-            "Nel file ho trovato invece: %s."
+            "Nel file ho trovato invece: %s.")
             % (stanza, stanza.upper(), ", ".join(trovate)), parent=self)
 
     def contati_in_eliminazione(self, opzioni):
@@ -2031,24 +2090,25 @@ class App(tk.Tk):
         stanza = self.var_room.get()
         items = [i for i in self.store.items if i.get("stanza") == stanza]
         if not items:
-            messagebox.showinfo("Esporta", "%s non contiene dispositivi." % stanza,
+            messagebox.showinfo(T("Esporta"), T("%s non contiene dispositivi.") % stanza,
                                 parent=self)
             return
         percorso = filedialog.asksaveasfilename(
-            parent=self, title="Esporta %s" % stanza, defaultextension=".xlsx",
+            parent=self, title=T("Esporta %s") % stanza, defaultextension=".xlsx",
             initialfile="Inventario_%s_%s.xlsx" % (
                 nome_file(stanza), datetime.now().strftime("%Y%m%d")),
             filetypes=[("File Excel", "*.xlsx")])
         if not percorso:
             return
         try:
-            excel_io.export(items, percorso, rooms=[stanza], titolo=stanza)
+            excel_io.export(items, percorso, rooms=[stanza], titolo=stanza,
+                            lingua=lang.corrente())
         except InventoryError as exc:
-            messagebox.showerror("Esportazione non riuscita", str(exc), parent=self)
+            messagebox.showerror(T("Esportazione non riuscita"), str(exc), parent=self)
             return
         if messagebox.askyesno(
-            "Esportazione completata",
-            "%d dispositivi di %s esportati in:\n%s\n\nAprirlo ora?"
+            T("Esportazione completata"),
+            T("%d dispositivi di %s esportati in:\n%s\n\nAprirlo ora?")
             % (len(items), stanza, percorso), parent=self
         ):
             excel_io.open_file(percorso)
@@ -2060,33 +2120,35 @@ class App(tk.Tk):
         if not opzioni:
             return
         stanza, forma = opzioni["stanza"], opzioni["forma"]
+        lingua_file = opzioni.get("lingua")
         items = [i for i in self.store.items
                  if stanza is None or i.get("stanza") == stanza]
         if not items:
             messagebox.showinfo(
-                "Esporta",
-                "%s non contiene dispositivi da esportare."
+                T("Esporta"),
+                T("%s non contiene dispositivi da esportare.")
                 % (stanza or "L'inventario"), parent=self)
             return
 
         if forma == "file":
             cartella = filedialog.askdirectory(
-                parent=self, title="Cartella in cui salvare un file per stanza")
+                parent=self, title=T("Cartella in cui salvare un file per stanza"))
             if not cartella:
                 return
             try:
-                scritti = excel_io.export_per_stanza(items, cartella, rooms)
+                scritti = excel_io.export_per_stanza(items, cartella, rooms,
+                                                     lingua=lingua_file)
             except InventoryError as exc:
-                messagebox.showerror("Esportazione non riuscita", str(exc), parent=self)
+                messagebox.showerror(T("Esportazione non riuscita"), str(exc), parent=self)
                 return
             if not scritti:
-                messagebox.showinfo("Esporta", "Nessuna stanza contiene dispositivi.",
+                messagebox.showinfo(T("Esporta"), T("Nessuna stanza contiene dispositivi."),
                                     parent=self)
                 return
             elenco = "\n".join(os.path.basename(p) for p in scritti)
             if messagebox.askyesno(
-                "Esportazione completata",
-                "%d file scritti in:\n%s\n\n%s\n\nAprire la cartella?"
+                T("Esportazione completata"),
+                T("%d file scritti in:\n%s\n\n%s\n\nAprire la cartella?")
                 % (len(scritti), cartella, elenco), parent=self
             ):
                 excel_io.open_file(cartella)
@@ -2098,24 +2160,24 @@ class App(tk.Tk):
         else:
             proposto = "Inventario_%s.xlsx" % datetime.now().strftime("%Y%m%d")
         percorso = filedialog.asksaveasfilename(
-            parent=self, title="Esporta inventario", defaultextension=".xlsx",
+            parent=self, title=T("Esporta inventario"), defaultextension=".xlsx",
             initialfile=proposto, filetypes=[("File Excel", "*.xlsx")])
         if not percorso:
             return
         try:
             excel_io.export(items, percorso, group_by_room=(forma == "fogli"),
                             rooms=[stanza] if stanza else rooms,
-                            titolo=stanza)
+                            titolo=stanza, lingua=lingua_file)
         except InventoryError as exc:
-            messagebox.showerror("Esportazione non riuscita", str(exc), parent=self)
+            messagebox.showerror(T("Esportazione non riuscita"), str(exc), parent=self)
             return
         descrizione = ("%d dispositivi di %s" % (len(items), stanza) if stanza
                        else "%d dispositivi" % len(items))
         if forma == "fogli":
             descrizione += ", un foglio per stanza"
         if messagebox.askyesno(
-            "Esportazione completata",
-            "%s esportati in:\n%s\n\nAprirlo ora?" % (descrizione, percorso),
+            T("Esportazione completata"),
+            T("%s esportati in:\n%s\n\nAprirlo ora?") % (descrizione, percorso),
             parent=self
         ):
             excel_io.open_file(percorso)
@@ -2123,39 +2185,40 @@ class App(tk.Tk):
     def on_print(self):
         items = self.filtered_items()
         if not items:
-            messagebox.showinfo("Stampa", "Non c'e' nulla da stampare nella vista corrente.",
+            messagebox.showinfo(T("Stampa"), T("Non c'e' nulla da stampare nella vista corrente."),
                                 parent=self)
             return
         per_room = self.view == "home" and messagebox.askyesno(
-            "Stampa", "Stampare una pagina separata per ogni stanza?\n\n"
-            "No = un unico elenco.", parent=self)
+            T("Stampa"), T("Stampare una pagina separata per ogni stanza?\n\n"
+            "No = un unico elenco."), parent=self)
         try:
             path = excel_io.build_print_file(items, group_by_room=per_room,
                                              rooms=self.cfg["rooms"])
             printed = excel_io.send_to_printer(path)
         except InventoryError as exc:
-            messagebox.showerror("Stampa non riuscita", str(exc), parent=self)
+            messagebox.showerror(T("Stampa non riuscita"), str(exc), parent=self)
             return
         if printed:
             self.var_status.set("Stampa inviata alla stampante predefinita.     "
                                 + self.var_status.get())
         else:
             messagebox.showinfo(
-                "Stampa", "Il documento e' stato aperto in Excel.\n"
-                "Usa File > Stampa per inviarlo alla stampante.", parent=self)
+                T("Stampa"), T("Il documento e' stato aperto in Excel.\n"
+                "Usa File > Stampa per inviarlo alla stampante."), parent=self)
 
     def on_reset(self):
         """Svuota l'inventario, per poi ricaricarlo da un'importazione."""
         if not self.store.items:
-            messagebox.showinfo("Reset", "L'inventario e' gia' vuoto.", parent=self)
+            messagebox.showinfo(T("Reset"), T("L'inventario e' gia' vuoto."), parent=self)
             return
-        protetti = [i for i in self.store.items if not puo_essere_eliminato(i)[0]]
+        protetti = [i for i in self.store.items
+                    if is_iphone(i.get("tipo")) or not puo_essere_eliminato(i)[0]]
         da_eliminare = len(self.store.items) - len(protetti)
         if not da_eliminare:
             messagebox.showinfo(
-                "Reset",
-                "Non c'e' niente da eliminare: tutti i %d dispositivi in inventario\n"
-                "sono iPhone protetti dalla conservazione." % len(protetti), parent=self)
+                T("Reset"),
+                T("Non c'e' niente da eliminare: tutti i %d dispositivi in inventario\n"
+                "sono iPhone protetti dalla conservazione.") % len(protetti), parent=self)
             return
         if not ResetDialog(self, da_eliminare, len(protetti)).show():
             return
@@ -2163,24 +2226,31 @@ class App(tk.Tk):
         if not esito:
             return
         eliminati, tenuti, copia = esito
-        messaggio = "Eliminati %d dispositivi." % eliminati
+        messaggio = T("Eliminati %d dispositivi.") % eliminati
         if tenuti:
-            messaggio += "\nMantenuti %d iPhone protetti." % tenuti
-        messaggio += ("\n\nCopia di sicurezza del file precedente:\n%s\n\n"
-                      "Ora puoi ricaricare l'inventario con Importa xls..." % copia)
-        messagebox.showinfo("Inventario svuotato", messaggio, parent=self)
+            messaggio += T("\nMantenuti %d iPhone.") % tenuti
+        messaggio += (T("\n\nCopia di sicurezza del file precedente:\n%s\n\n"
+                      "Ora puoi ricaricare l'inventario con Importa xls...") % copia)
+        messagebox.showinfo(T("Inventario svuotato"), messaggio, parent=self)
 
     def on_settings(self):
         result = RoomsDialog(self, self.cfg["rooms"], self.cfg["types"],
                              self.cfg.get("loan_rooms", []),
-                             self.cfg.get("iphone_room", "")).show()
+                             self.cfg.get("iphone_room", ""),
+                             lang.corrente()).show()
         if not result:
             return
+        nuova_lingua = result.pop("lingua", lang.corrente())
         try:
             config.save_shared_config(self.store.path, result)
         except OSError as exc:
-            messagebox.showerror("Errore", "Impossibile salvare le impostazioni:\n%s" % exc,
+            messagebox.showerror(T("Errore"), T("Impossibile salvare le impostazioni:\n%s") % exc,
                                  parent=self)
+            return
+        if nuova_lingua != lang.corrente():
+            lang.imposta(nuova_lingua)
+            config.save_language(nuova_lingua)
+            self.ricostruisci()
             return
         self.cfg = config.load_shared_config(self.store.path)
         self.store.iphone_room = self.cfg.get("iphone_room")
@@ -2200,23 +2270,23 @@ def choose_data_file(root):
     """
     cartella = config.app_dir()
     answer = messagebox.askyesnocancel(
-        'Site Services : Inventario Iphone, Laptop e Tablet',
-        "Non ho ancora trovato il file dell'inventario.\n\n"
+        T('Site Services : Inventario Iphone, Laptop e Tablet'),
+        T("Non ho ancora trovato il file dell'inventario.\n\n"
         "Di norma si chiama Inventario.xlsx e sta nella stessa cartella del\n"
         "programma:\n%s\n\n"
         "Si'  = apri un file inventario gia' esistente\n"
         "No   = crea qui un nuovo inventario vuoto\n"
-        "Annulla = esci" % cartella,
+        "Annulla = esci") % cartella,
         parent=root)
     if answer is None:
         return None
     if answer:
         return filedialog.askopenfilename(
-            parent=root, title="Seleziona il file inventario",
+            parent=root, title=T("Seleziona il file inventario"),
             initialdir=cartella,
             filetypes=[("File Excel", "*.xlsx")]) or None
     return filedialog.asksaveasfilename(
-        parent=root, title="Crea il file inventario",
+        parent=root, title=T("Crea il file inventario"),
         defaultextension=".xlsx", initialdir=cartella,
         initialfile=config.DATA_FILE_NAME,
         filetypes=[("File Excel", "*.xlsx")]) or None

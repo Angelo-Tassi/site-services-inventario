@@ -88,18 +88,18 @@ HEADER_ALIASES = {
                 "sn", "matricola", "service tag"],
     "imei": ["imei", "imei/meid", "meid", "codice imei"],
     "restituito_da": ["restituito da", "proprietario", "consegnato da",
-                      "riconsegnato da", "owner"],
+                      "riconsegnato da", "owner", "returned by"],
     "stanza": ["stanza", "room", "locale", "ubicazione", "posizione", "location"],
     "stato": ["stato", "status", "disponibilita", "disponibilita'"],
     "prestato_a": ["in prestito a", "prestato a", "prestito", "assegnato a",
-                   "utilizzatore", "borrower", "assigned to"],
+                   "utilizzatore", "borrower", "assigned to", "on loan to"],
     "prestato_il": ["prestato il", "data prestito", "in prestito dal",
-                    "loan date", "borrowed on"],
+                    "loan date", "borrowed on", "lent on"],
     "spedito_il": ["spedito il", "data spedizione", "rispedito il",
                    "shipped on"],
     "note": ["note", "nota", "commenti", "notes"],
-    "modificato_il": ["ultima modifica", "modificato il", "data"],
-    "modificato_da": ["modificato da", "utente"],
+    "modificato_il": ["ultima modifica", "modificato il", "data", "last change"],
+    "modificato_da": ["modificato da", "utente", "changed by"],
 }
 
 # Parole ignorate quando si ricavano i tag dai nomi delle stanze.
@@ -240,6 +240,16 @@ def normalize_identity(item):
     return item
 
 
+def _stato_canonico(valore, ammessi):
+    """Riporta all'italiano uno stato scritto in inglese in un file importato."""
+    testo = clean(valore)
+    if not testo or testo in ammessi:
+        return testo
+    from .lingua import STATI_EN
+    rovescio = dict((v.lower(), k) for k, v in STATI_EN.items())
+    return rovescio.get(testo.lower(), testo)
+
+
 def normalize_iphone(item):
     """Un iPhone ha l'IMEI e basta: niente asset tag, seriale o prestiti.
 
@@ -272,6 +282,7 @@ def normalize_state(item, stati=None):
     """
     ammessi = list(stati or STATI)
     normalize_iphone(item)
+    item["stato"] = _stato_canonico(item.get("stato"), ammessi)
     if is_iphone(item.get("tipo")):
         item["stato"] = SPEDITO if item.get("spedito_il") else DA_RISPEDIRE
     elif item.get("prestato_a"):
@@ -584,18 +595,20 @@ class InventoryStore(object):
         return destinazione
 
     def reset(self):
-        """Svuota l'inventario, tenendo solo cio' che non e' eliminabile.
+        """Svuota l'inventario, tenendo solo cio' che non si potrebbe recuperare.
 
-        Prima crea una copia di sicurezza del file dati. Gli iPhone protetti -
-        non ancora rispediti, o rispediti da meno di %d mesi - restano dentro:
-        non potrebbero essere ricaricati da un'importazione.
+        Prima crea una copia di sicurezza del file dati. **Gli iPhone restano
+        sempre**, in qualunque stato: non arrivano da un'importazione, quindi
+        cancellarli qui significherebbe perderli per sempre. Restano dentro
+        anche gli altri dispositivi non ancora eliminabili.
 
         Ritorna (eliminati, mantenuti, percorso della copia).
-        """ % MESI_CONSERVAZIONE
+        """
 
         def op(items):
             copia = self.copia_di_sicurezza()
-            tenuti = [it for it in items if not puo_essere_eliminato(it)[0]]
+            tenuti = [it for it in items
+                      if is_iphone(it.get("tipo")) or not puo_essere_eliminato(it)[0]]
             eliminati = len(items) - len(tenuti)
             items[:] = tenuti
             return eliminati, len(tenuti), copia

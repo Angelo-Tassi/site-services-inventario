@@ -6,6 +6,7 @@ import subprocess
 import sys
 
 QUI = os.path.dirname(os.path.abspath(__file__))
+TIMEOUT = 120
 
 
 def main():
@@ -13,8 +14,17 @@ def main():
                    if f.startswith("test_") and f.endswith(".py"))
     falliti = []
     for nome in suite:
-        esito = subprocess.run([sys.executable, os.path.join(QUI, nome)],
-                               capture_output=True, text=True)
+        # Con un limite di tempo: una finestra di dialogo lasciata aperta per
+        # sbaglio bloccherebbe l'intera esecuzione senza dire perche'.
+        try:
+            esito = subprocess.run([sys.executable, os.path.join(QUI, nome)],
+                                   capture_output=True, text=True, timeout=TIMEOUT)
+        except subprocess.TimeoutExpired:
+            falliti.append(nome)
+            print("%-26s BLOCCATA dopo %d secondi" % (nome, TIMEOUT))
+            print("    probabile finestra di dialogo in attesa: sostituisci "
+                  "messagebox nel test")
+            continue
         ultima = (esito.stdout.strip().splitlines() or ["(nessun output)"])[-1]
         if esito.returncode == 0:
             print("%-26s %s" % (nome, ultima))

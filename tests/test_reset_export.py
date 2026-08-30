@@ -4,11 +4,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fixture
 from openpyxl import load_workbook
+from tkinter import messagebox
 from inventario import excel_io
 from inventario.store import new_item, puo_essere_eliminato, rows_from_workbook
 from inventario.ui import PAROLA_RESET, App, ResetDialog, nome_file
 
 BAU, KIOSK, DR = fixture.BAU, fixture.KIOSK, fixture.DR
+avvisi = []
+messagebox.showwarning = lambda t, m, **k: avvisi.append((t, m))
+messagebox.showinfo = lambda t, m, **k: avvisi.append((t, m))
 app = App(fixture.build()); app._initial_load()
 TIPO = app.iphone_type()
 
@@ -41,8 +45,9 @@ dlg = ResetDialog(app, 13, 0)
 assert dlg.parola_giusta() is False
 dlg.var_conferma.set("si")
 assert dlg.parola_giusta() is False
-dlg._ok()
+avvisi.clear(); dlg._ok()
 assert dlg.result is None, "senza la frase esatta non si procede"
+assert avvisi and avvisi[-1][0] == "Conferma non valida", avvisi
 assert dlg.winfo_exists()
 dlg.var_conferma.set("  elimina tutto  ")
 assert dlg.parola_giusta() is True, "maiuscole e spazi non contano"

@@ -29,11 +29,11 @@ assert str(dlg.combo.cget("state")) == "readonly"
 assert all("disabled" in str(b.cget("state")) for b in dlg.scelte_forma), \
     "con una stanza sola la forma non ha senso"
 dlg.var_stanza.set(DR); dlg._ok()
-assert dlg.result == {"stanza": DR, "forma": "unico"}, dlg.result
+assert dlg.result == {"stanza": DR, "forma": "unico", "lingua": "it"}, dlg.result
 
 dlg = ExportOptionsDialog(app, STANZE)
 dlg.var_forma.set("fogli"); dlg._ok()
-assert dlg.result == {"stanza": None, "forma": "fogli"}
+assert dlg.result == {"stanza": None, "forma": "fogli", "lingua": "it"}
 
 # ------------------------------------------------ un foglio per stanza: identificabile
 percorso = os.path.join(d, "per_stanza.xlsx")

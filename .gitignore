@@ -9,6 +9,9 @@ dist/
 Distribuzione/
 *.spec
 
+# copie di sicurezza prodotte dal programma, ovunque si trovino
+Inventario_prima_del_reset_*.xlsx
+
 # file generati a runtime (solo nella radice: i dati di esempio restano)
 /avvio.log
 /inventario_percorso.json

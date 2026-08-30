@@ -12,6 +12,7 @@ from openpyxl.utils import get_column_letter
 
 from .store import (ALL_FIELDS, HEADERS, InventoryError, NON_DISPONIBILE,
                     SPEDITO, STATI, is_iphone, valore_visibile)
+from .lingua import T, intestazione, stato as traduci_stato
 
 PRINT_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
                 "stanza", "stato", "prestato_a", "prestato_il", "spedito_il", "note"]
@@ -36,7 +37,7 @@ def _safe_sheet_title(name):
     return (name or "Foglio")[:31]
 
 
-def _write_table(ws, items, fields, title=None, subtitle=None):
+def _write_table(ws, items, fields, title=None, subtitle=None, lingua=None):
     row = 1
     if title:
         ws.cell(row=1, column=1, value=title).font = Font(bold=True, size=14)
@@ -51,7 +52,8 @@ def _write_table(ws, items, fields, title=None, subtitle=None):
 
     header_row = row
     for col, field in enumerate(fields, start=1):
-        cell = ws.cell(row=header_row, column=col, value=HEADERS[field])
+        cell = ws.cell(row=header_row, column=col,
+                       value=intestazione(HEADERS[field], lingua))
         cell.font = Font(bold=True, color="FFFFFF")
         cell.fill = _HEADER_FILL
         cell.alignment = Alignment(vertical="center", horizontal="left")
@@ -63,7 +65,10 @@ def _write_table(ws, items, fields, title=None, subtitle=None):
         on_loan = item.get("stato") == NON_DISPONIBILE
         spedito = item.get("stato") == SPEDITO
         for col, field in enumerate(fields, start=1):
-            cell = ws.cell(row=r, column=col, value=valore_visibile(item, field))
+            valore = valore_visibile(item, field)
+            if field == "stato":
+                valore = traduci_stato(valore, lingua)
+            cell = ws.cell(row=r, column=col, value=valore)
             cell.border = _BORDER
             cell.alignment = Alignment(vertical="top", wrap_text=(field == "note"))
             if on_loan:
@@ -101,12 +106,18 @@ def _setup_print(ws, header_row, fields, footer_left):
     ws.oddFooter.right.size = 8
 
 
+def _sottotitolo(stamp, quanti, lingua):
+    if lingua == "en":
+        return "Exported on %s - %d devices" % (stamp, quanti)
+    return "Esportato il %s - %d dispositivi" % (stamp, quanti)
+
+
 def _sort_key(item):
     return (item.get("stanza", ""), item.get("asset_tag", ""))
 
 
 def export(items, path, group_by_room=False, rooms=None, full=True, for_print=False,
-           con_iphone=False, titolo=None):
+           con_iphone=False, titolo=None, lingua=None):
     """Scrive l'inventario in un file .xlsx.
 
     group_by_room: un foglio per stanza (piu' un foglio con il totale).
@@ -116,6 +127,8 @@ def export(items, path, group_by_room=False, rooms=None, full=True, for_print=Fa
         esportazioni; la stampa interna invece li include.
     titolo: se indicato, compare in testa al foglio e ne diventa il nome. Serve
         all'esportazione di una singola stanza, che deve dichiararsi.
+    lingua: "en" per scrivere intestazioni e stati in inglese. I nomi delle
+        stanze e dei tipi restano come li ha scritti l'utente.
     """
     fields = list(ALL_FIELDS) if (full and not for_print) else list(PRINT_FIELDS)
     if not con_iphone:
@@ -137,11 +150,11 @@ def export(items, path, group_by_room=False, rooms=None, full=True, for_print=Fa
             subtitle = "Stampato il %s - %d dispositivi" % (stamp, len(subset))
         elif room:
             title = room
-            subtitle = "Esportato il %s - %d dispositivi" % (stamp, len(subset))
+            subtitle = _sottotitolo(stamp, len(subset), lingua)
         elif titolo:
             title = titolo
-            subtitle = "Esportato il %s - %d dispositivi" % (stamp, len(subset))
-        header_row = _write_table(ws, subset, sheet_fields, title, subtitle)
+            subtitle = _sottotitolo(stamp, len(subset), lingua)
+        header_row = _write_table(ws, subset, sheet_fields, title, subtitle, lingua)
         if for_print:
             _setup_print(ws, header_row, sheet_fields,
                          'Site Services : Inventario Iphone, Laptop e Tablet' + " - %s" % stamp)
@@ -165,7 +178,7 @@ def export(items, path, group_by_room=False, rooms=None, full=True, for_print=Fa
     return path
 
 
-def export_per_stanza(items, cartella, rooms=None, con_iphone=False):
+def export_per_stanza(items, cartella, rooms=None, con_iphone=False, lingua=None):
     """Un file separato per ogni stanza che abbia dispositivi.
 
     Ritorna l'elenco dei percorsi scritti.
@@ -186,7 +199,8 @@ def export_per_stanza(items, cartella, rooms=None, con_iphone=False):
             "_".join("".join(c if c.isalnum() or c in " -_" else "-"
                              for c in str(stanza)).split()) or "stanza", giorno)
         scritti.append(export(subset, os.path.join(cartella, nome),
-                              rooms=[stanza], titolo=stanza, con_iphone=con_iphone))
+                              rooms=[stanza], titolo=stanza, con_iphone=con_iphone,
+                              lingua=lingua))
     return scritti
 
 

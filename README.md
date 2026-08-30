@@ -1,5 +1,7 @@
 # Site Services : Inventario Iphone, Laptop e Tablet
 
+*[English version](README.en.md)*
+
 Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
@@ -227,6 +229,8 @@ programma, e solo in ultimo lo si chiede all'utente.
   pagina e data; invio diretto alla stampante predefinita di Windows.
 - Nomi delle stanze, tipi di dispositivo, stanze con prestito e stanza degli
   iPhone modificabili da *Impostazioni*, validi per tutti gli utenti.
+- **Italiano e inglese**: la tendina *Lingua* traduce interfaccia, colonne e
+  stati; i file si possono esportare in inglese anche lavorando in italiano.
 
 Le stanze predefinite sono **Site Services BAU**, **Digital Kiosk** e
 **Magazzino Disaster Recovery**; i prestiti sono attivi sul Digital Kiosk.
@@ -284,6 +288,87 @@ consultazioni. Passati i tre mesi il blocco cade da solo.
 La regola vale **solo per gli iPhone**: laptop e tablet si eliminano sempre. Il
 vincolo e' nell'archivio dati, non nell'interfaccia, quindi non c'e' schermata da
 cui aggirarlo.
+
+## Impostazioni
+
+Il pulsante **Impostazioni**, in alto a destra, apre l'unico posto da cui si
+configura il programma. Quello che si decide li' vale **per tutti gli utenti**,
+perche' viene salvato in `inventario_impostazioni.json` accanto al file dati -
+tranne la lingua, che e' una preferenza personale del singolo computer.
+
+| Campo | A cosa serve |
+| --- | --- |
+| **Stanze** | l'elenco delle stanze, una per riga. L'ordine e' quello con cui compaiono le schede in home |
+| **Tipi di dispositivo** | le voci della tendina *Tipo*, una per riga |
+| **Stanze con prestito** | in quali stanze compare la colonna *Prestito*. Devono essere nomi presenti fra le stanze |
+| **Stanza degli iPhone** | dove finiscono i telefoni, sempre |
+| **Lingua** | Italiano o English. Cambia tutto: interfaccia, colonne, stati |
+
+### Creare o rinominare una stanza
+
+Aggiungi una riga nel riquadro **Stanze** e salva: la scheda compare subito in
+home, vuota. Per rinominarne una, cambia il testo della riga.
+
+Attenzione: rinominare una stanza **non sposta i dispositivi**, che restano
+etichettati con il vecchio nome e compaiono in una scheda a parte. Per portarli
+nella stanza rinominata, aprili e usa *Sposta in stanza...*, oppure - piu'
+rapido con molti dispositivi - esporta la vecchia stanza, cancella i dispositivi
+e reimporta il file dentro la stanza nuova.
+
+Se rinomini la stanza indicata come *Stanza degli iPhone* senza aggiornare quel
+campo, il programma se ne accorge e ripiega sulla prima stanza dell'elenco, per
+non lasciare i telefoni in una stanza inesistente.
+
+### Aggiungere un tipo di dispositivo
+
+Basta una riga in **Tipi di dispositivo**. Il tipo compare nella tendina di
+*Aggiungi* e nel filtro. Un tipo chiamato **iPhone** - scritto come vuoi,
+maiuscole e minuscole non contano - attiva da solo tutte le regole dei telefoni:
+IMEI al posto di asset tag e seriale, niente prestiti, stanza bloccata,
+contenitore in home, spedizione e conservazione.
+
+### Attivare i prestiti in una stanza
+
+Scrivi il nome della stanza nel riquadro **Stanze con prestito**. Se il nome non
+corrisponde a nessuna stanza, il salvataggio viene rifiutato con un avviso: e'
+il modo per accorgersi di un errore di battitura invece di scoprire piu' tardi
+che i pulsanti non compaiono.
+
+### Aggiungere dispositivi
+
+Non passa dalle impostazioni: si usa **Aggiungi** nella barra in alto, che
+chiede prima il tipo e poi se inserire a mano o con il lettore di codici. Per
+caricarne molti insieme c'e' l'importazione da Excel, e per svuotare tutto prima
+di una reimportazione c'e' *Reset inventario*.
+
+### Gli stati
+
+L'elenco degli stati non e' nella finestra: sta alla voce `states` del file
+`inventario_impostazioni.json`, che si apre con un editor di testo. Gli stati
+automatici - *Non disponibile*, *Da Rispedire*, *Spedito al servizio telefonia* -
+non si toccano.
+
+## Lingua
+
+La tendina **Lingua** nelle impostazioni passa fra italiano e inglese. Cambia
+tutto: pulsanti, messaggi, avvisi, nomi delle colonne nell'elenco e negli
+stati. Il programma si ridisegna subito, senza riavviare.
+
+La scelta e' **personale del computer**: chi lavora sullo stesso inventario da
+un altro PC puo' tenerlo in italiano. I dati nel file restano sempre in italiano
+- stati compresi - cosi' due utenti con lingue diverse leggono lo stesso
+inventario senza conflitti.
+
+### Esportare in inglese restando in italiano
+
+Nella finestra di esportazione c'e' la casella **Esporta i file in inglese**: e'
+spuntata di serie quando l'interfaccia e' in inglese, e si puo' attivare a mano
+quando si lavora in italiano ma il file va mandato a qualcuno che legge inglese.
+
+Traduce le intestazioni delle colonne e gli stati. **Non** traduce i nomi delle
+stanze e dei tipi, che sono testo tuo. Un file esportato in inglese si
+reimporta senza problemi: le intestazioni inglesi sono riconosciute e gli stati
+tornano alla forma italiana.
 
 ## Stati
 
@@ -376,7 +461,7 @@ stanza, fino al reset e alla riesportazione. I file si rigenerano con
 .venv/bin/python tests/run_all.py
 ```
 
-Sedici suite che coprono archivio dati e accessi concorrenti, risoluzione del
+Diciotto suite che coprono archivio dati e accessi concorrenti, risoluzione del
 percorso, schermate e colori, scheda di inserimento, prestiti, spedizioni,
 importazione ed esportazione. Girano senza bisogno di una finestra a schermo e
 non toccano i dati reali: ognuna si costruisce il proprio inventario in una
@@ -504,11 +589,11 @@ Non e' un'operazione che si fa per sbaglio: prima di procedere il programma
 Se la copia di sicurezza non riesce - cartella piena, permessi mancanti - il
 reset viene annullato e non si tocca niente.
 
-**Gli iPhone protetti restano.** Quelli non ancora rispediti, e quelli rispediti
-da meno di tre mesi, non vengono eliminati: non potrebbero essere ricaricati da
-un'importazione, dato che gli iPhone si inseriscono solo a mano. Il programma
-dice quanti ne ha mantenuti. Se in inventario ci sono solo iPhone protetti, il
-reset avverte che non c'e' niente da eliminare e non fa nulla.
+**Gli iPhone restano sempre.** Il reset non ne elimina nessuno, in nessuno
+stato: non arrivano da un'importazione, quindi cancellarli qui vorrebbe dire
+perderli per sempre. Vale anche per quelli spediti da oltre tre mesi, che a mano
+si potrebbero eliminare. Il programma dice quanti ne ha mantenuti; se in
+inventario ci sono solo iPhone, avverte che non c'e' niente da eliminare.
 
 Dopo il reset si ricarica tutto con *Importa xls...*.
 
@@ -737,6 +822,7 @@ Inventario.py                     avvio dell'applicazione
 inventario/config.py     percorso del file dati e impostazioni condivise
 inventario/store.py      lettura/scrittura del file .xlsx, lock, operazioni
 inventario/excel_io.py   esportazione, impaginazione di stampa, invio a stampante
+inventario/lingua.py     traduzioni in italiano e inglese
 inventario/theme.py      palette, font e stili dell'interfaccia
 inventario/ui.py         interfaccia grafica (home, vista stanza, dialoghi)
 ```
