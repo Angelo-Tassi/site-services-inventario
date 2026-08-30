@@ -110,6 +110,13 @@ Not needed if you download the release: it is built automatically by
 every published version. To build it yourself, on any Windows PC with Python,
 double-click `Compila EXE per Windows.bat`.
 
+### Updating the program
+
+Rebuild with `Compila EXE per Windows.bat` and replace `Inventario.exe` in the
+network folder, with nobody using it at that moment. The data is untouched: it
+lives in `Produzione\Inventario.xlsx`, a separate file, and so do the `Backup`
+and `Collaudo` folders.
+
 ### Running from source
 
 Needs Python 3.8+ and `openpyxl`. On macOS the system Python uses **Tk 8.5**,
@@ -247,6 +254,34 @@ back without trouble: the English headers are recognised and the statuses return
 to their Italian form.
 
 ---
+
+## Adding with the barcode reader
+
+Pressing **Add** you first pick the device type, then choose between typing it in
+and scanning. What gets read depends on the type.
+
+**Laptops and tablets** - three steps, numbered at the top of the window:
+
+1. **Scan the asset tag**
+2. **Scan the serial number**
+3. **Type the model**, which is not on the label
+
+**iPhones** - one step only: **scan the IMEI**, their only identifier.
+
+In both cases you end up on the record already filled in: what remains are the
+fields the barcode does not carry - model and who returned it for an iPhone,
+type and room for the others - then *Save*. The room offered is the one you are
+looking at, and for iPhones it is always theirs.
+
+Barcode readers behave like a keyboard: they type into the field and confirm by
+themselves, so you move from one code to the next without touching the mouse.
+
+### If a code will not read
+
+Every scanning step carries the **"I can't scan it - type it instead"** button:
+it turns that window into manual typing for that field alone, without losing the
+steps already done and without leaving the procedure. The field cannot be left
+empty: confirming an empty one is refused and the window stays put.
 
 ## Statuses
 
@@ -405,6 +440,28 @@ of the inventory does not delete them.
 They do appear in the **printout**, which is internal consultation, and of course
 in the on-screen inventory and in the data file.
 
+### Building the inventory from an existing Excel file
+
+The whole inventory can be created by importing: choose *Import xls...*, **The
+whole inventory** + **Merge**, and pick the file. A header row is required; at
+least one column between **Asset Tag** and **IMEI** must be there. The others are
+recognised by name, in Italian or English, for example:
+
+| Field | Accepted names |
+| --- | --- |
+| Asset Tag | Asset Tag, Asset, Tag, Etichetta, Inventario |
+| Type | Type, Device type, Tipo, Tipologia, Categoria |
+| Model | Model, Device, Modello, Descrizione, Dispositivo |
+| Serial number | Serial number, Serial, S/N, SN, Service tag, Numero di serie, Seriale, Matricola |
+| IMEI | IMEI, IMEI/MEID, MEID, Codice IMEI |
+| Room | Room, Location, Stanza, Locale, Ubicazione, Posizione |
+| Status | Status, Stato, Disponibilita' |
+| Notes | Notes, Note, Nota, Commenti |
+
+Rows with neither an asset tag nor an IMEI are counted and discarded; the summary
+says how many. The full guide, with examples, is
+[How to prepare the Excel file](https://angelo-tassi.github.io/site-services-inventario/formato-xls.html?lang=en).
+
 ### The import template
 
 To load laptops and tablets in bulk, start from the ready-made template:
@@ -526,6 +583,18 @@ and *Status* in the template - the allowed values stay written in the
 *Istruzioni* sheet - and Numbers saves in its own `.numbers` format, which the
 program cannot read: to reimport a file edited there, use *File > Export to >
 Excel*.
+
+## What is in the network folder
+
+| File | Contents |
+| --- | --- |
+| `Inventario.exe` | the program; on its own, with no prerequisites |
+| `Produzione\Inventario.xlsx` | the data; it is the inventory itself, openable in Excel |
+| `Produzione\inventario_impostazioni.json` | rooms, types, rooms with loans, iPhone room, statuses |
+| `Backup\` | the copies saved before every reset and every replacing import |
+| `Collaudo\` | the test files and the trial instructions |
+| `.Inventario.xlsx.lock` | present for a fraction of a second during a save |
+| `inventario_percorso.json` | which file the program opens, and the language preference |
 
 ## Simultaneous access
 

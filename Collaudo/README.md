@@ -209,7 +209,27 @@ file `Inventario_<Nome_stanza>_<data>.xlsx`.
 Poi la controprova: **reimporta** il file con i tre fogli, con *Tutto
 l'inventario* + *Unisci*. Deve leggerli tutti e riconoscere 30 dispositivi.
 
-## 7. La lingua
+## 7. Tornare indietro da un errore
+
+E' la prova che serve davvero in sede: sbagliare un'importazione e rimediare.
+
+1. importa `Inventario_di_prova.xlsx` due volte con **Tutto l'inventario** +
+   **Sostituisci**, cosi' esistono almeno due copie
+2. adesso combina il pasticcio: importa `Inventario_di_prova.xlsx` scegliendo
+   **Una sola stanza** > `Site Services BAU` > **Unisci**. Tutti e 30 i
+   dispositivi finiscono in BAU, che ne aveva 10
+3. premi **Ripristina** nella barra in alto
+
+**Cosa deve risultare.** L'avviso dice di quando e' l'ultima copia e quanti
+dispositivi conteneva rispetto a ora. Confermando, le schede stanza tornano
+10, 10 e 10, e il messaggio finale dice dove ha salvato lo stato sbagliato -
+perche' anche quello resta recuperabile.
+
+Poi prova **Impostazioni** > **Ripristina da una copia...**: l'elenco mostra
+tutte le copie dalla piu' recente, con data, ora e numero di dispositivi.
+Sceglierne una e confermare deve dare lo stesso risultato.
+
+## 8. La lingua
 
 Cambia lingua dalla tendina **Lingua** in alto a destra nell'intestazione, e
 controlla che diventi inglese **tutto**: pulsanti, intestazioni delle colonne,

@@ -207,7 +207,28 @@ column must be there reporting always the same room.
 Then the counter-check: **import back** the file with the three sheets, with
 *The whole inventory* + *Merge*. It must read them all and recognise 30 devices.
 
-## 7. Language
+## 7. Going back from a mistake
+
+This is the check that really matters on site: getting an import wrong and
+putting it right.
+
+1. import `Inventario_di_prova.xlsx` twice with **The whole inventory** +
+   **Replace**, so at least two copies exist
+2. now make the mess: import `Inventario_di_prova.xlsx` choosing **A single
+   room** > `Site Services BAU` > **Merge**. All 30 devices end up in BAU, which
+   had 10
+3. press **Restore** in the toolbar
+
+**What you should get.** The warning says when the latest copy is from and how
+many devices it held compared to now. On confirmation the room cards go back to
+10, 10 and 10, and the final message says where it saved the wrong state -
+because that stays recoverable too.
+
+Then try **Settings** > **Restore from a copy...**: the list shows every copy
+newest first, with date, time and device count. Picking one and confirming must
+give the same result.
+
+## 8. Language
 
 Switch language from the **Language** dropdown at the top right of the header,
 and check that **everything** changes: buttons, column headers, room cards, the
