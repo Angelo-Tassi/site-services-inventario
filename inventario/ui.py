@@ -317,24 +317,27 @@ class RoomsDialog(_Modal):
 class AddChoiceDialog(_Modal):
     """Come aggiungere un dispositivo: a mano o leggendo i codici a barre."""
 
-    def __init__(self, parent):
-        _Modal.__init__(self, parent, "Aggiungi dispositivo")
+    def __init__(self, parent, iphone=False):
+        _Modal.__init__(self, parent, "Aggiungi iPhone" if iphone else "Aggiungi dispositivo")
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
         ttk.Label(body, text="Come vuoi aggiungerlo?",
                   style="Section.TLabel").pack(anchor="w")
-        ttk.Label(body, style="Muted.TLabel",
-                  text="La scansione compila asset tag e numero di serie con il\n"
-                       "lettore di codici a barre. Per gli iPhone usa l'inserimento\n"
-                       "manuale: hanno l'IMEI al posto dell'asset tag.").pack(
-            anchor="w", pady=(4, 14))
+        if iphone:
+            aiuto = ("La scansione legge l'IMEI dal codice a barre: un iPhone non\n"
+                     "ha asset tag ne' numero di serie.")
+            etichetta = "Scansiona l'IMEI con il lettore di codici"
+        else:
+            aiuto = ("La scansione compila asset tag e numero di serie con il\n"
+                     "lettore di codici a barre.")
+            etichetta = "Scansiona con il lettore di codici"
+        ttk.Label(body, style="Muted.TLabel", text=aiuto).pack(anchor="w", pady=(4, 14))
 
         def scegli(modo):
             self.result = modo
             self.destroy()
 
-        ttk.Button(body, text="Scansiona con il lettore di codici",
-                   style="Primary.TButton",
+        ttk.Button(body, text=etichetta, style="Primary.TButton",
                    command=lambda: scegli("barcode")).pack(fill="x", pady=(0, 8))
         ttk.Button(body, text="Inserimento manuale",
                    command=lambda: scegli("manuale")).pack(fill="x")
@@ -1212,12 +1215,33 @@ class App(tk.Tk):
         self._reload("Elenco ricaricato.")
 
     def on_add(self):
-        """Chiede se inserire a mano o con il lettore di codici."""
-        modo = AddChoiceDialog(self).show()
+        """Chiede se inserire a mano o con il lettore di codici.
+
+        Nel contenitore degli iPhone la scansione riguarda l'IMEI, unico
+        identificativo di un telefono.
+        """
+        iphone = self.view == "type" and bool(self.iphone_type())
+        modo = AddChoiceDialog(self, iphone=iphone).show()
         if modo == "manuale":
             self.on_new()
         elif modo == "barcode":
-            self.on_new_barcode()
+            if iphone:
+                self.on_new_barcode_iphone()
+            else:
+                self.on_new_barcode()
+
+    def on_new_barcode_iphone(self):
+        """Un solo codice da leggere: l'IMEI. Il resto si scrive nella scheda."""
+        imei = ScanDialog(self, "IMEI", "l'IMEI del telefono", 1, 1).show()
+        if not imei:
+            return
+        preset = new_item(tipo=self.iphone_type(), imei=imei,
+                          stanza=self.iphone_room())
+        item = ItemDialog(self, self.cfg["rooms"], self.cfg["types"], preset,
+                          iphone_room=self.iphone_room(),
+                          stati=self.cfg.get("states")).show()
+        if item:
+            self._run(lambda: self.store.add(item), "Aggiunto %s." % item["asset_tag"])
 
     def stanza_predefinita(self):
         if self.view == "room":

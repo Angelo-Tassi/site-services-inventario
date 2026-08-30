@@ -45,12 +45,45 @@ dlg._ok()
 assert dlg.result["seriale"] == "" and dlg.result["prestato_a"] == ""
 
 # ---------------------------------------------- scelta fra manuale e scansione
+def voci(dialogo):
+    return [str(b.cget("text")) for b in dialogo.winfo_children()[0].winfo_children()
+            if b.winfo_class() == "TButton"]
+
+app.show_home()
 scelta = AddChoiceDialog(app)
-pulsanti = [w for w in scelta.winfo_children()[0].winfo_children()
-            if w.winfo_class() == "TButton"]
-assert [str(b.cget("text")) for b in pulsanti] == [
-    "Scansiona con il lettore di codici", "Inserimento manuale", "Annulla"]
+assert voci(scelta) == ["Scansiona con il lettore di codici",
+                        "Inserimento manuale", "Annulla"], voci(scelta)
 scelta._cancel()
+
+# nel contenitore iPhone si scansiona l'IMEI, non l'asset tag
+app.show_iphones()
+assert app.view == "type"
+scelta = AddChoiceDialog(app, iphone=True)
+assert voci(scelta) == ["Scansiona l'IMEI con il lettore di codici",
+                        "Inserimento manuale", "Annulla"], voci(scelta)
+assert scelta.title() == "Aggiungi iPhone"
+scelta._cancel()
+
+# un solo passo, e la scheda si apre gia' in modalita' iPhone
+passo_imei = ScanDialog(app, "IMEI", "l'IMEI del telefono", 1, 1)
+assert passo_imei.var_titolo.get() == "Scansiona l'IMEI del telefono"
+passo_imei.var_valore.set("351234567890123")
+passo_imei._ok()
+preset_tel = new_item(tipo=app.iphone_type(), imei=passo_imei.result,
+                      stanza=app.iphone_room())
+scheda = ItemDialog(app, app.cfg["rooms"], app.cfg["types"], preset_tel,
+                    iphone_room=app.iphone_room(), stati=app.cfg["states"])
+assert scheda.is_iphone()
+assert [l for l, _v, _w in scheda.required] == ["IMEI", "Modello", "Restituito da", "Stanza"]
+assert scheda.var_imei.get() == "351234567890123"
+assert scheda.missing_fields() == ["Modello", "Restituito da"]
+scheda.var_modello.set("Apple iPhone 13"); scheda.var_restituito.set("E. Rossi")
+scheda._ok()
+assert scheda.result["asset_tag"] == "351234567890123"
+assert scheda.result["seriale"] == "" and scheda.result["stanza"] == BAU
+app._run(lambda: app.store.add(scheda.result), "ok")
+assert app._item_by_tag("351234567890123")["stato"] == DA_RISPEDIRE
+app.show_home()
 
 # ---------------------------------------------- i passi della scansione
 passo = ScanDialog(app, "Asset tag", "l'asset tag", 1, 3)

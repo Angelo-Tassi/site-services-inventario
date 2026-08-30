@@ -377,19 +377,23 @@ consultare i dati in Excel senza rischi, usa *Esporta xls...*.
 
 ## Aggiungere con il lettore di codici a barre
 
-Premendo **Aggiungi** si sceglie fra inserimento manuale e scansione. La
-scansione e' pensata per laptop e tablet, che hanno le etichette con il codice;
-per gli iPhone si usa l'inserimento manuale, perche' hanno l'IMEI al posto
-dell'asset tag.
+Premendo **Aggiungi** si sceglie fra inserimento manuale e scansione. Cosa
+viene letto dipende da dove ti trovi.
 
-La procedura ha tre passi, numerati in alto nella finestra:
+**Laptop e tablet** - tre passi, numerati in alto nella finestra:
 
 1. **Scansiona l'asset tag**
 2. **Scansiona il numero di serie**
 3. **Scrivi il modello** del dispositivo, che sull'etichetta non c'e'
 
-Al termine si apre la scheda gia' compilata: restano da confermare tipo, stanza
-e stato, poi *Salva*. La stanza proposta e' quella che stai guardando.
+**iPhone**, aggiungendoli dal loro contenitore - un passo solo:
+
+1. **Scansiona l'IMEI**, che e' il loro unico identificativo
+
+In entrambi i casi al termine si apre la scheda gia' compilata: restano da
+completare i campi che il codice non porta - modello e chi lo ha restituito per
+un iPhone, tipo e stanza per gli altri - poi *Salva*. La stanza proposta e'
+quella che stai guardando, e per gli iPhone e' sempre la loro.
 
 I lettori di codici a barre si comportano come una tastiera: scrivono nel campo
 e confermano da soli, quindi si passa da un codice all'altro senza toccare il
