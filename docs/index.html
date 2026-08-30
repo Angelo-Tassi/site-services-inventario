@@ -73,22 +73,28 @@ h2{margin:0 0 8px;font-family:Archivo,sans-serif;font-weight:600;font-size:24px;
 .appbar .s{color:#BBD4EA;font-size:12px;margin-top:2px}
 .appbar .t{margin-left:auto;color:#BBD4EA;font-size:12px}
 .tools{display:flex;gap:6px;flex-wrap:wrap;padding:11px 16px 4px}
-.tb{background:#fff;border:1px solid var(--w-border);border-radius:3px;padding:7px 12px;font-size:12.5px}
+.tb{background:#fff;border:1px solid var(--w-border);border-radius:3px;
+  padding:7px 12px;font-size:12.5px;color:var(--w-text)}
 .tb.p{background:var(--w-primary);border-color:var(--w-primary);color:#fff;font-weight:600}
 .stage{padding:6px 16px 14px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin:8px 0 16px}
-.c{background:#fff;border:1px solid var(--w-border);border-radius:4px;overflow:hidden}
+.c{background:#fff;border:1px solid var(--w-border);border-radius:4px;
+  overflow:hidden;color:var(--w-text)}
 .c i{display:block;height:4px}
 .c .b{padding:12px 15px 14px}
 .c .n{font-weight:600;font-size:13.5px}
 .c .q{font-size:32px;font-weight:700;line-height:1.15}
 .c .m{font-size:11.5px;color:var(--w-muted)}
 .c .g{font-size:12px;font-weight:600;color:var(--w-link);margin-top:8px}
-.tw{background:#fff;border:1px solid var(--w-border);border-radius:3px;overflow-x:auto}
+/* superficie chiara fissa: il testo dentro non eredita mai il colore del tema,
+   altrimenti in modalita' scura diventa bianco su bianco */
+.tw{background:#fff;border:1px solid var(--w-border);border-radius:3px;
+  overflow-x:auto;color:var(--w-text)}
 table{border-collapse:collapse;width:100%;min-width:720px}
 th{background:var(--w-head);color:var(--w-primary);font-weight:600;font-size:12px;
   text-align:left;padding:8px 10px;white-space:nowrap;border-bottom:1px solid var(--w-border)}
-td{padding:7px 10px;font-size:12.5px;border-bottom:1px solid #EDF1F6;white-space:nowrap}
+td{padding:7px 10px;font-size:12.5px;border-bottom:1px solid #EDF1F6;
+  white-space:nowrap;color:var(--w-text)}
 tr:nth-child(even){background:var(--w-row-alt)}
 tr.ip,tr.ip:nth-child(even){background:var(--w-iphone)}
 tr.tb2,tr.tb2:nth-child(even){background:var(--w-tablet)}
@@ -145,7 +151,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.15.0 · alfa</div>
+  <div class="alpha">versione 0.15.1 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Scarica Inventario.exe</a>
@@ -325,7 +331,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.15.0 · alpha</div>
+  <div class="alpha">version 0.15.1 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Download Inventario.exe</a>
