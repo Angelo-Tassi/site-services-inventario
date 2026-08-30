@@ -376,7 +376,7 @@ stanza, fino al reset e alla riesportazione. I file si rigenerano con
 .venv/bin/python tests/run_all.py
 ```
 
-Quindici suite che coprono archivio dati e accessi concorrenti, risoluzione del
+Sedici suite che coprono archivio dati e accessi concorrenti, risoluzione del
 percorso, schermate e colori, scheda di inserimento, prestiti, spedizioni,
 importazione ed esportazione. Girano senza bisogno di una finestra a schermo e
 non toccano i dati reali: ognuna si costruisce il proprio inventario in una
@@ -533,16 +533,35 @@ altre stanze, e - quando il foglio non dichiara stanze - che tutte finiranno
 nella stanza scelta. Come sempre si sceglie fra *unisci* e *sostituisci*, e la
 sostituzione riguarda solo quella stanza.
 
-## Esportare una sola stanza
+## Come funziona l'esportazione
 
-Entrando in una stanza, accanto al suo nome compare **Esporta questa stanza in
-xls**: produce un file con i soli dispositivi di quella stanza, chiamato per
-esempio `Inventario_Digital_Kiosk_20260830.xlsx`.
+Come per l'importazione, *Esporta xls...* apre prima una finestra con due
+domande.
 
-Il nome della stanza e' anche **dentro** al file, in tre punti: e' il nome del
-foglio, e' scritto in testa alla prima riga, e sotto compare la data di
-esportazione con il numero di dispositivi. Cosi' resta riconoscibile anche se il
-file viene rinominato o stampato.
+**Che cosa** - tutto l'inventario, oppure una sola stanza scelta dalla tendina.
+
+**In che forma** - quando esporti tutto:
+
+| | |
+| --- | --- |
+| Un unico elenco | tutti i dispositivi in un solo foglio |
+| Un foglio per ogni stanza | un solo file, con dentro un foglio per stanza |
+| Un file separato per ogni stanza | si sceglie una cartella, ed esce un file per stanza, chiamato `Inventario_<Stanza>_<data>.xlsx` |
+
+Le stanze senza dispositivi non producono ne' fogli ne' file vuoti.
+
+**Ogni foglio dice di chi e'.** Il nome della stanza compare in tre punti: e' il
+nome del foglio, e' scritto in testa alla prima riga, e sotto c'e' la data di
+esportazione con il numero di dispositivi. La colonna *Stanza* resta sempre nella
+tabella. Cosi' un foglio resta riconoscibile anche se viene copiato altrove,
+rinominato o stampato.
+
+**Si reimporta tutto.** Qualsiasi cosa produca l'esportazione si puo' ricaricare:
+un file con piu' fogli viene letto per intero, e il nome di ogni foglio vale come
+la riga-separatore di quella stanza.
+
+Dentro una stanza c'e' anche la scorciatoia **Esporta questa stanza in xls**, che
+salta la finestra e produce direttamente il file di quella stanza.
 
 Esporta la stanza **intera**, non quello che stai vedendo: eventuali ricerche o
 filtri attivi non la riducono. Per esportare esattamente la vista corrente c'e'
@@ -629,6 +648,8 @@ esattamente cosa succede.
 | Manca il **modello** | importa lo stesso e ti dice quante righe restano senza |
 | Manca l'**asset tag** (o l'IMEI) | si ferma con un errore e non importa niente |
 | Un titolo prima della tabella | lo salta e cerca le intestazioni nelle prime 12 righe |
+| Piu' fogli | li legge tutti; un foglio intitolato come una stanza vale come separatore |
+| Un foglio senza tabella (istruzioni, appunti) | lo ignora |
 | Righe vuote | le salta senza contarle |
 | Righe senza identificativo | le conta come scartate e va avanti |
 

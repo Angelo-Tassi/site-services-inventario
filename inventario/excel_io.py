@@ -127,12 +127,17 @@ def export(items, path, group_by_room=False, rooms=None, full=True, for_print=Fa
     wb.remove(wb.active)
 
     def add_sheet(name, subset, room=None):
-        sheet_fields = [f for f in fields if not (room and f == "stanza")]
+        # La colonna Stanza resta sempre: un foglio deve dire da solo di chi e',
+        # anche se viene copiato o stampato fuori dal suo file.
+        sheet_fields = list(fields)
         ws = wb.create_sheet(_safe_sheet_title(name))
         title = subtitle = None
         if for_print:
             title = 'Site Services : Inventario Iphone, Laptop e Tablet' + (" - %s" % room if room else "")
             subtitle = "Stampato il %s - %d dispositivi" % (stamp, len(subset))
+        elif room:
+            title = room
+            subtitle = "Esportato il %s - %d dispositivi" % (stamp, len(subset))
         elif titolo:
             title = titolo
             subtitle = "Esportato il %s - %d dispositivi" % (stamp, len(subset))
@@ -158,6 +163,31 @@ def export(items, path, group_by_room=False, rooms=None, full=True, for_print=Fa
     finally:
         wb.close()
     return path
+
+
+def export_per_stanza(items, cartella, rooms=None, con_iphone=False):
+    """Un file separato per ogni stanza che abbia dispositivi.
+
+    Ritorna l'elenco dei percorsi scritti.
+    """
+    if not con_iphone:
+        items = [i for i in items if not is_iphone(i.get("tipo"))]
+    stanze = list(rooms or [])
+    for item in items:
+        if item.get("stanza") and item["stanza"] not in stanze:
+            stanze.append(item["stanza"])
+    giorno = datetime.now().strftime("%Y%m%d")
+    scritti = []
+    for stanza in stanze:
+        subset = [i for i in items if i.get("stanza", "") == stanza]
+        if not subset:
+            continue
+        nome = "Inventario_%s_%s.xlsx" % (
+            "_".join("".join(c if c.isalnum() or c in " -_" else "-"
+                             for c in str(stanza)).split()) or "stanza", giorno)
+        scritti.append(export(subset, os.path.join(cartella, nome),
+                              rooms=[stanza], titolo=stanza, con_iphone=con_iphone))
+    return scritti
 
 
 def build_print_file(items, group_by_room=False, rooms=None):

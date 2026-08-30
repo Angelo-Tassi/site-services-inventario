@@ -871,43 +871,58 @@ def rows_from_workbook(path, rooms=None):
     except Exception as exc:
         raise InventoryError("Impossibile leggere il file:\n%s" % exc)
     try:
-        ws = wb[SHEET_NAME] if SHEET_NAME in wb.sheetnames else wb.worksheets[0]
-        rows = ws.iter_rows(values_only=True)
-        header, mapping = _trova_intestazioni(rows)
-        if header is None:
+        tags = tag_stanze(rooms or [])
+        items = []
+        esito = {"scartate": 0, "da_tag": 0, "iphone": 0, "senza_modello": 0,
+                 "stanze_trovate": [], "colonne_ignorate": []}
+        letto = False
+
+        for ws in wb.worksheets:
+            rows = ws.iter_rows(values_only=True)
+            header, mapping = _trova_intestazioni(rows)
+            if header is None:
+                continue          # un foglio di istruzioni o di appunti: si salta
+            letto = True
+            for cella in header:
+                nome = clean(cella)
+                if nome and nome not in esito["colonne_ignorate"] \
+                        and list(header).index(cella) not in mapping:
+                    esito["colonne_ignorate"].append(nome)
+
+            # Un foglio intitolato come una stanza vale come separatore: e' la
+            # forma che prende un'esportazione con un foglio per stanza.
+            stanza_corrente = tags.get(clean(ws.title).upper())
+            if stanza_corrente and stanza_corrente not in esito["stanze_trovate"]:
+                esito["stanze_trovate"].append(stanza_corrente)
+
+            for row in rows:
+                if row is None or all(c is None or clean(c) == "" for c in row):
+                    continue
+                stanza = riga_tag(row, tags)
+                if stanza is not None:
+                    stanza_corrente = stanza
+                    if stanza not in esito["stanze_trovate"]:
+                        esito["stanze_trovate"].append(stanza)
+                    continue
+                item = _row_to_item(row, mapping)
+                if not item:
+                    esito["scartate"] += 1
+                    continue
+                if is_iphone(item.get("tipo")):
+                    esito["iphone"] += 1
+                    continue
+                if stanza_corrente:
+                    item["stanza"] = stanza_corrente
+                    esito["da_tag"] += 1
+                if not item.get("modello"):
+                    esito["senza_modello"] += 1
+                items.append(item)
+
+        if not letto:
             raise InventoryError(
                 "Nel file non e' stata trovata la colonna \"Asset Tag\" (o \"IMEI\").\n"
                 "Ci deve essere una riga con le intestazioni delle colonne."
             )
-        tags = tag_stanze(rooms or [])
-        items = []
-        esito = {"scartate": 0, "da_tag": 0, "iphone": 0, "senza_modello": 0,
-                 "stanze_trovate": [],
-                 "colonne_ignorate": [clean(c) for i, c in enumerate(header)
-                                      if clean(c) and i not in mapping]}
-        stanza_corrente = None
-        for row in rows:
-            if row is None or all(c is None or clean(c) == "" for c in row):
-                continue
-            stanza = riga_tag(row, tags)
-            if stanza is not None:
-                stanza_corrente = stanza
-                if stanza not in esito["stanze_trovate"]:
-                    esito["stanze_trovate"].append(stanza)
-                continue
-            item = _row_to_item(row, mapping)
-            if not item:
-                esito["scartate"] += 1
-                continue
-            if is_iphone(item.get("tipo")):
-                esito["iphone"] += 1
-                continue
-            if stanza_corrente:
-                item["stanza"] = stanza_corrente
-                esito["da_tag"] += 1
-            if not item.get("modello"):
-                esito["senza_modello"] += 1
-            items.append(item)
         return items, esito
     finally:
         wb.close()

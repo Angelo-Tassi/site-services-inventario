@@ -560,6 +560,76 @@ class ResetDialog(_Modal):
         self.destroy()
 
 
+class ExportOptionsDialog(_Modal):
+    """Primo passo dell'esportazione: che cosa si esporta, e in che forma."""
+
+    def __init__(self, parent, rooms):
+        _Modal.__init__(self, parent, "Esporta in Excel")
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+
+        ttk.Label(body, text="Che cosa vuoi esportare",
+                  style="Section.TLabel").pack(anchor="w")
+        self.var_ambito = tk.StringVar(value="tutto")
+        ttk.Radiobutton(body, variable=self.var_ambito, value="tutto",
+                        text="Tutto l'inventario",
+                        command=self._aggiorna).pack(anchor="w", pady=(6, 0))
+        ttk.Radiobutton(body, variable=self.var_ambito, value="stanza",
+                        text="Una sola stanza",
+                        command=self._aggiorna).pack(anchor="w", pady=(2, 0))
+        riga = ttk.Frame(body)
+        riga.pack(anchor="w", fill="x", padx=(24, 0), pady=(4, 0))
+        self.var_stanza = tk.StringVar(value=rooms[0] if rooms else "")
+        self.combo = ttk.Combobox(riga, textvariable=self.var_stanza, values=rooms,
+                                  state="readonly", width=30)
+        self.combo.pack(side="left")
+
+        ttk.Separator(body, orient="horizontal").pack(fill="x", pady=12)
+
+        ttk.Label(body, text="In che forma", style="Section.TLabel").pack(anchor="w")
+        self.var_forma = tk.StringVar(value="unico")
+        self.scelte_forma = []
+        for valore, testo in (
+            ("unico", "Un unico elenco, in un solo foglio"),
+            ("fogli", "Un foglio per ogni stanza, nello stesso file"),
+            ("file", "Un file separato per ogni stanza"),
+        ):
+            b = ttk.Radiobutton(body, variable=self.var_forma, value=valore, text=testo)
+            b.pack(anchor="w", pady=(6 if valore == "unico" else 2, 0))
+            self.scelte_forma.append(b)
+        self.nota = ttk.Label(body, style="Muted.TLabel", justify="left",
+                              text="Ogni foglio porta in testa il nome della stanza,\n"
+                                   "la data e il numero di dispositivi.")
+        self.nota.pack(anchor="w", padx=(24, 0), pady=(6, 0))
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(16, 0))
+        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text="Avanti", style="Primary.TButton",
+                   command=self._ok).pack(side="right")
+        self._aggiorna()
+
+    def _aggiorna(self):
+        singola = self.var_ambito.get() == "stanza"
+        self.combo.configure(state="readonly" if singola else "disabled")
+        for b in self.scelte_forma:
+            b.configure(state="disabled" if singola else "normal")
+        self.nota.configure(
+            text="Una stanza sola sta in un file solo, con il suo nome in testa."
+            if singola else "Ogni foglio porta in testa il nome della stanza,\n"
+                            "la data e il numero di dispositivi.")
+
+    def _ok(self):
+        if self.var_ambito.get() == "stanza":
+            if not self.var_stanza.get():
+                messagebox.showwarning("Stanza mancante", "Scegli la stanza.", parent=self)
+                return
+            self.result = {"stanza": self.var_stanza.get(), "forma": "unico"}
+        else:
+            self.result = {"stanza": None, "forma": self.var_forma.get()}
+        self.destroy()
+
+
 class ImportOptionsDialog(_Modal):
     """Primo passo dell'importazione: che cosa si carica, e come."""
 
@@ -1984,29 +2054,71 @@ class App(tk.Tk):
             excel_io.open_file(percorso)
 
     def on_export(self):
-        items = self.filtered_items()
-        if not items and not messagebox.askyesno(
-            "Esporta", "Nessun dispositivo nella vista corrente. Esportare comunque?",
-            parent=self
-        ):
+        """Prima cosa esportare e in che forma, poi dove salvarlo."""
+        rooms = self.cfg.get("rooms") or []
+        opzioni = ExportOptionsDialog(self, rooms).show()
+        if not opzioni:
             return
-        default = "Inventario_%s.xlsx" % datetime.now().strftime("%Y%m%d")
-        path = filedialog.asksaveasfilename(
+        stanza, forma = opzioni["stanza"], opzioni["forma"]
+        items = [i for i in self.store.items
+                 if stanza is None or i.get("stanza") == stanza]
+        if not items:
+            messagebox.showinfo(
+                "Esporta",
+                "%s non contiene dispositivi da esportare."
+                % (stanza or "L'inventario"), parent=self)
+            return
+
+        if forma == "file":
+            cartella = filedialog.askdirectory(
+                parent=self, title="Cartella in cui salvare un file per stanza")
+            if not cartella:
+                return
+            try:
+                scritti = excel_io.export_per_stanza(items, cartella, rooms)
+            except InventoryError as exc:
+                messagebox.showerror("Esportazione non riuscita", str(exc), parent=self)
+                return
+            if not scritti:
+                messagebox.showinfo("Esporta", "Nessuna stanza contiene dispositivi.",
+                                    parent=self)
+                return
+            elenco = "\n".join(os.path.basename(p) for p in scritti)
+            if messagebox.askyesno(
+                "Esportazione completata",
+                "%d file scritti in:\n%s\n\n%s\n\nAprire la cartella?"
+                % (len(scritti), cartella, elenco), parent=self
+            ):
+                excel_io.open_file(cartella)
+            return
+
+        if stanza:
+            proposto = "Inventario_%s_%s.xlsx" % (nome_file(stanza),
+                                                  datetime.now().strftime("%Y%m%d"))
+        else:
+            proposto = "Inventario_%s.xlsx" % datetime.now().strftime("%Y%m%d")
+        percorso = filedialog.asksaveasfilename(
             parent=self, title="Esporta inventario", defaultextension=".xlsx",
-            initialfile=default, filetypes=[("File Excel", "*.xlsx")])
-        if not path:
+            initialfile=proposto, filetypes=[("File Excel", "*.xlsx")])
+        if not percorso:
             return
-        per_room = self.view == "home" and messagebox.askyesno(
-            "Esporta", "Creare un foglio separato per ogni stanza?\n\n"
-            "No = un unico elenco.", parent=self)
         try:
-            excel_io.export(items, path, group_by_room=per_room, rooms=self.cfg["rooms"])
+            excel_io.export(items, percorso, group_by_room=(forma == "fogli"),
+                            rooms=[stanza] if stanza else rooms,
+                            titolo=stanza)
         except InventoryError as exc:
             messagebox.showerror("Esportazione non riuscita", str(exc), parent=self)
             return
-        if messagebox.askyesno("Esportazione completata",
-                               "File creato:\n%s\n\nAprirlo ora?" % path, parent=self):
-            excel_io.open_file(path)
+        descrizione = ("%d dispositivi di %s" % (len(items), stanza) if stanza
+                       else "%d dispositivi" % len(items))
+        if forma == "fogli":
+            descrizione += ", un foglio per stanza"
+        if messagebox.askyesno(
+            "Esportazione completata",
+            "%s esportati in:\n%s\n\nAprirlo ora?" % (descrizione, percorso),
+            parent=self
+        ):
+            excel_io.open_file(percorso)
 
     def on_print(self):
         items = self.filtered_items()

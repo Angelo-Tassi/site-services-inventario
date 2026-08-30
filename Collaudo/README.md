@@ -131,13 +131,28 @@ Deve funzionare lo stesso.
 Se prima del reset avevi inserito a mano un iPhone, deve **sopravvivere**: gli
 iPhone non si eliminano e non si reimportano.
 
-## 8. Esportazione di una stanza
+## 8. Esportazione
 
-Entra in una stanza e premi **Esporta questa stanza in xls**. Il file deve
-chiamarsi `Inventario_<Nome_stanza>_<data>.xlsx` e, aperto, avere il nome della
-stanza come **nome del foglio** e nella **prima riga**, con sotto la data di
-esportazione. Devono esserci solo i dispositivi di quella stanza, e nessun
-iPhone.
+Con l'inventario carico dal punto 1, prova le tre forme da *Esporta xls...*.
+
+**Un unico elenco.** Un foglio solo con tutti e 30 i dispositivi.
+
+**Un foglio per ogni stanza.** Un file con tre fogli, uno per stanza, 10
+dispositivi ciascuno. Apri ogni foglio e controlla che in **A1** ci sia il nome
+della stanza, sotto la data di esportazione, e che la colonna *Stanza* ci sia e
+riporti sempre la stessa stanza. Era questo il difetto della versione
+precedente: il foglio non diceva di chi era.
+
+**Un file separato per ogni stanza.** Scegli una cartella: devono uscire tre
+file `Inventario_<Nome_stanza>_<data>.xlsx`, ciascuno con la sua stanza in A1.
+
+Poi la controprova: **reimporta** il file con i tre fogli, con *Tutto
+l'inventario* + *Unisci*. Deve leggerli tutti e tre e riconoscere 30
+dispositivi, perche' il nome del foglio vale come riga-separatore.
+
+Infine, entra in una stanza e usa la scorciatoia **Esporta questa stanza in
+xls**: stesso risultato dell'opzione *Una sola stanza*. In nessuna forma devono
+comparire iPhone.
 
 ---
 
