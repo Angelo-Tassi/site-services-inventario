@@ -513,9 +513,11 @@ regular one with **30 devices, 10 per room**, and one deliberately carrying the
 cases the program has to report - and step-by-step instructions in
 [`Collaudo/README.en.md`](Collaudo/README.en.md).
 
-The checks are run on the included files, with nothing copied anywhere else. The
-instructions also explain **how to load the final inventory** once the trial is
-over: reset first, or an import that replaces everything.
+The checks are run on the included files, which stay where they are. The
+instructions also explain where to keep the **real inventories** - in a personal
+folder on your own computer, never in the program folder, which is replaced at
+every update - and **how to load the final inventory** once the trial is over:
+reset first, or an import that replaces everything.
 
 ## Automated tests
 

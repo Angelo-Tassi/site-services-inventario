@@ -64,20 +64,40 @@ These are the same files the automated tests use: if the program's behaviour
 changes, the tests fail and these instructions get rewritten. They are
 regenerated with `.venv/bin/python tests/genera_file_di_prova.py`.
 
-## Where the real inventory goes
+## The test files stay here
 
-**Not in this folder, and not next to the program either.** The program folder
-holds the application and the test data: it is a place where files are replaced
-at every update.
+Do not move them and do not copy them elsewhere: they are part of the program,
+they are updated along with it and they serve anyone who has to run the trial
+again. When the program asks you for a file, open them straight from this
+folder.
 
-While you are trying things out, keep the file you are about to load in a folder
-of your own - for example **Documents\Inventory** on the computer of the
-technician doing the import. In production, the final inventory belongs in the
-shared network folder, which is the one the program normally opens.
+## Real inventories live outside
 
-The path the program uses is chosen on first run and remembered in
-`inventario_percorso.json`, next to the executable. To change it, delete that
-file and restart.
+The Excel sheet with the final inventory - the one you will actually load, with
+the real devices - **must not be put in the program folder**. Keep it in a
+folder of your own, on your own computer: `Documents\Inventory`, the Desktop,
+wherever you prefer.
+
+Two reasons:
+
+- the program folder is **replaced at every update**: a file left there is lost
+  without warning;
+- if the program sits on a shared network folder, that file would be visible to
+  everyone, including people who should not read it.
+
+The same goes for the files you **export** from the program and for any backup
+copies you decide to keep: save them in a folder of your own.
+
+## Not to be confused: the file the program uses
+
+A different thing is the file the program works on, the one it reads and writes
+continuously. You do not import it: it simply opens it. Its path is chosen on
+first run and remembered in `inventario_percorso.json`, next to the executable;
+to change it, delete that file and restart.
+
+That one goes wherever the people using it need it: on the **shared network
+folder** if the inventory belongs to everybody, in a personal folder while you
+are still trying things out on your own.
 
 ---
 
@@ -124,8 +144,8 @@ folder: that is the backup copy.
 ### When the sheet declares no rooms
 
 Open `Inventario_di_prova.xlsx`, **delete the three separator rows** and save
-under another name in your own working folder. Import it again with **A single
-room** > `Digital Kiosk`.
+under another name **in a folder of your own**, so the test file stays
+untouched. Import it again with **A single room** > `Digital Kiosk`.
 
 This time the summary says **30 valid rows** and warns that *the sheet declares
 no rooms: every row will go into Digital Kiosk*.
@@ -162,7 +182,7 @@ other rooms discarded**.
 ### The room row is required
 
 Take `Inventario_di_prova.xlsx`, **delete the `DIGITAL KIOSK` row** and save
-under another name. Try importing it into Digital Kiosk again: a warning must
+under another name in a folder of your own. Try importing it into Digital Kiosk again: a warning must
 appear saying no row in the sheet names that room, that **nothing was imported**,
 and explaining to add an otherwise empty row with `DIGITAL KIOSK` in the first
 cell. Check that the inventory is unchanged.

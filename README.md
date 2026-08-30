@@ -468,9 +468,11 @@ regolare con **30 dispositivi, 10 per stanza**, e uno con dentro apposta i casi
 che il programma deve segnalare - e le istruzioni passo passo:
 [**Come testare l'importazione**](Collaudo/README.md).
 
-Le prove si fanno con i file inclusi, senza copiare niente altrove. Le
-istruzioni spiegano anche **come caricare l'inventario definitivo** una volta
-finito il collaudo: prima il reset, oppure l'importazione che sostituisce tutto.
+Le prove si fanno con i file inclusi, che restano dove sono. Le istruzioni
+spiegano anche dove tenere gli **inventari veri** - in una cartella personale sul
+proprio computer, mai in quella del programma, che a ogni aggiornamento viene
+sostituita - e **come caricare l'inventario definitivo** una volta finito il
+collaudo: prima il reset, oppure l'importazione che sostituisce tutto.
 
 I file si rigenerano con `.venv/bin/python tests/genera_file_di_prova.py`.
 

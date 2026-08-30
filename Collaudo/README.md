@@ -64,20 +64,39 @@ Sono i file usati anche dai test automatici: se il comportamento del programma
 cambia, i test falliscono e queste istruzioni vengono riscritte. Si rigenerano
 con `.venv/bin/python tests/genera_file_di_prova.py`.
 
-## Dove va l'inventario vero
+## I file di prova restano qui
 
-**Non in questa cartella, e nemmeno accanto al programma.** La cartella del
-programma contiene l'applicazione e i dati di prova: e' un posto dove i file
-vengono sostituiti a ogni aggiornamento.
+Non spostarli e non copiarli altrove: fanno parte del programma, vengono
+aggiornati insieme a lui e servono a chiunque debba rifare il collaudo. Quando
+il programma ti chiede un file, aprili direttamente da questa cartella.
 
-Mentre provi, tieni il file da caricare in una cartella tua - per esempio
-**Documenti\Inventario** sul computer del tecnico che sta importando. A regime,
-l'inventario definitivo va nella cartella di rete condivisa, che e' quella che
-il programma apre normalmente.
+## Gli inventari veri stanno fuori
 
-Il percorso del file che il programma usa si sceglie al primo avvio e resta
-memorizzato in `inventario_percorso.json`, accanto all'eseguibile. Per
-cambiarlo, cancella quel file e riavvia.
+Il foglio Excel con l'inventario definitivo - quello che caricherai davvero, con
+i dispositivi reali - **non va messo nella cartella del programma**. Tienilo in
+una cartella tua, sul tuo computer: `Documenti\Inventario`, il Desktop, dove
+preferisci.
+
+Due motivi:
+
+- la cartella del programma viene **sostituita a ogni aggiornamento**: un file
+  lasciato li' si perde senza preavviso;
+- se il programma sta su una cartella di rete condivisa, quel file sarebbe
+  visibile a tutti, anche a chi non deve leggerlo.
+
+Vale anche per i file che **esporti** dal programma e per le copie di sicurezza
+che decidi di conservare: salvali in una cartella tua.
+
+## Da non confondere: il file che il programma usa
+
+Diverso e' il file su cui il programma lavora, quello che legge e scrive di
+continuo. Non lo importi: lo apre e basta. Il suo percorso si sceglie al primo
+avvio e resta memorizzato in `inventario_percorso.json`, accanto
+all'eseguibile; per cambiarlo, cancella quel file e riavvia.
+
+Quello va dove serve a chi lo usa: sulla **cartella di rete condivisa** se
+l'inventario e' di tutti, in una cartella personale se stai ancora provando da
+solo.
 
 ---
 
@@ -125,8 +144,8 @@ Nella cartella dei dati deve essere comparso un file
 ### Quando il foglio non dichiara le stanze
 
 Apri `Inventario_di_prova.xlsx`, **cancella le tre righe-separatore** e salva
-con un altro nome nella tua cartella di lavoro. Reimportalo con **Una sola
-stanza** > `Digital Kiosk`.
+con un altro nome **in una cartella tua**, per lasciare intatto il file di
+prova. Reimportalo con **Una sola stanza** > `Digital Kiosk`.
 
 Stavolta il riepilogo dice **30 righe valide** e avverte che *il foglio non
 dichiara stanze: tutte le righe finiranno in Digital Kiosk*.
@@ -163,7 +182,7 @@ altre stanze scartate**.
 ### La riga della stanza e' obbligatoria
 
 Prendi `Inventario_di_prova.xlsx`, **cancella la riga `DIGITAL KIOSK`** e salva
-con un altro nome. Riprova a importarlo dentro Digital Kiosk: deve comparire un
+con un altro nome in una cartella tua. Riprova a importarlo dentro Digital Kiosk: deve comparire un
 avviso che dice che nel foglio non c'e' nessuna riga per quella stanza, che
 **non e' stato importato niente**, e che spiega di aggiungere una riga vuota con
 scritto `DIGITAL KIOSK` nella prima cella. Controlla che l'inventario sia
