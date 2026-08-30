@@ -83,7 +83,7 @@ ws.append([None] * 9)
 ws.append(["", "Laptop", "senza identificativo", "", KIOSK, "", "", "", ""])
 wb.save(foreign); wb.close()
 
-items, scartate = rows_from_workbook(foreign)
+items, scartate, _ = rows_from_workbook(foreign)
 assert len(items) == 2 and scartate == 1, (len(items), scartate)
 telefono = [i for i in items if i["imei"]][0]
 assert telefono["asset_tag"] == "351111111111111", "l'IMEI fa da identificativo"
@@ -102,7 +102,7 @@ assert prestato["stato"] == NON_DISPONIBILE and prestato["prestato_a"] == "Elena
 # round trip: esporto e reimporto senza perdere niente
 rt = os.path.join(d, "roundtrip.xlsx")
 excel_io.export(vuoto.items, rt)
-back, _ = rows_from_workbook(rt)
+back, _, _ = rows_from_workbook(rt)
 for a, b in zip(sorted(vuoto.items, key=lambda i: i["asset_tag"]),
                 sorted(back, key=lambda i: i["asset_tag"])):
     for f in ALL_FIELDS:

@@ -306,7 +306,7 @@ class RoomsDialog(_Modal):
 
 
 class ImportDialog(_Modal):
-    def __init__(self, parent, path, count, skipped):
+    def __init__(self, parent, path, count, skipped, da_tag=0):
         _Modal.__init__(self, parent, "Importa inventario")
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
@@ -314,8 +314,14 @@ class ImportDialog(_Modal):
                   style="Section.TLabel").pack(anchor="w")
         msg = "%d righe valide trovate." % count
         if skipped:
-            msg += "  %d righe ignorate (asset tag mancante)." % skipped
-        ttk.Label(body, text=msg, style="Muted.TLabel").pack(anchor="w", pady=(2, 12))
+            msg += "  %d righe ignorate (manca l'identificativo)." % skipped
+        ttk.Label(body, text=msg, style="Muted.TLabel").pack(anchor="w", pady=(2, 2))
+        if da_tag:
+            ttk.Label(body, style="Muted.TLabel",
+                      text="%d righe hanno preso la stanza dai separatori nel foglio."
+                           % da_tag).pack(anchor="w", pady=(0, 10))
+        else:
+            ttk.Label(body, text="").pack(pady=(0, 8))
         self.var_mode = tk.StringVar(value="merge")
         ttk.Radiobutton(body, variable=self.var_mode, value="merge",
                         text="Unisci: aggiunge i nuovi e aggiorna quelli con lo stesso asset tag"
@@ -503,7 +509,7 @@ class App(tk.Tk):
     def row_tag(self, item, dispari):
         """Il colore della riga: prestito, poi tipo, poi la banda alternata."""
         if is_on_loan(item):
-            return "loan"
+            return "loan_alt" if dispari else "loan"
         if is_shipped(item):
             return "spedito_alt" if dispari else "spedito"
         if is_iphone(item.get("tipo")):
@@ -583,6 +589,7 @@ class App(tk.Tk):
         scroll.pack(side="right", fill="y")
         tree.tag_configure("odd", background=theme.ROW_ALT)
         tree.tag_configure("loan", background=theme.LOAN_BG, foreground=theme.LOAN_FG)
+        tree.tag_configure("loan_alt", background=theme.LOAN_BG_ALT, foreground=theme.LOAN_FG)
         tree.tag_configure("spedito", background=theme.SHIP_ROW, foreground=theme.SHIP_FG)
         tree.tag_configure("spedito_alt", background=theme.SHIP_ROW_ALT,
                            foreground=theme.SHIP_FG)
@@ -1318,7 +1325,7 @@ class App(tk.Tk):
         if not path:
             return
         try:
-            items, skipped = rows_from_workbook(path)
+            items, skipped, da_tag = rows_from_workbook(path, self.cfg.get("rooms"))
         except InventoryError as exc:
             messagebox.showerror("Importazione non riuscita", str(exc), parent=self)
             return
@@ -1326,7 +1333,7 @@ class App(tk.Tk):
             messagebox.showwarning("Importazione", "Nessuna riga valida trovata nel file.",
                                    parent=self)
             return
-        mode = ImportDialog(self, path, len(items), skipped).show()
+        mode = ImportDialog(self, path, len(items), skipped, da_tag).show()
         if not mode:
             return
         if mode == "replace" and not messagebox.askyesno(

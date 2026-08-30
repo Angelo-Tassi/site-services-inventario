@@ -22,9 +22,9 @@ PRINT_WIDTHS = {"asset_tag": 16, "tipo": 10, "modello": 26, "seriale": 16,
 
 _HEADER_FILL = PatternFill("solid", fgColor="1F4E79")
 _BAND_FILL = PatternFill("solid", fgColor="F2F6FA")
-_LOAN_FILL = PatternFill("solid", fgColor="FBE3E1")
+_LOAN_FILL = PatternFill("solid", fgColor="FDEEEC")
 _LOAN_TEXT = "A93226"
-_SHIP_FILL = PatternFill("solid", fgColor="EEE3F6")
+_SHIP_FILL = PatternFill("solid", fgColor="F6EFFB")
 _SHIP_TEXT = "6C3483"
 _THIN = Side(style="thin", color="B7C4D2")
 _BORDER = Border(left=_THIN, right=_THIN, top=_THIN, bottom=_THIN)

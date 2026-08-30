@@ -192,7 +192,9 @@ programma, e solo in ultimo lo si chiede all'utente.
 - Ricerca libera (asset tag, modello, numero di serie, IMEI, note, stato, nome di
   chi ha restituito il dispositivo e di chi lo ha in prestito) e filtri per stanza
   e per tipo; ordinamento cliccando sulle intestazioni di colonna.
-- **Importazione** da file Excel esistenti in modalita' *unisci* o *sostituisci*;
+- **Importazione** da file Excel esistenti in modalita' *unisci* o *sostituisci*,
+  con la possibilita' di dividere per stanza un inventario unico usando le
+  righe-separatore (vedi piu' sotto);
   le intestazioni piu' comuni sono riconosciute da sole (per il seriale: *Numero
   di serie*, *Seriale*, *Serial Number*, *S/N*, *Matricola*, *Service Tag*).
 - **Esportazione** in `.xlsx` con **tutte** le colonne, in un unico elenco o con
@@ -362,6 +364,44 @@ consultare i dati in Excel senza rischi, usa *Esporta xls...*.
 | doppio clic sulle note | modifica la nota nell'elenco |
 | doppio clic sullo stato | tendina per cambiare stato nell'elenco |
 | doppio clic altrove | apre la scheda del dispositivo |
+
+## Dividere per stanza un inventario unico
+
+Se hai un solo foglio Excel con tutti i dispositivi e nessuna colonna *Stanza*,
+non serve aggiungerla: basta spezzare l'elenco con delle **righe-separatore**.
+
+Una riga con **una sola cella scritta**, contenente il nome di una stanza,
+assegna quella stanza a tutte le righe che seguono, fino al separatore
+successivo.
+
+| Asset Tag | Tipo | Modello | Numero di serie |
+| --- | --- | --- | --- |
+| **BAU** | | | |
+| IT-0101 | Laptop | Lenovo ThinkPad T14 Gen 4 | PF4A1B2C |
+| IT-0104 | Tablet | Dell Latitude 7320 Detachable | 8H2KLM3 |
+| **KIOSK** | | | |
+| IT-0106 | Laptop | Lenovo ThinkPad T14 Gen 5 | PF5K9M8F |
+| **DISASTER** | | | |
+| DR-0201 | Laptop | Lenovo ThinkPad T14 Gen 4 | PF4B7T1J |
+
+I tag riconosciuti sono ricavati **dai nomi delle stanze configurate**: vale il
+nome completo e ogni singola parola che non sia ambigua. Con le stanze di serie:
+
+| Scrivi | Finisce in |
+| --- | --- |
+| `BAU`, `SITE`, `SERVICES`, `SITE SERVICES BAU` | Site Services BAU |
+| `KIOSK`, `DIGITAL`, `DIGITAL KIOSK` | Digital Kiosk |
+| `DISASTER`, `RECOVERY`, `MAGAZZINO`, `MAGAZZINO DISASTER RECOVERY` | Magazzino Disaster Recovery |
+
+Maiuscole, minuscole e due punti finali non contano: `KIOSK`, `kiosk` e
+`Kiosk:` sono la stessa cosa. Se rinomini una stanza, i tag si aggiornano da
+soli. Una riga con piu' di una cella scritta non e' mai un separatore, quindi un
+dispositivo il cui asset tag sia per caso `BAU` non crea confusione.
+
+Il separatore ha la **precedenza sulla colonna Stanza**, se presente. Fanno
+eccezione gli iPhone, che finiscono comunque nella loro stanza. Prima di
+confermare, la finestra di importazione dice quante righe hanno preso la stanza
+dai separatori.
 
 ## Creare l'inventario da un file Excel esistente
 

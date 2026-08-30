@@ -101,6 +101,46 @@ HEADER_ALIASES = {
     "modificato_da": ["modificato da", "utente"],
 }
 
+# Parole ignorate quando si ricavano i tag dai nomi delle stanze.
+_PAROLE_VUOTE = {"DEL", "DELLA", "DEI", "DELLE", "DI", "DA", "IN", "PER", "LA", "IL"}
+
+
+def tag_stanze(rooms):
+    """Tag riconosciuti in importazione, ricavati dai nomi delle stanze.
+
+    Per ogni stanza vale il nome completo, piu' ogni singola parola che sia
+    inequivocabile: "Digital Kiosk" si scrive anche solo KIOSK, "Site Services
+    BAU" anche solo BAU, "Magazzino Disaster Recovery" anche solo DISASTER.
+    """
+    tags = {}
+    parole = {}
+    for stanza in rooms:
+        nome = clean(stanza).upper()
+        if not nome:
+            continue
+        tags[nome] = stanza
+        for parola in nome.split():
+            if len(parola) < 3 or parola in _PAROLE_VUOTE:
+                continue
+            parole.setdefault(parola, set()).add(stanza)
+    for parola, stanze in parole.items():
+        if len(stanze) == 1 and parola not in tags:
+            tags[parola] = list(stanze)[0]
+    return tags
+
+
+def riga_tag(row, tags):
+    """Se la riga e' un separatore di stanza ritorna la stanza, altrimenti None.
+
+    Un separatore e' una riga con una sola cella scritta, che contiene il tag.
+    """
+    valori = [clean(c) for c in (row or ()) if clean(c)]
+    if len(valori) != 1:
+        return None
+    testo = valori[0].upper().strip(" :-\u2013\u2014.\t")
+    return tags.get(testo)
+
+
 LOCK_TIMEOUT = 20.0     # secondi di attesa prima di rinunciare
 LOCK_STALE_AFTER = 120  # secondi dopo i quali un lock e' considerato abbandonato
 
@@ -712,8 +752,14 @@ def _row_to_item(row, mapping):
     return item if item["asset_tag"] else None
 
 
-def rows_from_workbook(path):
-    """Legge un file .xlsx/.xlsm esterno e ritorna (items, righe_scartate)."""
+def rows_from_workbook(path, rooms=None):
+    """Legge un file .xlsx/.xlsm esterno.
+
+    Ritorna (items, righe_scartate, stanze_dai_tag). Se nel foglio compaiono
+    righe-separatore con il nome (o l'abbreviazione) di una stanza, tutte le
+    righe successive fino al separatore seguente vengono assegnate a quella
+    stanza: e' il modo per dividere per stanza un unico inventario.
+    """
     try:
         wb = load_workbook(path, read_only=True, data_only=True)
     except Exception as exc:
@@ -726,21 +772,30 @@ def rows_from_workbook(path):
         except StopIteration:
             return [], 0
         mapping = map_headers(header)
-        if "asset_tag" not in mapping.values():
+        if not ({"asset_tag", "imei"} & set(mapping.values())):
             raise InventoryError(
-                "Nel file non e' stata trovata la colonna \"Asset Tag\".\n"
+                "Nel file non e' stata trovata la colonna \"Asset Tag\" (o \"IMEI\").\n"
                 "La prima riga deve contenere le intestazioni delle colonne."
             )
-        items, skipped = [], 0
+        tags = tag_stanze(rooms or [])
+        items, skipped, da_tag = [], 0, 0
+        stanza_corrente = None
         for row in rows:
             if row is None or all(c is None or clean(c) == "" for c in row):
                 continue
+            stanza = riga_tag(row, tags)
+            if stanza is not None:
+                stanza_corrente = stanza
+                continue
             item = _row_to_item(row, mapping)
-            if item:
-                items.append(item)
-            else:
+            if not item:
                 skipped += 1
-        return items, skipped
+                continue
+            if stanza_corrente:
+                item["stanza"] = stanza_corrente
+                da_tag += 1
+            items.append(item)
+        return items, skipped, da_tag
     finally:
         wb.close()
 

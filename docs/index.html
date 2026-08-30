@@ -25,9 +25,9 @@
 /* colori reali del programma, uguali in entrambi i temi */
 :root{
   --w-bg:#EEF2F7; --w-card:#FFF; --w-primary:#1F4E79; --w-text:#1B2733; --w-muted:#6B7A8C;
-  --w-border:#D7E0EA; --w-head:#E7EEF6; --w-row-alt:#F6F9FC; --w-loan-bg:#FBE3E1;
-  --w-loan-fg:#A93226; --w-iphone:#E2F4E4; --w-tablet:#FCEEDA; --w-link:#1A6BA8;
-  --w-ship:#EFE3F7; --w-ship-fg:#6C3483;
+  --w-border:#D7E0EA; --w-head:#E7EEF6; --w-row-alt:#F6F9FC; --w-loan-bg:#FDEEEC;
+  --w-loan-fg:#A93226; --w-iphone:#EDF9EF; --w-tablet:#FEF6EA; --w-link:#1A6BA8;
+  --w-ship:#F6EFFB; --w-ship-fg:#6C3483;
   --w-r1:#2E86C1; --w-r2:#16A085; --w-r3:#8E44AD; --w-r4:#5D6D7E;
   --w-face:"Segoe UI",-apple-system,"Helvetica Neue",Arial,sans-serif;
 }
@@ -131,7 +131,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.2.1 · alfa</div>
+  <div class="alpha">versione 0.3.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Scarica Inventario.exe</a>
@@ -251,8 +251,10 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
       <p>Stato e note si cambiano con un doppio clic direttamente nell'elenco, senza
         aprire nessuna finestra.</p></div>
     <div class="card"><h3>Excel dentro e fuori</h3>
-      <p>L'inventario si crea da zero importando un file Excel esistente. L'esportazione
-        riporta tutte le colonne, la stampa esce gia' impaginata su A4.</p></div>
+      <p>L'inventario si crea da zero importando un file Excel esistente, e un foglio
+        unico si divide per stanza scrivendo <code>BAU</code>, <code>KIOSK</code> o
+        <code>DISASTER</code> su una riga vuota. L'esportazione riporta tutte le
+        colonne, la stampa esce gia' impaginata su A4.</p></div>
   </div>
 </section>
 

@@ -35,7 +35,10 @@ assert app.tree.heading(ACTION_COLUMN)["text"] == "Prestito"
 
 # ---- prestiti: righe rosse, pulsanti giusti, cella vuota
 assert len(app.visible) == 5
-rossi = [t for t in app.tree.get_children() if "loan" in app.tree.item(t, "tags")]
+def colore_riga(t):
+    tags = app.tree.item(t, "tags")
+    return tags[0].replace("_alt", "") if tags else ""
+rossi = [t for t in app.tree.get_children() if colore_riga(t) == "loan"]
 assert sorted(rossi) == ["IT-0107", "IT-0110"]
 for tag in rossi:
     assert app._item_by_tag(tag)["stato"] == NON_DISPONIBILE
