@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Site Services · Inventario Iphone, Laptop e Tablet</title>
+<meta name="description" content="Inventario dei dispositivi in nostro possesso: un solo file da copiare nella cartella di rete, nessuna installazione sui PC.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#E9EDF2; --panel:#FFF; --ink:#14212C; --ink-soft:#55677A; --ink-faint:#7E8FA0;
+  --line:#D3DBE4; --accent:#1F4E79; --accent-strong:#163A5B; --accent-soft:#E3EDF6;
+  --shadow:0 1px 2px rgba(20,33,44,.06),0 14px 40px rgba(20,33,44,.13);
+  --on-accent:#FFFFFF;
+}
+@media (prefers-color-scheme:dark){:root{
+  --ground:#0E1720; --panel:#16222E; --ink:#E6EDF4; --ink-soft:#9FB0C0; --ink-faint:#748899;
+  --line:#263644; --accent:#6FB3E0; --accent-strong:#8CC5EA; --accent-soft:#1B2C3B;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 44px rgba(0,0,0,.55);
+  --on-accent:#0B1520;
+}}
+/* colori reali del programma, uguali in entrambi i temi */
+:root{
+  --w-bg:#EEF2F7; --w-card:#FFF; --w-primary:#1F4E79; --w-text:#1B2733; --w-muted:#6B7A8C;
+  --w-border:#D7E0EA; --w-head:#E7EEF6; --w-row-alt:#F6F9FC; --w-loan-bg:#FBE3E1;
+  --w-loan-fg:#A93226; --w-iphone:#E2F4E4; --w-tablet:#FCEEDA; --w-link:#1A6BA8;
+  --w-r1:#2E86C1; --w-r2:#16A085; --w-r3:#8E44AD; --w-r4:#5D6D7E;
+  --w-face:"Segoe UI",-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:var(--ground);color:var(--ink);
+  font:400 16px/1.65 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+a{color:var(--accent)}
+
+header{padding:64px 0 40px}
+.eyebrow{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+h1{margin:0 0 14px;font-family:Archivo,sans-serif;font-weight:700;
+  font-size:clamp(32px,5.2vw,52px);line-height:1.04;letter-spacing:-.022em;text-wrap:balance}
+.lede{margin:0;max-width:60ch;font-size:18px;color:var(--ink-soft)}
+.alpha{display:inline-block;margin-top:18px;padding:7px 12px;border-radius:3px;
+  background:var(--accent-soft);border:1px solid var(--line);
+  font:500 12px/1 "IBM Plex Mono",monospace;color:var(--accent)}
+
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 8px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:14px 22px;border-radius:4px;
+  text-decoration:none;font-weight:600;font-size:15px;border:1px solid transparent}
+.btn.main{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.main:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.btn.alt{background:var(--panel);color:var(--ink);border-color:var(--line)}
+.btn.alt:hover{border-color:var(--accent);color:var(--accent)}
+.note{font-size:14px;color:var(--ink-faint);margin:6px 0 0}
+
+section{padding:44px 0}
+h2{margin:0 0 8px;font-family:Archivo,sans-serif;font-weight:600;font-size:24px;letter-spacing:-.01em}
+.sub{margin:0 0 24px;color:var(--ink-soft);max-width:62ch}
+
+/* finestra del programma */
+.shot{background:var(--w-bg);border:1px solid var(--line);border-radius:7px;
+  box-shadow:var(--shadow);overflow:hidden;font-family:var(--w-face);color:var(--w-text);font-size:13px}
+.bar{background:#DFE6EE;border-bottom:1px solid #CBD6E1;padding:7px 12px;font-size:12px;color:#4B5C6B;
+  display:flex;align-items:center;gap:9px}
+.bar .dot{width:9px;height:9px;border-radius:50%;background:#9FB1C2}
+.bar .sp{flex:1}
+.appbar{background:var(--w-primary);color:#fff;padding:14px 18px;display:flex;
+  align-items:flex-end;gap:16px;flex-wrap:wrap}
+.appbar b{font-size:19px;font-weight:600}
+.appbar .s{color:#BBD4EA;font-size:12px;margin-top:2px}
+.appbar .t{margin-left:auto;color:#BBD4EA;font-size:12px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;padding:11px 16px 4px}
+.tb{background:#fff;border:1px solid var(--w-border);border-radius:3px;padding:7px 12px;font-size:12.5px}
+.tb.p{background:var(--w-primary);border-color:var(--w-primary);color:#fff;font-weight:600}
+.stage{padding:6px 16px 14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin:8px 0 16px}
+.c{background:#fff;border:1px solid var(--w-border);border-radius:4px;overflow:hidden}
+.c i{display:block;height:4px}
+.c .b{padding:12px 15px 14px}
+.c .n{font-weight:600;font-size:13.5px}
+.c .q{font-size:32px;font-weight:700;line-height:1.15}
+.c .m{font-size:11.5px;color:var(--w-muted)}
+.c .g{font-size:12px;font-weight:600;color:var(--w-link);margin-top:8px}
+.tw{background:#fff;border:1px solid var(--w-border);border-radius:3px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th{background:var(--w-head);color:var(--w-primary);font-weight:600;font-size:12px;
+  text-align:left;padding:8px 10px;white-space:nowrap;border-bottom:1px solid var(--w-border)}
+td{padding:7px 10px;font-size:12.5px;border-bottom:1px solid #EDF1F6;white-space:nowrap}
+tr:nth-child(even){background:var(--w-row-alt)}
+tr.ip,tr.ip:nth-child(even){background:var(--w-iphone)}
+tr.tb2,tr.tb2:nth-child(even){background:var(--w-tablet)}
+tr.ln,tr.ln:nth-child(even){background:var(--w-loan-bg)}
+tr.ln td{color:var(--w-loan-fg)}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:12px}
+.pill{display:inline-block;background:var(--w-link);color:#fff;border-radius:3px;
+  padding:4px 9px;font-size:11px;font-weight:600}
+.pill.r{background:var(--w-loan-fg)}
+.sel{color:var(--w-link);font-size:14px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:20px}
+.card h3{margin:0 0 7px;font-family:Archivo,sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+.card p{margin:0;font-size:14.5px;color:var(--ink-soft)}
+
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:14px}
+ol.steps li{counter-increment:s;background:var(--panel);border:1px solid var(--line);
+  border-radius:5px;padding:18px 20px 18px 58px;position:relative;font-size:15px;color:var(--ink-soft)}
+ol.steps li::before{content:counter(s);position:absolute;left:20px;top:17px;
+  width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;
+  font:600 13px/24px "IBM Plex Mono",monospace;text-align:center}
+ol.steps b{color:var(--ink)}
+code{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--accent-soft);
+  padding:2px 6px;border-radius:3px}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:5px;
+  padding:16px 18px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;font-size:13px}
+footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
+  color:var(--ink-faint);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Site Services · strumento interno</div>
+  <h1>Inventario Iphone, Laptop e Tablet</h1>
+  <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
+    prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
+  <div class="alpha">versione 0.1.0 · alfa</div>
+
+  <div class="cta">
+    <a class="btn main" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Scarica Inventario.exe</a>
+    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest">Tutte le versioni</a>
+    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario">Codice e documentazione</a>
+  </div>
+  <p class="note">Un file solo, per Windows. Contiene Python e tutte le librerie:
+    sui PC non va installato niente.</p>
+</header>
+
+<section>
+  <h2>Come si mette in funzione</h2>
+  <p class="sub">Tre passaggi, una volta sola. Dopo, gli utenti fanno solo doppio clic.</p>
+  <ol class="steps">
+    <li><b>Copia <code>Inventario.exe</code> nella cartella di rete condivisa.</b>
+      Quella a cui hanno gia' accesso le persone che devono usare l'inventario.</li>
+    <li><b>Aprilo.</b> Al primo avvio propone di creare li' accanto
+      <code>Inventario.xlsx</code>: e' l'archivio, ed e' anche l'inventario che apri in Excel.</li>
+    <li><b>Metti il collegamento sui desktop.</b> Tasto destro sull'eseguibile &rsaquo;
+      <i>Invia a</i> &rsaquo; <i>Desktop</i>. Oppure usa
+      <code>Crea collegamento sul desktop.bat</code>, incluso nel pacchetto.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Che aspetto ha</h2>
+  <p class="sub">La home mostra una scheda per stanza con il conteggio, piu' il contenitore
+    che raccoglie tutti gli iPhone. Sotto, l'inventario completo.</p>
+
+  <div class="shot">
+    <div class="bar"><span class="dot"></span><span>Site Services : Inventario Iphone, Laptop e Tablet</span><span class="sp"></span><span>— □ ×</span></div>
+    <div class="appbar">
+      <div><b>Site Services : Inventario Iphone, Laptop e Tablet</b>
+        <div class="s">Laptop e tablet in nostro possesso</div></div>
+      <div class="t">14 dispositivi &nbsp;&nbsp; Site Services BAU: 6 &nbsp;&nbsp; Digital Kiosk: 5 &nbsp;&nbsp; Magazzino DR: 3</div>
+    </div>
+    <div class="tools">
+      <span class="tb">‹ Home</span><span class="tb p">Nuovo</span><span class="tb">Modifica</span>
+      <span class="tb">Elimina</span><span class="tb">Sposta in stanza…</span>
+      <span class="tb">Importa xls…</span><span class="tb">Esporta xls…</span><span class="tb">Stampa</span>
+    </div>
+    <div class="stage">
+      <div class="cards">
+        <div class="c"><i style="background:var(--w-r1)"></i><div class="b">
+          <div class="n">Site Services BAU</div><div class="q" style="color:var(--w-r1)">6</div>
+          <div class="m">3 laptop · 2 tablet · 1 iphone</div><div class="g">Apri l’inventario ›</div></div></div>
+        <div class="c"><i style="background:var(--w-r2)"></i><div class="b">
+          <div class="n">Digital Kiosk</div><div class="q" style="color:var(--w-r2)">5</div>
+          <div class="m">3 laptop · 2 tablet</div>
+          <div class="m" style="color:var(--w-loan-fg);font-weight:600">2 in prestito</div>
+          <div class="g">Apri l’inventario ›</div></div></div>
+        <div class="c"><i style="background:var(--w-r3)"></i><div class="b">
+          <div class="n">Magazzino Disaster Recovery</div><div class="q" style="color:var(--w-r3)">3</div>
+          <div class="m">2 laptop · 1 tablet</div><div class="g">Apri l’inventario ›</div></div></div>
+        <div class="c"><i style="background:var(--w-r4)"></i><div class="b">
+          <div class="n">Iphone</div><div class="q" style="color:var(--w-r4)">1</div>
+          <div class="m">tutti i telefoni</div><div class="m">anche in Site Services BAU</div>
+          <div class="g">Apri l’inventario ›</div></div></div>
+      </div>
+      <div class="tw">
+        <table>
+          <thead><tr><th></th><th>Asset Tag</th><th>Tipo</th><th>Modello</th>
+            <th>Numero di serie</th><th>IMEI</th><th>Stanza</th><th>Stato</th>
+            <th>In prestito a</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td>
+              <td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td><td>—</td>
+              <td>Site Services BAU</td><td>Disponibile</td><td>—</td><td>Postazione reception</td></tr>
+            <tr class="ip"><td class="sel">◯</td><td class="mono">356938035643809</td><td>Iphone</td>
+              <td>Apple iPhone 14</td><td>—</td><td class="mono">356938035643809</td>
+              <td>Site Services BAU</td><td>Da Rispedire</td><td>—</td><td>Restituito da M. Bianchi</td></tr>
+            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td>
+              <td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td><td>—</td>
+              <td>Site Services BAU</td><td>Controllare</td><td>—</td><td>Con tastiera e pennino</td></tr>
+            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td>
+              <td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td><td>—</td>
+              <td>Digital Kiosk</td><td>Non disponibile</td><td>Marco Bianchi</td><td>—</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td>
+              <td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td><td>—</td>
+              <td>Magazzino Disaster Recovery</td><td>Da rebuildare</td><td>—</td><td>Scorta sigillata</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <p class="note">Verde chiaro gli iPhone, arancione i tablet Dell, rosso i dispositivi
+    in prestito. Nella stanza dei prestiti ogni riga ha il pulsante <i>Presta</i> /
+    <i>Registra rientro</i>.</p>
+</section>
+
+<section>
+  <h2>Cosa sa fare</h2>
+  <div class="grid">
+    <div class="card"><h3>Nessun server</h3>
+      <p>I dati stanno in un unico <code>.xlsx</code> sulla cartella di rete: e' insieme
+        l'archivio e l'inventario che apri in Excel. Niente database, niente servizi da tenere accesi.</p></div>
+    <div class="card"><h3>Permessi della cartella</h3>
+      <p>Chi ha accesso alla cartella ha accesso all'inventario. Nessun elenco di utenti
+        da gestire, nessuna password in piu'.</p></div>
+    <div class="card"><h3>Piu' persone insieme</h3>
+      <p>Ogni salvataggio passa da un lock esclusivo e riscrive il file in modo atomico.
+        L'elenco a video si aggiorna da solo quando qualcun altro salva.</p></div>
+    <div class="card"><h3>Prestiti</h3>
+      <p>Nelle stanze abilitate, un pulsante sulla riga registra nome, data e ora.
+        Finche' il dispositivo e' fuori la riga e' rossa e lo stato <i>Non disponibile</i>.</p></div>
+    <div class="card"><h3>Stati e note al volo</h3>
+      <p>Stato e note si cambiano con un doppio clic direttamente nell'elenco, senza
+        aprire nessuna finestra.</p></div>
+    <div class="card"><h3>Excel dentro e fuori</h3>
+      <p>L'inventario si crea da zero importando un file Excel esistente. L'esportazione
+        riporta tutte le colonne, la stampa esce gia' impaginata su A4.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Preferisci compilarlo tu</h2>
+  <p class="sub">L'eseguibile pubblicato viene costruito automaticamente da GitHub Actions
+    su una macchina Windows a ogni versione. Se vuoi farlo in casa, serve solo Python.</p>
+  <pre>git clone https://github.com/Angelo-Tassi/site-services-inventario.git
+cd site-services-inventario
+pip install -r requirements.txt
+python Inventario.py</pre>
+  <p class="note">Su Windows c'e' anche <code>Compila EXE per Windows.bat</code>, che fa
+    tutto da solo. Su macOS serve un Python con Tk 8.6 o superiore: quello di python.org va bene.</p>
+</section>
+
+<footer>
+  <div class="wrap" style="padding:0">
+    Strumento interno Site Services · versione alfa ·
+    <a href="https://github.com/Angelo-Tassi/site-services-inventario/issues">segnala un problema</a>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>
