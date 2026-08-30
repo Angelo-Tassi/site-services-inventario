@@ -403,10 +403,25 @@ resta tracciato nelle colonne *Ultima modifica* e *Modificato da*.
 
 Le righe delle stanze senza prestito non hanno alcun pulsante.
 
+## Dove tenere l'inventario vero
+
+**Non dentro questa cartella.** Il repository contiene il programma e dei dati
+dimostrativi; l'inventario reale va altrove - sulla cartella di rete condivisa,
+o in una cartella locale se stai ancora provando. Cosi' i dati non finiscono in
+un repository pubblico e non vengono sovrascritti da una prova.
+
+Il percorso si sceglie al primo avvio e resta memorizzato in
+`inventario_percorso.json`. Per cambiarlo, cancella quel file e riavvia, oppure
+modificane la voce `data_path`.
+
 ## Provare subito con dati di esempio
 
-La cartella `Esempio/` contiene un `Inventario.xlsx` con tredici dispositivi di
-prova divisi fra le tre stanze, di cui due gia' in prestito nel Digital Kiosk.
+La cartella `Esempio/` contiene un `Inventario.xlsx` con tredici dispositivi
+**finti** divisi fra le tre stanze, di cui due gia' in prestito nel Digital
+Kiosk. Serve a far vedere il programma a chi lo apre la prima volta: non e'
+l'inventario vero, e si rigenera con
+`.venv/bin/python tests/genera_esempio.py`.
+
 Per aprirlo senza toccare la configurazione:
 
 ```bash

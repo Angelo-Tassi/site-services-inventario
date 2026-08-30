@@ -488,6 +488,21 @@ safely, use *Export xls...*.
 | double-click on status | dropdown to change the status in the list |
 | double-click anywhere else | open the device record |
 
+## Where to keep the real inventory
+
+**Not inside this folder.** The repository holds the program and some
+demonstration data; the real inventory belongs elsewhere - on the shared network
+folder, or in a local folder while you are still trying things out. That way the
+data never ends up in a public repository and is never overwritten by a test.
+
+The path is chosen on first run and remembered in `inventario_percorso.json`. To
+change it, delete that file and restart, or edit its `data_path` entry.
+
+The `Esempio/` folder contains an `Inventario.xlsx` with thirteen **fake**
+devices across the three rooms, two of them on loan in the Digital Kiosk. It is
+there to show the program to whoever opens it for the first time, and can be
+regenerated with `.venv/bin/python tests/genera_esempio.py`.
+
 ## Trying the import
 
 The [`Collaudo/`](Collaudo/) folder contains two Excel sheets ready to import -
