@@ -11,7 +11,7 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
 from .store import (ALL_FIELDS, HEADERS, InventoryError, NON_DISPONIBILE,
-                    SPEDITO)
+                    SPEDITO, STATI, is_iphone)
 
 PRINT_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
                 "stanza", "stato", "prestato_a", "prestato_il", "spedito_il", "note"]
@@ -105,14 +105,19 @@ def _sort_key(item):
     return (item.get("stanza", ""), item.get("asset_tag", ""))
 
 
-def export(items, path, group_by_room=False, rooms=None, full=True, for_print=False):
+def export(items, path, group_by_room=False, rooms=None, full=True, for_print=False,
+           con_iphone=False):
     """Scrive l'inventario in un file .xlsx.
 
     group_by_room: un foglio per stanza (piu' un foglio con il totale).
     full: include anche le colonne di tracciamento delle modifiche.
     for_print: aggiunge titolo, intestazioni ripetute e impaginazione A4.
+    con_iphone: gli iPhone sono gestiti solo a mano e restano fuori dalle
+        esportazioni; la stampa interna invece li include.
     """
     fields = list(ALL_FIELDS) if (full and not for_print) else list(PRINT_FIELDS)
+    if not con_iphone:
+        items = [i for i in items if not is_iphone(i.get("tipo"))]
     items = sorted(items, key=_sort_key)
     stamp = datetime.now().strftime("%d/%m/%Y %H:%M")
 
@@ -155,7 +160,110 @@ def build_print_file(items, group_by_room=False, rooms=None):
     name = "Inventario_stampa_%s.xlsx" % datetime.now().strftime("%Y%m%d_%H%M%S")
     path = os.path.join(tempfile.gettempdir(), name)
     return export(items, path, group_by_room=group_by_room, rooms=rooms,
-                  full=False, for_print=True)
+                  full=False, for_print=True, con_iphone=True)
+
+
+TEMPLATE_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "stato", "note"]
+TEMPLATE_TIPI = ["Laptop", "Tablet"]
+RIGHE_PER_STANZA = 8
+
+
+def build_template(path, rooms, stati=None):
+    """Genera il modello vuoto da compilare e reimportare.
+
+    Contiene solo le colonne che servono a laptop e tablet, gia' divise per
+    stanza con le righe-separatore, e le tendine sui campi a scelta fissa.
+    Gli iPhone non compaiono: si inseriscono a mano dal programma.
+    """
+    from openpyxl.worksheet.datavalidation import DataValidation
+
+    stati = list(stati or STATI)
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Inventario"
+
+    intestazioni = [HEADERS[f] for f in TEMPLATE_FIELDS]
+    ws.append(intestazioni)
+    for cella in ws[1]:
+        cella.font = Font(bold=True, color="FFFFFF")
+        cella.fill = _HEADER_FILL
+        cella.alignment = Alignment(vertical="center")
+        cella.border = _BORDER
+    ws.row_dimensions[1].height = 22
+    ws.freeze_panes = "A2"
+
+    fill_tag = PatternFill("solid", fgColor="DCE6F1")
+    riga = 2
+    for stanza in rooms:
+        cella = ws.cell(row=riga, column=1, value=str(stanza).upper())
+        cella.font = Font(bold=True, color="1F4E79")
+        cella.fill = fill_tag
+        ws.merge_cells(start_row=riga, start_column=1,
+                       end_row=riga, end_column=len(TEMPLATE_FIELDS))
+        ws.row_dimensions[riga].height = 18
+        riga += 1
+        for _ in range(RIGHE_PER_STANZA):
+            for colonna in range(1, len(TEMPLATE_FIELDS) + 1):
+                ws.cell(row=riga, column=colonna).border = _BORDER
+            riga += 1
+
+    ultima = riga - 1
+    tipi = DataValidation(type="list", formula1='"%s"' % ",".join(TEMPLATE_TIPI),
+                          allow_blank=True, showDropDown=False)
+    tipi.error = "Scegli Laptop o Tablet."
+    tipi.errorTitle = "Tipo non valido"
+    ws.add_data_validation(tipi)
+    tipi.add("B2:B%d" % ultima)
+
+    scelte = DataValidation(type="list", formula1='"%s"' % ",".join(stati),
+                            allow_blank=True, showDropDown=False)
+    scelte.error = "Scegli uno degli stati previsti."
+    scelte.errorTitle = "Stato non valido"
+    ws.add_data_validation(scelte)
+    scelte.add("E2:E%d" % ultima)
+
+    larghezze = {"asset_tag": 18, "tipo": 14, "modello": 38, "seriale": 22,
+                 "stato": 24, "note": 42}
+    for i, campo in enumerate(TEMPLATE_FIELDS, start=1):
+        ws.column_dimensions[get_column_letter(i)].width = larghezze[campo]
+
+    guida = wb.create_sheet("Istruzioni")
+    testo = [
+        ("Modello di inventario - laptop e tablet", True),
+        ("", False),
+        ("Compila il foglio \"Inventario\" e importalo dal programma con", False),
+        ("Importa xls...  Le righe azzurre con il nome della stanza sono", False),
+        ("separatori: tutto cio' che scrivi sotto una di esse finisce in", False),
+        ("quella stanza, fino al separatore successivo.", False),
+        ("", False),
+        ("Regole", True),
+        ("- Asset Tag e Modello sono indispensabili; il numero di serie e'", False),
+        ("  vivamente consigliato.", False),
+        ("- L'asset tag identifica il dispositivo: importando due volte lo", False),
+        ("  stesso asset tag, la scheda viene aggiornata invece che duplicata.", False),
+        ("- Tipo e Stato hanno la tendina: usa i valori proposti.", False),
+        ("- Puoi aggiungere righe sotto un separatore, o spostare i separatori.", False),
+        ("- Non cambiare i nomi delle colonne nella prima riga.", False),
+        ("- Le righe lasciate vuote vengono semplicemente ignorate.", False),
+        ("", False),
+        ("Gli iPhone non si importano", True),
+        ("Sono gestiti solo a mano dal programma e non compaiono ne' nelle", False),
+        ("importazioni ne' nelle esportazioni. Se ne inserisci qui, vengono", False),
+        ("ignorati.", False),
+    ]
+    for numero, (frase, grassetto) in enumerate(testo, start=1):
+        cella = guida.cell(row=numero, column=1, value=frase)
+        if grassetto:
+            cella.font = Font(bold=True, size=12, color="1F4E79")
+    guida.column_dimensions["A"].width = 78
+
+    try:
+        wb.save(path)
+    except Exception as exc:
+        raise InventoryError("Impossibile scrivere %s:\n%s" % (path, exc))
+    finally:
+        wb.close()
+    return path
 
 
 def send_to_printer(path):

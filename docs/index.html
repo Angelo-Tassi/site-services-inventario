@@ -131,15 +131,17 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.3.0 · alfa</div>
+  <div class="alpha">versione 0.4.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Scarica Inventario.exe</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest">Tutte le versioni</a>
+    <a class="btn alt" href="Modello_inventario.xlsx" download>Modello Excel da compilare</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario">Codice e documentazione</a>
   </div>
   <p class="note">Un file solo, per Windows. Contiene Python e tutte le librerie:
-    sui PC non va installato niente.</p>
+    sui PC non va installato niente. Il modello Excel serve a caricare in blocco
+    laptop e tablet gia' censiti altrove.</p>
 </header>
 
 <section>
@@ -251,10 +253,11 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
       <p>Stato e note si cambiano con un doppio clic direttamente nell'elenco, senza
         aprire nessuna finestra.</p></div>
     <div class="card"><h3>Excel dentro e fuori</h3>
-      <p>L'inventario si crea da zero importando un file Excel esistente, e un foglio
-        unico si divide per stanza scrivendo <code>BAU</code>, <code>KIOSK</code> o
-        <code>DISASTER</code> su una riga vuota. L'esportazione riporta tutte le
-        colonne, la stampa esce gia' impaginata su A4.</p></div>
+      <p>Scarica il <a href="Modello_inventario.xlsx" download>modello gia' pronto</a>,
+        compilalo e importalo: un foglio unico si divide per stanza scrivendo
+        <code>BAU</code>, <code>KIOSK</code> o <code>DISASTER</code> su una riga vuota.
+        L'esportazione riporta tutte le colonne, la stampa esce impaginata su A4.
+        Gli iPhone restano fuori da import ed export: si gestiscono solo dal programma.</p></div>
   </div>
 </section>
 

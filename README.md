@@ -11,6 +11,8 @@ gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 ## Scarica
 
 **[Scarica l'ultima versione](../../releases/latest)** dalla pagina Releases.
+Serve anche il **[modello Excel da compilare](docs/Modello_inventario.xlsx)** per
+caricare in blocco laptop e tablet gia' censiti altrove.
 
 Nel pacchetto trovi `Inventario.exe`: un file solo, che contiene Python e tutte
 le librerie. **Sui PC non va installato niente.** Lo copi nella cartella di rete
@@ -192,8 +194,9 @@ programma, e solo in ultimo lo si chiede all'utente.
 - Ricerca libera (asset tag, modello, numero di serie, IMEI, note, stato, nome di
   chi ha restituito il dispositivo e di chi lo ha in prestito) e filtri per stanza
   e per tipo; ordinamento cliccando sulle intestazioni di colonna.
-- **Importazione** da file Excel esistenti in modalita' *unisci* o *sostituisci*,
-  con la possibilita' di dividere per stanza un inventario unico usando le
+- **Modello di importazione** scaricabile dal programma, gia' pronto da compilare.
+- **Importazione** da file Excel in modalita' *unisci* o *sostituisci*, con la
+  possibilita' di dividere per stanza un inventario unico usando le
   righe-separatore (vedi piu' sotto);
   le intestazioni piu' comuni sono riconosciute da sole (per il seriale: *Numero
   di serie*, *Seriale*, *Serial Number*, *S/N*, *Matricola*, *Service Tag*).
@@ -364,6 +367,36 @@ consultare i dati in Excel senza rischi, usa *Esporta xls...*.
 | doppio clic sulle note | modifica la nota nell'elenco |
 | doppio clic sullo stato | tendina per cambiare stato nell'elenco |
 | doppio clic altrove | apre la scheda del dispositivo |
+
+## Il modello di importazione
+
+Per caricare in blocco laptop e tablet parti dal modello gia' pronto, che si
+ottiene in due modi:
+
+- dal programma, pulsante **Scarica il modello di importazione** in home, a
+  destra del titolo *Inventario completo*;
+- dalla pagina del progetto, o direttamente da
+  [`docs/Modello_inventario.xlsx`](docs/Modello_inventario.xlsx).
+
+Contiene solo le colonne che servono a laptop e tablet - *Asset Tag*, *Tipo*,
+*Modello*, *Numero di serie*, *Stato*, *Note* - gia' divise per stanza dalle
+righe-separatore, con le tendine su *Tipo* e *Stato* e un foglio *Istruzioni*.
+Il modello generato dal programma rispecchia le stanze e gli stati configurati
+in quel momento.
+
+Compilalo e caricalo con *Importa xls...*: non serve aggiungere la colonna
+*Stanza*, ci pensano i separatori.
+
+## Gli iPhone restano fuori da import ed export
+
+Gli iPhone si inseriscono **solo a mano** dal programma. Non compaiono nel
+modello, vengono ignorati se presenti in un file importato (la finestra di
+importazione dice quanti), e non finiscono in nessuna esportazione, nemmeno in
+quella divisa per stanza. Una **sostituzione** dell'inventario non li cancella:
+vengono mantenuti, perche' non potrebbero essere ricaricati da un file.
+
+Restano invece nella **stampa**, che e' consultazione interna, e ovviamente
+nell'inventario a video e nel file dati.
 
 ## Dividere per stanza un inventario unico
 

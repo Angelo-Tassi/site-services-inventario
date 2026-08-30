@@ -306,22 +306,23 @@ class RoomsDialog(_Modal):
 
 
 class ImportDialog(_Modal):
-    def __init__(self, parent, path, count, skipped, da_tag=0):
+    def __init__(self, parent, path, count, esito=None):
         _Modal.__init__(self, parent, "Importa inventario")
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
         ttk.Label(body, text=os.path.basename(path),
                   style="Section.TLabel").pack(anchor="w")
-        msg = "%d righe valide trovate." % count
-        if skipped:
-            msg += "  %d righe ignorate (manca l'identificativo)." % skipped
-        ttk.Label(body, text=msg, style="Muted.TLabel").pack(anchor="w", pady=(2, 2))
-        if da_tag:
-            ttk.Label(body, style="Muted.TLabel",
-                      text="%d righe hanno preso la stanza dai separatori nel foglio."
-                           % da_tag).pack(anchor="w", pady=(0, 10))
-        else:
-            ttk.Label(body, text="").pack(pady=(0, 8))
+        esito = esito or {}
+        righe = ["%d righe valide trovate." % count]
+        if esito.get("scartate"):
+            righe.append("%d righe ignorate: manca l'identificativo." % esito["scartate"])
+        if esito.get("da_tag"):
+            righe.append("%d righe hanno preso la stanza dai separatori nel foglio."
+                         % esito["da_tag"])
+        if esito.get("iphone"):
+            righe.append("%d iPhone ignorati: si inseriscono solo a mano." % esito["iphone"])
+        ttk.Label(body, text="\n".join(righe), style="Muted.TLabel",
+                  justify="left").pack(anchor="w", pady=(2, 12))
         self.var_mode = tk.StringVar(value="merge")
         ttk.Radiobutton(body, variable=self.var_mode, value="merge",
                         text="Unisci: aggiunge i nuovi e aggiorna quelli con lo stesso asset tag"
@@ -858,6 +859,8 @@ class App(tk.Tk):
             self.var_section_count = tk.StringVar()
             ttk.Label(header, textvariable=self.var_section_count,
                       style="Muted.TLabel").pack(side="left", padx=(10, 0))
+            ttk.Button(header, text="Scarica il modello di importazione",
+                       command=self.on_template).pack(side="right")
         else:
             header = ttk.Frame(self.body)
             header.pack(fill="x", pady=(10, 8))
@@ -1318,6 +1321,29 @@ class App(tk.Tk):
                    command=ok).pack(side="right")
         return dialog.show()
 
+    def on_template(self):
+        """Genera il modello vuoto da compilare e reimportare."""
+        percorso = filedialog.asksaveasfilename(
+            parent=self, title="Salva il modello di inventario",
+            defaultextension=".xlsx", initialfile="Modello_inventario.xlsx",
+            filetypes=[("File Excel", "*.xlsx")])
+        if not percorso:
+            return
+        try:
+            excel_io.build_template(percorso, self.cfg.get("rooms", []),
+                                    self.cfg.get("states"))
+        except InventoryError as exc:
+            messagebox.showerror("Modello non creato", str(exc), parent=self)
+            return
+        if messagebox.askyesno(
+            "Modello creato",
+            "%s\n\nCompila il foglio \"Inventario\" e reimportalo con\n"
+            "Importa xls...  Le righe con il nome della stanza dividono\n"
+            "l'elenco: quello che scrivi sotto finisce in quella stanza.\n\n"
+            "Aprirlo ora?" % percorso, parent=self
+        ):
+            excel_io.open_file(percorso)
+
     def on_import(self):
         path = filedialog.askopenfilename(
             parent=self, title="Seleziona il file da importare",
@@ -1325,7 +1351,7 @@ class App(tk.Tk):
         if not path:
             return
         try:
-            items, skipped, da_tag = rows_from_workbook(path, self.cfg.get("rooms"))
+            items, esito = rows_from_workbook(path, self.cfg.get("rooms"))
         except InventoryError as exc:
             messagebox.showerror("Importazione non riuscita", str(exc), parent=self)
             return
@@ -1333,12 +1359,13 @@ class App(tk.Tk):
             messagebox.showwarning("Importazione", "Nessuna riga valida trovata nel file.",
                                    parent=self)
             return
-        mode = ImportDialog(self, path, len(items), skipped, da_tag).show()
+        mode = ImportDialog(self, path, len(items), esito).show()
         if not mode:
             return
         if mode == "replace" and not messagebox.askyesno(
             "Conferma sostituzione",
             "L'inventario attuale (%d dispositivi) verra' sostituito dai %d dal file.\n"
+            "Gli iPhone gia' registrati vengono mantenuti.\n\n"
             "Procedere?" % (len(self.store.items), len(items)), parent=self
         ):
             return

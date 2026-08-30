@@ -688,7 +688,9 @@ class InventoryStore(object):
         def op(items):
             added = updated = 0
             if mode == "replace":
-                items[:] = []
+                # Gli iPhone non arrivano mai da un'importazione: vanno tenuti,
+                # altrimenti una sostituzione li cancellerebbe.
+                items[:] = [it for it in items if is_iphone(it.get("tipo"))]
             index = {it["asset_tag"]: i for i, it in enumerate(items)}
             for raw in incoming:
                 item = dict(raw)
@@ -755,10 +757,13 @@ def _row_to_item(row, mapping):
 def rows_from_workbook(path, rooms=None):
     """Legge un file .xlsx/.xlsm esterno.
 
-    Ritorna (items, righe_scartate, stanze_dai_tag). Se nel foglio compaiono
-    righe-separatore con il nome (o l'abbreviazione) di una stanza, tutte le
-    righe successive fino al separatore seguente vengono assegnate a quella
-    stanza: e' il modo per dividere per stanza un unico inventario.
+    Ritorna (items, esito), dove esito e' un dizionario con le righe scartate,
+    quelle che hanno preso la stanza da un separatore e gli iPhone ignorati.
+
+    Se nel foglio compaiono righe-separatore con il nome (o l'abbreviazione) di
+    una stanza, tutte le righe successive fino al separatore seguente vengono
+    assegnate a quella stanza: e' il modo per dividere per stanza un unico
+    inventario. Gli iPhone non si importano: sono gestiti solo a mano.
     """
     try:
         wb = load_workbook(path, read_only=True, data_only=True)
@@ -778,7 +783,8 @@ def rows_from_workbook(path, rooms=None):
                 "La prima riga deve contenere le intestazioni delle colonne."
             )
         tags = tag_stanze(rooms or [])
-        items, skipped, da_tag = [], 0, 0
+        items = []
+        esito = {"scartate": 0, "da_tag": 0, "iphone": 0}
         stanza_corrente = None
         for row in rows:
             if row is None or all(c is None or clean(c) == "" for c in row):
@@ -789,13 +795,16 @@ def rows_from_workbook(path, rooms=None):
                 continue
             item = _row_to_item(row, mapping)
             if not item:
-                skipped += 1
+                esito["scartate"] += 1
+                continue
+            if is_iphone(item.get("tipo")):
+                esito["iphone"] += 1
                 continue
             if stanza_corrente:
                 item["stanza"] = stanza_corrente
-                da_tag += 1
+                esito["da_tag"] += 1
             items.append(item)
-        return items, skipped, da_tag
+        return items, esito
     finally:
         wb.close()
 

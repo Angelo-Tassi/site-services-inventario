@@ -44,30 +44,30 @@ ws.append(["", "Iphone", "Apple iPhone 14", "", "356938035643809", "restituito"]
 ws.append(["", "Laptop", "senza identificativo", "", "", ""])
 wb.save(foglio); wb.close()
 
-items, scartate, da_tag = rows_from_workbook(foglio, STANZE)
+items, esito = rows_from_workbook(foglio, STANZE)
+scartate, da_tag = esito['scartate'], esito['da_tag']
 assert scartate == 1, scartate
-assert da_tag == 6, da_tag
+assert da_tag == 5, da_tag
+assert esito["iphone"] == 1, esito      # gli iPhone non si importano
 per_stanza = {}
 for i in items:
     per_stanza.setdefault(i["stanza"], []).append(i["asset_tag"])
 assert sorted(per_stanza[BAU]) == ["IT-0101", "IT-0104"], per_stanza
 assert sorted(per_stanza[KIOSK]) == ["IT-0106", "IT-0107"], per_stanza
-assert sorted(per_stanza[DR]) == ["356938035643809", "DR-0201"], per_stanza
+assert sorted(per_stanza[DR]) == ["DR-0201"], per_stanza
+assert not any(i["tipo"].lower() == "iphone" for i in items)
 
 # ---- caricamento in un inventario vuoto
 p = os.path.join(d, "Inventario.xlsx")
 s = InventoryStore(p, iphone_room=BAU)
 s.create_if_missing()
 aggiunti, aggiornati = s.import_items(items, "replace")
-assert (aggiunti, aggiornati) == (6, 0), (aggiunti, aggiornati)
+assert (aggiunti, aggiornati) == (5, 0), (aggiunti, aggiornati)
 s.load()
 conteggi = {}
 for i in s.items:
     conteggi[i["stanza"]] = conteggi.get(i["stanza"], 0) + 1
-assert conteggi == {BAU: 3, KIOSK: 2, DR: 1}, conteggi
-# l'iPhone viene ricondotto alla sua stanza anche se il tag diceva DISASTER
-tel = [i for i in s.items if i["asset_tag"] == "356938035643809"][0]
-assert tel["stanza"] == BAU and tel["stato"] == "Da Rispedire", tel
+assert conteggi == {BAU: 2, KIOSK: 2, DR: 1}, conteggi
 
 # ---- senza separatori si comporta come prima
 semplice = os.path.join(d, "semplice.xlsx")
@@ -75,7 +75,8 @@ wb = Workbook(); ws = wb.active
 ws.append(["Asset Tag", "Tipo", "Modello", "Stanza"])
 ws.append(["IT-0900", "Laptop", "T14", KIOSK])
 wb.save(semplice); wb.close()
-items, scartate, da_tag = rows_from_workbook(semplice, STANZE)
+items, esito = rows_from_workbook(semplice, STANZE)
+da_tag = esito['da_tag']
 assert da_tag == 0 and items[0]["stanza"] == KIOSK
 
 # ---- il separatore ha la precedenza sulla colonna Stanza
@@ -85,6 +86,7 @@ ws.append(["Asset Tag", "Tipo", "Modello", "Stanza"])
 ws.append(["DISASTER", None, None, None])
 ws.append(["IT-0901", "Laptop", "T14", KIOSK])
 wb.save(misto); wb.close()
-items, _, da_tag = rows_from_workbook(misto, STANZE)
+items, esito = rows_from_workbook(misto, STANZE)
+da_tag = esito['da_tag']
 assert da_tag == 1 and items[0]["stanza"] == DR, items
 print("IMPORT CON TAG OK")
