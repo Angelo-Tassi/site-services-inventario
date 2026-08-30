@@ -359,16 +359,33 @@ impostazioni di Excel: Numbers le ignora, ma i dati restano identici.
 | `Inventario.xlsx` | i dati; e' gia' l'inventario, apribile in Excel |
 | `inventario_impostazioni.json` | stanze, tipi, stanze con prestito, stanza degli iPhone, stati |
 
-## Test
+## Provare l'importazione
+
+La cartella [`Collaudo/`](Collaudo/) contiene due fogli Excel pronti da
+importare - uno regolare con **30 dispositivi, 10 per stanza**, e uno con dentro
+apposta i casi che il programma deve segnalare - e le istruzioni passo passo:
+[**Come testare l'importazione**](Collaudo/README.md).
+
+Sette scenari, dal caricamento iniziale alla sostituzione di una sola stanza,
+fino al reset e alla riesportazione. I file si rigenerano con
+`.venv/bin/python tests/genera_file_di_prova.py`.
+
+## Test automatici
 
 ```bash
 .venv/bin/python tests/run_all.py
 ```
 
-Cinque suite che coprono archivio dati e accessi concorrenti, risoluzione del
-percorso, schermate e colori, scheda di inserimento e spedizioni. Girano senza
-bisogno di una finestra a schermo e non toccano i dati reali: ognuna si
-costruisce il proprio inventario in una cartella temporanea.
+Tredici suite che coprono archivio dati e accessi concorrenti, risoluzione del
+percorso, schermate e colori, scheda di inserimento, prestiti, spedizioni,
+importazione ed esportazione. Girano senza bisogno di una finestra a schermo e
+non toccano i dati reali: ognuna si costruisce il proprio inventario in una
+cartella temporanea.
+
+Una di queste, `test_collaudo.py`, ripete sui file di `Collaudo/` esattamente
+gli scenari descritti nelle istruzioni: se il comportamento cambia, il test
+fallisce e le istruzioni vanno riscritte, cosi' non promettono mai cose che non
+succedono.
 | `.Inventario.xlsx.lock` | presente solo per una frazione di secondo durante un salvataggio |
 
 ## Accessi contemporanei
@@ -590,6 +607,7 @@ esattamente cosa succede.
 | Due colonne per lo stesso dato | usa la prima e segnala la seconda fra quelle ignorate |
 | Manca il **modello** | importa lo stesso e ti dice quante righe restano senza |
 | Manca l'**asset tag** (o l'IMEI) | si ferma con un errore e non importa niente |
+| Un titolo prima della tabella | lo salta e cerca le intestazioni nelle prime 12 righe |
 | Righe vuote | le salta senza contarle |
 | Righe senza identificativo | le conta come scartate e va avanti |
 

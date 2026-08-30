@@ -56,6 +56,27 @@ try:
 except InventoryError as e:
     assert "Asset Tag" in str(e) and "IMEI" in str(e), str(e)
 
+# ---- un file con titolo e riga vuota in cima: le intestazioni si trovano lo stesso
+p = foglio("con_titolo", ["Digital Kiosk", None, None, None],
+           [["Esportato il 30/08/2026", None, None, None],
+            [None, None, None, None],
+            ["Asset Tag", "Tipo", "Modello", "Numero di serie"],
+            ["IT-0900", "Laptop", "T14 Gen 5", "PF5NEW9"]])
+items, esito = rows_from_workbook(p, STANZE)
+assert len(items) == 1 and items[0]["asset_tag"] == "IT-0900", items
+assert items[0]["modello"] == "T14 Gen 5"
+
+# ---- ma un titolo lunghissimo senza tabella resta un errore
+p = foglio("solo_titoli", ["Relazione annuale"],
+           [["Reparto"], ["Nota"], ["Altro"], ["Ancora"], ["E ancora"],
+            ["Sesto"], ["Settimo"], ["Ottavo"], ["Nono"], ["Decimo"],
+            ["Undicesimo"], ["Dodicesimo"],
+            ["Asset Tag"], ["IT-0901"]])
+try:
+    rows_from_workbook(p, STANZE); raise SystemExit("intestazione troppo in basso accettata")
+except InventoryError as e:
+    assert "intestazioni" in str(e)
+
 # ---- maiuscole, spazi e sinonimi
 intestazioni = ["  ASSET TAG ", "tipo", "MoDeLLo", "s/n", "ubicazione"]
 mappa = map_headers(intestazioni)

@@ -806,6 +806,27 @@ def _stamp_item(item):
     item["modificato_da"] = current_user()
 
 
+RIGHE_DA_ISPEZIONARE = 12
+
+
+def _trova_intestazioni(rows):
+    """La riga delle intestazioni, saltando eventuali titoli in cima al foglio.
+
+    I file esportati dal programma per una singola stanza hanno il nome della
+    stanza e la data prima della tabella; lo stesso capita spesso ai fogli che
+    arrivano da altri sistemi.
+    """
+    for numero, row in enumerate(rows):
+        if numero >= RIGHE_DA_ISPEZIONARE:
+            break
+        if row is None or all(c is None or clean(c) == "" for c in row):
+            continue
+        mapping = map_headers(row)
+        if {"asset_tag", "imei"} & set(mapping.values()):
+            return row, mapping
+    return None, {}
+
+
 def map_headers(header_row):
     """Mappa indice colonna -> campo, riconoscendo le intestazioni note."""
     mapping = {}
@@ -851,15 +872,11 @@ def rows_from_workbook(path, rooms=None):
     try:
         ws = wb[SHEET_NAME] if SHEET_NAME in wb.sheetnames else wb.worksheets[0]
         rows = ws.iter_rows(values_only=True)
-        try:
-            header = next(rows)
-        except StopIteration:
-            return [], 0
-        mapping = map_headers(header)
-        if not ({"asset_tag", "imei"} & set(mapping.values())):
+        header, mapping = _trova_intestazioni(rows)
+        if header is None:
             raise InventoryError(
                 "Nel file non e' stata trovata la colonna \"Asset Tag\" (o \"IMEI\").\n"
-                "La prima riga deve contenere le intestazioni delle colonne."
+                "Ci deve essere una riga con le intestazioni delle colonne."
             )
         tags = tag_stanze(rooms or [])
         items = []
