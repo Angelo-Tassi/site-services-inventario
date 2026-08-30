@@ -37,7 +37,8 @@ assert app.tree.heading(ACTION_COLUMN)["text"] == "Prestito"
 assert len(app.visible) == 5
 def colore_riga(t):
     tags = app.tree.item(t, "tags")
-    return tags[0].replace("_alt", "") if tags else ""
+    nome = tags[0].replace("_alt", "") if tags else ""
+    return "" if nome == "odd" else nome
 rossi = [t for t in app.tree.get_children() if colore_riga(t) == "loan"]
 assert sorted(rossi) == ["IT-0107", "IT-0110"]
 for tag in rossi:
@@ -71,8 +72,10 @@ app._run(lambda: app.store.add(new_item(tipo=TIPO, modello="Apple iPhone 14",
 app._run(lambda: app.store.add(new_item("IT-0999", "Tablet", "Samsung Galaxy Tab A9",
                                         "R52ZZ", BAU)), "ok")
 def colore(t):
+    """Il colore della riga, ignorando la banda alternata."""
     tags = app.tree.item(t, "tags")
-    return tags[0].replace("_alt", "") if tags else ""
+    nome = tags[0].replace("_alt", "") if tags else ""
+    return "" if nome == "odd" else nome
 app.show_home()
 assert colore("356938035643809") == "iphone"
 assert colore("IT-0104") == "tablet" and colore("IT-0105") == "tablet"

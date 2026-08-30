@@ -162,10 +162,10 @@ programma, e solo in ultimo lo si chiede all'utente.
   Kiosk). Nell'inventario completo, nelle altre stanze e nel contenitore iPhone
   la prima colonna e' soltanto la casella di selezione, senza intestazione.
   Vedi la sezione dedicata piu' sotto.
-- **Aggiungi** chiede prima come procedere: **inserimento manuale** oppure
-  **scansione con il lettore di codici a barre** (vedi piu' sotto). L'inserimento
-  manuale apre la scheda, con il **tipo in cima**: e' lui a decidere quali campi
-  vengono chiesti. Se manca un dato obbligatorio il
+- **Aggiungi** chiede prima **che cosa** stai inserendo, con una tendina fra i
+  tipi configurati, e solo dopo **come**: inserimento manuale o scansione con il
+  lettore di codici (vedi piu' sotto). Il tipo scelto decide i campi richiesti e
+  cosa si puo' leggere con il lettore. Se manca un dato obbligatorio il
   programma elenca quali e non inserisce nulla finche' non sono compilati.
 
 | Tipo | Campi obbligatori |
@@ -176,7 +176,9 @@ programma, e solo in ultimo lo si chiede all'utente.
   Un iPhone **non ha numero di serie e non si presta mai**: al posto del seriale
   c'e' l'IMEI, e i campi del prestito restano vuoti. La regola e' nell'archivio
   dati: anche importando o modificando una scheda, quei campi vengono ripuliti,
-  e il tentativo di prestare un iPhone viene rifiutato.
+  e il tentativo di prestare un iPhone viene rifiutato. Nel contenitore *Iphone*
+  quelle colonne non compaiono affatto: restano nelle altre schermate, dove
+  servono a laptop e tablet.
 
   Scegliendo **iPhone** il modulo si ridisegna: al posto di *Asset Tag* e
   *Numero di serie* compaiono **IMEI** e **Restituito da** (il nome di chi lo ha
@@ -200,7 +202,11 @@ programma, e solo in ultimo lo si chiede all'utente.
   con una stanza diversa viene ricondotto alla sua.
 - Ricerca libera (asset tag, modello, numero di serie, IMEI, note, stato, nome di
   chi ha restituito il dispositivo e di chi lo ha in prestito) e filtri per stanza
-  e per tipo; ordinamento cliccando sulle intestazioni di colonna.
+  e per tipo.
+- **L'elenco parte dal piu' recente**: l'ultimo dispositivo inserito o modificato
+  e' sempre in cima. Cliccando sulle intestazioni si ordina per qualsiasi colonna;
+  le colonne con una data si ordinano per data, non alfabeticamente, e partono
+  dalla piu' recente.
 - **Modello di importazione** scaricabile dal programma, gia' pronto da compilare.
 - **Importazione** da file Excel in modalita' *unisci* o *sostituisci*, con la
   possibilita' di dividere per stanza un inventario unico usando le
@@ -377,8 +383,8 @@ consultare i dati in Excel senza rischi, usa *Esporta xls...*.
 
 ## Aggiungere con il lettore di codici a barre
 
-Premendo **Aggiungi** si sceglie fra inserimento manuale e scansione. Cosa
-viene letto dipende da dove ti trovi.
+Premendo **Aggiungi** si sceglie prima il tipo di dispositivo, poi fra
+inserimento manuale e scansione. Cosa viene letto dipende dal tipo scelto.
 
 **Laptop e tablet** - tre passi, numerati in alto nella finestra:
 
@@ -386,7 +392,7 @@ viene letto dipende da dove ti trovi.
 2. **Scansiona il numero di serie**
 3. **Scrivi il modello** del dispositivo, che sull'etichetta non c'e'
 
-**iPhone**, aggiungendoli dal loro contenitore - un passo solo:
+**iPhone** - un passo solo:
 
 1. **Scansiona l'IMEI**, che e' il loro unico identificativo
 

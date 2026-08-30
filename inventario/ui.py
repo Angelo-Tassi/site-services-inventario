@@ -20,11 +20,30 @@ from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
 NO_ROOM = "(senza stanza)"
 
 
+CAMPI_DATA = ("modificato_il", "prestato_il", "spedito_il")
+
+
+def chiave_ordinamento(item, campo):
+    """Le colonne con una data si ordinano per data, non per testo."""
+    valore = item.get(campo, "")
+    if campo in CAMPI_DATA:
+        for formato in ("%d/%m/%Y %H:%M:%S", "%d/%m/%Y %H:%M", "%d/%m/%Y"):
+            try:
+                return datetime.strptime(str(valore), formato)
+            except ValueError:
+                continue
+        return datetime.min          # senza data finisce in fondo
+    return str(valore).lower()
+
+
 def item_stato_iphone(spedito):
     return SPEDITO if spedito else DA_RISPEDIRE
 
 CHECK_COLUMN = "_sel"
 ACTION_COLUMN = "_azione"
+# Un iPhone non ha numero di serie e non si presta: nel suo contenitore quelle
+# colonne sarebbero sempre vuote.
+COLONNE_NON_IPHONE = ("seriale", "prestato_a", "prestato_il")
 CHECK_ON = "\u25c9"      # cerchio pieno: riga selezionata
 CHECK_OFF = "\u25cb"     # cerchio vuoto
 COLUMN_WIDTHS = {CHECK_COLUMN: 46, ACTION_COLUMN: 150, "asset_tag": 120, "tipo": 75, "modello": 185,
@@ -314,6 +333,37 @@ class RoomsDialog(_Modal):
         self.destroy()
 
 
+class TypeChoiceDialog(_Modal):
+    """Primo passo di Aggiungi: che cosa si sta inserendo."""
+
+    def __init__(self, parent, types, predefinito=""):
+        _Modal.__init__(self, parent, "Aggiungi dispositivo")
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, text="Che cosa vuoi aggiungere?",
+                  style="Section.TLabel").pack(anchor="w")
+        ttk.Label(body, style="Muted.TLabel",
+                  text="Il tipo decide i campi da compilare e cosa si puo'\n"
+                       "leggere con il lettore di codici.").pack(anchor="w", pady=(4, 12))
+        self.var_tipo = tk.StringVar(value=predefinito or (types[0] if types else ""))
+        combo = ttk.Combobox(body, textvariable=self.var_tipo, values=types,
+                             state="readonly", width=30)
+        combo.pack(fill="x")
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(16, 0))
+        ttk.Button(buttons, text="Annulla", command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text="Avanti", style="Primary.TButton",
+                   command=self._ok).pack(side="right")
+        self.bind("<Return>", lambda e: self._ok())
+        combo.focus_set()
+
+    def _ok(self):
+        if not self.var_tipo.get().strip():
+            return
+        self.result = self.var_tipo.get()
+        self.destroy()
+
+
 class AddChoiceDialog(_Modal):
     """Come aggiungere un dispositivo: a mano o leggendo i codici a barre."""
 
@@ -517,8 +567,8 @@ class App(tk.Tk):
         self.store = InventoryStore(data_path,
                                     iphone_room=self.cfg.get("iphone_room"),
                                     stati=self.cfg.get("states"))
-        self.sort_field = "asset_tag"
-        self.sort_reverse = False
+        self.sort_field = "modificato_il"
+        self.sort_reverse = True        # il piu' recente in cima
         self.visible = []
         self.view = "home"
         self.tree = None
@@ -664,7 +714,10 @@ class App(tk.Tk):
         colonne = [CHECK_COLUMN]
         if self.action_column_visible():
             colonne.append(ACTION_COLUMN)
-        return colonne + list(ALL_FIELDS)
+        campi = list(ALL_FIELDS)
+        if self.ship_column_visible():
+            campi = [c for c in campi if c not in COLONNE_NON_IPHONE]
+        return colonne + campi
 
     def _make_table(self, parent):
         wrap = tk.Frame(parent, bg=theme.CARD, highlightthickness=1,
@@ -936,6 +989,7 @@ class App(tk.Tk):
     def show_home(self):
         self.view = "home"
         self.var_room.set("Tutte")
+        self.var_type.set("Tutti")      # il contenitore iPhone lascia il filtro impostato
         self.var_subtitle.set("Laptop e tablet in nostro possesso")
         self.btn_home.state(["disabled"])
         self._render()
@@ -1088,7 +1142,7 @@ class App(tk.Tk):
             ):
                 continue
             result.append(item)
-        result.sort(key=lambda it: str(it.get(self.sort_field, "")).lower(),
+        result.sort(key=lambda it: chiave_ordinamento(it, self.sort_field),
                     reverse=self.sort_reverse)
         return result
 
@@ -1145,7 +1199,9 @@ class App(tk.Tk):
         if self.sort_field == field:
             self.sort_reverse = not self.sort_reverse
         else:
-            self.sort_field, self.sort_reverse = field, False
+            # le date partono dalla piu' recente, il testo dalla A
+            self.sort_field = field
+            self.sort_reverse = field in CAMPI_DATA
         if self.tree is not None:
             for name in ALL_FIELDS:
                 arrow = ""
@@ -1215,27 +1271,38 @@ class App(tk.Tk):
         self._reload("Elenco ricaricato.")
 
     def on_add(self):
-        """Chiede se inserire a mano o con il lettore di codici.
-
-        Nel contenitore degli iPhone la scansione riguarda l'IMEI, unico
-        identificativo di un telefono.
-        """
-        iphone = self.view == "type" and bool(self.iphone_type())
+        """Prima cosa si aggiunge, poi come: a mano o con il lettore di codici."""
+        tipi = self.cfg.get("types") or []
+        if not tipi:
+            messagebox.showinfo("Aggiungi",
+                                "Non ci sono tipi di dispositivo configurati.", parent=self)
+            return
+        tipo = TypeChoiceDialog(self, tipi, self.tipo_predefinito()).show()
+        if not tipo:
+            return
+        iphone = is_iphone(tipo)
         modo = AddChoiceDialog(self, iphone=iphone).show()
         if modo == "manuale":
-            self.on_new()
+            self.on_new(tipo)
         elif modo == "barcode":
             if iphone:
-                self.on_new_barcode_iphone()
+                self.on_new_barcode_iphone(tipo)
             else:
-                self.on_new_barcode()
+                self.on_new_barcode(tipo)
 
-    def on_new_barcode_iphone(self):
+    def tipo_predefinito(self):
+        """Nel contenitore iPhone si aggiunge quasi sempre un iPhone."""
+        tipi = self.cfg.get("types") or []
+        if self.view == "type":
+            return self.iphone_type() or (tipi[0] if tipi else "")
+        return next((t for t in tipi if not is_iphone(t)), tipi[0] if tipi else "")
+
+    def on_new_barcode_iphone(self, tipo=None):
         """Un solo codice da leggere: l'IMEI. Il resto si scrive nella scheda."""
         imei = ScanDialog(self, "IMEI", "l'IMEI del telefono", 1, 1).show()
         if not imei:
             return
-        preset = new_item(tipo=self.iphone_type(), imei=imei,
+        preset = new_item(tipo=tipo or self.iphone_type(), imei=imei,
                           stanza=self.iphone_room())
         item = ItemDialog(self, self.cfg["rooms"], self.cfg["types"], preset,
                           iphone_room=self.iphone_room(),
@@ -1251,7 +1318,7 @@ class App(tk.Tk):
         rooms = self.cfg.get("rooms") or []
         return rooms[0] if rooms else ""
 
-    def on_new_barcode(self):
+    def on_new_barcode(self, tipo=None):
         """Asset tag e seriale con il lettore, poi il modello a mano."""
         tag = ScanDialog(self, "Asset tag", "l'asset tag", 1, 3).show()
         if not tag:
@@ -1263,10 +1330,9 @@ class App(tk.Tk):
                              manuale=True).show()
         if not modello:
             return
-        tipi = self.cfg.get("types") or []
         preset = new_item(
             asset_tag=tag, seriale=seriale, modello=modello,
-            tipo=next((t for t in tipi if not is_iphone(t)), ""),
+            tipo=tipo or self.tipo_predefinito(),
             stanza=self.stanza_predefinita())
         item = ItemDialog(self, self.cfg["rooms"], self.cfg["types"], preset,
                           iphone_room=self.iphone_room(),
@@ -1274,13 +1340,11 @@ class App(tk.Tk):
         if item:
             self._run(lambda: self.store.add(item), "Aggiunto %s." % item["asset_tag"])
 
-    def on_new(self):
+    def on_new(self, tipo=None):
         rooms = self.cfg["rooms"]
-        preset = None
-        if self.view == "room":
-            preset = new_item(stanza=self.var_room.get())
-        elif self.view == "type":
-            preset = new_item(tipo=self.var_type.get(), stanza=self.iphone_room())
+        tipo = tipo or self.tipo_predefinito()
+        stanza = self.iphone_room() if is_iphone(tipo) else self.stanza_predefinita()
+        preset = new_item(tipo=tipo, stanza=stanza)
         item = ItemDialog(self, rooms, self.cfg["types"], preset,
                           iphone_room=self.iphone_room(),
                           stati=self.cfg.get("states")).show()

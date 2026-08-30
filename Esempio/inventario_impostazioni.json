@@ -2,7 +2,8 @@
   "rooms": [
     "Site Services BAU",
     "Digital Kiosk",
-    "Magazzino Disaster Recovery"
+    "Magazzino Disaster Recovery",
+    "Stanza ATA"
   ],
   "types": [
     "Laptop",
@@ -11,5 +12,6 @@
   ],
   "loan_rooms": [
     "Digital Kiosk"
-  ]
+  ],
+  "iphone_room": "Site Services BAU"
 }

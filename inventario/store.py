@@ -286,7 +286,7 @@ def eliminabile_dal(item):
     quando = clean(item.get("spedito_il"))
     if not quando:
         return None
-    for formato in ("%d/%m/%Y %H:%M", "%d/%m/%Y"):
+    for formato in ("%d/%m/%Y %H:%M:%S", "%d/%m/%Y %H:%M", "%d/%m/%Y"):
         try:
             return _somma_mesi(datetime.strptime(quando, formato), MESI_CONSERVAZIONE)
         except ValueError:
@@ -736,7 +736,8 @@ def _index_of(items, tag):
 
 
 def _stamp_item(item):
-    item["modificato_il"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+    # con i secondi due inserimenti nello stesso minuto restano in ordine
+    item["modificato_il"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     item["modificato_da"] = current_user()
 
 
@@ -834,7 +835,7 @@ def _style_sheet(ws, row_count):
     widths = {"asset_tag": 18, "tipo": 12, "modello": 32, "seriale": 20,
               "imei": 20, "restituito_da": 22, "stanza": 24, "stato": 16,
               "prestato_a": 24, "prestato_il": 18, "spedito_il": 18, "note": 38,
-              "modificato_il": 18, "modificato_da": 24}
+              "modificato_il": 20, "modificato_da": 24}
     for i, field in enumerate(ALL_FIELDS, start=1):
         ws.column_dimensions[ws.cell(row=1, column=i).column_letter].width = widths[field]
     if row_count:
