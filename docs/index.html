@@ -183,10 +183,12 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
       spunta <i>Annulla blocco</i> nelle proprieta', usala prima di estrarre; se non
       c'e', non serve.</li>
     <li><b>Collegalo all'inventario condiviso.</b> Doppio clic su
-      <code>Collega inventario condiviso.bat</code> e incolla il percorso della
-      cartella di rete, per esempio <code>\\server\Condivisa\Inventario</code>.
-      Se l'inventario non c'e' ancora viene creato vuoto; se c'e', non viene toccato.
-      Su quella cartella serve il permesso di <i>Modifica</i>.</li>
+      <code>Collega inventario condiviso.bat</code>: <b>si apre una finestra</b>,
+      sfoglia fino alla cartella di rete e scegli quella. Niente percorsi da
+      copiare. Se l'inventario non c'e' ancora viene creato vuoto; se c'e', non
+      viene toccato. Su quella cartella serve il permesso di <i>Modifica</i>.
+      La stessa cosa si puo' fare dal programma, in
+      <i>Impostazioni &rsaquo; Collega inventario condiviso…</i></li>
     <li><b>Porta l'inventario che hai gia'</b>, se ne hai uno: copialo in
       <code>Produzione\Inventario.xlsx</code> dentro la cartella di rete, con
       esattamente quel nome. Un foglio <i>da importare</i> invece non va copiato li':
@@ -390,10 +392,11 @@ python Inventario.py</pre>
       the <i>Unblock</i> tick in its properties, use it before extracting; if it is
       not there, nothing to do.</li>
     <li><b>Link it to the shared inventory.</b> Double-click
-      <code>Collega inventario condiviso.bat</code> and paste the path of the network
-      folder, for example <code>\\server\Shared\Inventory</code>. If the inventory
-      is not there yet an empty one is created; if it is, it is left alone. You need
-      <i>Modify</i> permission on that folder.</li>
+      <code>Collega inventario condiviso.bat</code>: <b>a window opens</b>, browse to
+      the network folder and pick it. No paths to copy. If the inventory is not there
+      yet an empty one is created; if it is, it is left alone. You need <i>Modify</i>
+      permission on that folder. The same can be done from the program, under
+      <i>Settings &rsaquo; Link shared inventory…</i></li>
     <li><b>Bring the inventory you already have</b>, if any: copy it to
       <code>Produzione\Inventario.xlsx</code> inside the network folder, with exactly
       that name. A sheet <i>to import</i>, on the other hand, does not go there: it is
