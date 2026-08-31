@@ -72,7 +72,13 @@ Inventario.exe, con il pacchetto consigliato leggi Inventario.py.
 AGGIORNARE IL PROGRAMMA PIU' AVANTI
 
    Sostituisci il contenuto della cartella con quello del pacchetto
-   nuovo. I dati non si toccano: stanno in Produzione, e Backup e
+   nuovo. Se prima c'era Inventario.exe e adesso usi il pacchetto
+   senza eseguibile, CANCELLA Inventario.exe e la cartella _internal:
+   altrimenti restano li' e chi li apre usa la versione vecchia del
+   programma. Poi rifai i collegamenti sui desktop.
+
+   La versione in uso e' scritta nella barra del titolo della
+   finestra: e' il modo per accorgersene. I dati non si toccano: stanno in Produzione, e Backup e
    Collaudo restano dove sono.
 
    Se un file non si lascia cancellare, guarda PRIMA la sola lettura:
@@ -172,6 +178,13 @@ with the recommended package read Inventario.py.
 UPDATING THE PROGRAM LATER
 
    Replace the contents of the folder with those of the new package.
+   If Inventario.exe was there before and you now use the package
+   without an executable, DELETE Inventario.exe and the _internal
+   folder: otherwise they stay and whoever opens them runs the old
+   version of the program. Then redo the desktop shortcuts.
+
+   The version in use is written in the window title bar: that is how
+   you notice.
    The data is untouched: it lives in Produzione, and Backup and
    Collaudo stay where they are.
 

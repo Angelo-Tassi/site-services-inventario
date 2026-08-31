@@ -142,6 +142,34 @@ def riga_tag(row, tags):
     return tags.get(testo)
 
 
+def separatore_con_avanzi(row, mapping, tags):
+    """Riconosce un separatore anche quando la riga porta celle di troppo.
+
+    La forma pulita - una sola cella scritta - la vede gia' riga_tag. Qui si
+    prendono i fogli meno ordinati: vale come separatore la riga in cui la
+    casella dell'identificativo contiene il nome di una stanza e nessun altro
+    campo del dispositivo e' pieno. Un dispositivo vero non si chiama come una
+    stanza, quindi il rischio di scambiarli e' nullo; il danno di non
+    riconoscere un separatore, invece, e' che tutto l'inventario finisce senza
+    stanza e il nome della stanza diventa un dispositivo.
+    """
+    campi = {}
+    for idx, field in mapping.items():
+        campi.setdefault(field, idx)
+    idx = campi.get("asset_tag", campi.get("imei"))
+    if idx is None or idx >= len(row):
+        return None
+    testo = clean(row[idx]).upper().strip(" :-\u2013\u2014.\t")
+    if testo not in tags:
+        return None
+    for field in ("tipo", "modello", "seriale", "imei", "stato"):
+        altro = campi.get(field)
+        if altro is not None and altro != idx and altro < len(row) \
+                and clean(row[altro]):
+            return None
+    return tags[testo]
+
+
 LOCK_TIMEOUT = 20.0     # secondi di attesa prima di rinunciare
 LOCK_STALE_AFTER = 120  # secondi dopo i quali un lock e' considerato abbandonato
 
@@ -997,6 +1025,8 @@ def rows_from_workbook(path, rooms=None):
                 if row is None or all(c is None or clean(c) == "" for c in row):
                     continue
                 stanza = riga_tag(row, tags)
+                if stanza is None:
+                    stanza = separatore_con_avanzi(row, mapping, tags)
                 if stanza is not None:
                     stanza_corrente = stanza
                     if stanza not in esito["stanze_trovate"]:

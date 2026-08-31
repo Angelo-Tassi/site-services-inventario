@@ -101,5 +101,19 @@ app.var_search.set("8h2klm3"); app.refresh_table()
 assert [i["asset_tag"] for i in app.visible] == ["IT-0104"]
 app.reset_filters()
 assert len(app.visible) == 15
+
+# ---- la tabella si scorre anche in orizzontale: le ultime colonne (note,
+# modificato il, modificato da) altrimenti non si raggiungono
+assert str(app.tree.cget("xscrollcommand")), "manca lo scorrimento orizzontale"
+barre = [w for w in app.tree.master.winfo_children()
+         if w.winfo_class() == "TScrollbar"]
+assert len(barre) == 2, "servono due barre di scorrimento, non %d" % len(barre)
+assert sorted(str(b.cget("orient")) for b in barre) == ["horizontal", "vertical"]
+
+# ---- la versione si legge nel titolo: serve per capire, davanti a un difetto,
+# quale copia del programma sta girando davvero
+from inventario import __version__
+assert __version__ in app.title(), app.title()
+
 app.destroy()
 print("UI OK")

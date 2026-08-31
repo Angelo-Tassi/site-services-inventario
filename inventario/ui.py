@@ -10,7 +10,7 @@ import tkinter as tk
 from datetime import datetime
 from tkinter import filedialog, messagebox, ttk
 
-from . import config, excel_io, theme
+from . import __version__, config, excel_io, theme
 from . import lingua as lang
 from .lingua import T, intestazione, stato as traduci_stato
 from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
@@ -895,7 +895,7 @@ class ImportDialog(_Modal):
         ttk.Label(body, text=T("\n").join(righe), style="Muted.TLabel",
                   justify="left").pack(anchor="w", pady=(2, 8))
 
-        for testo in self._avvertenze(esito):
+        for testo in self._avvertenze(esito, opzioni, count):
             avviso = tk.Label(body, text=testo, justify="left", anchor="w",
                               bg=theme.LOAN_BG, fg=theme.LOAN_FG,
                               padx=10, pady=8, wraplength=430)
@@ -928,9 +928,22 @@ class ImportDialog(_Modal):
                    command=self._ok).pack(side="right")
 
     @staticmethod
-    def _avvertenze(esito):
+    def _avvertenze(esito, opzioni=None, count=0):
         """Cosa il file conteneva e il programma non ha potuto usare."""
         messaggi = []
+        opzioni = opzioni or {}
+        if count and opzioni.get("stanza") is None \
+                and not esito.get("stanze_trovate"):
+            # e' il difetto che si nota solo dopo: le schede delle stanze
+            # restano a zero e tutto finisce nell'elenco completo
+            messaggi.append(
+                T("Nel foglio non c'e' nessuna riga che dichiari una stanza.\n"
+                  "I %d dispositivi verranno importati SENZA STANZA: le schede\n"
+                  "delle stanze resteranno vuote.\n\n"
+                  "Una riga separatore e' una riga con scritto solo il nome della\n"
+                  "stanza, per esempio  Site Services BAU  (vanno bene anche BAU,\n"
+                  "KIOSK, DISASTER). Vale per tutte le righe che la seguono.")
+                % count)
         ignorate = esito.get("colonne_ignorate") or []
         if ignorate:
             elenco = ", ".join(ignorate[:6])
@@ -1013,7 +1026,8 @@ class RoomCard(tk.Frame):
 class App(tk.Tk):
     def __init__(self, data_path):
         tk.Tk.__init__(self)
-        self.title(T("Site Services : Inventario Iphone, Laptop e Tablet"))
+        self.title(T("Site Services : Inventario Iphone, Laptop e Tablet")
+                   + "  -  v" + __version__)
         self.geometry("1220x720")
         self.minsize(980, 560)
 
@@ -1057,7 +1071,8 @@ class App(tk.Tk):
         self._clear_row_buttons()
         for figlio in self.winfo_children():
             figlio.destroy()
-        self.title(T("Site Services : Inventario Iphone, Laptop e Tablet"))
+        self.title(T("Site Services : Inventario Iphone, Laptop e Tablet")
+                   + "  -  v" + __version__)
         self.cfg = config.load_shared_config(self.store.path)
         self.store.iphone_room = self.cfg.get("iphone_room")
         self.store.stati = list(self.cfg.get("states") or [])
@@ -1078,6 +1093,8 @@ class App(tk.Tk):
         left.pack(side="left")
         ttk.Label(left, text=T("Site Services : Inventario Iphone, Laptop e Tablet"),
                   style="HeadTitle.TLabel").pack(anchor="w")
+        ttk.Label(left, text="v" + __version__,
+                  style="HeadSub.TLabel").pack(anchor="w")
         self.var_subtitle = tk.StringVar(value=T("Laptop e tablet in nostro possesso"))
         ttk.Label(left, textvariable=self.var_subtitle,
                   style="HeadSub.TLabel").pack(anchor="w", pady=(2, 0))
@@ -1247,14 +1264,38 @@ class App(tk.Tk):
             tree.column(field, width=COLUMN_WIDTHS[field], anchor="w",
                         stretch=(field in ("modello", "note")))
         scroll = ttk.Scrollbar(wrap, orient="vertical", command=tree.yview)
+        scroll_x = ttk.Scrollbar(wrap, orient="horizontal", command=tree.xview)
 
         def on_scroll(primo, ultimo):
             scroll.set(primo, ultimo)
             self._sync_row_buttons()
 
-        tree.configure(yscrollcommand=on_scroll)
-        tree.pack(side="left", fill="both", expand=True)
-        scroll.pack(side="right", fill="y")
+        def on_scroll_x(primo, ultimo):
+            scroll_x.set(primo, ultimo)
+            self._sync_row_buttons()
+
+        tree.configure(yscrollcommand=on_scroll, xscrollcommand=on_scroll_x)
+        # con la griglia le due barre restano ai bordi giusti anche quando la
+        # tabella e' piu' larga della finestra: le colonne in fondo - note,
+        # modificato il, modificato da - si raggiungono scorrendo a destra
+        tree.grid(row=0, column=0, sticky="nsew")
+        scroll.grid(row=0, column=1, sticky="ns")
+        scroll_x.grid(row=1, column=0, sticky="ew")
+        wrap.rowconfigure(0, weight=1)
+        wrap.columnconfigure(0, weight=1)
+
+        def rotella_orizzontale(event):
+            passo = event.delta
+            if passo:                      # Windows e macOS
+                tree.xview_scroll(-1 if passo > 0 else 1, "units")
+            self._sync_row_buttons()
+            return "break"
+
+        tree.bind("<Shift-MouseWheel>", rotella_orizzontale)
+        tree.bind("<Button-6>", lambda e: (tree.xview_scroll(-1, "units"),
+                                           self._sync_row_buttons()))
+        tree.bind("<Button-7>", lambda e: (tree.xview_scroll(1, "units"),
+                                           self._sync_row_buttons()))
         tree.tag_configure("odd", background=theme.ROW_ALT)
         tree.tag_configure("loan", background=theme.LOAN_BG, foreground=theme.LOAN_FG)
         tree.tag_configure("loan_alt", background=theme.LOAN_BG_ALT, foreground=theme.LOAN_FG)

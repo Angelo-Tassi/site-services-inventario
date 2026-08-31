@@ -238,6 +238,24 @@ It is worth talking to whoever runs security **before** deploying to many
 workstations: an unsigned internal tool is a normal situation, usually settled
 with one allow rule.
 
+## Which version is running
+
+The version number is written **in the window title bar** and under the title
+inside the program. It is the first thing to check when something does not
+behave as this page says: nearly always the copy in use is not the one you
+think.
+
+**Do not mix the two packages in one folder.** If you extract the package
+without an executable over a folder that held `Inventario.exe`, the old
+executable stays there and still works: whoever opens it - or still has the old
+desktop shortcut - **runs an earlier version of the program**, with the defects
+fixed since. Delete `Inventario.exe` and the `_internal` folder, and redo the
+shortcuts with `Crea collegamento sul desktop.bat`. If both are in the folder,
+the `.bat` tells you and points at the new one.
+
+If the old executable will not delete, see
+[If `Inventario.exe` will not delete](#if-inventarioexe-will-not-delete).
+
 ## Running it
 
 Double-click **`Inventario.exe`** in the network folder.
@@ -344,7 +362,7 @@ a new folder**, next to the old one:
 2. **move** - do not copy - the `Produzione` folder from the old installation to
    the new one: the real inventory is in there. Move `Backup` too, if you want to
    keep the copies;
-3. redo the desktop shortcuts pointing at the new `Inventario.exe`;
+3. redo the desktop shortcuts with `Crea collegamento sul desktop.bat`;
 4. delete the old folder once it frees up, at your leisure.
 
 The inventory is not lost and nobody is left without the program. This is also

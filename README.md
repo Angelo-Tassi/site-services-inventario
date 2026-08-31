@@ -244,6 +244,25 @@ Vale la pena parlarne con chi gestisce la sicurezza **prima** di distribuirlo su
 molte postazioni: uno strumento interno non firmato e' una situazione normale,
 che di solito si risolve con una riga di autorizzazione.
 
+## Quale versione sta girando
+
+Il numero di versione e' scritto **nella barra del titolo della finestra** e
+sotto il titolo dentro il programma. E' la prima cosa da guardare quando
+qualcosa non funziona come dice questa pagina: quasi sempre la copia che si sta
+usando non e' quella che si crede.
+
+**Non mescolare i due pacchetti nella stessa cartella.** Se estrai il pacchetto
+senza eseguibile sopra una cartella dove c'era `Inventario.exe`, l'eseguibile
+vecchio resta li' e continua a funzionare: chi lo apre - o chi ha ancora il
+vecchio collegamento sul desktop - **usa una versione precedente del
+programma**, con i difetti che sono stati corretti nel frattempo. Cancella
+`Inventario.exe` e la cartella `_internal`, e rifai i collegamenti con
+`Crea collegamento sul desktop.bat`. Se in cartella ci sono tutti e due, il file
+`.bat` te lo dice e punta a quello nuovo.
+
+Se l'eseguibile vecchio non si lascia cancellare, vedi
+[Se `Inventario.exe` non si lascia cancellare](#se-inventarioexe-non-si-lascia-cancellare).
+
 ## Come si lancia
 
 Doppio clic su **`Inventario.exe`** nella cartella di rete.
@@ -371,7 +390,7 @@ nuovo **in una cartella nuova**, accanto alla vecchia:
 2. **sposta** - non copiare - la cartella `Produzione` dalla vecchia
    installazione alla nuova: dentro c'e' l'inventario vero. Sposta anche
    `Backup`, se vuoi conservare le copie;
-3. rifai il collegamento sui desktop puntando al nuovo `Inventario.exe`;
+3. rifai il collegamento sui desktop con `Crea collegamento sul desktop.bat`;
 4. cancella la vecchia cartella quando si sara' liberata, con calma.
 
 L'inventario non si perde e nessuno resta senza programma. E' anche la procedura
