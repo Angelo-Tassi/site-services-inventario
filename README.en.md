@@ -146,6 +146,64 @@ without unblocking anything. It costs a few hundred euros a year and has to be
 requested from whoever runs corporate IT; if you get one, it is added to the build
 in a single step.
 
+## Where to put the program
+
+There are two ways to deploy it, and they differ only in where the executable
+lives. In both, **there is one inventory, on the share**.
+
+### A. Everything on the network folder
+
+This is the starting arrangement: extract the package onto the share and put the
+shortcut on the desktops. One place to update, nothing to touch on the
+workstations.
+
+The drawback is that the executable is **started from the network**, and
+corporate security systems watch that behaviour closely: an unsigned binary run
+from a share is one of the patterns they flag most often.
+
+### B. Program on the workstations, data on the share
+
+If security is a concern - or if somebody has already flagged the executable -
+this is the quieter arrangement, and the program supports it with no changes.
+
+1. copy the program folder (`Inventario.exe`, `_internal` and the files beside
+   them) onto each workstation, for example into `C:\Program Files\Inventario`
+   or `%LOCALAPPDATA%\Inventario`;
+2. **leave only the data on the share**: the `Produzione` folder with
+   `Inventario.xlsx` and the settings inside;
+3. on each workstation, next to the executable, create
+   `inventario_percorso.json` with the network path:
+
+```json
+{ "data_path": "\\\\server\\Shared\\Inventory\\Produzione\\Inventario.xlsx" }
+```
+
+   Alternatively start the program once and point it at the file when asked: the
+   choice is remembered by itself.
+
+No executable is left on the share, and nobody starts one from the network. The
+**backup copies follow the data**: they go into `Produzione\Backup` on the
+share, one set for everybody, not onto individual workstations.
+
+The price is that an update has to be distributed to every workstation - by copy,
+by software package or by GPO - instead of replacing a single folder.
+
+### If the executable gets flagged
+
+The program is not signed, so it can be intercepted. There are three routes, in
+order of solidity:
+
+1. **a code-signing certificate**: solves it at the root, on any workstation and
+   with either arrangement;
+2. **an allow rule** agreed with whoever runs security - AppLocker or Windows
+   Defender Application Control - by path or by file hash;
+3. **moving the program locally**, that is arrangement B, which removes the
+   "executable started from a share" pattern altogether.
+
+It is worth talking to whoever runs security **before** deploying to many
+workstations: an unsigned internal tool is a normal situation, usually settled
+with one allow rule.
+
 ## Running it
 
 Double-click **`Inventario.exe`** in the network folder.
@@ -217,7 +275,16 @@ If you rebooted your computer and the file still will not delete, the lock is no
 on your PC. Before looking elsewhere, one test tells you straight away which
 problem you have.
 
-**Try renaming** `Inventario.exe` to `Inventario_old.exe`.
+**Check the read-only attribute first**: right-click the file > *Properties* >
+at the bottom of the General tab, the **Read-only** box. If it is ticked, clear
+it and try again: it is the most banal cause and also the most common, and has
+nothing to do with locks. From the command line:
+
+```
+attrib -R "\\server\Shared\Inventory\Inventario.exe"
+```
+
+If that was not it, **try renaming** `Inventario.exe` to `Inventario_old.exe`.
 
 | What happens | Which problem it is | What to do |
 | --- | --- | --- |

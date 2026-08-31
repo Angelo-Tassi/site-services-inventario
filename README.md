@@ -149,6 +149,66 @@ niente, su nessuna postazione e senza sbloccare niente. Costa qualche centinaio
 di euro all'anno e va richiesto a chi gestisce l'IT aziendale; se lo ottieni, si
 aggiunge alla compilazione con un passaggio solo.
 
+## Dove mettere il programma
+
+Ci sono due modi di distribuirlo, e cambiano solo dove sta l'eseguibile. In
+entrambi **l'inventario e' uno solo, sulla share**.
+
+### A. Tutto sulla cartella di rete
+
+E' l'impostazione di partenza: si estrae il pacchetto sulla share e si mette il
+collegamento sui desktop. Un solo posto da aggiornare, niente da toccare sulle
+postazioni.
+
+Lo svantaggio e' che l'eseguibile **viene avviato dalla rete**, e i sistemi di
+sicurezza aziendali guardano quel comportamento con attenzione: un binario non
+firmato eseguito da una share e' uno degli schemi che segnalano piu' spesso.
+
+### B. Programma sulle postazioni, dati sulla share
+
+Se la sicurezza e' un tema - o se qualcuno ha gia' segnalato l'eseguibile -
+questa e' la sistemazione piu' tranquilla, e il programma la supporta senza
+modifiche.
+
+1. copia la cartella del programma (`Inventario.exe`, `_internal` e i file
+   accanto) su ogni postazione, per esempio in
+   `C:\Programmi\Inventario` o in `%LOCALAPPDATA%\Inventario`;
+2. **lascia sulla share solo i dati**: la cartella `Produzione` con dentro
+   `Inventario.xlsx` e le impostazioni;
+3. su ogni postazione, accanto all'eseguibile, crea `inventario_percorso.json`
+   con il percorso di rete:
+
+```json
+{ "data_path": "\\\\server\\Condivisa\\Inventario\\Produzione\\Inventario.xlsx" }
+```
+
+   In alternativa avvia il programma una volta e indica il file quando lo chiede:
+   la scelta viene memorizzata da sola.
+
+Sulla share non resta nessun eseguibile, e nessuno lo avvia dalla rete. Le
+**copie di sicurezza seguono i dati**: finiscono in `Produzione\Backup` sulla
+share, uno solo per tutti, non sulle singole postazioni.
+
+Il prezzo e' che un aggiornamento va distribuito su ogni postazione - con una
+copia, un pacchetto software o una GPO - invece di sostituire una cartella sola.
+
+### Se l'eseguibile viene segnalato
+
+Il programma non e' firmato, quindi puo' essere intercettato. Le strade sono
+tre, in ordine di solidita':
+
+1. **un certificato di firma del codice**: risolve alla radice, su qualsiasi
+   postazione e con qualsiasi sistemazione;
+2. **una regola di autorizzazione** concordata con chi gestisce la sicurezza -
+   AppLocker o Windows Defender Application Control - su percorso o su impronta
+   del file;
+3. **spostare il programma in locale**, cioe' la sistemazione B, che toglie di
+   mezzo lo schema "eseguibile avviato da una share".
+
+Vale la pena parlarne con chi gestisce la sicurezza **prima** di distribuirlo su
+molte postazioni: uno strumento interno non firmato e' una situazione normale,
+che di solito si risolve con una riga di autorizzazione.
+
 ## Come si lancia
 
 Doppio clic su **`Inventario.exe`** nella cartella di rete.
@@ -239,7 +299,17 @@ Se hai riavviato il tuo computer e il file non si cancella lo stesso, il blocco
 non e' sul tuo PC. Prima di cercarlo altrove, un test dice subito di che
 problema si tratta.
 
-**Prova a rinominare** `Inventario.exe` in `Inventario_vecchio.exe`.
+**Guarda prima l'attributo di sola lettura**: tasto destro sul file >
+*Proprieta'* > in fondo alla scheda Generale, la casella **Sola lettura**. Se e'
+spuntata, togli la spunta e riprova: e' la causa piu' banale e anche la piu'
+frequente, e non ha niente a che vedere con i blocchi. Da riga di comando:
+
+```
+attrib -R "\\server\Condivisa\Inventario\Inventario.exe"
+```
+
+Se non era quello, **prova a rinominare** `Inventario.exe` in
+`Inventario_vecchio.exe`.
 
 | Cosa succede | Che problema e' | Cosa fare |
 | --- | --- | --- |

@@ -56,18 +56,27 @@ NOME_PRODUZIONE = "Produzione"
 
 
 def backup_dir():
-    """Cartella delle copie di sicurezza, dentro quella del programma.
+    """Cartella delle copie di sicurezza.
 
-    Se la cartella del programma e' in sola lettura - capita su una share
-    condivisa - si ripiega accanto al file dati e poi sul profilo utente: una
-    copia deve poter essere scritta, altrimenti l'operazione distruttiva viene
-    annullata.
+    Le copie stanno con i dati, non con il programma: se l'eseguibile e'
+    installato sulle singole postazioni e l'inventario vive sulla share, i
+    backup devono restare sulla share, uno solo per tutti. Quando programma e
+    dati stanno insieme - il caso di partenza - la cartella e' quella di sempre
+    dentro l'applicazione.
+
+    Se non si riesce a scrivere si ripiega sul profilo utente: una copia deve
+    poter essere scritta, altrimenti l'operazione distruttiva viene annullata.
     """
-    candidate = [os.path.join(app_dir(), NOME_BACKUP)]
+    candidate = []
     percorso = load_data_path()
-    if percorso:
-        candidate.append(os.path.join(os.path.dirname(os.path.abspath(percorso)),
-                                      NOME_BACKUP))
+    dati = os.path.dirname(os.path.abspath(percorso)) if percorso else None
+    dentro_il_programma = bool(
+        dati and os.path.abspath(dati).startswith(os.path.abspath(app_dir())))
+    if dentro_il_programma or not dati:
+        candidate.append(os.path.join(app_dir(), NOME_BACKUP))
+    if dati:
+        candidate.append(os.path.join(dati, NOME_BACKUP))
+        candidate.append(os.path.join(app_dir(), NOME_BACKUP))
     base = os.environ.get("APPDATA") or os.path.expanduser("~")
     candidate.append(os.path.join(base, "Inventario", NOME_BACKUP))
     for cartella in candidate:

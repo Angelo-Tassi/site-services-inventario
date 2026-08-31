@@ -19,8 +19,18 @@ assert "*" in regole and "!.gitignore" in regole, regole
 finta_app = tempfile.mkdtemp()
 config.app_dir = lambda: finta_app
 os.environ["APPDATA"] = tempfile.mkdtemp()
+config.load_data_path = lambda: os.path.join(finta_app, "Produzione", "Inventario.xlsx")
 cartella = config.backup_dir()
 assert cartella == os.path.join(finta_app, "Backup"), cartella
+
+# ---- con il programma installato in locale, le copie restano con i dati
+altrove = tempfile.mkdtemp()
+os.makedirs(os.path.join(altrove, "Produzione"))
+config.load_data_path = lambda: os.path.join(altrove, "Produzione", "Inventario.xlsx")
+sulla_share = config.backup_dir()
+assert sulla_share == os.path.join(altrove, "Produzione", "Backup"), sulla_share
+assert not sulla_share.startswith(finta_app), "le copie non devono finire sulla postazione"
+config.load_data_path = lambda: os.path.join(finta_app, "Produzione", "Inventario.xlsx")
 assert os.path.isdir(cartella)
 assert not os.path.exists(os.path.join(cartella, ".scrivibile")), "la prova va rimossa"
 
