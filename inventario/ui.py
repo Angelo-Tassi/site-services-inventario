@@ -370,6 +370,7 @@ class RoomsDialog(_Modal):
         ttk.Button(buttons, text=T("Collega inventario condiviso..."),
                    command=self._collega).pack(side="left", padx=(0, 8))
         ttk.Button(buttons, text=T("Ripristina da una copia..."),
+                   style="Rosso.TButton",
                    command=self._ripristina).pack(side="left")
         ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
         ttk.Button(buttons, text=T("Salva"), style="Primary.TButton",
@@ -1138,16 +1139,21 @@ class App(tk.Tk):
         ):
             ttk.Button(bar, text=T(text), command=command).pack(side="left", padx=(0, 6))
         ttk.Separator(bar, orient="vertical").pack(side="left", fill="y", padx=10)
-        for text, command in (
-            ("Importa xls...", self.on_import),
-            ("Esporta xls...", self.on_export),
-            ("Stampa", self.on_print),
+        # Il colore dice a quale famiglia appartiene il comando: arancione i
+        # dati che entrano, verde quelli che escono, rosso quello che riscrive
+        # l'inventario di tutti.
+        for text, command, stile in (
+            ("Importa xls...", self.on_import, "Arancio.TButton"),
+            ("Esporta xls...", self.on_export, "Verde.TButton"),
+            ("Salva copia in locale...", self.on_copia_locale, "Verde.TButton"),
+            ("Stampa", self.on_print, "TButton"),
         ):
-            ttk.Button(bar, text=T(text), command=command).pack(side="left", padx=(0, 6))
+            ttk.Button(bar, text=T(text), style=stile,
+                       command=command).pack(side="left", padx=(0, 6))
         ttk.Button(bar, text=T("Impostazioni"), command=self.on_settings).pack(side="right")
-        ttk.Button(bar, text=T("Reset inventario"),
+        ttk.Button(bar, text=T("Reset inventario"), style="Rosso.TButton",
                    command=self.on_reset).pack(side="right", padx=(0, 6))
-        ttk.Button(bar, text=T("Ripristina"),
+        ttk.Button(bar, text=T("Ripristina"), style="Rosso.TButton",
                    command=self.on_restore).pack(side="right", padx=(0, 6))
         ttk.Button(bar, text=T("Aggiorna"), command=self.on_refresh).pack(side="right", padx=6)
 
@@ -1614,8 +1620,10 @@ class App(tk.Tk):
                       style="Section.TLabel").pack(side="left")
             if self.view == "room":
                 ttk.Button(header, text=T("Esporta questa stanza in xls"),
+                           style="Verde.TButton",
                            command=self.on_export_room).pack(side="right")
                 ttk.Button(header, text=T("Importa i dati di questa stanza"),
+                           style="Arancio.TButton",
                            command=self.on_import_room).pack(side="right", padx=(0, 6))
             self.var_section_count = tk.StringVar()
             ttk.Label(header, textvariable=self.var_section_count,
@@ -2516,6 +2524,43 @@ class App(tk.Tk):
               "Lo stato precedente e' stato salvato in:\n%s")
             % (ripristinati, quando.strftime("%d/%m/%Y %H:%M:%S"), precedente),
             parent=self)
+
+    def on_copia_locale(self):
+        """Salva una copia dell'inventario dove decide l'utente.
+
+        Serve contro il caso che nessun backup automatico copre: la cartella di
+        rete che sparisce, o qualcuno che ci cancella dentro. La copia e' un
+        inventario completo e apribile - non un estratto - quindi da sola basta
+        a ripartire.
+        """
+        adesso = datetime.now()
+        proposto = "Inventario_%s.xlsx" % adesso.strftime("%Y-%m-%d_%H-%M")
+        percorso = filedialog.asksaveasfilename(
+            parent=self, title=T("Salva una copia dell'inventario"),
+            defaultextension=".xlsx", initialfile=proposto,
+            initialdir=os.path.expanduser("~"),
+            filetypes=[(T("File Excel"), "*.xlsx")])
+        if not percorso:
+            return
+        try:
+            salvato, impostazioni, quanti = self.store.copia_in(percorso)
+        except InventoryError as exc:
+            messagebox.showerror(T("Copia non riuscita"), str(exc), parent=self)
+            return
+        righe = [T("%d dispositivi, come sono in questo momento.") % quanti,
+                 "",
+                 salvato]
+        if impostazioni:
+            righe.append(os.path.basename(impostazioni))
+            righe.append("")
+            righe.append(T("Accanto ai dati e' stato salvato anche il file delle\n"
+                           "impostazioni: stanze, tipi e stati per rimetterlo\n"
+                           "com'era."))
+        righe.append("")
+        righe.append(T("E' un inventario completo: si apre in Excel, e in caso di\n"
+                       "guaio si ricarica con Ripristina o con Importa xls...\n"
+                       "in modalita' Sostituisci."))
+        messagebox.showinfo(T("Copia salvata"), "\n".join(righe), parent=self)
 
     def on_collega(self):
         """Sceglie la cartella condivisa in cui sta l'inventario di tutti."""

@@ -692,6 +692,44 @@ class InventoryStore(object):
                 "L'operazione e' stata annullata: nessun dato e' stato toccato." % exc)
         return destinazione
 
+    def copia_in(self, destinazione):
+        """Copia l'inventario, com'e' in questo istante, nel percorso indicato.
+
+        La copia si prende dentro il lock: se in quel momento un altro tecnico
+        sta salvando, si aspetta che abbia finito. Cosi' il file portato via non
+        e' mai un inventario colto a meta' scrittura, ed e' aggiornato al
+        secondo in cui viene chiesto.
+
+        Accanto all'inventario viene salvato anche il file delle impostazioni -
+        stanze, tipi, stati - perche' da soli i dati non bastano a ricostruire
+        l'inventario com'era.
+
+        Ritorna (file dati, file impostazioni o None, quanti dispositivi).
+        """
+        from . import config
+
+        cartella = os.path.dirname(os.path.abspath(destinazione))
+        if not os.path.isdir(cartella):
+            raise InventoryError("La cartella non esiste:\n%s" % cartella)
+        with _Lock(self.path):
+            if not os.path.exists(self.path):
+                raise InventoryError("L'inventario non c'e' piu':\n%s" % self.path)
+            try:
+                shutil.copy2(self.path, destinazione)
+            except OSError as exc:
+                raise InventoryError("Non riesco a salvare la copia:\n%s" % exc)
+            quanti = len(self._read())
+            impostazioni = None
+            sorgente = config.shared_config_path(self.path)
+            if os.path.exists(sorgente):
+                accanto = os.path.splitext(destinazione)[0] + "_impostazioni.json"
+                try:
+                    shutil.copy2(sorgente, accanto)
+                    impostazioni = accanto
+                except OSError:
+                    impostazioni = None      # i dati sono salvi: basta e avanza
+        return destinazione, impostazioni, quanti
+
     def copie_disponibili(self, quante=40):
         """Le copie di sicurezza, dalla piu' recente. (percorso, data, dispositivi)."""
         from . import config

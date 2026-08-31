@@ -27,6 +27,19 @@ SHIP_ROW = "#F6EFFB"    # riga di un dispositivo rispedito
 SHIP_ROW_ALT = "#EFE5F7"
 SHIP_FG = "#6C3483"
 
+# Pulsanti della barra, colorati per famiglia: chi sta per premere sa a che
+# categoria appartiene il comando prima di leggerlo. Sfondi pastello e testo
+# scuro dello stesso tono - il contrasto resta alto, il colore non urla.
+AZIONE_ROSSA_BG = "#FBEAE7"      # ripristino e reset: si tocca l'inventario
+AZIONE_ROSSA_BG_ON = "#F6D8D2"
+AZIONE_ROSSA_FG = "#96291D"
+AZIONE_VERDE_BG = "#E7F4EA"      # esportazioni: i dati escono
+AZIONE_VERDE_BG_ON = "#D6EBDC"
+AZIONE_VERDE_FG = "#1E6B3A"
+AZIONE_ARANCIO_BG = "#FDF0E0"    # importazioni: i dati entrano
+AZIONE_ARANCIO_BG_ON = "#F8E2C8"
+AZIONE_ARANCIO_FG = "#8A5316"
+
 ROOM_COLORS = ["#2E86C1", "#16A085", "#8E44AD", "#D68910", "#C0392B"]
 IPHONE_COLOR = "#5D6D7E"   # scheda di comodo, non una stanza vera
 
@@ -82,6 +95,19 @@ def apply(root):
                     font=fonts["bold"], borderwidth=0, padding=(14, 6))
     style.map("Primary.TButton", background=[("active", PRIMARY_DARK),
                                              ("pressed", PRIMARY_DARK)])
+    for nome, sfondo, acceso, testo in (
+        ("Rosso", AZIONE_ROSSA_BG, AZIONE_ROSSA_BG_ON, AZIONE_ROSSA_FG),
+        ("Verde", AZIONE_VERDE_BG, AZIONE_VERDE_BG_ON, AZIONE_VERDE_FG),
+        ("Arancio", AZIONE_ARANCIO_BG, AZIONE_ARANCIO_BG_ON, AZIONE_ARANCIO_FG),
+    ):
+        style.configure("%s.TButton" % nome, background=sfondo, foreground=testo,
+                        font=fonts["bold"], borderwidth=1, relief="flat",
+                        padding=(12, 6))
+        style.map("%s.TButton" % nome,
+                  background=[("active", acceso), ("pressed", acceso)],
+                  foreground=[("active", testo), ("pressed", testo)],
+                  bordercolor=[("!disabled", acceso)])
+
     style.configure("Ghost.TButton", background=BG, foreground=PRIMARY,
                     font=fonts["bold"], borderwidth=0, padding=(6, 4))
     style.map("Ghost.TButton", background=[("active", BG)], foreground=[("active", ACCENT)])

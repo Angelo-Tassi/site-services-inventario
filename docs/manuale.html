@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manuale · Site Services Inventario</title>
+<meta name="description" content="Manuale del programma: dove stanno i file, che cosa fa ogni pulsante, prestiti, iPhone, importazioni ed esportazioni, copie di sicurezza e ripristino.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128187;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#E9EDF2; --panel:#FFF; --ink:#14212C; --ink-soft:#55677A; --ink-faint:#7E8FA0;
+  --line:#D3DBE4; --accent:#1F4E79; --accent-strong:#163A5B; --accent-soft:#E3EDF6;
+  --shadow:0 1px 2px rgba(20,33,44,.06),0 14px 40px rgba(20,33,44,.13);
+  --on-accent:#FFFFFF;
+}
+@media (prefers-color-scheme:dark){:root{
+  --ground:#0E1720; --panel:#16222E; --ink:#E6EDF4; --ink-soft:#9FB0C0; --ink-faint:#748899;
+  --line:#263644; --accent:#6FB3E0; --accent-strong:#8CC5EA; --accent-soft:#1B2C3B;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 44px rgba(0,0,0,.55);
+  --on-accent:#0B1520;
+}}
+/* colori reali del programma, uguali in entrambi i temi */
+:root{
+  --w-bg:#EEF2F7; --w-card:#FFF; --w-primary:#1F4E79; --w-text:#1B2733; --w-muted:#6B7A8C;
+  --w-border:#D7E0EA; --w-head:#E7EEF6; --w-row-alt:#F6F9FC; --w-loan-bg:#FDEEEC;
+  --w-loan-fg:#A93226; --w-iphone:#EDF9EF; --w-tablet:#EAF4FD; --w-link:#1A6BA8;
+  --w-ship:#F6EFFB; --w-ship-fg:#6C3483;
+  --w-r1:#2E86C1; --w-r2:#16A085; --w-r3:#8E44AD; --w-r4:#5D6D7E;
+  --w-face:"Segoe UI",-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:var(--ground);color:var(--ink);
+  font:400 16px/1.65 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+a{color:var(--accent)}
+
+header{padding:64px 0 40px}
+.eyebrow{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+h1{margin:0 0 14px;font-family:Archivo,sans-serif;font-weight:700;
+  font-size:clamp(32px,5.2vw,52px);line-height:1.04;letter-spacing:-.022em;text-wrap:balance}
+.lede{margin:0;max-width:60ch;font-size:18px;color:var(--ink-soft)}
+.alpha{display:inline-block;margin-top:18px;padding:7px 12px;border-radius:3px;
+  background:var(--accent-soft);border:1px solid var(--line);
+  font:500 12px/1 "IBM Plex Mono",monospace;color:var(--accent)}
+
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 8px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:14px 22px;border-radius:4px;
+  text-decoration:none;font-weight:600;font-size:15px;border:1px solid transparent}
+.btn.main{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.main:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.btn.alt{background:var(--panel);color:var(--ink);border-color:var(--line)}
+.btn.alt:hover{border-color:var(--accent);color:var(--accent)}
+.note{font-size:14px;color:var(--ink-faint);margin:6px 0 0}
+
+section{padding:44px 0}
+h2{margin:0 0 8px;font-family:Archivo,sans-serif;font-weight:600;font-size:24px;letter-spacing:-.01em}
+.sub{margin:0 0 24px;color:var(--ink-soft);max-width:62ch}
+
+/* finestra del programma */
+.shot{background:var(--w-bg);border:1px solid var(--line);border-radius:7px;
+  box-shadow:var(--shadow);overflow:hidden;font-family:var(--w-face);color:var(--w-text);font-size:13px}
+.bar{background:#DFE6EE;border-bottom:1px solid #CBD6E1;padding:7px 12px;font-size:12px;color:#4B5C6B;
+  display:flex;align-items:center;gap:9px}
+.bar .dot{width:9px;height:9px;border-radius:50%;background:#9FB1C2}
+.bar .sp{flex:1}
+.appbar{background:var(--w-primary);color:#fff;padding:14px 18px;display:flex;
+  align-items:flex-end;gap:16px;flex-wrap:wrap}
+.appbar b{font-size:19px;font-weight:600}
+.appbar .s{color:#BBD4EA;font-size:12px;margin-top:2px}
+.appbar .t{margin-left:auto;color:#BBD4EA;font-size:12px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;padding:11px 16px 4px}
+.tb{background:#fff;border:1px solid var(--w-border);border-radius:3px;
+  padding:7px 12px;font-size:12.5px;color:var(--w-text)}
+.tb.p{background:var(--w-primary);border-color:var(--w-primary);color:#fff;font-weight:600}
+.stage{padding:6px 16px 14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin:8px 0 16px}
+.c{background:#fff;border:1px solid var(--w-border);border-radius:4px;
+  overflow:hidden;color:var(--w-text)}
+.c i{display:block;height:4px}
+.c .b{padding:12px 15px 14px}
+.c .n{font-weight:600;font-size:13.5px}
+.c .q{font-size:32px;font-weight:700;line-height:1.15}
+.c .m{font-size:11.5px;color:var(--w-muted)}
+.c .g{font-size:12px;font-weight:600;color:var(--w-link);margin-top:8px}
+/* superficie chiara fissa: il testo dentro non eredita mai il colore del tema,
+   altrimenti in modalita' scura diventa bianco su bianco */
+.tw{background:#fff;border:1px solid var(--w-border);border-radius:3px;
+  overflow-x:auto;color:var(--w-text)}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th{background:var(--w-head);color:var(--w-primary);font-weight:600;font-size:12px;
+  text-align:left;padding:8px 10px;white-space:nowrap;border-bottom:1px solid var(--w-border)}
+td{padding:7px 10px;font-size:12.5px;border-bottom:1px solid #EDF1F6;
+  white-space:nowrap;color:var(--w-text)}
+tr:nth-child(even){background:var(--w-row-alt)}
+tr.ip,tr.ip:nth-child(even){background:var(--w-iphone)}
+tr.tb2,tr.tb2:nth-child(even){background:var(--w-tablet)}
+tr.ln,tr.ln:nth-child(even){background:var(--w-loan-bg)}
+tr.sp,tr.sp:nth-child(even){background:var(--w-ship)}
+tr.sp td{color:var(--w-ship-fg)}
+tr.ln td{color:var(--w-loan-fg)}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:12px}
+.pill{display:inline-block;background:var(--w-link);color:#fff;border-radius:3px;
+  padding:4px 9px;font-size:11px;font-weight:600}
+.pill.r{background:var(--w-loan-fg)}
+.sel{color:var(--w-link);font-size:14px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:20px}
+.card h3{margin:0 0 7px;font-family:Archivo,sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+.card p{margin:0;font-size:14.5px;color:var(--ink-soft)}
+
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:14px}
+ol.steps li{counter-increment:s;background:var(--panel);border:1px solid var(--line);
+  border-radius:5px;padding:18px 20px 18px 58px;position:relative;font-size:15px;color:var(--ink-soft)}
+ol.steps li::before{content:counter(s);position:absolute;left:20px;top:17px;
+  width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;
+  font:600 13px/24px "IBM Plex Mono",monospace;text-align:center}
+ol.steps b{color:var(--ink)}
+code{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--accent-soft);
+  padding:2px 6px;border-radius:3px}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:5px;
+  padding:16px 18px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;font-size:13px}
+footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
+  color:var(--ink-faint);font-size:14px}
+.lingua{display:flex;justify-content:flex-end;align-items:center;gap:10px;
+  padding-top:26px;font-size:14px;color:var(--ink-soft)}
+.lingua select{font:inherit;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line);border-radius:4px;padding:7px 10px}
+[hidden]{display:none !important}
+
+h3{margin:26px 0 6px;font-family:Archivo,sans-serif;font-size:17px;font-weight:600}
+tr.sep td{background:var(--w-head);color:var(--w-primary)}
+table{min-width:520px}
+.eyebrow a{color:var(--ink-faint);text-decoration:none}
+.eyebrow a:hover{color:var(--accent)}
+
+/* pulsanti come appaiono nel programma, per riconoscerli nel testo */
+.k{display:inline-block;border-radius:3px;padding:3px 9px;font-size:12.5px;
+  font-weight:600;border:1px solid;white-space:nowrap;font-family:var(--w-face)}
+.k.rosso{background:#FBEAE7;border-color:#F6D8D2;color:#96291D}
+.k.verde{background:#E7F4EA;border-color:#D6EBDC;color:#1E6B3A}
+.k.arancio{background:#FDF0E0;border-color:#F8E2C8;color:#8A5316}
+.k.blu{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.k.grigio{background:#fff;border-color:#D7E0EA;color:#1B2733}
+.legenda{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px}
+.tw table.man{min-width:640px}
+.tw td.d{white-space:normal;min-width:320px}
+.avviso{background:var(--accent-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:4px;padding:14px 18px;margin:18px 0;font-size:15px;color:var(--ink-soft)}
+.avviso b{color:var(--ink)}
+.indice{columns:2;column-gap:26px;margin:0 0 10px;padding:0;list-style:none;font-size:15px}
+.indice li{margin:0 0 7px;break-inside:avoid}
+@media(max-width:620px){.indice{columns:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="lingua">
+  <label for="lang">Lingua / Language</label>
+  <select id="lang">
+    <option value="it">Italiano</option>
+    <option value="en">English</option>
+  </select>
+</div>
+<div data-lang="it"><header>
+  <div class="eyebrow"><a href="index.html">← Torna alla pagina del progetto</a></div>
+  <h1>Manuale del programma</h1>
+  <p class="lede">Che cosa fa ogni pulsante, dove stanno i file, come si mette al
+    sicuro l'inventario e come si torna indietro quando qualcosa va storto.</p>
+</header>
+
+<section>
+  <h2>Indice</h2>
+  <ul class="indice">
+    <li><a href="#idea">L'idea in tre righe</a></li>
+    <li><a href="#dove">Dove stanno i file</a></li>
+    <li><a href="#finestra">La finestra: home e stanze</a></li>
+    <li><a href="#pulsanti">Tutti i pulsanti, uno per uno</a></li>
+    <li><a href="#aggiungere">Aggiungere un dispositivo</a></li>
+    <li><a href="#modificare">Modificare al volo</a></li>
+    <li><a href="#prestiti">Prestiti</a></li>
+    <li><a href="#iphone">iPhone</a></li>
+    <li><a href="#importare">Importare da Excel</a></li>
+    <li><a href="#esportare">Esportare e stampare</a></li>
+    <li><a href="#sicurezza">Sicurezza dei dati</a></li>
+    <li><a href="#ripristino">Tornare indietro</a></li>
+    <li><a href="#impostazioni">Impostazioni</a></li>
+    <li><a href="#lingua">Lingua</a></li>
+    <li><a href="#diagnostica">Se qualcosa non va</a></li>
+    <li><a href="#regole">Cinque regole</a></li>
+  </ul>
+</section>
+
+<section id="idea">
+  <h2>L'idea in tre righe</h2>
+  <p class="sub">Tre cose da tenere a mente, il resto discende da queste.</p>
+  <div class="grid">
+    <div class="card"><h3>Un inventario solo</h3>
+      <p>Il file vive sulla cartella di rete. Ogni tecnico apre quello: non esistono
+        copie personali che dopo mezza giornata sarebbero gia' diverse.</p></div>
+    <div class="card"><h3>Si aggiorna sul momento</h3>
+      <p>Ogni entrata o uscita si registra quando accade, in dieci secondi. Non si
+        accumulano i movimenti per ricostruirli dopo tre mesi.</p></div>
+    <div class="card"><h3>Resta un file Excel</h3>
+      <p>L'inventario e' un normale <code>.xlsx</code>: si apre anche senza il
+        programma, e nessun dato resta prigioniero di un formato nostro.</p></div>
+  </div>
+</section>
+
+<section id="dove">
+  <h2>Dove stanno i file</h2>
+  <p class="sub">Due posti, e non si mescolano mai: il programma sta sulla postazione,
+    i dati sulla cartella di rete.</p>
+
+  <h3>Sulla tua postazione — il programma</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Percorso</th><th>Che cos'e'</th></tr>
+    <tr><td class="mono">C:\Inventario\Inventario.py</td><td class="d">Il programma che si avvia.</td></tr>
+    <tr><td class="mono">C:\Inventario\inventario\</td><td class="d">Il resto del programma, leggibile: sono file di testo.</td></tr>
+    <tr><td class="mono">C:\Inventario\python\</td><td class="d">Il Python ufficiale di python.org che fa girare il programma. Non spostare, non rinominare.</td></tr>
+    <tr><td class="mono">C:\Inventario\inventario_percorso.json</td><td class="d">Dice quale inventario aprire, e la lingua scelta. E' l'unico file da non perdere quando si aggiorna.</td></tr>
+    <tr><td class="mono">C:\Inventario\Collaudo\</td><td class="d">Due fogli Excel di prova e le istruzioni per provare l'importazione senza rischiare niente.</td></tr>
+    <tr><td class="mono">C:\Inventario\Diagnostica.txt</td><td class="d">Compare solo quando si lancia la diagnostica.</td></tr>
+  </table></div>
+
+  <h3>Sulla cartella di rete — i dati</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Percorso</th><th>Che cos'e'</th></tr>
+    <tr><td class="mono">\\server\Condivisa\Inventario\Produzione\Inventario.xlsx</td><td class="d"><b>L'inventario.</b> E' questo il file che conta. Si apre anche in Excel.</td></tr>
+    <tr><td class="mono">…\Produzione\inventario_impostazioni.json</td><td class="d">Stanze, tipi di dispositivo, stanze con prestito, stanza degli iPhone, stati. Uguale per tutti.</td></tr>
+    <tr><td class="mono">…\Produzione\Backup\</td><td class="d">Le copie che il programma salva <b>da solo</b> prima di ogni operazione che cancella o sostituisce.</td></tr>
+    <tr><td class="mono">…\.Inventario.xlsx.lock</td><td class="d">Compare per una frazione di secondo durante un salvataggio, poi sparisce. Se resta, vuol dire che un salvataggio si e' interrotto.</td></tr>
+  </table></div>
+
+  <div class="avviso"><b>Le copie che salvi tu</b> con <span class="k verde">Salva copia
+    in locale…</span> vanno dove vuoi tu: Documenti, Desktop, una chiavetta. Il programma
+    non le tocca e non le cancella mai.</div>
+</section>
+
+<section id="finestra">
+  <h2>La finestra: home e stanze</h2>
+  <p class="sub">Due sole schermate, e si passa dall'una all'altra con un clic.</p>
+  <div class="grid">
+    <div class="card"><h3>Home</h3>
+      <p>Una scheda per stanza con il numero di dispositivi e la ripartizione per tipo.
+        In fondo alle schede c'e' il contenitore <b>Iphone</b>, che non e' una stanza ma
+        raccoglie tutti i telefoni. Sotto le schede, l'inventario completo.</p></div>
+    <div class="card"><h3>Stanza</h3>
+      <p>Si apre cliccando una scheda. Mostra solo i dispositivi di quella stanza, e
+        aggiunge i due pulsanti per importare ed esportare soltanto lei.</p></div>
+    <div class="card"><h3>Selezione</h3>
+      <p>La colonna con la casella a sinistra: si seleziona <b>un dispositivo alla
+        volta</b>. Serve per Modifica, Elimina e Sposta.</p></div>
+    <div class="card"><h3>Filtri e ricerca</h3>
+      <p>Sopra l'elenco: stanza, tipo e una casella di ricerca che guarda dentro tutti
+        i campi, asset tag, seriale, note e nome di chi ha in prestito.</p></div>
+  </div>
+</section>
+
+<section id="pulsanti">
+  <h2>Tutti i pulsanti, uno per uno</h2>
+  <p class="sub">Il colore dice a che famiglia appartiene il comando, prima ancora di
+    leggerlo.</p>
+  <div class="legenda">
+    <span class="k arancio">arancione: i dati entrano</span>
+    <span class="k verde">verde: i dati escono</span>
+    <span class="k rosso">rosso: riscrive l'inventario di tutti</span>
+    <span class="k grigio">grigio: tutto il resto</span>
+  </div>
+
+  <div class="tw"><table class="man">
+    <tr><th>Pulsante</th><th>Che cosa fa</th></tr>
+    <tr><td><span class="k grigio">‹ Home</span></td><td class="d">Torna alla schermata iniziale da qualsiasi stanza.</td></tr>
+    <tr><td><span class="k blu">Aggiungi</span></td><td class="d">Chiede prima <b>che tipo</b> di dispositivo, poi se inserirlo a mano o con il lettore di codici a barre.</td></tr>
+    <tr><td><span class="k grigio">Modifica</span></td><td class="d">Apre il dispositivo selezionato per cambiarne i campi.</td></tr>
+    <tr><td><span class="k grigio">Elimina</span></td><td class="d">Toglie il dispositivo selezionato, con conferma. Gli iPhone hanno protezioni in piu': vedi <a href="#iphone">iPhone</a>.</td></tr>
+    <tr><td><span class="k grigio">Sposta in stanza…</span></td><td class="d">Cambia la stanza del dispositivo selezionato. Gli iPhone non si spostano.</td></tr>
+    <tr><td><span class="k arancio">Importa xls…</span></td><td class="d">Carica dispositivi da un foglio Excel. Prima chiede <b>che cosa</b> importare e <b>come</b>. Vedi <a href="#importare">Importare</a>.</td></tr>
+    <tr><td><span class="k verde">Esporta xls…</span></td><td class="d">Produce un file Excel dell'inventario. Prima chiede ambito e forma. Vedi <a href="#esportare">Esportare</a>.</td></tr>
+    <tr><td><span class="k verde">Salva copia in locale…</span></td><td class="d"><b>La copia di sicurezza che decidi tu.</b> Vedi <a href="#sicurezza">Sicurezza dei dati</a>.</td></tr>
+    <tr><td><span class="k grigio">Stampa</span></td><td class="d">Manda alla stampante l'elenco che stai guardando, impaginato. Puo' fare una pagina per stanza.</td></tr>
+    <tr><td><span class="k grigio">Aggiorna</span></td><td class="d">Rilegge subito l'inventario dalla rete. L'elenco si aggiorna comunque da solo ogni quindici secondi.</td></tr>
+    <tr><td><span class="k rosso">Ripristina</span></td><td class="d">Riporta l'inventario all'ultima copia di sicurezza. Vedi <a href="#ripristino">Tornare indietro</a>.</td></tr>
+    <tr><td><span class="k rosso">Reset inventario</span></td><td class="d">Svuota l'inventario. Chiede di scrivere <span class="mono">ELIMINA TUTTO</span> e salva prima una copia. Gli iPhone non si toccano mai.</td></tr>
+    <tr><td><span class="k grigio">Impostazioni</span></td><td class="d">Stanze, tipi, prestiti, lingua, ripristino da una copia scelta, e il collegamento all'inventario condiviso.</td></tr>
+  </table></div>
+
+  <h3>Solo dentro una stanza</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Pulsante</th><th>Che cosa fa</th></tr>
+    <tr><td><span class="k arancio">Importa i dati di questa stanza</span></td><td class="d">Carica dal foglio <b>solo</b> la sezione di questa stanza e scarta il resto. Il foglio deve contenere la riga separatore con il nome della stanza: se manca, non importa niente e te lo dice.</td></tr>
+    <tr><td><span class="k verde">Esporta questa stanza in xls</span></td><td class="d">Produce un file con i soli dispositivi di questa stanza, con il nome della stanza dentro al file.</td></tr>
+  </table></div>
+
+  <h3>Sulle righe dell'elenco</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Pulsante</th><th>Dove compare</th></tr>
+    <tr><td><span class="k blu">Presta</span> / <span class="k rosso">Rientro</span></td><td class="d">Colonna <b>Prestito</b>, solo nella stanza Digital Kiosk.</td></tr>
+    <tr><td><span class="k blu">Conferma spedizione</span></td><td class="d">Colonna <b>Spedizione</b>, solo nel contenitore Iphone.</td></tr>
+  </table></div>
+</section>
+
+<section id="aggiungere">
+  <h2>Aggiungere un dispositivo</h2>
+  <ol class="steps">
+    <li><b>Premi Aggiungi.</b> Compare subito la scelta del tipo: Laptop, Tablet o Iphone.</li>
+    <li><b>Scegli come inserirlo.</b> A mano, oppure con il lettore di codici a barre.
+      Con il lettore i campi si riempiono man mano che scansioni; se un codice non si
+      legge, il pulsante <i>non riesco a scansionare</i> ti fa scrivere quel campo a mano
+      senza ricominciare.</li>
+    <li><b>Compila.</b> Per laptop e tablet servono asset tag, modello e numero di serie.
+      Per gli iPhone servono <b>IMEI</b> e <b>Restituito da</b>: asset tag e numero di
+      serie non esistono proprio.</li>
+  </ol>
+  <p class="note">Il dispositivo appena inserito compare in cima all'elenco: e' ordinato
+    per ultima modifica, cosi' si vede subito che e' arrivato.</p>
+</section>
+
+<section id="modificare">
+  <h2>Modificare al volo</h2>
+  <p class="sub">Le cose che cambiano spesso non richiedono di aprire niente.</p>
+  <div class="grid">
+    <div class="card"><h3>Stato</h3>
+      <p>Doppio clic sulla cella <b>Stato</b>: compare la tendina con Disponibile, In
+        attesa ritiro, Guasto in attesa tecnico, Da rebuildare, Controllare.</p></div>
+    <div class="card"><h3>Note</h3>
+      <p>Doppio clic sulla cella <b>Note</b> e si scrive. Invio per confermare.</p></div>
+    <div class="card"><h3>Stanza</h3>
+      <p>Con <span class="k grigio">Sposta in stanza…</span>, oppure dalla scheda del
+        dispositivo.</p></div>
+  </div>
+</section>
+
+<section id="prestiti">
+  <h2>Prestiti</h2>
+  <p class="sub">Esistono solo dove servono: nella stanza <b>Digital Kiosk</b>.</p>
+  <ol class="steps">
+    <li><b>Presta.</b> Il pulsante sulla riga chiede il nome di chi prende il dispositivo.
+      Vengono registrati nome, data e ora.</li>
+    <li><b>Il dispositivo diventa rosso</b> e il suo stato passa a <i>Non disponibile</i>:
+      si vede a colpo d'occhio che non c'e'.</li>
+    <li><b>Rientro.</b> Lo stesso pulsante lo riporta disponibile e cancella il prestito.</li>
+  </ol>
+  <p class="note">Nelle altre stanze la colonna Prestito non compare affatto. Gli iPhone
+    non si prestano mai.</p>
+</section>
+
+<section id="iphone">
+  <h2>iPhone</h2>
+  <p class="sub">Seguono regole loro, perche' il loro ciclo di vita e' diverso.</p>
+  <div class="grid">
+    <div class="card"><h3>Campi diversi</h3>
+      <p><b>IMEI</b> e <b>Restituito da</b> al posto di asset tag e numero di serie. Non
+        hanno asset tag, in nessuna parte del programma.</p></div>
+    <div class="card"><h3>Solo a mano</h3>
+      <p>Non entrano mai da un'importazione e non escono mai in un'esportazione: si
+        inseriscono uno a uno.</p></div>
+    <div class="card"><h3>Stanza fissa</h3>
+      <p>Stanno sempre in Site Services BAU e non si spostano. Nella scheda il campo
+        appare gia' compilato e bloccato.</p></div>
+    <div class="card"><h3>Spedizione</h3>
+      <p><span class="k blu">Conferma spedizione</span> registra giorno e ora dell'invio
+        al servizio telefonia. Lo stato diventa <i>Spedito al servizio telefonia</i> e la
+        riga diventa viola.</p></div>
+    <div class="card"><h3>Conservazione</h3>
+      <p>Dopo la spedizione restano consultabili per <b>tre mesi</b>. Prima di allora il
+        programma rifiuta di eliminarli e dice da quando sara' possibile.</p></div>
+    <div class="card"><h3>Mai cancellati</h3>
+      <p>Nessuna operazione distruttiva li tocca: ne' il reset completo, ne'
+        un'importazione in sostituzione.</p></div>
+  </div>
+</section>
+
+<section id="importare">
+  <h2>Importare da Excel</h2>
+  <p class="sub">Serve a caricare in blocco quello che e' gia' censito altrove. Il
+    formato del foglio e' spiegato in dettaglio in
+    <a href="formato-xls.html">Come preparare il file Excel</a>.</p>
+
+  <h3>Prima cosa: che cosa e come</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Scelta</th><th>Significato</th></tr>
+    <tr><td><b>Tutto l'inventario</b></td><td class="d">Carica tutte le righe del foglio, assegnando le stanze in base alle righe separatore.</td></tr>
+    <tr><td><b>Una sola stanza</b></td><td class="d">Carica solo la sezione di quella stanza e scarta il resto. Serve la riga separatore.</td></tr>
+    <tr><td><b>Unisci</b></td><td class="d">Aggiunge i nuovi e aggiorna quelli che hanno lo stesso asset tag. Non cancella niente.</td></tr>
+    <tr><td><b>Sostituisci</b></td><td class="d">Svuota prima, poi carica. Salva sempre una copia di sicurezza. Gli iPhone restano.</td></tr>
+  </table></div>
+
+  <h3>Le righe separatore</h3>
+  <p class="sub">Una riga con scritto <b>solo</b> il nome della stanza divide il foglio:
+    tutto quello che segue finisce in quella stanza, fino al separatore successivo.
+    Vanno bene anche le abbreviazioni <span class="mono">BAU</span>,
+    <span class="mono">KIOSK</span>, <span class="mono">DISASTER</span>.</p>
+
+  <div class="avviso">Prima di importare, il programma mostra un riepilogo: quante righe
+    valide ha trovato, quali stanze ha riconosciuto, quali colonne non ha capito e quante
+    righe scarta. <b>Se nel foglio non trova nessuna stanza te lo dice li'</b>, prima di
+    toccare qualsiasi cosa, perche' altrimenti i dispositivi finirebbero senza stanza.</div>
+
+  <p class="note">Un foglio da importare non e' un inventario e non va mai aperto come
+    tale: si carica da qui.</p>
+</section>
+
+<section id="esportare">
+  <h2>Esportare e stampare</h2>
+  <h3>Prima cosa: ambito e forma</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Scelta</th><th>Risultato</th></tr>
+    <tr><td><b>Tutto / una stanza</b></td><td class="d">Che cosa finisce nel file.</td></tr>
+    <tr><td><b>Elenco unico</b></td><td class="d">Un file, un foglio, con la colonna Stanza.</td></tr>
+    <tr><td><b>Un foglio per stanza</b></td><td class="d">Un file solo, con un foglio Excel per ogni stanza.</td></tr>
+    <tr><td><b>Un file per stanza</b></td><td class="d">Piu' file separati, ognuno con il nome della stanza dentro.</td></tr>
+  </table></div>
+  <p class="note">Alla fine di <b>ogni</b> esportazione il programma chiede se aprire il
+    file, mandarlo per e-mail — apre Outlook con il file gia' allegato — o chiudere e
+    basta. Lavorando in italiano si puo' anche chiedere che il file esca in inglese.</p>
+  <h3>Stampa</h3>
+  <p class="sub">Impagina quello che stai guardando e lo manda alla stampante, con la
+    possibilita' di una pagina separata per ogni stanza.</p>
+</section>
+
+<section id="sicurezza">
+  <h2>Sicurezza dei dati</h2>
+  <p class="sub">Quattro protezioni diverse, che coprono guasti diversi.</p>
+
+  <div class="grid">
+    <div class="card"><h3>1 · Salvataggi che non si pestano</h3>
+      <p>Ogni salvataggio prende un <b>lock esclusivo</b>, rilegge il file, applica la
+        modifica e riscrive in modo atomico. Due tecnici che salvano nello stesso istante
+        non si sovrascrivono a vicenda.</p></div>
+    <div class="card"><h3>2 · Copie automatiche</h3>
+      <p>Prima di <b>ogni</b> operazione che cancella o sostituisce, il programma salva
+        da solo una copia in <span class="mono">Produzione\Backup\</span>, con la data
+        nel nome. Non devi ricordartene tu.</p></div>
+    <div class="card"><h3>3 · La copia che decidi tu</h3>
+      <p><span class="k verde">Salva copia in locale…</span> mette una copia
+        dell'inventario dove vuoi: sul tuo PC, su una chiavetta, fuori dalla rete.</p></div>
+    <div class="card"><h3>4 · Ripristino</h3>
+      <p>Si torna indietro dall'interfaccia, senza cercare file a mano. Vedi
+        <a href="#ripristino">qui sotto</a>.</p></div>
+  </div>
+
+  <h3>La copia in locale, in dettaglio</h3>
+  <p class="sub">E' la protezione contro il caso che le copie automatiche non coprono:
+    la cartella di rete che sparisce, o qualcuno che ci cancella dentro. Le copie
+    automatiche stanno sulla share: se sparisce la share, spariscono anche quelle.</p>
+  <ol class="steps">
+    <li><b>Premi <span class="k verde">Salva copia in locale…</span></b> e scegli dove
+      salvare. Il nome proposto porta data e ora, per esempio
+      <span class="mono">Inventario_2026-08-31_18-30.xlsx</span>.</li>
+    <li><b>La copia e' l'inventario di quel secondo.</b> Viene presa dal file sulla rete
+      nel momento in cui la chiedi, non da quello che il programma aveva letto prima. Se
+      in quell'istante un altro tecnico sta salvando, il programma aspetta che finisca:
+      non ottieni mai un file colto a meta' scrittura.</li>
+    <li><b>Accanto viene salvato anche il file delle impostazioni</b>, con lo stesso nome
+      e il suffisso <span class="mono">_impostazioni.json</span>: da soli i dati non
+      basterebbero a rimettere l'inventario com'era, servono anche stanze, tipi e stati.</li>
+    <li><b>E' un inventario completo, non un estratto.</b> Si apre in Excel, e in caso di
+      guaio si ricarica: con <span class="k rosso">Ripristina</span> scegliendo il file,
+      oppure con <span class="k arancio">Importa xls…</span> in modalita' Sostituisci.</li>
+  </ol>
+  <div class="avviso"><b>Quando farla.</b> Prima di ogni operazione grossa, e ogni tanto
+    per abitudine — a fine settimana, o dopo una giornata di movimenti. Costa cinque
+    secondi. Tienila fuori dalla cartella di rete: e' proprio da quella che ti protegge.</div>
+</section>
+
+<section id="ripristino">
+  <h2>Tornare indietro</h2>
+  <div class="tw"><table class="man">
+    <tr><th>Se…</th><th>Fai cosi'</th></tr>
+    <tr><td class="d">Hai appena sbagliato un'importazione o un reset</td><td class="d"><span class="k rosso">Ripristina</span> nella barra: riporta l'inventario all'<b>ultima</b> copia salvata, dicendoti di quando e' e quanti dispositivi contiene.</td></tr>
+    <tr><td class="d">Ti serve una copia piu' vecchia</td><td class="d"><span class="k grigio">Impostazioni</span> › <span class="k rosso">Ripristina da una copia…</span>: le mostra tutte, con data e numero di dispositivi, e scegli.</td></tr>
+    <tr><td class="d">La cartella di rete e' sparita o i dati sono stati cancellati</td><td class="d">Riparti dalla tua copia locale: rimettila sulla share come <span class="mono">Produzione\Inventario.xlsx</span>, insieme al file delle impostazioni rinominato <span class="mono">inventario_impostazioni.json</span>.</td></tr>
+    <tr><td class="d">Vuoi svuotare tutto e ricaricare da zero</td><td class="d"><span class="k rosso">Reset inventario</span>, scrivendo <span class="mono">ELIMINA TUTTO</span>. Una copia viene salvata comunque prima di procedere.</td></tr>
+  </table></div>
+  <div class="avviso">Anche il ripristino <b>salva prima una copia</b> dello stato
+    attuale: se ripristini la versione sbagliata, quella di partenza e' ancora li'.</div>
+</section>
+
+<section id="impostazioni">
+  <h2>Impostazioni</h2>
+  <div class="tw"><table class="man">
+    <tr><th>Voce</th><th>A che serve</th></tr>
+    <tr><td class="d"><b>Stanze</b></td><td class="d">Una per riga. Rinominarne una sposta anche i dispositivi che ci stavano.</td></tr>
+    <tr><td class="d"><b>Tipi di dispositivo</b></td><td class="d">Laptop, Tablet, Iphone. Togliendo Iphone sparisce tutta la parte dei telefoni.</td></tr>
+    <tr><td class="d"><b>Stanze con prestito</b></td><td class="d">Dove compare la colonna Prestito. Di solito solo Digital Kiosk.</td></tr>
+    <tr><td class="d"><b>Lingua</b></td><td class="d">Italiano o inglese. C'e' anche la tendina in alto a destra nell'intestazione.</td></tr>
+    <tr><td class="d"><b>Collega inventario condiviso…</b></td><td class="d">Sceglie la cartella di rete su cui lavorare, sfogliando. Dopo va riaperto il programma.</td></tr>
+    <tr><td class="d"><b>Ripristina da una copia…</b></td><td class="d">L'elenco di tutte le copie di sicurezza disponibili.</td></tr>
+  </table></div>
+  <p class="note">Stanze, tipi, stati e stanze con prestito sono <b>condivisi</b>: stanno
+    sulla rete e valgono per tutti. La lingua no: e' una preferenza tua, resta sul tuo PC.</p>
+</section>
+
+<section id="lingua">
+  <h2>Lingua</h2>
+  <p class="sub">La tendina nell'intestazione traduce tutto: pulsanti, finestre, messaggi,
+    colonne e stati. I dati restano come sono stati scritti — i nomi delle stanze non
+    cambiano — perche' sono gli stessi per tutti.</p>
+  <p class="note">Lavorando in italiano si puo' chiedere che un singolo file esportato
+    esca in inglese: l'opzione compare nella finestra di esportazione.</p>
+</section>
+
+<section id="diagnostica">
+  <h2>Se qualcosa non va</h2>
+  <p class="sub">Doppio clic su <span class="mono">Diagnostica.bat</span>, nella cartella
+    del programma. Scrive <span class="mono">Diagnostica.txt</span> li' accanto e te lo
+    apre. Non modifica niente: legge e basta.</p>
+  <p class="sub">Dentro c'e' la versione in uso e da dove parte, quale inventario apre e
+    se puo' scriverci, le stanze che conosce, che cosa legge davvero da un file Excel, la
+    misura della finestra e della tabella, e dove Windows tiene il desktop. Sono percorsi
+    e nomi di stanza, niente di riservato: si manda a chi assiste.</p>
+</section>
+
+<section id="regole">
+  <h2>Cinque regole</h2>
+  <ol class="steps">
+    <li><b>Aggiorna quando succede</b>, non a fine trimestre. E' tutto il senso dello strumento.</li>
+    <li><b>L'inventario e' quello sulla rete.</b> Non tenerne copie di lavoro personali.</li>
+    <li><b>Un foglio da importare si importa</b>, non si apre come inventario.</li>
+    <li><b>Salva una copia in locale</b> ogni tanto, e prima di ogni operazione grossa.</li>
+    <li><b>Prima di premere un pulsante rosso</b>, leggi cosa dice la finestra di conferma: ti dice sempre quanti dispositivi stai per toccare.</li>
+  </ol>
+</section>
+
+<footer>
+  <div class="wrap" style="padding:0">
+    <a href="index.html">Pagina del progetto</a> ·
+    <a href="tenerlo-aggiornato.html">Tenerlo aggiornato</a> ·
+    <a href="formato-xls.html">Formato dei file Excel</a>
+  </div>
+</footer>
+</div>
+<div data-lang="en" hidden><header>
+  <div class="eyebrow"><a href="index.html?lang=en">← Back to the project page</a></div>
+  <h1>Program manual</h1>
+  <p class="lede">What every button does, where the files are, how to put the
+    inventory beyond harm, and how to go back when something goes wrong.</p>
+</header>
+
+<section>
+  <h2>Contents</h2>
+  <ul class="indice">
+    <li><a href="#idea-en">The idea in three lines</a></li>
+    <li><a href="#dove-en">Where the files are</a></li>
+    <li><a href="#finestra-en">The window: home and rooms</a></li>
+    <li><a href="#pulsanti-en">Every button, one by one</a></li>
+    <li><a href="#aggiungere-en">Adding a device</a></li>
+    <li><a href="#modificare-en">Editing on the spot</a></li>
+    <li><a href="#prestiti-en">Loans</a></li>
+    <li><a href="#iphone-en">iPhones</a></li>
+    <li><a href="#importare-en">Importing from Excel</a></li>
+    <li><a href="#esportare-en">Exporting and printing</a></li>
+    <li><a href="#sicurezza-en">Keeping the data safe</a></li>
+    <li><a href="#ripristino-en">Going back</a></li>
+    <li><a href="#impostazioni-en">Settings</a></li>
+    <li><a href="#lingua-en">Language</a></li>
+    <li><a href="#diagnostica-en">If something is off</a></li>
+    <li><a href="#regole-en">Five rules</a></li>
+  </ul>
+</section>
+
+<section id="idea-en">
+  <h2>The idea in three lines</h2>
+  <p class="sub">Three things to keep in mind; everything else follows from them.</p>
+  <div class="grid">
+    <div class="card"><h3>One inventory</h3>
+      <p>The file lives on the network folder. Every technician opens that one: there are
+        no personal copies that would already differ after half a day.</p></div>
+    <div class="card"><h3>Updated as it happens</h3>
+      <p>Every device in or out is recorded when it happens, in ten seconds. Movements are
+        not piled up to be reconstructed three months later.</p></div>
+    <div class="card"><h3>It stays an Excel file</h3>
+      <p>The inventory is an ordinary <code>.xlsx</code>: it opens without the program, and
+        no data is held prisoner by a format of ours.</p></div>
+  </div>
+</section>
+
+<section id="dove-en">
+  <h2>Where the files are</h2>
+  <p class="sub">Two places, and they never mix: the program on the workstation, the data
+    on the network folder.</p>
+
+  <h3>On your workstation — the program</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Path</th><th>What it is</th></tr>
+    <tr><td class="mono">C:\Inventario\Inventario.py</td><td class="d">The program that starts.</td></tr>
+    <tr><td class="mono">C:\Inventario\inventario\</td><td class="d">The rest of the program, readable: they are text files.</td></tr>
+    <tr><td class="mono">C:\Inventario\python\</td><td class="d">The official python.org Python that runs it. Do not move, do not rename.</td></tr>
+    <tr><td class="mono">C:\Inventario\inventario_percorso.json</td><td class="d">Says which inventory to open, and the chosen language. The one file not to lose when updating.</td></tr>
+    <tr><td class="mono">C:\Inventario\Collaudo\</td><td class="d">Two Excel test sheets and the instructions to try importing without risking anything.</td></tr>
+    <tr><td class="mono">C:\Inventario\Diagnostica.txt</td><td class="d">Appears only when the diagnostic is run.</td></tr>
+  </table></div>
+
+  <h3>On the network folder — the data</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Path</th><th>What it is</th></tr>
+    <tr><td class="mono">\\server\Shared\Inventory\Produzione\Inventario.xlsx</td><td class="d"><b>The inventory.</b> This is the file that matters. It opens in Excel too.</td></tr>
+    <tr><td class="mono">…\Produzione\inventario_impostazioni.json</td><td class="d">Rooms, device types, loan rooms, iPhone room, statuses. The same for everybody.</td></tr>
+    <tr><td class="mono">…\Produzione\Backup\</td><td class="d">The copies the program saves <b>by itself</b> before every operation that deletes or replaces.</td></tr>
+    <tr><td class="mono">…\.Inventario.xlsx.lock</td><td class="d">Appears for a fraction of a second during a save, then goes. If it stays, a save was interrupted.</td></tr>
+  </table></div>
+
+  <div class="avviso"><b>The copies you save yourself</b> with <span class="k verde">Save a
+    local copy…</span> go wherever you want: Documents, Desktop, a USB stick. The program
+    never touches or deletes them.</div>
+</section>
+
+<section id="finestra-en">
+  <h2>The window: home and rooms</h2>
+  <p class="sub">Only two screens, one click apart.</p>
+  <div class="grid">
+    <div class="card"><h3>Home</h3>
+      <p>One card per room with the device count and the split by type. After the rooms
+        comes the <b>Iphone</b> container, which is not a room but gathers every phone.
+        Below the cards, the complete inventory.</p></div>
+    <div class="card"><h3>Room</h3>
+      <p>Opens by clicking a card. Shows only that room's devices, and adds the two buttons
+        to import and export just that room.</p></div>
+    <div class="card"><h3>Selection</h3>
+      <p>The checkbox column on the left: <b>one device at a time</b>. It is what Edit,
+        Delete and Move act on.</p></div>
+    <div class="card"><h3>Filters and search</h3>
+      <p>Above the list: room, type, and a search box that looks inside every field — asset
+        tag, serial, notes and the name of whoever has it on loan.</p></div>
+  </div>
+</section>
+
+<section id="pulsanti-en">
+  <h2>Every button, one by one</h2>
+  <p class="sub">The colour says which family a command belongs to, before you even read
+    it.</p>
+  <div class="legenda">
+    <span class="k arancio">orange: data coming in</span>
+    <span class="k verde">green: data going out</span>
+    <span class="k rosso">red: rewrites everybody's inventory</span>
+    <span class="k grigio">grey: everything else</span>
+  </div>
+
+  <div class="tw"><table class="man">
+    <tr><th>Button</th><th>What it does</th></tr>
+    <tr><td><span class="k grigio">‹ Home</span></td><td class="d">Back to the first screen from any room.</td></tr>
+    <tr><td><span class="k blu">Add</span></td><td class="d">Asks first <b>which type</b> of device, then whether to enter it by hand or with the barcode reader.</td></tr>
+    <tr><td><span class="k grigio">Edit</span></td><td class="d">Opens the selected device to change its fields.</td></tr>
+    <tr><td><span class="k grigio">Delete</span></td><td class="d">Removes the selected device, with confirmation. iPhones have extra protection: see <a href="#iphone-en">iPhones</a>.</td></tr>
+    <tr><td><span class="k grigio">Move to room…</span></td><td class="d">Changes the selected device's room. iPhones do not move.</td></tr>
+    <tr><td><span class="k arancio">Import xls…</span></td><td class="d">Loads devices from an Excel sheet. It asks first <b>what</b> to import and <b>how</b>. See <a href="#importare-en">Importing</a>.</td></tr>
+    <tr><td><span class="k verde">Export xls…</span></td><td class="d">Produces an Excel file of the inventory. It asks first for scope and shape. See <a href="#esportare-en">Exporting</a>.</td></tr>
+    <tr><td><span class="k verde">Save a local copy…</span></td><td class="d"><b>The backup you decide on.</b> See <a href="#sicurezza-en">Keeping the data safe</a>.</td></tr>
+    <tr><td><span class="k grigio">Print</span></td><td class="d">Sends the list you are looking at to the printer, laid out. It can do one page per room.</td></tr>
+    <tr><td><span class="k grigio">Refresh</span></td><td class="d">Rereads the inventory from the network at once. The list refreshes by itself every fifteen seconds anyway.</td></tr>
+    <tr><td><span class="k rosso">Restore</span></td><td class="d">Takes the inventory back to the last backup copy. See <a href="#ripristino-en">Going back</a>.</td></tr>
+    <tr><td><span class="k rosso">Reset inventory</span></td><td class="d">Empties the inventory. It asks you to type <span class="mono">ELIMINA TUTTO</span> and saves a copy first. iPhones are never touched.</td></tr>
+    <tr><td><span class="k grigio">Settings</span></td><td class="d">Rooms, types, loans, language, restoring from a chosen copy, and the link to the shared inventory.</td></tr>
+  </table></div>
+
+  <h3>Only inside a room</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Button</th><th>What it does</th></tr>
+    <tr><td><span class="k arancio">Import this room's data</span></td><td class="d">Loads <b>only</b> this room's section from the sheet and discards the rest. The sheet must carry the separator row with the room name: if it is missing, nothing is imported and you are told.</td></tr>
+    <tr><td><span class="k verde">Export this room to xls</span></td><td class="d">Produces a file with this room's devices only, with the room name inside the file.</td></tr>
+  </table></div>
+
+  <h3>On the rows of the list</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Button</th><th>Where it appears</th></tr>
+    <tr><td><span class="k blu">Lend</span> / <span class="k rosso">Return</span></td><td class="d">The <b>Loan</b> column, only in the Digital Kiosk room.</td></tr>
+    <tr><td><span class="k blu">Confirm shipment</span></td><td class="d">The <b>Shipment</b> column, only in the Iphone container.</td></tr>
+  </table></div>
+</section>
+
+<section id="aggiungere-en">
+  <h2>Adding a device</h2>
+  <ol class="steps">
+    <li><b>Press Add.</b> The type choice appears straight away: Laptop, Tablet or Iphone.</li>
+    <li><b>Choose how to enter it.</b> By hand, or with the barcode reader. With the reader
+      the fields fill in as you scan; if a code will not read, the <i>I cannot scan</i>
+      button lets you type that one field without starting over.</li>
+    <li><b>Fill it in.</b> Laptops and tablets need asset tag, model and serial number.
+      iPhones need <b>IMEI</b> and <b>Returned by</b>: asset tag and serial number do not
+      exist for them at all.</li>
+  </ol>
+  <p class="note">A device just entered appears at the top of the list: it is sorted by
+    last change, so you can see it arrived.</p>
+</section>
+
+<section id="modificare-en">
+  <h2>Editing on the spot</h2>
+  <p class="sub">The things that change often need nothing opened.</p>
+  <div class="grid">
+    <div class="card"><h3>Status</h3>
+      <p>Double-click the <b>Status</b> cell: the dropdown appears with Available, Awaiting
+        collection, Faulty - awaiting technician, To be rebuilt, To be checked.</p></div>
+    <div class="card"><h3>Notes</h3>
+      <p>Double-click the <b>Notes</b> cell and type. Enter to confirm.</p></div>
+    <div class="card"><h3>Room</h3>
+      <p>With <span class="k grigio">Move to room…</span>, or from the device's own
+        card.</p></div>
+  </div>
+</section>
+
+<section id="prestiti-en">
+  <h2>Loans</h2>
+  <p class="sub">They exist only where they are needed: in the <b>Digital Kiosk</b> room.</p>
+  <ol class="steps">
+    <li><b>Lend.</b> The button on the row asks for the name of whoever takes the device.
+      Name, date and time are recorded.</li>
+    <li><b>The device turns red</b> and its status becomes <i>Not available</i>: you can see
+      at a glance that it is out.</li>
+    <li><b>Return.</b> The same button makes it available again and clears the loan.</li>
+  </ol>
+  <p class="note">In other rooms the Loan column does not appear at all. iPhones are never
+    lent.</p>
+</section>
+
+<section id="iphone-en">
+  <h2>iPhones</h2>
+  <p class="sub">They follow their own rules, because their life cycle is different.</p>
+  <div class="grid">
+    <div class="card"><h3>Different fields</h3>
+      <p><b>IMEI</b> and <b>Returned by</b> instead of asset tag and serial number. They
+        have no asset tag anywhere in the program.</p></div>
+    <div class="card"><h3>By hand only</h3>
+      <p>They never come in through an import and never go out in an export: they are
+        entered one at a time.</p></div>
+    <div class="card"><h3>Fixed room</h3>
+      <p>They always live in Site Services BAU and do not move. On the card the field is
+        already filled in and locked.</p></div>
+    <div class="card"><h3>Shipment</h3>
+      <p><span class="k blu">Confirm shipment</span> records the day and time of sending to
+        the phone service. The status becomes <i>Shipped to the phone service</i> and the
+        row turns purple.</p></div>
+    <div class="card"><h3>Retention</h3>
+      <p>After shipping they stay consultable for <b>three months</b>. Before that the
+        program refuses to delete them and says from when it will be possible.</p></div>
+    <div class="card"><h3>Never deleted</h3>
+      <p>No destructive operation touches them: neither a full reset nor a replacing
+        import.</p></div>
+  </div>
+</section>
+
+<section id="importare-en">
+  <h2>Importing from Excel</h2>
+  <p class="sub">For loading in bulk what is already recorded elsewhere. The sheet format is
+    explained in detail in <a href="formato-xls.html?lang=en">How to prepare the Excel
+    file</a>.</p>
+
+  <h3>First: what and how</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Choice</th><th>Meaning</th></tr>
+    <tr><td><b>The whole inventory</b></td><td class="d">Loads every row of the sheet, assigning rooms from the separator rows.</td></tr>
+    <tr><td><b>One room only</b></td><td class="d">Loads only that room's section and discards the rest. The separator row is required.</td></tr>
+    <tr><td><b>Merge</b></td><td class="d">Adds the new ones and updates those with the same asset tag. Nothing is deleted.</td></tr>
+    <tr><td><b>Replace</b></td><td class="d">Empties first, then loads. It always saves a backup copy. iPhones stay.</td></tr>
+  </table></div>
+
+  <h3>Separator rows</h3>
+  <p class="sub">A row carrying <b>only</b> a room name splits the sheet: everything that
+    follows goes into that room, until the next separator. The short forms
+    <span class="mono">BAU</span>, <span class="mono">KIOSK</span> and
+    <span class="mono">DISASTER</span> work too.</p>
+
+  <div class="avviso">Before importing, the program shows a summary: how many valid rows it
+    found, which rooms it recognised, which columns it did not understand and how many rows
+    it discards. <b>If it finds no room in the sheet it tells you right there</b>, before
+    touching anything, because otherwise the devices would end up with no room.</div>
+
+  <p class="note">A sheet to import is not an inventory and must never be opened as one: it
+    is loaded from here.</p>
+</section>
+
+<section id="esportare-en">
+  <h2>Exporting and printing</h2>
+  <h3>First: scope and shape</h3>
+  <div class="tw"><table class="man">
+    <tr><th>Choice</th><th>Result</th></tr>
+    <tr><td><b>Everything / one room</b></td><td class="d">What ends up in the file.</td></tr>
+    <tr><td><b>Single list</b></td><td class="d">One file, one sheet, with the Room column.</td></tr>
+    <tr><td><b>One sheet per room</b></td><td class="d">A single file, with one Excel sheet per room.</td></tr>
+    <tr><td><b>One file per room</b></td><td class="d">Separate files, each with the room name inside.</td></tr>
+  </table></div>
+  <p class="note">At the end of <b>every</b> export the program asks whether to open the
+    file, send it by e-mail — it opens Outlook with the file already attached — or just
+    close. Working in Italian you can also ask for the file to come out in English.</p>
+  <h3>Printing</h3>
+  <p class="sub">Lays out what you are looking at and sends it to the printer, optionally
+    with a separate page for each room.</p>
+</section>
+
+<section id="sicurezza-en">
+  <h2>Keeping the data safe</h2>
+  <p class="sub">Four different protections, covering four different failures.</p>
+
+  <div class="grid">
+    <div class="card"><h3>1 · Saves that do not clash</h3>
+      <p>Every save takes an <b>exclusive lock</b>, rereads the file, applies the change and
+        rewrites atomically. Two technicians saving at the same instant do not overwrite
+        each other.</p></div>
+    <div class="card"><h3>2 · Automatic copies</h3>
+      <p>Before <b>every</b> operation that deletes or replaces, the program saves a copy by
+        itself into <span class="mono">Produzione\Backup\</span>, with the date in the name.
+        You do not have to remember.</p></div>
+    <div class="card"><h3>3 · The copy you decide on</h3>
+      <p><span class="k verde">Save a local copy…</span> puts a copy of the inventory
+        wherever you want: your PC, a USB stick, off the network.</p></div>
+    <div class="card"><h3>4 · Restore</h3>
+      <p>You go back from the interface, without hunting for files by hand. See
+        <a href="#ripristino-en">below</a>.</p></div>
+  </div>
+
+  <h3>The local copy, in detail</h3>
+  <p class="sub">This is the protection against what the automatic copies cannot cover: the
+    network folder disappearing, or somebody deleting inside it. The automatic copies live
+    on the share: if the share goes, they go with it.</p>
+  <ol class="steps">
+    <li><b>Press <span class="k verde">Save a local copy…</span></b> and choose where to
+      save. The suggested name carries the date and time, for example
+      <span class="mono">Inventario_2026-08-31_18-30.xlsx</span>.</li>
+    <li><b>The copy is the inventory of that second.</b> It is taken from the file on the
+      network at the moment you ask, not from what the program had read earlier. If another
+      technician is saving right then, the program waits for them to finish: you never get a
+      file caught mid-write.</li>
+    <li><b>The settings file is saved next to it</b>, with the same name and the suffix
+      <span class="mono">_impostazioni.json</span>: the data alone would not be enough to put
+      the inventory back as it was — rooms, types and statuses are needed too.</li>
+    <li><b>It is a complete inventory, not an extract.</b> It opens in Excel, and if
+      something goes wrong it is reloaded: with <span class="k rosso">Restore</span> by
+      picking the file, or with <span class="k arancio">Import xls…</span> in Replace
+      mode.</li>
+  </ol>
+  <div class="avviso"><b>When to do it.</b> Before every big operation, and now and then out
+    of habit — at the end of the week, or after a day of movements. It costs five seconds.
+    Keep it off the network folder: that is exactly what it protects you from.</div>
+</section>
+
+<section id="ripristino-en">
+  <h2>Going back</h2>
+  <div class="tw"><table class="man">
+    <tr><th>If…</th><th>Do this</th></tr>
+    <tr><td class="d">You have just botched an import or a reset</td><td class="d"><span class="k rosso">Restore</span> in the toolbar: it takes the inventory back to the <b>latest</b> saved copy, telling you when it is from and how many devices it holds.</td></tr>
+    <tr><td class="d">You need an older copy</td><td class="d"><span class="k grigio">Settings</span> › <span class="k rosso">Restore from a copy…</span>: it lists them all, with date and device count, and you choose.</td></tr>
+    <tr><td class="d">The network folder is gone or the data was deleted</td><td class="d">Start again from your local copy: put it back on the share as <span class="mono">Produzione\Inventario.xlsx</span>, together with the settings file renamed <span class="mono">inventario_impostazioni.json</span>.</td></tr>
+    <tr><td class="d">You want to empty everything and reload from scratch</td><td class="d"><span class="k rosso">Reset inventory</span>, typing <span class="mono">ELIMINA TUTTO</span>. A copy is saved before proceeding anyway.</td></tr>
+  </table></div>
+  <div class="avviso">Restoring <b>also saves a copy first</b> of the current state: if you
+    restore the wrong version, the one you started from is still there.</div>
+</section>
+
+<section id="impostazioni-en">
+  <h2>Settings</h2>
+  <div class="tw"><table class="man">
+    <tr><th>Item</th><th>What it is for</th></tr>
+    <tr><td class="d"><b>Rooms</b></td><td class="d">One per line. Renaming one also moves the devices that were in it.</td></tr>
+    <tr><td class="d"><b>Device types</b></td><td class="d">Laptop, Tablet, Iphone. Removing Iphone removes the whole phone side of the program.</td></tr>
+    <tr><td class="d"><b>Loan rooms</b></td><td class="d">Where the Loan column appears. Usually Digital Kiosk only.</td></tr>
+    <tr><td class="d"><b>Language</b></td><td class="d">Italian or English. There is also the dropdown at the top right of the header.</td></tr>
+    <tr><td class="d"><b>Link shared inventory…</b></td><td class="d">Picks the network folder to work on, by browsing. The program has to be reopened afterwards.</td></tr>
+    <tr><td class="d"><b>Restore from a copy…</b></td><td class="d">The list of every backup copy available.</td></tr>
+  </table></div>
+  <p class="note">Rooms, types, statuses and loan rooms are <b>shared</b>: they live on the
+    network and apply to everybody. The language does not: it is your own preference and
+    stays on your PC.</p>
+</section>
+
+<section id="lingua-en">
+  <h2>Language</h2>
+  <p class="sub">The dropdown in the header translates everything: buttons, windows,
+    messages, columns and statuses. The data stays as it was written — room names do not
+    change — because it is the same for everybody.</p>
+  <p class="note">Working in Italian you can ask for a single exported file to come out in
+    English: the option appears in the export window.</p>
+</section>
+
+<section id="diagnostica-en">
+  <h2>If something is off</h2>
+  <p class="sub">Double-click <span class="mono">Diagnostica.bat</span> in the program
+    folder. It writes <span class="mono">Diagnostica.txt</span> beside it and opens it. It
+    changes nothing: it only reads.</p>
+  <p class="sub">Inside is the version in use and where it starts from, which inventory it
+    opens and whether it can write there, the rooms it knows, what it actually reads from an
+    Excel file, the size of the window and of the table, and where Windows keeps the desktop.
+    It is paths and room names, nothing confidential: send it to whoever helps you.</p>
+</section>
+
+<section id="regole-en">
+  <h2>Five rules</h2>
+  <ol class="steps">
+    <li><b>Update as it happens</b>, not at the end of the quarter. That is the whole point of the tool.</li>
+    <li><b>The inventory is the one on the network.</b> Do not keep personal working copies.</li>
+    <li><b>A sheet to import gets imported</b>, not opened as an inventory.</li>
+    <li><b>Save a local copy</b> now and then, and before every big operation.</li>
+    <li><b>Before pressing a red button</b>, read what the confirmation window says: it always tells you how many devices you are about to affect.</li>
+  </ol>
+</section>
+
+<footer>
+  <div class="wrap" style="padding:0">
+    <a href="index.html?lang=en">Project page</a> ·
+    <a href="tenerlo-aggiornato.html?lang=en">Keeping it up to date</a> ·
+    <a href="formato-xls.html?lang=en">Excel file format</a>
+  </div>
+</footer>
+</div>
+</div>
+<script>
+(function () {
+  var scelta = document.getElementById("lang");
+  function applica(codice) {
+    document.querySelectorAll("[data-lang]").forEach(function (b) {
+      b.hidden = b.getAttribute("data-lang") !== codice;
+    });
+    document.documentElement.lang = codice;
+    scelta.value = codice;
+  }
+  function valida(codice) {
+    return codice === "it" || codice === "en" ? codice : null;
+  }
+  // l'indirizzo vince sulla preferenza salvata: un link in inglese porta in inglese
+  var dallUrl = valida(new URLSearchParams(location.search).get("lang"));
+  var salvata = null;
+  try { salvata = valida(localStorage.getItem("lingua")); } catch (e) {}
+  var codice = dallUrl || salvata || "it";
+  applica(codice);
+  if (dallUrl) { try { localStorage.setItem("lingua", dallUrl); } catch (e) {} }
+  scelta.addEventListener("change", function () {
+    applica(scelta.value);
+    try { localStorage.setItem("lingua", scelta.value); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

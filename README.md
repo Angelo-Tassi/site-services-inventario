@@ -1,6 +1,6 @@
 # Site Services : Inventario Iphone, Laptop e Tablet
 
-### [Apri la pagina del progetto](https://angelo-tassi.github.io/site-services-inventario/) &nbsp;·&nbsp; [Scarica il programma](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip) &nbsp;·&nbsp; [English](README.en.md)
+### [Apri la pagina del progetto](https://angelo-tassi.github.io/site-services-inventario/) &nbsp;·&nbsp; [Scarica il programma](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip) &nbsp;·&nbsp; [Manuale](https://angelo-tassi.github.io/site-services-inventario/manuale.html) &nbsp;·&nbsp; [English](README.en.md)
 
 > **Pagina del progetto:** <https://angelo-tassi.github.io/site-services-inventario/>
 > Da li' si scarica il programma, il modello Excel e si leggono le guide, in
@@ -784,11 +784,35 @@ rifiutata senza toccare l'inventario.
 Il ripristino agisce sull'inventario condiviso: quello che si riporta indietro
 lo vedono tutti i tecnici.
 
-## Le copie di sicurezza
+## La copia in locale
+
+Le copie automatiche stanno sulla cartella di rete, accanto ai dati. Coprono
+l'errore umano - un reset di troppo, un'importazione sbagliata - ma **non**
+coprono il caso in cui sparisca la cartella di rete, o qualcuno ci cancelli
+dentro: in quel caso spariscono anche loro.
+
+Per quello c'e' **`Salva copia in locale...`** nella barra dei comandi. Salva
+dove decidi tu - il tuo PC, una chiavetta, fuori dalla rete - una copia
+dell'inventario **com'e' in quel secondo**:
+
+- viene presa dal file sulla rete nel momento in cui la chiedi, non da quello
+  che il programma aveva letto prima;
+- se in quell'istante un altro tecnico sta salvando, il programma aspetta che
+  finisca: non ottieni mai un file colto a meta' scrittura;
+- accanto ai dati viene salvato anche il file delle impostazioni, con lo stesso
+  nome e il suffisso `_impostazioni.json`: da soli i dati non basterebbero a
+  rimettere l'inventario com'era;
+- **e' un inventario completo, non un estratto**: si apre in Excel, e si
+  ricarica con *Ripristina* o con *Importa xls...* in modalita' Sostituisci.
+
+Il nome proposto porta data e ora, `Inventario_2026-08-31_18-30.xlsx`. Vale la
+pena farla prima di ogni operazione grossa, e ogni tanto per abitudine.
+
+## Le copie di sicurezza automatiche
 
 Prima di ogni operazione che cancella dati - il **reset** e ogni **importazione
 in sostituzione**, sull'intero inventario o su una singola stanza - il programma
-duplica il file dati nella cartella **`Backup`**, dentro quella del programma.
+duplica il file dati nella cartella **`Backup`**, accanto ai dati sulla rete.
 
 Il nome porta **la data del file salvato**, non quella della copia:
 `Inventario_2026-08-31_09-12-45.xlsx`. Cosi' due reset di fila sullo stesso

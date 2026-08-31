@@ -1,6 +1,6 @@
 # Site Services : iPhone, Laptop and Tablet Inventory
 
-### [Open the project page](https://angelo-tassi.github.io/site-services-inventario/?lang=en) &nbsp;·&nbsp; [Download the program](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip) &nbsp;·&nbsp; [Italiano](README.md)
+### [Open the project page](https://angelo-tassi.github.io/site-services-inventario/?lang=en) &nbsp;·&nbsp; [Download the program](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip) &nbsp;·&nbsp; [Manual](https://angelo-tassi.github.io/site-services-inventario/manuale.html?lang=en) &nbsp;·&nbsp; [Italiano](README.md)
 
 > **Project page:** <https://angelo-tassi.github.io/site-services-inventario/?lang=en>
 > From there you download the program and the Excel template, and read the
@@ -697,11 +697,36 @@ the inventory.
 Restoring acts on the shared inventory: what you roll back, every technician
 sees.
 
-## Backup copies
+## The local copy
+
+The automatic copies live on the network folder, next to the data. They cover
+human error - one reset too many, a botched import - but they do **not** cover
+the network folder disappearing, or somebody deleting inside it: in that case
+they go too.
+
+That is what **`Save a local copy...`** in the toolbar is for. It saves, wherever
+you decide - your PC, a USB stick, off the network - a copy of the inventory
+**as it is at that second**:
+
+- it is taken from the file on the network at the moment you ask, not from what
+  the program had read earlier;
+- if another technician is saving right then, the program waits for them to
+  finish: you never get a file caught mid-write;
+- the settings file is saved next to the data, with the same name and the
+  `_impostazioni.json` suffix: the data alone would not be enough to put the
+  inventory back as it was;
+- **it is a complete inventory, not an extract**: it opens in Excel, and it is
+  reloaded with *Restore* or with *Import xls...* in Replace mode.
+
+The suggested name carries the date and time,
+`Inventario_2026-08-31_18-30.xlsx`. It is worth doing before every big
+operation, and now and then out of habit.
+
+## Automatic backup copies
 
 Before every operation that deletes data - the **reset** and every **replacing
 import**, on the whole inventory or on a single room - the program duplicates
-the data file into the **`Backup`** folder, inside the program folder.
+the data file into the **`Backup`** folder, next to the data on the network.
 
 The name carries **the date of the file being saved**, not the date of the copy:
 `Inventario_2026-08-31_09-12-45.xlsx`. That way two resets in a row on the same

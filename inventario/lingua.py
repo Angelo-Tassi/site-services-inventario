@@ -496,6 +496,26 @@ EN = {
         'Inventory not reachable',
     "Questo programma deve aprire l'inventario condiviso:\n\n%s\n\nIn questo momento non si raggiunge. Di solito e' la cartella\ndi rete che non risponde, o la connessione.\n\nControlla di vedere quella cartella da Esplora risorse, poi\nriapri il programma. Non viene creato nessun inventario\nlocale: si lavora tutti sullo stesso file.\n\nIl percorso e' scritto in:\n%s":
         'This program has to open the shared inventory:\n\n%s\n\nIt cannot be reached right now. Usually it is the network\nfolder not answering, or the connection.\n\nCheck that you can see that folder in File Explorer, then\nreopen the program. No local inventory is created: everybody\nworks on the same file.\n\nThe path is written in:\n%s',
+    'Salva copia in locale...':
+        'Save a local copy...',
+    "Salva una copia dell'inventario":
+        'Save a copy of the inventory',
+    'Copia non riuscita':
+        'Copy failed',
+    'Copia salvata':
+        'Copy saved',
+    '%d dispositivi, come sono in questo momento.':
+        '%d devices, exactly as they are right now.',
+    "Accanto ai dati e' stato salvato anche il file delle\nimpostazioni: stanze, tipi e stati per rimetterlo\ncom'era.":
+        'The settings file was saved next to the data as well:\nrooms, types and statuses, to put it back the way it\nwas.',
+    "E' un inventario completo: si apre in Excel, e in caso di\nguaio si ricarica con Ripristina o con Importa xls...\nin modalita' Sostituisci.":
+        'It is a complete inventory: it opens in Excel, and if\nsomething goes wrong it is reloaded with Restore, or with\nImport xls... in Replace mode.',
+    'La cartella non esiste:\n%s':
+        'The folder does not exist:\n%s',
+    "L'inventario non c'e' piu':\n%s":
+        'The inventory is gone:\n%s',
+    'Non riesco a salvare la copia:\n%s':
+        'I cannot save the copy:\n%s',
 }
 
 # ------------------------------------------------- colonne dei file prodotti
