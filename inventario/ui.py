@@ -1243,14 +1243,68 @@ class App(tk.Tk):
     def can_lend(self, item):
         return item.get("stanza") in self.cfg.get("loan_rooms", [])
 
+    def _campi_visibili(self):
+        """I campi che hanno senso nella vista aperta.
+
+        Una colonna vuota per costruzione - il prestito dove i prestiti non
+        esistono, l'IMEI dove non ci sono telefoni, la stanza dentro una stanza
+        sola - non porta informazione: toglie spazio a quello che si deve
+        leggere davvero.
+
+        Si decide da come e' configurato l'inventario, non dai dati presenti in
+        quel momento: cosi' le colonne non compaiono e spariscono mentre si
+        lavora, e una stanza vuota mostra le stesse colonne di quando sara'
+        piena.
+
+        L'esportazione e la stampa non passano di qui: portano via tutto.
+        """
+        campi = list(ALL_FIELDS)
+
+        def togli(*nomi):
+            for nome in nomi:
+                if nome in campi:
+                    campi.remove(nome)
+
+        contenitore_iphone = self.ship_column_visible()
+        stanza = self.var_room.get() if self.view == "room" else None
+
+        # Quello che e' uguale su tutte le righe sta nel titolo, non in colonna.
+        if stanza is not None or contenitore_iphone:
+            togli("stanza")
+        if self.view == "type":
+            togli("tipo")
+
+        # I campi dei telefoni si vedono dove i telefoni possono esserci.
+        if contenitore_iphone:
+            ci_sono_iphone = True
+        elif not self.iphone_type() or self.view == "type":
+            ci_sono_iphone = False
+        elif stanza is not None:
+            ci_sono_iphone = (stanza == self.iphone_room())
+        else:
+            ci_sono_iphone = True
+        if not ci_sono_iphone:
+            togli("imei", "restituito_da", "spedito_il")
+        if contenitore_iphone:
+            togli(*COLONNE_NON_IPHONE)      # un iPhone non ha asset tag ne' seriale
+
+        # Il prestito si vede dove i prestiti sono previsti.
+        stanze_prestito = self.cfg.get("loan_rooms", [])
+        if contenitore_iphone:
+            si_presta = False
+        elif stanza is not None:
+            si_presta = stanza in stanze_prestito
+        else:
+            si_presta = bool(stanze_prestito)
+        if not si_presta:
+            togli("prestato_a", "prestato_il")
+        return campi
+
     def _columns(self):
         colonne = [CHECK_COLUMN]
         if self.action_column_visible():
             colonne.append(ACTION_COLUMN)
-        campi = list(ALL_FIELDS)
-        if self.ship_column_visible():
-            campi = [c for c in campi if c not in COLONNE_NON_IPHONE]
-        return colonne + campi
+        return colonne + self._campi_visibili()
 
     def _make_table(self, parent):
         wrap = tk.Frame(parent, bg=theme.CARD, highlightthickness=1,

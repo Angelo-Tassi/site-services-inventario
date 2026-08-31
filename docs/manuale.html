@@ -181,6 +181,7 @@ table{min-width:520px}
     <li><a href="#dove">Dove stanno i file</a></li>
     <li><a href="#finestra">La finestra: home e stanze</a></li>
     <li><a href="#pulsanti">Tutti i pulsanti, uno per uno</a></li>
+    <li><a href="#colonne">Le colonne di ogni stanza</a></li>
     <li><a href="#aggiungere">Aggiungere un dispositivo</a></li>
     <li><a href="#modificare">Modificare al volo</a></li>
     <li><a href="#prestiti">Prestiti</a></li>
@@ -303,6 +304,29 @@ table{min-width:520px}
     <tr><td><span class="k blu">Presta</span> / <span class="k rosso">Rientro</span></td><td class="d">Colonna <b>Prestito</b>, solo nella stanza Digital Kiosk.</td></tr>
     <tr><td><span class="k blu">Conferma spedizione</span></td><td class="d">Colonna <b>Spedizione</b>, solo nel contenitore Iphone.</td></tr>
   </table></div>
+</section>
+
+<section id="colonne">
+  <h2>Perche' le colonne cambiano da una stanza all'altra</h2>
+  <p class="sub">Ogni vista mostra <b>solo</b> le colonne che li' possono avere un
+    valore. Una colonna vuota per costruzione non porta informazione: toglie spazio a
+    quello che si deve leggere davvero.</p>
+  <div class="tw"><table class="man">
+    <tr><th>Dove sei</th><th>Che cosa vedi</th><th>Che cosa sparisce</th></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Tutte le colonne: qui c'e' dentro tutto.</td><td class="d">Niente.</td></tr>
+    <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Restituito da e Spedito il, perche' li' stanno i telefoni.</td><td class="d">Stanza, In prestito a, Prestato il.</td></tr>
+    <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">In prestito a, Prestato il e la colonna <b>Prestito</b> con i pulsanti.</td><td class="d">Stanza, IMEI, Restituito da, Spedito il.</td></tr>
+    <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Solo l'essenziale: asset tag, tipo, modello, seriale, stato, note.</td><td class="d">Stanza, tutto il prestito, tutto quello degli iPhone.</td></tr>
+    <tr><td class="d"><b>Contenitore Iphone</b></td><td class="d">Modello, IMEI, Restituito da, stato, Spedito il, note, piu' la colonna <b>Spedizione</b>.</td><td class="d">Asset tag e seriale (un iPhone non ne ha), prestiti, stanza e tipo.</td></tr>
+  </table></div>
+  <p class="note">La colonna <b>Stanza</b> sparisce sempre dentro una stanza: sarebbe
+    uguale su ogni riga, e il nome e' gia' scritto sopra l'elenco. Lo stesso vale per il
+    <b>tipo</b> dentro il contenitore Iphone.</p>
+  <div class="avviso">Le colonne dipendono da <b>come e' configurato l'inventario</b>, non
+    dai dispositivi presenti in quel momento: una stanza vuota mostra le stesse colonne di
+    quando sara' piena, e nulla balla mentre lavori. Se dalle impostazioni attivi i
+    prestiti in un'altra stanza, le due colonne compaiono li'.
+    <b>Esportazione e stampa non sono toccate</b>: portano via sempre tutti i campi.</div>
 </section>
 
 <section id="aggiungere">
@@ -550,6 +574,7 @@ table{min-width:520px}
     <li><a href="#dove-en">Where the files are</a></li>
     <li><a href="#finestra-en">The window: home and rooms</a></li>
     <li><a href="#pulsanti-en">Every button, one by one</a></li>
+    <li><a href="#colonne-en">The columns of each room</a></li>
     <li><a href="#aggiungere-en">Adding a device</a></li>
     <li><a href="#modificare-en">Editing on the spot</a></li>
     <li><a href="#prestiti-en">Loans</a></li>
@@ -672,6 +697,29 @@ table{min-width:520px}
     <tr><td><span class="k blu">Lend</span> / <span class="k rosso">Return</span></td><td class="d">The <b>Loan</b> column, only in the Digital Kiosk room.</td></tr>
     <tr><td><span class="k blu">Confirm shipment</span></td><td class="d">The <b>Shipment</b> column, only in the Iphone container.</td></tr>
   </table></div>
+</section>
+
+<section id="colonne-en">
+  <h2>Why the columns differ from room to room</h2>
+  <p class="sub">Each view shows <b>only</b> the columns that can hold a value there. A
+    column empty by construction carries no information: it takes space away from what you
+    actually have to read.</p>
+  <div class="tw"><table class="man">
+    <tr><th>Where you are</th><th>What you see</th><th>What goes away</th></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Every column: everything is in here.</td><td class="d">Nothing.</td></tr>
+    <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Returned by and Shipped on, because the phones live there.</td><td class="d">Room, On loan to, Lent on.</td></tr>
+    <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">On loan to, Lent on, and the <b>Loan</b> column with its buttons.</td><td class="d">Room, IMEI, Returned by, Shipped on.</td></tr>
+    <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Only the essentials: asset tag, type, model, serial, status, notes.</td><td class="d">Room, everything about loans, everything about iPhones.</td></tr>
+    <tr><td class="d"><b>Iphone container</b></td><td class="d">Model, IMEI, Returned by, status, Shipped on, notes, plus the <b>Shipment</b> column.</td><td class="d">Asset tag and serial (an iPhone has neither), loans, room and type.</td></tr>
+  </table></div>
+  <p class="note">The <b>Room</b> column always disappears inside a room: it would be the
+    same on every row, and the name is already written above the list. The same goes for
+    <b>type</b> inside the Iphone container.</p>
+  <div class="avviso">The columns depend on <b>how the inventory is configured</b>, not on
+    the devices present at that moment: an empty room shows the same columns it will show
+    when it is full, and nothing dances while you work. Turn loans on for another room in
+    the settings and the two columns appear there.
+    <b>Exporting and printing are untouched</b>: they always carry every field.</div>
 </section>
 
 <section id="aggiungere-en">

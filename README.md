@@ -382,6 +382,31 @@ dice: non crea mai un inventario locale al posto di quello condiviso.
 Le stanze predefinite sono **Site Services BAU**, **Digital Kiosk** e
 **Magazzino Disaster Recovery**; i prestiti sono attivi sul Digital Kiosk.
 
+## Le colonne di ogni stanza
+
+Ogni vista mostra **solo** le colonne che li' possono avere un valore. Una
+colonna vuota per costruzione non porta informazione: toglie spazio a quello che
+si deve leggere.
+
+| Dove sei | Che cosa sparisce |
+| --- | --- |
+| **Home** | niente: c'e' dentro tutto |
+| **Site Services BAU** | Stanza, In prestito a, Prestato il |
+| **Digital Kiosk** | Stanza, IMEI, Restituito da, Spedito il |
+| **Magazzino Disaster Recovery** | Stanza, prestiti e campi degli iPhone |
+| **Contenitore Iphone** | Asset tag, seriale, prestiti, stanza e tipo |
+
+La colonna **Stanza** sparisce sempre dentro una stanza: sarebbe uguale su ogni
+riga, e il nome e' gia' scritto sopra l'elenco. Lo stesso vale per il **tipo**
+dentro il contenitore Iphone.
+
+Le colonne dipendono da **come e' configurato l'inventario**, non dai
+dispositivi presenti in quel momento: una stanza vuota mostra le stesse colonne
+di quando sara' piena, e niente balla mentre si lavora. Attivando i prestiti in
+un'altra stanza dalle impostazioni, le due colonne compaiono li'.
+
+**Esportazione e stampa non sono toccate**: portano via sempre tutti i campi.
+
 ## Prestiti
 
 Aprendo una stanza elencata fra le *stanze con prestito* (di serie il Digital

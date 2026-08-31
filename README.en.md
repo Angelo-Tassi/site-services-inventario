@@ -457,6 +457,31 @@ opening a window.
 The status is never written by hand into the file: if an import brings an
 unexpected status, it is reset to *Available*.
 
+## The columns of each room
+
+Each view shows **only** the columns that can hold a value there. A column empty
+by construction carries no information: it takes space away from what you have
+to read.
+
+| Where you are | What goes away |
+| --- | --- |
+| **Home** | nothing: everything is in here |
+| **Site Services BAU** | Room, On loan to, Lent on |
+| **Digital Kiosk** | Room, IMEI, Returned by, Shipped on |
+| **Magazzino Disaster Recovery** | Room, loans and the iPhone fields |
+| **Iphone container** | Asset tag, serial, loans, room and type |
+
+The **Room** column always disappears inside a room: it would be the same on
+every row, and the name is already written above the list. The same goes for
+**type** inside the Iphone container.
+
+The columns depend on **how the inventory is configured**, not on the devices
+present at that moment: an empty room shows the same columns it will show when
+it is full, and nothing dances while you work. Turn loans on for another room in
+the settings and the two columns appear there.
+
+**Exporting and printing are untouched**: they always carry every field.
+
 ## Loans
 
 Opening a room listed among the *rooms with loans* (the Digital Kiosk by
