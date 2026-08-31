@@ -92,12 +92,19 @@ assert valore_visibile(tel, "asset_tag") == "", "non si mostra mai"
 assert valore_visibile(tel, "imei") == "356938035643809"
 assert valore_visibile(app._item_by_tag("IT-0900"), "asset_tag") == "IT-0900"
 
-# nell'elenco generale la cella resta vuota, l'IMEI identifica la riga
+# nell'elenco generale la colonna dell'asset tag resta vuota per un telefono,
+# e l'IMEI non c'e' proprio: si guarda nel contenitore Iphone
 app.show_home()
 colonne = app._columns()
 riga = app.tree.item("356938035643809", "values")
 assert riga[colonne.index("asset_tag")] == "", riga
+assert "imei" not in colonne, colonne
+app.show_iphones()
+colonne = app._columns()
+riga = app.tree.item("356938035643809", "values")
 assert riga[colonne.index("imei")] == "356938035643809"
+assert "asset_tag" not in colonne, colonne
+app.show_home()
 
 # la scheda di un iPhone non ha il campo Asset Tag
 scheda = ItemDialog(app, app.cfg["rooms"], app.cfg["types"], tel,

@@ -12,7 +12,7 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
 from .store import (ALL_FIELDS, HEADERS, InventoryError, NON_DISPONIBILE,
-                    SPEDITO, STATI, is_iphone, valore_visibile)
+                    SPEDITO, STATI, clean, is_iphone, valore_visibile)
 from .lingua import T, intestazione, stato as traduci_stato
 
 PRINT_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
@@ -113,17 +113,48 @@ def _sottotitolo(stamp, quanti, lingua):
     return "Esportato il %s - %d dispositivi" % (stamp, quanti)
 
 
+# Le colonne portanti di un inventario: ci sono sempre, anche vuote, perche'
+# danno al file la forma che chi lo apre - o chi lo reimporta - si aspetta.
+CAMPI_PORTANTI = ["asset_tag", "tipo", "modello", "seriale", "stanza", "stato", "note"]
+
+# Quello che esce dal programma in un file .xlsx e' l'inventario, non la sua
+# cronaca. Chi ha in mano un dispositivo prestato, da quando, chi ha restituito
+# un telefono, chi ha toccato per ultimo la riga: sono dati che servono a chi
+# lavora nella stanza, davanti all'elenco, e non a chi riceve il file. Non a
+# caso queste colonne non esistono nemmeno nel modello da compilare, quindi un
+# file esportato si reimporta senza perdere niente.
+CAMPI_ESPORTAZIONE = list(CAMPI_PORTANTI)
+
+
+def campi_con_valore(items, fields):
+    """Toglie le colonne che in questo file resterebbero vuote in ogni riga.
+
+    Un'esportazione non contiene iPhone, quindi non ha nessun IMEI da scrivere;
+    l'esportazione di una stanza senza prestiti non ha prestiti. Colonne di sole
+    caselle vuote allargano il foglio e non dicono niente a chi lo legge.
+
+    Le colonne portanti restano comunque: un inventario deve avere sempre lo
+    stesso impianto, altrimenti due file dello stesso inventario non si
+    somigliano.
+    """
+    if not items:
+        return [f for f in fields if f in CAMPI_PORTANTI]
+    return [f for f in fields
+            if f in CAMPI_PORTANTI or any(clean(i.get(f)) for i in items)]
+
+
 def _sort_key(item):
     return (item.get("stanza", ""), item.get("asset_tag", ""))
 
 
-def export(items, path, group_by_room=False, rooms=None, full=True, for_print=False,
+def export(items, path, group_by_room=False, rooms=None, for_print=False,
            con_iphone=False, titolo=None, lingua=None):
     """Scrive l'inventario in un file .xlsx.
 
     group_by_room: un foglio per stanza (piu' un foglio con il totale).
-    full: include anche le colonne di tracciamento delle modifiche.
-    for_print: aggiunge titolo, intestazioni ripetute e impaginazione A4.
+    for_print: aggiunge titolo, intestazioni ripetute e impaginazione A4, e
+        porta anche i dati di consultazione - prestiti, IMEI, spedizioni -
+        perche' la stampa serve a chi lavora, non a chi riceve il file.
     con_iphone: gli iPhone sono gestiti solo a mano e restano fuori dalle
         esportazioni; la stampa interna invece li include.
     titolo: se indicato, compare in testa al foglio e ne diventa il nome. Serve
@@ -131,10 +162,13 @@ def export(items, path, group_by_room=False, rooms=None, full=True, for_print=Fa
     lingua: "en" per scrivere intestazioni e stati in inglese. I nomi delle
         stanze e dei tipi restano come li ha scritti l'utente.
     """
-    fields = list(ALL_FIELDS) if (full and not for_print) else list(PRINT_FIELDS)
+    fields = list(PRINT_FIELDS) if for_print else list(CAMPI_ESPORTAZIONE)
     if not con_iphone:
         items = [i for i in items if not is_iphone(i.get("tipo"))]
     items = sorted(items, key=_sort_key)
+    # si decide una volta sola, su tutto quello che finira' nel file: i fogli di
+    # uno stesso documento devono avere le stesse colonne
+    fields = campi_con_valore(items, fields)
     stamp = datetime.now().strftime("%d/%m/%Y %H:%M")
 
     wb = Workbook()
@@ -210,7 +244,7 @@ def build_print_file(items, group_by_room=False, rooms=None):
     name = "Inventario_stampa_%s.xlsx" % datetime.now().strftime("%Y%m%d_%H%M%S")
     path = os.path.join(tempfile.gettempdir(), name)
     return export(items, path, group_by_room=group_by_room, rooms=rooms,
-                  full=False, for_print=True, con_iphone=True)
+                  for_print=True, con_iphone=True)
 
 
 TEMPLATE_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "stato", "note"]

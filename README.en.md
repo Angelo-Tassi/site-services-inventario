@@ -464,14 +464,14 @@ by construction carries no information: it takes space away from what you have
 to read.
 
 The **complete inventory on the home screen** is an overview: it says what a
-device is, where it is and how it is - asset tag, type, model, serial, IMEI,
-room, status, notes - in a row you can read without scrolling sideways. The
-finer questions are asked inside the room they belong to, and in the overview
-the status sums them up: *On loan*, *Shipped to the phone service*.
+device is, where it is and how it is - asset tag, type, model, serial, room,
+status, notes - in a row you can read without scrolling sideways. The finer
+questions are asked inside the room they belong to, and in the overview the
+status sums them up: *On loan*, *Shipped to the phone service*.
 
 | Where you are | What goes away |
 | --- | --- |
-| **Home** | loans, returned by, shipped on, last change |
+| **Home** | IMEI, loans, returned by, shipped on, last change |
 | **Site Services BAU** | Room, On loan to, Lent on |
 | **Digital Kiosk** | Room, IMEI, Returned by, Shipped on |
 | **Magazzino Disaster Recovery** | Room, loans and the iPhone fields |
@@ -486,7 +486,21 @@ present at that moment: an empty room shows the same columns it will show when
 it is full, and nothing dances while you work. Turn loans on for another room in
 the settings and the two columns appear there.
 
-**Exporting and printing are untouched**: they always carry every field.
+### The same rule in the files that come out
+
+An exported file carries **the inventory**, not its chronicle: asset tag, type,
+model, serial number, room, status and notes. They are exactly the columns of
+the [template to fill in](#the-import-template) plus the room, so an exported
+file can be reimported without losing anything.
+
+Loans, IMEI, returned by and shipments stay out: they serve whoever is working
+in front of the list, inside the room they belong to, not whoever receives the
+file. **Printing** does carry them, because it is made for whoever is working.
+
+**A consequence worth knowing:** a loan in progress does not survive an
+*export -> reimport* round trip, because it is not in the file. To rebuild a
+whole inventory you do not use an export but *Save a local copy...*, which
+copies the real file and carries everything with it.
 
 ## Loans
 

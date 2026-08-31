@@ -1306,8 +1306,8 @@ class App(tk.Tk):
         # le riguarda - e lo stato in panoramica le riassume gia': "In
         # prestito", "Spedito al servizio telefonia".
         if self.view == "home":
-            togli("prestato_a", "prestato_il", "restituito_da", "spedito_il",
-                  "modificato_il", "modificato_da")
+            togli("imei", "prestato_a", "prestato_il", "restituito_da",
+                  "spedito_il", "modificato_il", "modificato_da")
         return campi
 
     def _columns(self):

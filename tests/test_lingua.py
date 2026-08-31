@@ -77,7 +77,8 @@ uscita = os.path.join(d, "export_en.xlsx")
 excel_io.export(app.store.items, uscita, lingua="en")
 wb = load_workbook(uscita); ws = wb.active
 teste = [c.value for c in ws[1]]
-assert teste == [INTESTAZIONI_EN[HEADERS[f]] for f in ALL_FIELDS], teste
+from inventario.excel_io import CAMPI_ESPORTAZIONE
+assert teste == [INTESTAZIONI_EN[HEADERS[f]] for f in CAMPI_ESPORTAZIONE], teste
 colonna = teste.index("Status")
 valori = {r[colonna] for r in ws.iter_rows(min_row=2, values_only=True) if r[0]}
 assert valori <= set(STATI_EN.values()), valori

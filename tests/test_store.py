@@ -66,11 +66,11 @@ except InventoryError:
 s.load()
 assert [i for i in s.items if i["asset_tag"] == "IT-0101"][0]["stato"] == "Da rebuildare"
 
-# --------------------------------------- l'export contiene tutte le colonne
+# ------- l'export contiene l'inventario, non la cronaca di chi l'ha toccato
 exp = os.path.join(d, "export.xlsx")
 excel_io.export(s.items, exp)
 wb = load_workbook(exp)
-assert [c.value for c in wb.active[1]] == [HEADERS[f] for f in ALL_FIELDS]
+assert [c.value for c in wb.active[1]] == [HEADERS[f] for f in excel_io.CAMPI_ESPORTAZIONE]
 wb.close()
 
 # ------------- l'inventario si crea da zero importando un file Excel
@@ -104,7 +104,7 @@ assert tel["stanza"] == BAU and tel["stato"] == "Da Rispedire", tel
 prestato = [i for i in vuoto.items if i["asset_tag"] == "IT-0301"][0]
 assert prestato["stato"] == NON_DISPONIBILE and prestato["prestato_a"] == "Elena Rossi"
 
-# round trip: esporto e reimporto senza perdere niente.
+# Round trip: quello che l'esportazione porta via, l'importazione lo rimette.
 # Gli iPhone restano fuori dall'esportazione: si confrontano solo gli altri.
 rt = os.path.join(d, "roundtrip.xlsx")
 excel_io.export(vuoto.items, rt)
@@ -113,8 +113,23 @@ attesi = [i for i in vuoto.items if i["tipo"].lower() != "iphone"]
 assert len(back) == len(attesi) == 1, (len(back), len(attesi))
 for a, b in zip(sorted(attesi, key=lambda i: i["asset_tag"]),
                 sorted(back, key=lambda i: i["asset_tag"])):
-    for f in ALL_FIELDS:
+    for f in excel_io.CAMPI_ESPORTAZIONE:
+        if f == "stato":
+            continue          # dipende dal prestito, che nel file non c'e'
         assert a[f] == b[f], (f, a[f], b[f])
+
+# Un prestito in corso NON sopravvive a un giro export/import: e' un dato di
+# consultazione, sta nell'inventario e non nei file che ne escono. Chi deve
+# ricostruire l'inventario per intero non usa un export ma una copia del file,
+# che invece si porta dietro tutto.
+assert not back[0]["prestato_a"], back[0]
+assert back[0]["stato"] == DISPONIBILE, back[0]
+copia = os.path.join(d, "copia_intera.xlsx")
+vuoto.copia_in(copia)
+identici = InventoryStore(copia).load()
+prestato_nella_copia = [i for i in identici if i["asset_tag"] == "IT-0301"][0]
+assert prestato_nella_copia["prestato_a"] == "Elena Rossi", prestato_nella_copia
+assert prestato_nella_copia["stato"] == NON_DISPONIBILE
 
 # l'esportazione non contiene mai iPhone, la stampa interna si'
 solo_export, _ = rows_from_workbook(rt)

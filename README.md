@@ -389,14 +389,14 @@ colonna vuota per costruzione non porta informazione: toglie spazio a quello che
 si deve leggere.
 
 L'**inventario completo in home** e' una panoramica: dice che cos'e' un
-dispositivo, dov'e' e come sta - asset tag, tipo, modello, seriale, IMEI,
-stanza, stato, note - in una riga che si legge senza scorrere di lato. Le
-domande piu' precise si fanno dentro la stanza che le riguarda, e in panoramica
-ci pensa lo stato a riassumerle: *In prestito*, *Spedito al servizio telefonia*.
+dispositivo, dov'e' e come sta - asset tag, tipo, modello, seriale, stanza,
+stato, note - in una riga che si legge senza scorrere di lato. Le domande piu'
+precise si fanno dentro la stanza che le riguarda, e in panoramica ci pensa lo
+stato a riassumerle: *In prestito*, *Spedito al servizio telefonia*.
 
 | Dove sei | Che cosa sparisce |
 | --- | --- |
-| **Home** | prestiti, restituito da, spedito il, ultima modifica |
+| **Home** | IMEI, prestiti, restituito da, spedito il, ultima modifica |
 | **Site Services BAU** | Stanza, In prestito a, Prestato il |
 | **Digital Kiosk** | Stanza, IMEI, Restituito da, Spedito il |
 | **Magazzino Disaster Recovery** | Stanza, prestiti e campi degli iPhone |
@@ -411,7 +411,21 @@ dispositivi presenti in quel momento: una stanza vuota mostra le stesse colonne
 di quando sara' piena, e niente balla mentre si lavora. Attivando i prestiti in
 un'altra stanza dalle impostazioni, le due colonne compaiono li'.
 
-**Esportazione e stampa non sono toccate**: portano via sempre tutti i campi.
+### La stessa regola nei file che escono
+
+Un file esportato porta **l'inventario**, non la sua cronaca: asset tag, tipo,
+modello, numero di serie, stanza, stato e note. Sono esattamente le colonne del
+[modello da compilare](#il-modello-di-importazione) piu' la stanza, quindi un
+file esportato si reimporta senza perdere niente.
+
+Prestiti, IMEI, restituito da e spedizioni restano fuori: servono a chi lavora
+davanti all'elenco, dentro la stanza che li riguarda, non a chi riceve il file.
+La **stampa** invece li porta, perche' e' fatta per chi lavora.
+
+**Una conseguenza da conoscere:** un prestito in corso non sopravvive a un giro
+*esporta -> reimporta*, perche' nel file non c'e'. Per rimettere in piedi un
+inventario per intero non si usa un'esportazione ma *Salva copia in locale...*,
+che copia il file vero e si porta dietro tutto.
 
 ## Prestiti
 

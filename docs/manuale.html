@@ -314,12 +314,13 @@ table{min-width:520px}
   <p class="sub">L'<b>inventario completo in home</b> e' una panoramica: dice che cos'e'
     un dispositivo, dov'e' e come sta, in una riga che si legge senza scorrere di lato.
     Le domande piu' precise - chi ha il prestito e da quando, chi ha restituito un
-    telefono, quando e' stato spedito - si fanno dentro la stanza che le riguarda, il
-    <b>Digital Kiosk</b> e il contenitore <b>Iphone</b>. In panoramica ci pensa lo stato
-    a riassumerle: <i>In prestito</i>, <i>Spedito al servizio telefonia</i>.</p>
+    telefono, quando e' stato spedito, qual e' l'IMEI - si fanno dentro la stanza che le
+    riguarda, il <b>Digital Kiosk</b> e il contenitore <b>Iphone</b>. In panoramica ci
+    pensa lo stato a riassumerle: <i>In prestito</i>, <i>Spedito al servizio
+    telefonia</i>.</p>
   <div class="tw"><table class="man">
     <tr><th>Dove sei</th><th>Che cosa vedi</th><th>Che cosa sparisce</th></tr>
-    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, tipo, modello, seriale, IMEI, stanza, stato, note. Otto colonne per dire che cos'e', dov'e' e come sta.</td><td class="d">Tutto il resto: chi ha il prestito e da quando, chi ha restituito, quando e' stato spedito, ultima modifica.</td></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, tipo, modello, seriale, stanza, stato, note. Sette colonne per dire che cos'e', dov'e' e come sta.</td><td class="d">Tutto il resto: IMEI, chi ha il prestito e da quando, chi ha restituito, quando e' stato spedito, ultima modifica.</td></tr>
     <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Restituito da e Spedito il, perche' li' stanno i telefoni.</td><td class="d">Stanza, In prestito a, Prestato il.</td></tr>
     <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">In prestito a, Prestato il e la colonna <b>Prestito</b> con i pulsanti.</td><td class="d">Stanza, IMEI, Restituito da, Spedito il.</td></tr>
     <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Solo l'essenziale: asset tag, tipo, modello, seriale, stato, note.</td><td class="d">Stanza, tutto il prestito, tutto quello degli iPhone.</td></tr>
@@ -331,8 +332,21 @@ table{min-width:520px}
   <div class="avviso">Le colonne dipendono da <b>come e' configurato l'inventario</b>, non
     dai dispositivi presenti in quel momento: una stanza vuota mostra le stesse colonne di
     quando sara' piena, e nulla balla mentre lavori. Se dalle impostazioni attivi i
-    prestiti in un'altra stanza, le due colonne compaiono li'.
-    <b>Esportazione e stampa non sono toccate</b>: portano via sempre tutti i campi.</div>
+    prestiti in un'altra stanza, le due colonne compaiono li'.</div>
+
+  <h3>La stessa regola nei file che escono</h3>
+  <p class="sub">Un file esportato porta <b>l'inventario</b>, non la sua cronaca: asset
+    tag, tipo, modello, numero di serie, stanza, stato e note. Sono esattamente le colonne
+    del modello da compilare, piu' la stanza: per questo un file esportato si reimporta
+    senza perdere niente.</p>
+  <p class="sub">Prestiti, IMEI, restituito da e spedizioni restano fuori: servono a chi
+    lavora davanti all'elenco, dentro la stanza che li riguarda, e non a chi riceve il
+    file. La <b>stampa</b> invece li porta, perche' e' fatta per chi lavora.</p>
+  <div class="avviso"><b>Una conseguenza da conoscere.</b> Un prestito in corso non
+    sopravvive a un giro esporta &rarr; reimporta: nel file non c'e'. Per rimettere in
+    piedi un inventario per intero non si usa un'esportazione ma
+    <span class="k verde">Salva copia in locale…</span>, che copia il file vero e si porta
+    dietro tutto.</div>
 </section>
 
 <section id="aggiungere">
@@ -713,12 +727,12 @@ table{min-width:520px}
   <p class="sub">The <b>complete inventory on the home screen</b> is an overview: it says
     what a device is, where it is and how it is, in a row you can read without scrolling
     sideways. The finer questions - who has it on loan and since when, who returned a
-    phone, when it was shipped - are asked inside the room they belong to, the <b>Digital
-    Kiosk</b> and the <b>Iphone</b> container. In the overview the status sums them up:
-    <i>On loan</i>, <i>Shipped to the phone service</i>.</p>
+    phone, when it was shipped, what the IMEI is - are asked inside the room they belong
+    to, the <b>Digital Kiosk</b> and the <b>Iphone</b> container. In the overview the
+    status sums them up: <i>On loan</i>, <i>Shipped to the phone service</i>.</p>
   <div class="tw"><table class="man">
     <tr><th>Where you are</th><th>What you see</th><th>What goes away</th></tr>
-    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, type, model, serial, IMEI, room, status, notes. Eight columns to say what a device is, where it is and how it is.</td><td class="d">Everything else: who has it on loan and since when, who returned it, when it was shipped, last change.</td></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, type, model, serial, room, status, notes. Seven columns to say what a device is, where it is and how it is.</td><td class="d">Everything else: IMEI, who has it on loan and since when, who returned it, when it was shipped, last change.</td></tr>
     <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Returned by and Shipped on, because the phones live there.</td><td class="d">Room, On loan to, Lent on.</td></tr>
     <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">On loan to, Lent on, and the <b>Loan</b> column with its buttons.</td><td class="d">Room, IMEI, Returned by, Shipped on.</td></tr>
     <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Only the essentials: asset tag, type, model, serial, status, notes.</td><td class="d">Room, everything about loans, everything about iPhones.</td></tr>
@@ -730,8 +744,20 @@ table{min-width:520px}
   <div class="avviso">The columns depend on <b>how the inventory is configured</b>, not on
     the devices present at that moment: an empty room shows the same columns it will show
     when it is full, and nothing dances while you work. Turn loans on for another room in
-    the settings and the two columns appear there.
-    <b>Exporting and printing are untouched</b>: they always carry every field.</div>
+    the settings and the two columns appear there.</div>
+
+  <h3>The same rule in the files that come out</h3>
+  <p class="sub">An exported file carries <b>the inventory</b>, not its chronicle: asset
+    tag, type, model, serial number, room, status and notes. They are exactly the columns
+    of the template to fill in, plus the room: that is why an exported file can be
+    reimported without losing anything.</p>
+  <p class="sub">Loans, IMEI, returned by and shipments stay out: they serve whoever is
+    working in front of the list, inside the room they belong to, not whoever receives the
+    file. <b>Printing</b> does carry them, because it is made for whoever is working.</p>
+  <div class="avviso"><b>A consequence worth knowing.</b> A loan in progress does not
+    survive an export &rarr; reimport round trip: it is not in the file. To rebuild a whole
+    inventory you do not use an export but <span class="k verde">Save a local copy…</span>,
+    which copies the real file and carries everything with it.</div>
 </section>
 
 <section id="aggiungere-en">

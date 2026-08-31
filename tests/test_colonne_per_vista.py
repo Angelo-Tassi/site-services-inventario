@@ -26,8 +26,10 @@ def campi():
 # ---- home: una panoramica, non una scheda. Dice che cos'e' un dispositivo,
 # dov'e' e come sta; il resto si guarda dentro la stanza che lo riguarda
 app.show_home()
-assert campi() == ["asset_tag", "tipo", "modello", "seriale", "imei", "stanza",
+assert campi() == ["asset_tag", "tipo", "modello", "seriale", "stanza",
                    "stato", "note"], campi()
+# l'IMEI e' l'identificativo dei soli telefoni: si guarda dove stanno loro
+assert "imei" not in campi()
 assert app._columns() == [CHECK_COLUMN] + campi()
 # lo stato riassume da solo il prestito e la spedizione
 prestati = [i for i in app.store.items if i.get("prestato_a")]
