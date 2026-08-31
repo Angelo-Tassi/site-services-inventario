@@ -1,6 +1,6 @@
 # Site Services : iPhone, Laptop and Tablet Inventory
 
-### [Open the project page](https://angelo-tassi.github.io/site-services-inventario/?lang=en) &nbsp;·&nbsp; [Download the program](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe) &nbsp;·&nbsp; [Italiano](README.md)
+### [Open the project page](https://angelo-tassi.github.io/site-services-inventario/?lang=en) &nbsp;·&nbsp; [Download the program](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows-senza-exe.zip) &nbsp;·&nbsp; [Italiano](README.md)
 
 > **Project page:** <https://angelo-tassi.github.io/site-services-inventario/?lang=en>
 > From there you download the program and the Excel template, and read the
@@ -31,18 +31,50 @@ out of date, and nobody knows where a device ended up any more.
 
 ## Download
 
-**[Download the latest version](../../releases/latest)** from the Releases page.
+The Releases page offers **two different packages** that do exactly the same
+thing. They differ only in what gets executed.
+
+| Package | What is inside | When to pick it |
+| --- | --- | --- |
+| **[`Inventario-windows-senza-exe.zip`](../../releases/latest/download/Inventario-windows-senza-exe.zip)** | the official python.org Python, signed by the Python Software Foundation, and the program in plain sight as `.py` files | **recommended.** No executable built by us: there is nothing unsigned to get past security |
+| [`Inventario-windows.zip`](../../releases/latest/download/Inventario-windows.zip) | `Inventario.exe`, the program packed into a single executable | if you prefer one file to start and warnings are not a concern |
+
 You may also want the **[Excel template](docs/Modello_inventario.xlsx)** for
 loading laptops and tablets already recorded elsewhere.
 
-The package contains `Inventario.exe`: a single file carrying Python and every
-library. **Nothing has to be installed on the PCs.** Copy it into the shared
-network folder, double-click it, and whoever can reach that folder can use the
-inventory.
+Something native does run either way - on Windows it has to - but in the first
+package it is `python\pythonw.exe`, that is **the official python.org binary**,
+with its signature and its reputation. Antivirus software knows it.
+`Inventario.exe`, by contrast, is a file born anew with every version, signed by
+nobody and never seen before: that is what gets it looked at with suspicion, not
+the program itself.
+
+**Nothing has to be installed on the PCs** in either case: Python and the
+libraries travel inside the package. Extract it into the shared network folder,
+and whoever can reach that folder can use the inventory.
+
+With the recommended package, the share holds this:
+
+```
+\\server\Shared\Inventory\
+    Inventario.py                   the program, readable: opens in Notepad
+    inventario\                     the rest of the program, also in plain sight
+    python\                         the official python.org Python
+    Crea collegamento sul desktop.bat   creates the desktop shortcut
+    LEGGIMI-PRIMA.txt               installation instructions
+    Produzione\
+        Inventario.xlsx             the real inventory, one for everybody
+        inventario_impostazioni.json  rooms, types, loans, statuses
+    Backup\                        copies saved before every destructive operation
+    Collaudo\                      the test files
+```
+
+With the `Inventario.exe` package instead:
 
 ```
 \\server\Shared\Inventory\
     Inventario.exe                  the program
+    _internal\                      Python and the libraries: do not move, do not rename
     Produzione\
         Inventario.xlsx             the real inventory, one for everybody
         inventario_impostazioni.json  rooms, types, loans, statuses
@@ -166,8 +198,8 @@ from a share is one of the patterns they flag most often.
 If security is a concern - or if somebody has already flagged the executable -
 this is the quieter arrangement, and the program supports it with no changes.
 
-1. copy the program folder (`Inventario.exe`, `_internal` and the files beside
-   them) onto each workstation, for example into `C:\Program Files\Inventario`
+1. copy the program folder (everything in the zip except `Produzione`) onto
+   each workstation, for example into `C:\Program Files\Inventario`
    or `%LOCALAPPDATA%\Inventario`;
 2. **leave only the data on the share**: the `Produzione` folder with
    `Inventario.xlsx` and the settings inside;
@@ -197,8 +229,10 @@ order of solidity:
    with either arrangement;
 2. **an allow rule** agreed with whoever runs security - AppLocker or Windows
    Defender Application Control - by path or by file hash;
-3. **moving the program locally**, that is arrangement B, which removes the
-   "executable started from a share" pattern altogether.
+3. **using the package without an executable of ours**, which removes the
+   unsigned binary, and optionally **moving the program locally**, that is
+   arrangement B, which also removes the "executable started from a share"
+   pattern. Together the two leave little to flag.
 
 It is worth talking to whoever runs security **before** deploying to many
 workstations: an unsigned internal tool is a normal situation, usually settled

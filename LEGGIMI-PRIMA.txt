@@ -10,6 +10,21 @@ ITALIANO
 Tre passaggi. Il primo e' il piu' importante: evita gli avvisi di
 sicurezza di Windows su tutte le postazioni.
 
+I pacchetti sono due e fanno la stessa cosa:
+
+  Inventario-windows-senza-exe.zip   CONSIGLIATO. Dentro c'e' il Python
+      ufficiale di python.org, firmato dalla Python Software Foundation,
+      e il programma in chiaro come file .py. Nessun eseguibile
+      costruito da noi, quindi niente di non firmato da far passare.
+
+  Inventario-windows.zip             contiene Inventario.exe, il
+      programma in un eseguibile unico. Piu' comodo, ma e' un file non
+      firmato che nasce nuovo a ogni versione: e' quello che gli
+      antivirus guardano con sospetto.
+
+Le istruzioni qui sotto valgono per tutti e due: dove leggi
+Inventario.exe, con il pacchetto consigliato leggi Inventario.py.
+
 
 1) SBLOCCA IL FILE ZIP, PRIMA DI ESTRARLO
 
@@ -30,23 +45,28 @@ sicurezza di Windows su tutte le postazioni.
    Estrai tutto il contenuto dello zip in una cartella della share,
    per esempio:   \\server\Condivisa\Inventario\
 
-   Dentro trovi Inventario.exe insieme alle cartelle di lavoro
-   (_internal, Produzione, Backup, Collaudo). Non spostare e non
-   rinominare _internal: il programma non partirebbe piu'.
+   Con il pacchetto consigliato dentro trovi Inventario.py, la
+   cartella inventario e la cartella python, insieme alle cartelle di
+   lavoro (Produzione, Backup, Collaudo). Con l'altro pacchetto trovi
+   Inventario.exe e _internal al loro posto. In nessuno dei due casi
+   spostare o rinominare le sottocartelle: il programma non partirebbe
+   piu'.
 
    Servono i permessi NTFS:
-     - sull'eseguibile:  Lettura ed esecuzione
+     - sul programma:    Lettura ed esecuzione
      - sulla cartella:   Modifica
 
 
 3) CREA IL COLLEGAMENTO SUL DESKTOP DI OGNI POSTAZIONE
 
-   Apri la cartella di rete, tasto destro su Inventario.exe
-   > Mostra altre opzioni > Invia a > Desktop (crea collegamento)
+   Doppio clic su "Crea collegamento sul desktop.bat": riconosce da
+   solo quale dei due pacchetti hai estratto, mette il collegamento sul
+   desktop e ne lascia una copia nella cartella, da trascinare sul
+   desktop degli altri.
 
-   In alternativa, un doppio clic su
-   "Crea collegamento sul desktop.bat" lo crea e ne lascia una copia
-   nella cartella, da trascinare sul desktop degli altri.
+   Con il pacchetto Inventario.exe va bene anche tasto destro
+   sull'eseguibile > Mostra altre opzioni > Invia a > Desktop (crea
+   collegamento).
 
 
 AGGIORNARE IL PROGRAMMA PIU' AVANTI
@@ -55,9 +75,14 @@ AGGIORNARE IL PROGRAMMA PIU' AVANTI
    nuovo. I dati non si toccano: stanno in Produzione, e Backup e
    Collaudo restano dove sono.
 
-   Se Inventario.exe non si lascia cancellare, e' perche' qualcuno lo
-   sta usando: Windows blocca l'eseguibile finche' un processo
-   avviato da li' e' in esecuzione, anche da un altro computer.
+   Se un file non si lascia cancellare, guarda PRIMA la sola lettura:
+   tasto destro > Proprieta' > in fondo alla scheda Generale, togli la
+   spunta da [x] Sola lettura. E' la causa piu' banale e anche la piu'
+   frequente.
+
+   Se non era quello, e' perche' qualcuno lo sta usando: Windows blocca
+   l'eseguibile finche' un processo avviato da li' e' in esecuzione,
+   anche da un altro computer.
    Sul server: Gestione computer > Cartelle condivise > File aperti,
    cerca "Inventario", vedi chi lo tiene aperto e chiudilo da li'.
    Poi riprova.
@@ -85,6 +110,21 @@ ENGLISH
 Three steps. The first one matters most: it prevents Windows security
 warnings on every workstation.
 
+There are two packages and they do the same thing:
+
+  Inventario-windows-senza-exe.zip   RECOMMENDED. Inside are the
+      official python.org Python, signed by the Python Software
+      Foundation, and the program in plain sight as .py files. No
+      executable built by us, so nothing unsigned to get past security.
+
+  Inventario-windows.zip             holds Inventario.exe, the program
+      packed into a single executable. Handier, but it is an unsigned
+      file born anew with every version: that is what antivirus
+      software looks at with suspicion.
+
+The instructions below apply to both: where you read Inventario.exe,
+with the recommended package read Inventario.py.
+
 
 1) UNBLOCK THE ZIP FILE, BEFORE EXTRACTING IT
 
@@ -106,23 +146,27 @@ warnings on every workstation.
    Extract the whole contents of the zip into a folder on the share,
    for example:   \\server\Shared\Inventory\
 
-   Inside you find Inventario.exe together with the working folders
-   (_internal, Produzione, Backup, Collaudo). Do not move or rename
-   _internal: the program would no longer start.
+   With the recommended package you find Inventario.py, the inventario
+   folder and the python folder, together with the working folders
+   (Produzione, Backup, Collaudo). With the other package you find
+   Inventario.exe and _internal in their place. In neither case move or
+   rename the subfolders: the program would no longer start.
 
    NTFS permissions needed:
-     - on the executable:  Read and execute
+     - on the program:     Read and execute
      - on the folder:      Modify
 
 
 3) CREATE THE DESKTOP SHORTCUT ON EVERY WORKSTATION
 
-   Open the network folder, right-click Inventario.exe
-   > Show more options > Send to > Desktop (create shortcut)
-
-   Alternatively, double-clicking "Crea collegamento sul desktop.bat"
-   creates one and leaves a copy in the folder, to drag onto the
+   Double-click "Crea collegamento sul desktop.bat": it works out by
+   itself which of the two packages you extracted, puts the shortcut on
+   the desktop and leaves a copy in the folder, to drag onto the
    others' desktops.
+
+   With the Inventario.exe package you can also right-click the
+   executable > Show more options > Send to > Desktop (create
+   shortcut).
 
 
 UPDATING THE PROGRAM LATER
@@ -131,9 +175,14 @@ UPDATING THE PROGRAM LATER
    The data is untouched: it lives in Produzione, and Backup and
    Collaudo stay where they are.
 
-   If Inventario.exe will not delete, it is because somebody is using
-   it: Windows locks the executable while a process started from it
-   is running, even from another computer.
+   If a file will not delete, check the read-only attribute FIRST:
+   right-click > Properties > at the bottom of the General tab, clear
+   the [x] Read-only box. It is the most banal cause and also the most
+   common.
+
+   If that was not it, it is because somebody is using it: Windows
+   locks the executable while a process started from it is running,
+   even from another computer.
    On the server: Computer Management > Shared Folders > Open Files,
    look for "Inventario", see who is holding it and close it there.
    Then try again.

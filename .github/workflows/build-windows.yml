@@ -1,8 +1,13 @@
-name: Compila l'eseguibile Windows
+name: Compila i pacchetti Windows
 
 # Ad ogni tag "v*" costruisce il programma su una macchina Windows e allega alla
-# release due cose: il pacchetto zip da estrarre sulla share, che e' il modo
-# consigliato, e il singolo eseguibile per chi lo preferisce.
+# release tre cose:
+#   1. il pacchetto SENZA eseguibile nostro, che e' quello consigliato dove la
+#      sicurezza aziendale e' un tema: dentro c'e' il Python ufficiale di
+#      python.org, firmato dalla Python Software Foundation, e il programma in
+#      chiaro come file .py. Nessun binario prodotto da noi;
+#   2. il pacchetto con Inventario.exe da estrarre sulla share;
+#   3. il singolo eseguibile per chi lo preferisce.
 #
 # Il pacchetto usa la forma "onedir": l'eseguibile sta accanto alle sue
 # librerie invece di scompattarsi in una cartella temporanea a ogni avvio.
@@ -28,6 +33,70 @@ jobs:
 
       - name: Installa le dipendenze
         run: python -m pip install --upgrade pip pyinstaller openpyxl
+
+      - name: Prepara il pacchetto senza eseguibile nostro
+        shell: pwsh
+        run: |
+          $ver = "3.12.10"
+          $zip = "python-$ver-embed-amd64.zip"
+          Invoke-WebRequest "https://www.python.org/ftp/python/$ver/$zip" -OutFile $zip
+          New-Item -ItemType Directory -Force -Path Portatile\python | Out-Null
+          Expand-Archive $zip -DestinationPath Portatile\python
+
+          # Il pacchetto incorporabile di python.org non contiene Tkinter: si
+          # prende dalla stessa versione ufficiale gia' installata sul runner.
+          $full = $env:pythonLocation
+          Copy-Item "$full\DLLs\_tkinter.pyd" Portatile\python\
+          Copy-Item "$full\DLLs\tcl86t.dll"   Portatile\python\
+          Copy-Item "$full\DLLs\tk86t.dll"    Portatile\python\
+          Copy-Item "$full\DLLs\zlib1.dll"    Portatile\python\ -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path Portatile\python\Lib | Out-Null
+          Copy-Item "$full\Lib\tkinter" Portatile\python\Lib\ -Recurse
+          Copy-Item "$full\tcl" Portatile\python\tcl -Recurse
+
+          # Percorsi di ricerca: la libreria compressa, questa cartella, la
+          # cartella del programma (..), Lib e le librerie installate.
+          $pth = Get-ChildItem Portatile\python\python*._pth | Select-Object -First 1
+          $lib = (Get-Content $pth.FullName)[0]
+          @(
+            $lib, ".", "..", "Lib", "Lib\site-packages", "import site"
+          ) | Set-Content $pth.FullName -Encoding ascii
+
+          python -m pip install --no-compile --target Portatile\python\Lib\site-packages openpyxl
+
+      - name: Controlla la firma e che il programma parta davvero
+        shell: pwsh
+        run: |
+          Get-AuthenticodeSignature Portatile\python\pythonw.exe |
+            Format-List Status, StatusMessage, SignerCertificate
+          Copy-Item Inventario.py Portatile\
+          Copy-Item inventario Portatile\inventario -Recurse
+          # import di tutto quello che serve, con i percorsi veri del pacchetto
+          Portatile\python\python.exe -c "import tkinter, openpyxl, inventario.ui; print('avvio possibile')"
+
+      - name: Prepara la cartella senza eseguibile da copiare in rete
+        shell: pwsh
+        run: |
+          Copy-Item LEGGIMI-PRIMA.txt Portatile\
+          Copy-Item "Crea collegamento sul desktop.bat" Portatile\
+          Copy-Item "Avvia Inventario.bat" Portatile\
+          Copy-Item README.md Portatile\"Come funziona.txt"
+          New-Item -ItemType Directory -Force -Path Portatile\Backup | Out-Null
+          Copy-Item Backup\.gitignore Portatile\Backup\ -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path Portatile\Produzione | Out-Null
+          Copy-Item Produzione\.gitignore Portatile\Produzione\ -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path Portatile\Collaudo | Out-Null
+          Copy-Item Collaudo\*.xlsx Portatile\Collaudo\
+          Copy-Item Collaudo\README.md Portatile\Collaudo\
+          Copy-Item Collaudo\README.en.md Portatile\Collaudo\
+          # le cartelle di lavoro del build non viaggiano con il pacchetto
+          Remove-Item Portatile\inventario\__pycache__ -Recurse -ErrorAction SilentlyContinue
+          Compress-Archive -Path Portatile\* -DestinationPath Inventario-windows-senza-exe.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Inventario-windows-senza-exe
+          path: Inventario-windows-senza-exe.zip
 
       - name: Compila il pacchetto da estrarre sulla share
         run: >
@@ -70,5 +139,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
+            Inventario-windows-senza-exe.zip
             Inventario-windows.zip
             dist-unico/Inventario.exe

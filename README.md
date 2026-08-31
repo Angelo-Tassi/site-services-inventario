@@ -1,6 +1,6 @@
 # Site Services : Inventario Iphone, Laptop e Tablet
 
-### [Apri la pagina del progetto](https://angelo-tassi.github.io/site-services-inventario/) &nbsp;·&nbsp; [Scarica il programma](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe) &nbsp;·&nbsp; [English](README.en.md)
+### [Apri la pagina del progetto](https://angelo-tassi.github.io/site-services-inventario/) &nbsp;·&nbsp; [Scarica il programma](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows-senza-exe.zip) &nbsp;·&nbsp; [English](README.en.md)
 
 > **Pagina del progetto:** <https://angelo-tassi.github.io/site-services-inventario/>
 > Da li' si scarica il programma, il modello Excel e si leggono le guide, in
@@ -31,13 +31,26 @@ gia' vecchio, e nessuno sa piu' dove sia finito un dispositivo.
 
 ## Scarica
 
-**[Scarica `Inventario-windows.zip`](../../releases/latest)** dalla pagina
-Releases: e' il pacchetto completo da estrarre sulla share. Serve anche il
-**[modello Excel da compilare](docs/Modello_inventario.xlsx)** per caricare in
-blocco laptop e tablet gia' censiti altrove.
+Dalla pagina Releases si scaricano **due pacchetti diversi**, che fanno la
+stessa identica cosa. Cambia solo che cosa viene eseguito.
 
-**Sui PC non va installato niente**: il pacchetto contiene Python e tutte le
-librerie. Quattro passaggi, una volta sola:
+| Pacchetto | Che cosa contiene | Quando sceglierlo |
+| --- | --- | --- |
+| **[`Inventario-windows-senza-exe.zip`](../../releases/latest/download/Inventario-windows-senza-exe.zip)** | il Python ufficiale di python.org, firmato dalla Python Software Foundation, e il programma in chiaro come file `.py` | **consigliato.** Nessun eseguibile costruito da noi: non c'e' niente di non firmato da far passare |
+| [`Inventario-windows.zip`](../../releases/latest/download/Inventario-windows.zip) | `Inventario.exe`, il programma impacchettato in un eseguibile unico | se si preferisce un solo file da avviare e gli avvisi non sono un problema |
+
+Serve anche il **[modello Excel da compilare](docs/Modello_inventario.xlsx)** per
+caricare in blocco laptop e tablet gia' censiti altrove.
+
+Un eseguibile che parte c'e' comunque - su Windows qualcosa di nativo deve pur
+girare - ma nel primo pacchetto e' `python\pythonw.exe`, cioe' **il binario
+ufficiale di python.org**, con la sua firma e la sua reputazione. Un antivirus
+lo conosce. `Inventario.exe`, invece, e' un file che nasce a ogni versione, non
+e' firmato da nessuno e nessuno l'ha mai visto prima: e' quello il motivo per
+cui viene guardato con sospetto, non il programma in se'.
+
+**Sui PC non va installato niente** in nessuno dei due casi: Python e le
+librerie viaggiano dentro il pacchetto. Quattro passaggi, una volta sola:
 
 1. scarica lo zip;
 2. **sbloccalo** prima di estrarlo - tasto destro > *Proprieta'* >
@@ -45,11 +58,31 @@ librerie. Quattro passaggi, una volta sola:
    tutte le postazioni: vedi [Gli avvisi di sicurezza di
    Windows](#gli-avvisi-di-sicurezza-di-windows);
 3. estrai tutto il contenuto nella cartella di rete condivisa;
-4. su ogni postazione, tasto destro su `Inventario.exe` > *Invia a* >
-   *Desktop (crea collegamento)*.
+4. su ogni postazione, doppio clic su **`Crea collegamento sul desktop.bat`**:
+   riconosce da solo quale dei due pacchetti hai estratto e mette il
+   collegamento sul desktop. Con il pacchetto `Inventario.exe` va bene anche
+   tasto destro sull'eseguibile > *Invia a* > *Desktop (crea collegamento)*.
 
 Chi ha accesso a quella cartella ha accesso all'inventario. Nello zip c'e' anche
 `LEGGIMI-PRIMA.txt` con questi passaggi in italiano e in inglese.
+
+Con il pacchetto consigliato, sulla share si trova questo:
+
+```
+\\server\Condivisa\Inventario\
+    Inventario.py                   il programma, leggibile: si apre col Blocco note
+    inventario\                     il resto del programma, sempre in chiaro
+    python\                         il Python ufficiale di python.org
+    Crea collegamento sul desktop.bat
+    LEGGIMI-PRIMA.txt               istruzioni di installazione
+    Produzione\
+        Inventario.xlsx             l'inventario vero, uno solo per tutti
+        inventario_impostazioni.json  stanze, tipi, prestiti, stati
+    Backup\                        le copie salvate prima di ogni operazione distruttiva
+    Collaudo\                      i file di prova
+```
+
+Con il pacchetto `Inventario.exe`, invece:
 
 ```
 \\server\Condivisa\Inventario\
@@ -170,8 +203,8 @@ Se la sicurezza e' un tema - o se qualcuno ha gia' segnalato l'eseguibile -
 questa e' la sistemazione piu' tranquilla, e il programma la supporta senza
 modifiche.
 
-1. copia la cartella del programma (`Inventario.exe`, `_internal` e i file
-   accanto) su ogni postazione, per esempio in
+1. copia la cartella del programma (tutto quello che c'e' nello zip tranne
+   `Produzione`) su ogni postazione, per esempio in
    `C:\Programmi\Inventario` o in `%LOCALAPPDATA%\Inventario`;
 2. **lascia sulla share solo i dati**: la cartella `Produzione` con dentro
    `Inventario.xlsx` e le impostazioni;
@@ -202,8 +235,10 @@ tre, in ordine di solidita':
 2. **una regola di autorizzazione** concordata con chi gestisce la sicurezza -
    AppLocker o Windows Defender Application Control - su percorso o su impronta
    del file;
-3. **spostare il programma in locale**, cioe' la sistemazione B, che toglie di
-   mezzo lo schema "eseguibile avviato da una share".
+3. **usare il pacchetto senza eseguibile nostro**, che toglie di mezzo il
+   binario non firmato, ed eventualmente **spostare il programma in locale**,
+   cioe' la sistemazione B, che toglie di mezzo anche lo schema "eseguibile
+   avviato da una share". Insieme, le due cose lasciano poco da segnalare.
 
 Vale la pena parlarne con chi gestisce la sicurezza **prima** di distribuirlo su
 molte postazioni: uno strumento interno non firmato e' una situazione normale,
