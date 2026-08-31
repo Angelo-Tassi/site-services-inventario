@@ -75,8 +75,11 @@ Inventario.exe, con il pacchetto consigliato leggi Inventario.py.
 
 AGGIORNARE IL PROGRAMMA PIU' AVANTI
 
-   Sostituisci il contenuto della cartella con quello del pacchetto
-   nuovo. Se prima c'era Inventario.exe e adesso usi il pacchetto
+   NON sovrascrivere la cartella esistente: estrai il pacchetto nuovo
+   in una cartella NUOVA (Inventario3, Inventario4...) e copia dentro
+   la sua Produzione il file Inventario.xlsx della vecchia. Sulle share
+   quasi nessuno ha il permesso di cancellare, e una sovrascrittura a
+   meta' lascia un programma che non parte. Se prima c'era Inventario.exe e adesso usi il pacchetto
    senza eseguibile, CANCELLA Inventario.exe e la cartella _internal:
    altrimenti restano li' e chi li apre usa la versione vecchia del
    programma. Poi rifai i collegamenti sui desktop.
@@ -185,7 +188,11 @@ with the recommended package read Inventario.py.
 
 UPDATING THE PROGRAM LATER
 
-   Replace the contents of the folder with those of the new package.
+   Do NOT overwrite the existing folder: extract the new package into
+   a NEW folder (Inventory3, Inventory4...) and copy Inventario.xlsx
+   from the old Produzione into the new one. On shares hardly anyone
+   has delete permission, and a half-finished overwrite leaves a
+   program that will not start.
    If Inventario.exe was there before and you now use the package
    without an executable, DELETE Inventario.exe and the _internal
    folder: otherwise they stay and whoever opens them runs the old

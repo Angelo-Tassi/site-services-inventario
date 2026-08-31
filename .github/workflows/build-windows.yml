@@ -92,7 +92,25 @@ jobs:
           Copy-Item Collaudo\README.en.md Portatile\Collaudo\
           # le cartelle di lavoro del build non viaggiano con il pacchetto
           Remove-Item Portatile\inventario\__pycache__ -Recurse -ErrorAction SilentlyContinue
+          # I file presi dal Python installato sul runner arrivano con
+          # l'attributo di sola lettura, e l'archivio se lo porta dietro fino
+          # alla share: chi poi deve aggiornare il programma si ritrova file
+          # che non si lasciano sostituire. Si toglie qui, una volta per tutte.
+          Get-ChildItem Portatile -Recurse -File | ForEach-Object {
+            if ($_.IsReadOnly) { $_.IsReadOnly = $false }
+          }
           Compress-Archive -Path Portatile\* -DestinationPath Inventario-windows-senza-exe.zip
+
+      - name: Nessun file in sola lettura nel pacchetto
+        shell: pwsh
+        run: |
+          $bloccati = Get-ChildItem Portatile -Recurse -File |
+            Where-Object { $_.IsReadOnly }
+          if ($bloccati) {
+            $bloccati | Select-Object -First 10 FullName | Format-Table
+            throw "$($bloccati.Count) file sono in sola lettura: sulla share non si lasceranno aggiornare."
+          }
+          Write-Host "Nessun file in sola lettura."
 
       - uses: actions/upload-artifact@v4
         with:
@@ -129,6 +147,9 @@ jobs:
           Copy-Item Collaudo\*.xlsx Distribuzione\Collaudo\
           Copy-Item Collaudo\README.md Distribuzione\Collaudo\
           Copy-Item Collaudo\README.en.md Distribuzione\Collaudo\
+          Get-ChildItem Distribuzione -Recurse -File | ForEach-Object {
+            if ($_.IsReadOnly) { $_.IsReadOnly = $false }
+          }
           Compress-Archive -Path Distribuzione\* -DestinationPath Inventario-windows.zip
 
       - uses: actions/upload-artifact@v4

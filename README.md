@@ -251,6 +251,56 @@ Vale la pena parlarne con chi gestisce la sicurezza **prima** di distribuirlo su
 molte postazioni: uno strumento interno non firmato e' una situazione normale,
 che di solito si risolve con una riga di autorizzazione.
 
+## Aggiornare il programma: una cartella nuova, mai sovrascrivere
+
+Sulle share aziendali quasi nessuno ha il permesso di **cancellare**. Si puo'
+creare, si puo' scrivere, ma sostituire un file gia' li' spesso no - e allora
+l'estrazione del pacchetto nuovo sostituisce alcuni file e altri no. Il
+risultato non e' un aggiornamento a meta': e' un programma che **non parte
+piu'**, perche' i pezzi appartengono a due versioni diverse.
+
+**Quindi: ogni aggiornamento va in una cartella nuova.**
+
+```
+\\server\Condivisa\Inventario2\      <- versione precedente, si lascia dov'e'
+\\server\Condivisa\Inventario3\      <- si estrae qui il pacchetto nuovo
+```
+
+1. estrai il pacchetto nuovo in una cartella che **non esiste ancora**;
+2. copia dentro la nuova `Produzione\` il file `Inventario.xlsx` della vecchia -
+   e' l'unica cosa da portarsi dietro;
+3. rifai i collegamenti sul desktop con `Crea collegamento sul desktop.bat`;
+4. la cartella vecchia si cancella con calma, quando qualcuno con i permessi
+   giusti puo' farlo. Nel frattempo rinominala - se si riesce - in
+   `Inventario_vecchio`, cosi' e' chiaro a tutti quale non usare.
+
+Non e' un ripiego: creare una cartella nuova e' l'unica operazione che riesce
+sempre, anche senza permessi di cancellazione, e non puo' lasciare
+un'installazione mezza vecchia e mezza nuova.
+
+### E se i file risultano in sola lettura
+
+Fino alla versione 0.23.2 alcuni file del pacchetto arrivavano con l'attributo
+di **sola lettura**: venivano dal Python ufficiale copiato in fase di
+costruzione, e l'archivio se lo portava dietro. Erano quelli che poi non si
+lasciavano sostituire. Dalla 0.23.3 la costruzione toglie l'attributo e
+**verifica** che non ne resti nessuno, altrimenti il pacchetto non viene
+pubblicato.
+
+Sui file gia' finiti sulla share si toglie cosi', dal Prompt dei comandi:
+
+```
+attrib -R "\\server\Condivisa\Inventario2\*" /S
+```
+
+### La sistemazione che toglie il problema alla radice
+
+Se questa storia si ripete a ogni versione, il posto sbagliato e' la share:
+**metti il programma sulle postazioni e lascia sulla share solo i dati**. Un
+aggiornamento diventa una copia in una cartella tua, dove i permessi ce li hai,
+e la share non contiene piu' niente da sostituire. Vedi
+[Programma sulle postazioni, dati sulla share](#b-programma-sulle-postazioni-dati-sulla-share).
+
 ## Il primo avvio, e un errore che costa caro
 
 Alla prima apertura il programma **crea da solo** l'inventario vuoto in

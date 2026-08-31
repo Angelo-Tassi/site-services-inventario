@@ -244,6 +244,55 @@ It is worth talking to whoever runs security **before** deploying to many
 workstations: an unsigned internal tool is a normal situation, usually settled
 with one allow rule.
 
+## Updating the program: a new folder, never overwrite
+
+On corporate shares hardly anyone has permission to **delete**. You can create,
+you can write, but replacing a file already there often fails - and then
+extracting the new package replaces some files and not others. The result is not
+a half-update: it is a program that **no longer starts**, because the pieces
+belong to two different versions.
+
+**So: every update goes into a new folder.**
+
+```
+\\server\Shared\Inventory2\       <- previous version, left where it is
+\\server\Shared\Inventory3\       <- the new package is extracted here
+```
+
+1. extract the new package into a folder that **does not exist yet**;
+2. copy `Inventario.xlsx` from the old `Produzione\` into the new one - it is
+   the only thing to carry over;
+3. redo the desktop shortcuts with `Crea collegamento sul desktop.bat`;
+4. delete the old folder later, when somebody with the right permissions can.
+   Meanwhile rename it - if you can - to `Inventario_old`, so everyone can see
+   which one not to use.
+
+This is not a workaround: creating a new folder is the one operation that always
+succeeds, even without delete permission, and it cannot leave an installation
+half old and half new.
+
+### If files turn out to be read-only
+
+Up to version 0.23.2 some files in the package arrived with the **read-only**
+attribute: they came from the official Python copied in at build time, and the
+archive carried it along. Those were the ones that would not be replaced. From
+0.23.3 the build clears the attribute and **verifies** that none is left,
+otherwise the package is not published.
+
+On files already on the share, clear it from the command prompt:
+
+```
+attrib -R "\\server\Shared\Inventory2\*" /S
+```
+
+### The arrangement that removes the problem at the root
+
+If this repeats with every version, the share is the wrong place: **put the
+program on the workstations and leave only the data on the share**. An update
+becomes a copy into a folder of your own, where you do have permissions, and the
+share no longer holds anything to replace. See
+[Program on the workstations, data on the share](#b-program-on-the-workstations-data-on-the-share).
+
 ## The first launch, and a costly mistake
 
 On first opening, the program **creates the empty inventory by itself** in
