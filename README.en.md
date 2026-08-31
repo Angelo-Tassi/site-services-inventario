@@ -365,7 +365,7 @@ there is *Reset inventory*.
 
 The list of statuses is not in the window: it is the `states` entry of
 `inventario_impostazioni.json`, which opens in any text editor. The automatic
-statuses - *Not available*, *To be shipped back*, *Shipped to the phone service*
+statuses - *On loan*, *To be shipped back*, *Shipped to the phone service*
 - are not editable.
 
 ### The settings file
@@ -447,7 +447,7 @@ You pick it when adding the device, and change it at any time **without opening
 any window**: double-click the *Status* cell in the list and choose from the
 dropdown that appears in its place. It works from every screen.
 
-Three statuses are automatic and win over everything: **Not available** while a
+Three statuses are automatic and win over everything: **On loan** while a
 loan is in progress, **To be shipped back** for iPhones still with us, and
 **Shipped to the phone service** for those already gone. In those cases the
 dropdown is filled in and locked, with the reason beside it, and trying to
@@ -463,9 +463,15 @@ Each view shows **only** the columns that can hold a value there. A column empty
 by construction carries no information: it takes space away from what you have
 to read.
 
+The **complete inventory on the home screen** is an overview: it says what a
+device is, where it is and how it is - asset tag, type, model, serial, IMEI,
+room, status, notes - in a row you can read without scrolling sideways. The
+finer questions are asked inside the room they belong to, and in the overview
+the status sums them up: *On loan*, *Shipped to the phone service*.
+
 | Where you are | What goes away |
 | --- | --- |
-| **Home** | nothing: everything is in here |
+| **Home** | loans, returned by, shipped on, last change |
 | **Site Services BAU** | Room, On loan to, Lent on |
 | **Digital Kiosk** | Room, IMEI, Returned by, Shipped on |
 | **Magazzino Disaster Recovery** | Room, loans and the iPhone fields |
@@ -490,7 +496,7 @@ changes with the state of the device. Outside that room the column does not
 exist.
 
 *Lend* asks for the person's name and records date and time. While the device is
-out, the row is red and the status is *Not available*. *Register return* closes
+out, the row is red and the status is *On loan*. *Register return* closes
 the loan and puts it back among the available ones.
 
 ## Shipping iPhones

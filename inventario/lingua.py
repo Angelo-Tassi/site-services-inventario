@@ -539,7 +539,7 @@ INTESTAZIONI_EN = {
 
 STATI_EN = {
     "Disponibile": "Available",
-    "Non disponibile": "Not available",
+    "In prestito": "On loan",
     "Da Rispedire": "To be shipped back",
     "Spedito al servizio telefonia": "Shipped to the phone service",
     "In attesa ritiro": "Awaiting collection",

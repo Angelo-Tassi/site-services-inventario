@@ -388,9 +388,15 @@ Ogni vista mostra **solo** le colonne che li' possono avere un valore. Una
 colonna vuota per costruzione non porta informazione: toglie spazio a quello che
 si deve leggere.
 
+L'**inventario completo in home** e' una panoramica: dice che cos'e' un
+dispositivo, dov'e' e come sta - asset tag, tipo, modello, seriale, IMEI,
+stanza, stato, note - in una riga che si legge senza scorrere di lato. Le
+domande piu' precise si fanno dentro la stanza che le riguarda, e in panoramica
+ci pensa lo stato a riassumerle: *In prestito*, *Spedito al servizio telefonia*.
+
 | Dove sei | Che cosa sparisce |
 | --- | --- |
-| **Home** | niente: c'e' dentro tutto |
+| **Home** | prestiti, restituito da, spedito il, ultima modifica |
 | **Site Services BAU** | Stanza, In prestito a, Prestato il |
 | **Digital Kiosk** | Stanza, IMEI, Restituito da, Spedito il |
 | **Magazzino Disaster Recovery** | Stanza, prestiti e campi degli iPhone |
@@ -417,14 +423,14 @@ esiste:
 | Stato | Pulsante | Cosa succede |
 | --- | --- | --- |
 | Disponibile | **Presta** | chiede il nome della persona e registra nome, data e ora accanto al dispositivo |
-| Non disponibile | **Registra rientro** | chiude il prestito e riporta il dispositivo fra i disponibili |
+| In prestito | **Registra rientro** | chiude il prestito e riporta il dispositivo fra i disponibili |
 
 Finche' il dispositivo e' fuori, la sua riga e' **evidenziata in rosso** e lo
-stato risulta **Non disponibile**; l'evidenziazione si ritrova anche nei file
+stato risulta **In prestito**; l'evidenziazione si ritrova anche nei file
 esportati e stampati. Il nome di chi ha in prestito un dispositivo e' incluso
 nella ricerca, quindi basta digitare il cognome per trovare cosa ha in mano.
 
-Tre stati sono automatici e vincono su tutto: **Non disponibile** mentre c'e' un
+Tre stati sono automatici e vincono su tutto: **In prestito** mentre c'e' un
 prestito in corso, **Da Rispedire** per gli iPhone ancora in casa e **Spedito al
 servizio telefonia** per quelli gia' partiti. Registrato il rientro,
 il dispositivo torna *Disponibile*. Vedi *Stati* qui sotto per gli altri.
@@ -517,7 +523,7 @@ di una reimportazione c'e' *Reset inventario*.
 
 L'elenco degli stati non e' nella finestra: sta alla voce `states` del file
 `inventario_impostazioni.json`, che si apre con un editor di testo. Gli stati
-automatici - *Non disponibile*, *Da Rispedire*, *Spedito al servizio telefonia* -
+automatici - *In prestito*, *Da Rispedire*, *Spedito al servizio telefonia* -
 non si toccano.
 
 ### Il file delle impostazioni
@@ -573,7 +579,7 @@ nell'elenco e si sceglie dalla tendina che compare al suo posto. Funziona da
 ogni schermata: inventario completo, singola stanza, contenitore iPhone.
 
 Restano fuori dalla scelta manuale gli stati automatici: un dispositivo **in
-prestito** e' *Non disponibile* e lo stato torna modificabile solo dopo il
+prestito** e' *In prestito* e lo stato torna modificabile solo dopo il
 rientro; un **iPhone** e' *Da Rispedire* finche' non viene spedito, poi *Spedito al
 servizio telefonia*. In entrambi i casi la tendina
 appare gia' compilata e bloccata, con la spiegazione accanto, e provando a

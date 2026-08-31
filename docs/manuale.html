@@ -311,9 +311,15 @@ table{min-width:520px}
   <p class="sub">Ogni vista mostra <b>solo</b> le colonne che li' possono avere un
     valore. Una colonna vuota per costruzione non porta informazione: toglie spazio a
     quello che si deve leggere davvero.</p>
+  <p class="sub">L'<b>inventario completo in home</b> e' una panoramica: dice che cos'e'
+    un dispositivo, dov'e' e come sta, in una riga che si legge senza scorrere di lato.
+    Le domande piu' precise - chi ha il prestito e da quando, chi ha restituito un
+    telefono, quando e' stato spedito - si fanno dentro la stanza che le riguarda, il
+    <b>Digital Kiosk</b> e il contenitore <b>Iphone</b>. In panoramica ci pensa lo stato
+    a riassumerle: <i>In prestito</i>, <i>Spedito al servizio telefonia</i>.</p>
   <div class="tw"><table class="man">
     <tr><th>Dove sei</th><th>Che cosa vedi</th><th>Che cosa sparisce</th></tr>
-    <tr><td class="d"><b>Home</b></td><td class="d">Tutte le colonne: qui c'e' dentro tutto.</td><td class="d">Niente.</td></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, tipo, modello, seriale, IMEI, stanza, stato, note. Otto colonne per dire che cos'e', dov'e' e come sta.</td><td class="d">Tutto il resto: chi ha il prestito e da quando, chi ha restituito, quando e' stato spedito, ultima modifica.</td></tr>
     <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Restituito da e Spedito il, perche' li' stanno i telefoni.</td><td class="d">Stanza, In prestito a, Prestato il.</td></tr>
     <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">In prestito a, Prestato il e la colonna <b>Prestito</b> con i pulsanti.</td><td class="d">Stanza, IMEI, Restituito da, Spedito il.</td></tr>
     <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Solo l'essenziale: asset tag, tipo, modello, seriale, stato, note.</td><td class="d">Stanza, tutto il prestito, tutto quello degli iPhone.</td></tr>
@@ -366,7 +372,7 @@ table{min-width:520px}
   <ol class="steps">
     <li><b>Presta.</b> Il pulsante sulla riga chiede il nome di chi prende il dispositivo.
       Vengono registrati nome, data e ora.</li>
-    <li><b>Il dispositivo diventa rosso</b> e il suo stato passa a <i>Non disponibile</i>:
+    <li><b>Il dispositivo diventa rosso</b> e il suo stato passa a <i>In prestito</i>:
       si vede a colpo d'occhio che non c'e'.</li>
     <li><b>Rientro.</b> Lo stesso pulsante lo riporta disponibile e cancella il prestito.</li>
   </ol>
@@ -704,9 +710,15 @@ table{min-width:520px}
   <p class="sub">Each view shows <b>only</b> the columns that can hold a value there. A
     column empty by construction carries no information: it takes space away from what you
     actually have to read.</p>
+  <p class="sub">The <b>complete inventory on the home screen</b> is an overview: it says
+    what a device is, where it is and how it is, in a row you can read without scrolling
+    sideways. The finer questions - who has it on loan and since when, who returned a
+    phone, when it was shipped - are asked inside the room they belong to, the <b>Digital
+    Kiosk</b> and the <b>Iphone</b> container. In the overview the status sums them up:
+    <i>On loan</i>, <i>Shipped to the phone service</i>.</p>
   <div class="tw"><table class="man">
     <tr><th>Where you are</th><th>What you see</th><th>What goes away</th></tr>
-    <tr><td class="d"><b>Home</b></td><td class="d">Every column: everything is in here.</td><td class="d">Nothing.</td></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, type, model, serial, IMEI, room, status, notes. Eight columns to say what a device is, where it is and how it is.</td><td class="d">Everything else: who has it on loan and since when, who returned it, when it was shipped, last change.</td></tr>
     <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Returned by and Shipped on, because the phones live there.</td><td class="d">Room, On loan to, Lent on.</td></tr>
     <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">On loan to, Lent on, and the <b>Loan</b> column with its buttons.</td><td class="d">Room, IMEI, Returned by, Shipped on.</td></tr>
     <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Only the essentials: asset tag, type, model, serial, status, notes.</td><td class="d">Room, everything about loans, everything about iPhones.</td></tr>
@@ -758,7 +770,7 @@ table{min-width:520px}
   <ol class="steps">
     <li><b>Lend.</b> The button on the row asks for the name of whoever takes the device.
       Name, date and time are recorded.</li>
-    <li><b>The device turns red</b> and its status becomes <i>Not available</i>: you can see
+    <li><b>The device turns red</b> and its status becomes <i>On loan</i>: you can see
       at a glance that it is out.</li>
     <li><b>Return.</b> The same button makes it available again and clears the loan.</li>
   </ol>

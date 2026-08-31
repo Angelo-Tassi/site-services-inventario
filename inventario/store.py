@@ -35,7 +35,11 @@ FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
 TIPO_IPHONE = "iphone"
 
 DISPONIBILE = "Disponibile"
-NON_DISPONIBILE = "Non disponibile"
+# Uno stato che dice quello che e' successo, non quello che manca: chi legge
+# l'elenco vuole sapere che il dispositivo e' in prestito, non che "non e'
+# disponibile". Viene ricalcolato dal prestito a ogni lettura, quindi gli
+# inventari scritti prima si allineano da soli.
+NON_DISPONIBILE = "In prestito"
 # Gli iPhone in nostro possesso sono sempre in attesa di essere rispediti.
 DA_RISPEDIRE = "Da Rispedire"
 # ...finche' non partono davvero per il servizio telefonia.
@@ -345,8 +349,8 @@ def normalize_state(item, stati=None):
     """Mette a posto lo stato.
 
     Due casi sono automatici e vincono sempre: un iPhone e' "Da Rispedire", un
-    dispositivo in prestito e' "Non disponibile". Negli altri casi si tiene lo
-    stato scelto dall'utente, purche' sia fra quelli previsti.
+    dispositivo prestato e' "In prestito". Negli altri casi si tiene lo stato
+    scelto dall'utente, purche' sia fra quelli previsti.
     """
     ammessi = list(stati or STATI)
     normalize_iphone(item)

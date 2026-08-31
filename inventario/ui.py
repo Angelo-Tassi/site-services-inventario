@@ -1298,6 +1298,16 @@ class App(tk.Tk):
             si_presta = bool(stanze_prestito)
         if not si_presta:
             togli("prestato_a", "prestato_il")
+
+        # L'inventario completo e' una panoramica, non una scheda: deve dire in
+        # una riga che cos'e' un dispositivo, dov'e' e come sta. Chi e' l'ha in
+        # prestito, quando e' stato spedito, chi l'ha restituito e chi ha
+        # toccato la riga per ultimo sono domande da fare dentro la stanza che
+        # le riguarda - e lo stato in panoramica le riassume gia': "In
+        # prestito", "Spedito al servizio telefonia".
+        if self.view == "home":
+            togli("prestato_a", "prestato_il", "restituito_da", "spedito_il",
+                  "modificato_il", "modificato_da")
         return campi
 
     def _columns(self):
@@ -1875,7 +1885,8 @@ class App(tk.Tk):
             self.sort_field = field
             self.sort_reverse = field in CAMPI_DATA
         if self.tree is not None:
-            for name in ALL_FIELDS:
+            # solo le colonne di questa vista: le altre nella tabella non ci sono
+            for name in self._campi_visibili():
                 arrow = ""
                 if name == self.sort_field:
                     arrow = "  ▾" if self.sort_reverse else "  ▴"

@@ -23,10 +23,20 @@ app._initial_load()
 def campi():
     return app._campi_visibili()
 
-# ---- home: l'inventario completo, quindi tutte le colonne
+# ---- home: una panoramica, non una scheda. Dice che cos'e' un dispositivo,
+# dov'e' e come sta; il resto si guarda dentro la stanza che lo riguarda
 app.show_home()
-assert campi() == list(ALL_FIELDS), campi()
-assert app._columns() == [CHECK_COLUMN] + list(ALL_FIELDS)
+assert campi() == ["asset_tag", "tipo", "modello", "seriale", "imei", "stanza",
+                   "stato", "note"], campi()
+assert app._columns() == [CHECK_COLUMN] + campi()
+# lo stato riassume da solo il prestito e la spedizione
+prestati = [i for i in app.store.items if i.get("prestato_a")]
+assert prestati and all(i["stato"] == "In prestito" for i in prestati), prestati
+# e l'ordinamento continua a funzionare anche su una colonna che non si vede
+assert app.sort_field == "modificato_il" and "modificato_il" not in campi()
+app.sort_by("modello")
+assert app.visible[0]["modello"] <= app.visible[-1]["modello"]
+app.sort_by("modificato_il")
 
 # ---- dentro una stanza la colonna Stanza sparisce sempre: e' nel titolo
 for stanza in (BAU, KIOSK, DR):

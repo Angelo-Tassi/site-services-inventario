@@ -18,7 +18,7 @@ d = tempfile.mkdtemp()
 # ---- ogni intestazione e ogni stato hanno la loro traduzione
 for campo in ALL_FIELDS:
     assert HEADERS[campo] in INTESTAZIONI_EN, campo
-for stato in STATI + ["Non disponibile", "Da Rispedire", "Spedito al servizio telefonia"]:
+for stato in STATI + ["In prestito", "Da Rispedire", "Spedito al servizio telefonia"]:
     assert stato in STATI_EN, stato
 
 # ---- l'italiano e' il testo sorgente: senza traduzione resta leggibile
@@ -44,7 +44,7 @@ assert app.tree.heading("seriale")["text"].startswith("Serial number"), \
 assert app.tree.heading("stato")["text"].startswith("Status")
 assert app.view == "home" and len(app.visible) == 13
 riga = app.tree.item("IT-0107", "values")
-assert riga[app._columns().index("stato")] == "Not available", riga
+assert riga[app._columns().index("stato")] == "On loan", riga
 
 # ---- lo stato si mostra tradotto ma si salva in italiano
 assert stato_canonico("To be rebuilt", STATI) == "Da rebuildare"
@@ -86,7 +86,7 @@ wb.close()
 
 righe, esito = rows_from_workbook(uscita, STANZE)
 assert len(righe) == 13, len(righe)
-assert {i["stato"] for i in righe} <= set(STATI + ["Non disponibile"]), \
+assert {i["stato"] for i in righe} <= set(STATI + ["In prestito"]), \
     "rileggendo, gli stati tornano in italiano"
 assert any(i["stato"] == DISPONIBILE for i in righe)
 assert all(i["seriale"] or i["imei"] for i in righe if i["tipo"] != "Iphone")
