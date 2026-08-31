@@ -29,6 +29,13 @@ L'IDEA IN UNA RIGA
 
    c) incolla il percorso della cartella di rete, per esempio
          \\server\Condivisa\Inventario
+      oppure
+         F:\Inventario
+
+      Per copiarlo: in Esplora risorse, Maiusc + tasto destro sulla
+      cartella > Copia come percorso. Le virgolette non danno
+      fastidio. Se preferisci, premi solo Invio: si apre una
+      finestra per scegliere la cartella.
 
    Se sulla rete l'inventario non c'e' ancora viene creato vuoto,
    in Produzione\Inventario.xlsx. Se c'e' gia', non viene toccato.
@@ -114,6 +121,12 @@ THE IDEA IN ONE LINE
 
    c) paste the path of the network folder, for example
          \\server\Shared\Inventory
+      or
+         F:\Inventory
+
+      To copy it: in File Explorer, Shift + right-click the folder >
+      Copy as path. The quotes do no harm. Or just press Enter: a
+      window opens to pick the folder.
 
    If the inventory is not on the network yet, an empty one is
    created at Produzione\Inventario.xlsx. If it is there already,

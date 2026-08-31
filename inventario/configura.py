@@ -9,6 +9,7 @@ lo crea vuoto; se c'e', lo lascia esattamente com'e'.
 """
 
 import os
+import re
 import sys
 
 from . import config
@@ -17,8 +18,56 @@ from .store import InventoryStore, InventoryError
 
 def _chiedi(domanda):
     try:
-        return input(domanda).strip().strip('"').strip()
+        return input(domanda).strip()
     except (EOFError, KeyboardInterrupt):
+        return ""
+
+
+def normalizza(scritto):
+    """Accetta il percorso in tutte le forme in cui Windows lo fa copiare.
+
+    "Copia come percorso" lo mette fra virgolette, la barra degli indirizzi a
+    volte restituisce le barre al contrario o un indirizzo file://, e capita di
+    incollarci dentro spazi o barre di troppo. Sono tutte la stessa cartella:
+    chiedere a chi installa di ripulirlo a mano non ha senso.
+    """
+    testo = (scritto or "").strip().strip('"').strip("'").strip()
+    if testo.lower().startswith("file:"):
+        try:
+            from urllib.parse import unquote, urlparse
+            parsed = urlparse(testo)
+            testo = unquote(parsed.path)
+            if parsed.netloc:                      # file://server/condivisa
+                testo = "//" + parsed.netloc + testo
+            elif re.match(r"^/[A-Za-z]:", testo):  # file:///F:/Inventario
+                testo = testo[1:]
+        except Exception:
+            pass
+    if os.sep == "\\":
+        testo = testo.replace("/", "\\")
+        di_rete = testo.startswith("\\\\")
+        while "\\\\" in testo:
+            testo = testo.replace("\\\\", "\\")
+        if di_rete:
+            # il doppio all'inizio di un percorso di rete non e' una ripetizione
+            testo = "\\" + testo
+    ripulito = testo.rstrip("\\/")
+    # una radice come "F:\" o "\\server" non si accorcia fino a sparire
+    return ripulito if len(ripulito) > 2 else testo
+
+
+def scegli_cartella():
+    """Finestra di scelta della cartella, per non incollare percorsi a mano."""
+    try:
+        import tkinter as tk
+        from tkinter import filedialog
+        root = tk.Tk()
+        root.withdraw()
+        scelta = filedialog.askdirectory(
+            parent=root, title="Scegli la cartella condivisa dell'inventario")
+        root.destroy()
+        return scelta or ""
+    except Exception:
         return ""
 
 
@@ -28,10 +77,13 @@ def percorso_inventario(cartella):
     Accetta indifferentemente la cartella condivisa, la cartella `Produzione` o
     direttamente il file: chi la scrive a mano intende sempre la stessa cosa.
     """
-    cartella = cartella.rstrip("\\/")
+    cartella = normalizza(cartella)
     if cartella.lower().endswith(".xlsx"):
         return cartella
-    if os.path.basename(cartella).lower() == config.NOME_PRODUZIONE.lower():
+    # la cartella si separa a mano: chi installa da Windows puo' scrivere le
+    # barre in tutti e due i versi, e basename ne riconosce una sola
+    ultimo = re.split(r"[\\/]", cartella)[-1]
+    if ultimo.lower() == config.NOME_PRODUZIONE.lower():
         return os.path.join(cartella, config.DATA_FILE_NAME)
     return os.path.join(cartella, config.NOME_PRODUZIONE, config.DATA_FILE_NAME)
 
@@ -84,6 +136,10 @@ def main():
     print("   \\\\server\\Condivisa\\Inventario")
     print("   F:\\Inventario")
     print()
+    print("Per copiarlo: in Esplora risorse, Maiusc + tasto destro sulla")
+    print("cartella  >  Copia come percorso. Le virgolette non danno")
+    print("fastidio, e vanno bene anche le barre al contrario.")
+    print()
     attuale, sorgente = config.configured_data_path()
     if attuale:
         print("Adesso questa installazione apre:")
@@ -91,8 +147,21 @@ def main():
         print("   (scritto in %s)" % sorgente)
         print()
 
+    print("Incollalo qui sotto e premi Invio.")
+    print("Oppure premi solo Invio: si apre una finestra per sceglierla.")
+    print()
     cartella = _chiedi("Cartella condivisa: ")
     if not cartella:
+        print("Apro la finestra di scelta...")
+        cartella = scegli_cartella()
+    if not cartella:
+        print("\nAnnullato: non e' stato cambiato niente.")
+        return 1
+    print()
+    print("Ho capito questo:")
+    print("   %s" % percorso_inventario(cartella))
+    conferma = _chiedi("Va bene? [Invio = si, n = no] ")
+    if conferma.lower().startswith("n"):
         print("\nAnnullato: non e' stato cambiato niente.")
         return 1
     try:
