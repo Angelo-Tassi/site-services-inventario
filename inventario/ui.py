@@ -21,6 +21,8 @@ from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
                     sembra_un_foglio_da_importare, testo_spedizione,
                     valore_visibile)
 
+ALTEZZA_MINIMA_TABELLA = 160   # pixel: circa cinque righe
+
 NO_ROOM_IT = "(senza stanza)"
 
 
@@ -1282,7 +1284,11 @@ class App(tk.Tk):
         tree.grid(row=0, column=0, sticky="nsew")
         scroll.grid(row=0, column=1, sticky="ns")
         scroll_x.grid(row=1, column=0, sticky="ew")
-        wrap.rowconfigure(0, weight=1)
+        # minsize e' la protezione contro lo schermo bianco: senza, quando lo
+        # spazio verticale non basta - font piu' grandi, ingrandimento di
+        # Windows al 125%, finestra bassa - la griglia riduce la tabella fino
+        # ad altezza zero, e i dispositivi ci sono ma non si vedono.
+        wrap.rowconfigure(0, weight=1, minsize=ALTEZZA_MINIMA_TABELLA)
         wrap.columnconfigure(0, weight=1)
 
         def rotella_orizzontale(event):

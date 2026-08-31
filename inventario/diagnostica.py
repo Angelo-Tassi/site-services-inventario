@@ -37,6 +37,79 @@ def _desktop():
     return tentativi
 
 
+def _misura_interfaccia(percorso):
+    """Apre l'interfaccia per un istante e misura la tabella.
+
+    Serve a rispondere alla domanda che da lontano non si puo' indovinare: la
+    tabella e' vuota perche' non ci sono righe, o perche' e' alta zero pixel?
+    Con i font e l'ingrandimento di Windows le proporzioni non sono quelle del
+    computer di chi sviluppa.
+    """
+    righe = []
+    try:
+        import tkinter as tk
+        from .ui import App
+    except Exception as exc:
+        return ["interfaccia non disponibile: %r" % exc]
+
+    esito = []
+
+    def misura(app):
+        try:
+            app.update()
+            esito.append("scala di Windows   : %.2f" % app.tk.call("tk", "scaling"))
+            esito.append("schermo            : %dx%d"
+                         % (app.winfo_screenwidth(), app.winfo_screenheight()))
+            esito.append("finestra           : %dx%d"
+                         % (app.winfo_width(), app.winfo_height()))
+            from tkinter import ttk
+            altezza_riga = ttk.Style(app).lookup("Inv.Treeview", "rowheight")
+            esito.append("altezza di una riga: %s" % altezza_riga)
+            tree = app.tree
+            wrap = tree.master
+            esito.append("cornice tabella    : %dx%d"
+                         % (wrap.winfo_width(), wrap.winfo_height()))
+            esito.append("tabella            : %dx%d"
+                         % (tree.winfo_width(), tree.winfo_height()))
+            esito.append("righe nella tabella: %d" % len(tree.get_children()))
+            esito.append("tabella visibile   : %s" % bool(tree.winfo_ismapped()))
+            larghezza_colonne = sum(int(tree.column(c, "width"))
+                                    for c in tree.cget("columns"))
+            esito.append("larghezza colonne  : %d (la tabella ne mostra %d)"
+                         % (larghezza_colonne, tree.winfo_width()))
+            if tree.winfo_height() < 40:
+                esito.append("")
+                esito.append("  ESITO: la tabella e' alta %d pixel, troppo poco per"
+                             % tree.winfo_height())
+                esito.append("  mostrare anche una sola riga. I dispositivi ci sono,")
+                esito.append("  ma non c'e' spazio per disegnarli: e' questo il")
+                esito.append("  motivo dello schermo bianco.")
+            elif not tree.get_children():
+                esito.append("")
+                esito.append("  ESITO: la tabella ha spazio ma non contiene righe.")
+            else:
+                esito.append("")
+                esito.append("  ESITO: la tabella ha spazio e contiene righe.")
+        except Exception as exc:
+            esito.append("misura non riuscita: %r" % exc)
+        finally:
+            try:
+                app.destroy()
+            except Exception:
+                pass
+
+    try:
+        app = App(percorso)
+        app._initial_load()
+        app.after(400, lambda: misura(app))
+        # se qualcosa si inceppa la finestra si chiude comunque
+        app.after(8000, lambda: app.destroy())
+        app.mainloop()
+    except Exception as exc:
+        return ["apertura dell'interfaccia non riuscita: %r" % exc]
+    return esito or ["nessuna misura raccolta"]
+
+
 def raccogli():
     from . import __version__, config
     from .store import (InventoryStore, righe_separatore,
@@ -143,6 +216,10 @@ def raccogli():
                 righe.append("  ESITO: la lettura del file funziona correttamente.")
         except Exception as exc:
             righe.append("lettura non riuscita: %r" % exc)
+
+    _sezione(righe, "misura dell'interfaccia")
+    for riga in _misura_interfaccia(percorso):
+        righe.append(riga)
 
     _sezione(righe, "dove si trova il desktop")
     for come, dove in _desktop():

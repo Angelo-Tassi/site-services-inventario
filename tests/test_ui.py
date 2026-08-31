@@ -110,6 +110,15 @@ barre = [w for w in app.tree.master.winfo_children()
 assert len(barre) == 2, "servono due barre di scorrimento, non %d" % len(barre)
 assert sorted(str(b.cget("orient")) for b in barre) == ["horizontal", "vertical"]
 
+# ---- la tabella non si lascia mai schiacciare a zero: e' la differenza fra
+# "non ci sono dispositivi" e "ci sono ma non si vedono"
+from inventario.ui import ALTEZZA_MINIMA_TABELLA
+app.geometry("980x560"); app.update()
+assert app.tree.winfo_height() > 40, app.tree.winfo_height()
+info = app.tree.master.grid_rowconfigure(0)
+assert int(info["minsize"]) == ALTEZZA_MINIMA_TABELLA, info["minsize"]
+assert int(info["weight"]) == 1
+
 # ---- la versione si legge nel titolo: serve per capire, davanti a un difetto,
 # quale copia del programma sta girando davvero
 from inventario import __version__
