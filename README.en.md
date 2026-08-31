@@ -239,7 +239,7 @@ which is a personal preference of the single computer.
 | Field | What it does |
 | --- | --- |
 | **Rooms** | the list of rooms, one per line. The order is the order of the cards on the home page |
-| **Device types** | the entries of the *Type* dropdown, one per line |
+| **Device types** | the entries of the *Type* dropdown, one per line. Out of the box: *Laptop*, *Tablet* and *Iphone* |
 | **Rooms with loans** | where the *Loan* column appears. They must be names present among the rooms |
 | **iPhone room** | where phones always end up |
 | **Language** | Italiano or English. The same dropdown is also in the window header |
@@ -284,6 +284,18 @@ The list of statuses is not in the window: it is the `states` entry of
 `inventario_impostazioni.json`, which opens in any text editor. The automatic
 statuses - *Not available*, *To be shipped back*, *Shipped to the phone service*
 - are not editable.
+
+### The settings file
+
+It is written by itself when the program creates a new inventory, next to the
+data file in `Produzione`, with the starting values: three rooms, the three
+types, loans on the Digital Kiosk, iPhones in Site Services BAU and the five
+statuses. That way the configuration is visible and the same for every
+technician, instead of depending on what the program carries inside.
+
+If an entry is removed from the file, the starting values apply again for that
+entry. The exception is `loan_rooms`, which can deliberately stay empty: it means
+no room handles loans.
 
 ## Language
 

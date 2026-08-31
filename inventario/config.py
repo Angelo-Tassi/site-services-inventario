@@ -21,7 +21,10 @@ from . import store
 APP_NAME = "Inventario"
 
 DEFAULT_ROOMS = ["Site Services BAU", "Digital Kiosk", "Magazzino Disaster Recovery"]
-DEFAULT_TYPES = ["Laptop", "Tablet"]
+# "Iphone" non e' un tipo come gli altri: la sua presenza accende il
+# contenitore in home, il modulo con l'IMEI, la spedizione e la
+# conservazione. Deve esserci da subito in un'installazione nuova.
+DEFAULT_TYPES = ["Laptop", "Tablet", "Iphone"]
 # Stanze in cui e' attiva la gestione dei prestiti.
 DEFAULT_LOAN_ROOMS = ["Digital Kiosk"]
 # Gli iPhone stanno sempre qui e non possono essere spostati altrove.
@@ -187,8 +190,12 @@ def load_shared_config(data_path):
     except (OSError, ValueError):
         data = {}
     for key in ("rooms", "types", "loan_rooms", "states"):
-        values = [str(v).strip() for v in data.get(key, []) if str(v).strip()]
+        if key not in data:
+            continue          # voce assente: restano i valori predefiniti
+        values = [str(v).strip() for v in data.get(key) or [] if str(v).strip()]
         if values or key == "loan_rooms":
+            # solo loan_rooms puo' essere svuotata di proposito: significa
+            # "nessuna stanza gestisce prestiti"
             cfg[key] = values
     stanza = str(data.get("iphone_room") or cfg["iphone_room"]).strip()
     # Se la stanza degli iPhone non esiste (o e' stata rinominata) si ripiega

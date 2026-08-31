@@ -390,7 +390,7 @@ tranne la lingua, che e' una preferenza personale del singolo computer.
 | Campo | A cosa serve |
 | --- | --- |
 | **Stanze** | l'elenco delle stanze, una per riga. L'ordine e' quello con cui compaiono le schede in home |
-| **Tipi di dispositivo** | le voci della tendina *Tipo*, una per riga |
+| **Tipi di dispositivo** | le voci della tendina *Tipo*, una per riga. Di serie sono *Laptop*, *Tablet* e *Iphone* |
 | **Stanze con prestito** | in quali stanze compare la colonna *Prestito*. Devono essere nomi presenti fra le stanze |
 | **Stanza degli iPhone** | dove finiscono i telefoni, sempre |
 | **Lingua** | Italiano o English. La stessa tendina e' anche nell'intestazione della finestra |
@@ -438,6 +438,18 @@ L'elenco degli stati non e' nella finestra: sta alla voce `states` del file
 `inventario_impostazioni.json`, che si apre con un editor di testo. Gli stati
 automatici - *Non disponibile*, *Da Rispedire*, *Spedito al servizio telefonia* -
 non si toccano.
+
+### Il file delle impostazioni
+
+Viene scritto da solo quando il programma crea un inventario nuovo, accanto al
+file dati in `Produzione`, con i valori di partenza: tre stanze, i tre tipi, i
+prestiti sul Digital Kiosk, gli iPhone in Site Services BAU e i cinque stati.
+Cosi' la configurazione e' visibile e uguale per tutti i tecnici, invece di
+dipendere da quello che il programma ha dentro.
+
+Se una voce viene tolta dal file, per quella valgono di nuovo i valori di
+partenza. Fa eccezione `loan_rooms`, che puo' restare vuota di proposito: vuol
+dire che nessuna stanza gestisce i prestiti.
 
 ## Lingua
 

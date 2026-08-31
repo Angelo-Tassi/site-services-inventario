@@ -428,12 +428,24 @@ class InventoryStore(object):
         return os.path.exists(self.path)
 
     def create_if_missing(self):
+        """Crea l'inventario, e accanto le impostazioni con i valori di partenza.
+
+        Scrivere subito il file delle impostazioni serve a due cose: rende
+        visibile com'e' configurato l'inventario, e lo rende uguale per tutti i
+        tecnici invece di dipendere dai valori predefiniti del programma.
+        """
         if self.exists():
             return False
         folder = os.path.dirname(self.path)
         if folder and not os.path.isdir(folder):
             raise InventoryError("La cartella %s non esiste." % folder)
         self._write([])
+        from . import config
+        if not os.path.exists(config.shared_config_path(self.path)):
+            try:
+                config.save_shared_config(self.path, config.load_shared_config(self.path))
+            except OSError:
+                pass          # cartella in sola lettura: si va avanti con i predefiniti
         return True
 
     def _disk_stamp(self):
