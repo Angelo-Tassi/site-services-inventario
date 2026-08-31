@@ -31,77 +31,18 @@ gia' vecchio, e nessuno sa piu' dove sia finito un dispositivo.
 
 ## Scarica
 
-Dalla pagina Releases si scaricano **due pacchetti diversi**, che fanno la
-stessa identica cosa. Cambia solo che cosa viene eseguito.
+**[Scarica `Inventario-windows-senza-exe.zip`](../../releases/latest/download/Inventario-windows-senza-exe.zip)**
+dalla pagina Releases. Dentro ci sono il Python ufficiale di python.org,
+firmato dalla Python Software Foundation, e il programma in chiaro come file
+`.py`: nessun eseguibile costruito da noi, quindi niente di non firmato da far
+passare alla sicurezza aziendale.
 
-| Pacchetto | Che cosa contiene | Quando sceglierlo |
-| --- | --- | --- |
-| **[`Inventario-windows-senza-exe.zip`](../../releases/latest/download/Inventario-windows-senza-exe.zip)** | il Python ufficiale di python.org, firmato dalla Python Software Foundation, e il programma in chiaro come file `.py` | **consigliato.** Nessun eseguibile costruito da noi: non c'e' niente di non firmato da far passare |
-| [`Inventario-windows.zip`](../../releases/latest/download/Inventario-windows.zip) | `Inventario.exe`, il programma impacchettato in un eseguibile unico | se si preferisce un solo file da avviare e gli avvisi non sono un problema |
+Serve anche il **[modello Excel da compilare](docs/Modello_inventario.xlsx)**,
+se hai laptop e tablet gia' censiti altrove da caricare in blocco.
 
-Serve anche il **[modello Excel da compilare](docs/Modello_inventario.xlsx)** per
-caricare in blocco laptop e tablet gia' censiti altrove.
-
-Un eseguibile che parte c'e' comunque - su Windows qualcosa di nativo deve pur
-girare - ma nel primo pacchetto e' `python\pythonw.exe`, cioe' **il binario
-ufficiale di python.org**, con la sua firma e la sua reputazione. Un antivirus
-lo conosce. `Inventario.exe`, invece, e' un file che nasce a ogni versione, non
-e' firmato da nessuno e nessuno l'ha mai visto prima: e' quello il motivo per
-cui viene guardato con sospetto, non il programma in se'.
-
-**Sui PC non va installato niente** in nessuno dei due casi: Python e le
-librerie viaggiano dentro il pacchetto. Quattro passaggi, una volta sola:
-
-1. scarica lo zip;
-2. **sbloccalo** prima di estrarlo - tasto destro > *Proprieta'* >
-   **Annulla blocco**. Se quella casella non c'e', non serve: vuol dire che
-   Windows non ha marchiato il file. E' il passaggio che evita gli avvisi di sicurezza su
-   tutte le postazioni: vedi [Gli avvisi di sicurezza di
-   Windows](#gli-avvisi-di-sicurezza-di-windows);
-3. estrai tutto il contenuto nella cartella di rete condivisa;
-4. su ogni postazione, doppio clic su **`Crea collegamento sul desktop.bat`**:
-   riconosce da solo quale dei due pacchetti hai estratto e mette il
-   collegamento sul desktop. Con il pacchetto `Inventario.exe` va bene anche
-   tasto destro sull'eseguibile > *Invia a* > *Desktop (crea collegamento)*.
-
-Chi ha accesso a quella cartella ha accesso all'inventario. Nello zip c'e' anche
-`LEGGIMI-PRIMA.txt` con questi passaggi in italiano e in inglese.
-
-Con il pacchetto consigliato, sulla share si trova questo:
-
-```
-\\server\Condivisa\Inventario\
-    Inventario.py                   il programma, leggibile: si apre col Blocco note
-    inventario\                     il resto del programma, sempre in chiaro
-    python\                         il Python ufficiale di python.org
-    Crea collegamento sul desktop.bat
-    LEGGIMI-PRIMA.txt               istruzioni di installazione
-    Produzione\
-        Inventario.xlsx             l'inventario vero, uno solo per tutti
-        inventario_impostazioni.json  stanze, tipi, prestiti, stati
-    Backup\                        le copie salvate prima di ogni operazione distruttiva
-    Collaudo\                      i file di prova
-```
-
-Con il pacchetto `Inventario.exe`, invece:
-
-```
-\\server\Condivisa\Inventario\
-    Inventario.exe                  il programma
-    _internal\                      Python e le librerie: non spostare, non rinominare
-    LEGGIMI-PRIMA.txt               istruzioni di installazione
-    Produzione\
-        Inventario.xlsx             l'inventario vero, uno solo per tutti
-        inventario_impostazioni.json  stanze, tipi, prestiti, stati
-    Backup\                        le copie salvate prima di ogni operazione distruttiva
-    Collaudo\                      i file di prova
-```
-
-**L'inventario e' uno solo, e sta sulla share.** Ogni tecnico apre lo stesso
-file: non esistono copie locali sulle singole postazioni, e ogni modifica -
-un'aggiunta, un prestito, un ripristino - viene scritta subito li' dove la
-vedono tutti. E' il motivo per cui i salvataggi passano da un lock e l'elenco si
-aggiorna da solo ogni quindici secondi.
+C'e' anche [`Inventario-windows.zip`](../../releases/latest/download/Inventario-windows.zip),
+con `Inventario.exe` al posto dei file `.py`: fa esattamente le stesse cose, in
+un file solo da avviare. Le istruzioni che seguono valgono per tutti e due.
 
 ## In due parole
 
@@ -113,6 +54,180 @@ aggiorna da solo ogni quindici secondi.
 - **Prestiti**, **stati**, **stanze** e **note** modificabili al volo.
 
 ---
+
+---
+
+## Come si installa
+
+**Il programma sta sulle postazioni. L'inventario sta sulla share. Uno solo,
+per tutti.**
+
+E' la divisione che conta, e vale la pena spiegare perche'.
+
+L'inventario deve essere **uno**: se ogni tecnico ne tenesse una copia, dopo
+mezza giornata sarebbero tutte diverse e nessuna vera. Per questo il file
+`.xlsx` sta sulla cartella di rete, e ogni modifica - un'aggiunta, un prestito,
+un rientro - viene scritta subito li', dove la vedono tutti.
+
+Il programma, invece, non ha niente da condividere: e' lo stesso identico
+codice su ogni PC. Tenerlo sulla share non porta nessun vantaggio e porta due
+guai concreti: un eseguibile avviato dalla rete e' lo schema che i sistemi di
+sicurezza aziendali guardano con piu' sospetto, e i suoi file restano
+**bloccati** da Windows finche' qualcuno lo tiene aperto - anche da un altro
+computer - quindi non si lasciano aggiornare.
+
+```
+Su ogni postazione                      Sulla cartella di rete
+------------------------------          ----------------------------------
+C:\Inventario\                          \\server\Condivisa\Inventario\
+    Inventario.py                            Produzione\
+    inventario\                                  Inventario.xlsx      <- l'inventario
+    python\                                      inventario_impostazioni.json
+    inventario_percorso.json                 Backup\                  <- le copie
+    Collaudo\
+```
+
+### Passo 1 - prepara una copia, una volta sola
+
+Su un PC qualsiasi:
+
+1. scarica lo zip ed **estrailo in una cartella locale**, per esempio
+   `C:\Inventario`. Non sulla share;
+2. doppio clic su **`Collega inventario condiviso.bat`**;
+3. incolla il percorso della cartella di rete quando lo chiede:
+
+```
+\\server\Condivisa\Inventario
+```
+
+Il programma ci pensa lui: se sulla share l'inventario non c'e' ancora, lo crea
+vuoto in `Produzione\Inventario.xlsx`; se c'e' gia', non lo tocca. Poi scrive
+`inventario_percorso.json` accanto a se stesso, ed e' li' che resta memorizzato
+quale inventario aprire.
+
+Serve il permesso di **Modifica** su quella cartella di rete. Se non ce l'hai,
+il programma te lo dice chiaramente invece di fallire a meta'.
+
+### Passo 2 - porta l'inventario che hai gia'
+
+Se un inventario esiste gia' - il file su cui stavi lavorando - va copiato
+sulla share **con il nome giusto e nel posto giusto**:
+
+```
+\\server\Condivisa\Inventario\Produzione\Inventario.xlsx
+```
+
+Il nome deve essere esattamente `Inventario.xlsx`, e deve stare dentro
+`Produzione`. Chiudi il programma prima di sostituirlo, e conserva una copia
+del file vecchio finche' non hai verificato che l'inventario si apra e i
+dispositivi ci siano tutti.
+
+Se invece il tuo inventario e' un foglio con altre colonne, o diviso per stanze
+con le righe separatore, **non copiarlo li'**: quello si carica da dentro il
+programma con *Importa xls...*, che e' un'altra cosa. Vedi
+[Il modello di importazione](#il-modello-di-importazione).
+
+### Passo 3 - distribuisci la cartella alle postazioni
+
+La cartella `C:\Inventario` che hai preparato e' gia' configurata: la
+configurazione viaggia con lei. Copiala tale e quale su ogni postazione - a
+mano, con uno script, con un pacchetto software o via GPO - sempre nello stesso
+percorso locale.
+
+Su ogni postazione, poi, doppio clic su **`Crea collegamento sul desktop.bat`**:
+mette l'icona sulla scrivania dell'utente e ne lascia una copia nella cartella.
+
+Da quel momento il tecnico fa doppio clic sull'icona e lavora sull'inventario di
+tutti, senza sapere niente di percorsi di rete.
+
+### Cosa serve sulla cartella di rete
+
+| Chi | Su cosa | Permesso |
+| --- | --- | --- |
+| i tecnici | `\\server\Condivisa\Inventario\` e tutto quello che contiene | **Modifica** |
+
+Basta questo. Nessun permesso di esecuzione, perche' dalla share non viene
+eseguito niente; nessun elenco di utenti da gestire dentro il programma: chi ha
+accesso alla cartella ha accesso all'inventario, chi non ce l'ha non lo apre.
+
+### Se la share non risponde
+
+Il programma **si ferma e lo dice**, indicando quale inventario si aspettava di
+trovare. Non ne crea uno locale: lavorare su una copia che nessun altro vede
+sarebbe il modo piu' silenzioso di perdere una giornata di lavoro.
+
+## Come si lancia
+
+Doppio clic sull'icona **Inventario dispositivi** sul desktop.
+
+La finestra si apre sull'inventario condiviso. Il numero di versione e' scritto
+nella barra del titolo: serve a sapere, davanti a un dubbio, quale copia si sta
+usando.
+
+## Aggiornare il programma
+
+Adesso che il programma sta sulle postazioni, un aggiornamento e' una copia
+dentro una cartella tua, dove i permessi ce li hai:
+
+1. scarica il pacchetto nuovo;
+2. su ogni postazione, **sostituisci la cartella locale** del programma;
+3. **non toccare `inventario_percorso.json`**: e' la riga che dice dove sta
+   l'inventario condiviso. Se lo sovrascrivi, ripassa
+   `Collega inventario condiviso.bat`.
+
+**I dati non si toccano mai**: stanno sulla share, e nessun aggiornamento del
+programma li sfiora. Anche i collegamenti sul desktop restano validi, perche'
+puntano allo stesso percorso locale.
+
+## Gli avvisi di sicurezza di Windows
+
+Il pacchetto consigliato non contiene nessun eseguibile costruito da noi, il che
+toglie di mezzo la causa piu' comune di segnalazione. Resta una sola accortezza,
+al momento del download:
+
+**Sblocca lo zip prima di estrarlo.** Tasto destro sul file scaricato >
+*Proprieta'* > in fondo alla scheda Generale, spunta **Annulla blocco** >
+*Applica*.
+
+Windows marca come "scaricato da Internet" tutto cio' che si estrae da un
+archivio marchiato, e quel marchio segue i file. Sbloccando l'archivio prima di
+aprirlo, il marchio non passa a niente.
+
+**Se la casella "Annulla blocco" non c'e', non c'e' niente da sbloccare**: vuol
+dire che Windows non ha messo il marchio - capita quando il download passa da un
+proxy aziendale - e i file estratti sono gia' puliti.
+
+Se in azienda l'esecuzione di programmi non firmati e' regolata da criteri di
+sicurezza (AppLocker, Windows Defender Application Control), serve
+un'autorizzazione dagli amministratori: un binario firmato dalla Python Software
+Foundation, installato in locale, e' pero' il caso piu' facile da far passare.
+
+## Un foglio da importare non e' un inventario
+
+Sono due cose diverse e non vanno mai scambiate:
+
+- **l'inventario** e' `Produzione\Inventario.xlsx` sulla share: il programma lo
+  apre e ci scrive dentro;
+- **un foglio da importare** e' un file Excel che contiene dispositivi da
+  caricare, spesso diviso da righe con il nome della stanza. Si carica con
+  *Importa xls...*, da dentro il programma.
+
+Se un foglio da importare viene aperto *come* inventario, le righe separatore
+diventano dispositivi e nessun dispositivo ha una stanza. Il programma se ne
+accorge e avvisa, ma la regola resta: i fogli si importano, non si aprono.
+
+## Quando qualcosa non torna: la diagnostica
+
+Nella cartella del programma c'e' **`Diagnostica.bat`**. Doppio clic, e scrive
+`Diagnostica.txt` li' accanto, aprendolo nel Blocco note. Non modifica niente.
+
+Dentro c'e' quello che serve a capire un problema senza tirare a indovinare: la
+versione in uso e da dove parte, quale inventario apre e se puo' scriverci, le
+stanze che conosce, cosa legge davvero da un file Excel, la misura della
+finestra e della tabella, e dove Windows mette il desktop dell'utente.
+
+Il file contiene percorsi e nomi di stanza, niente di riservato: si manda a chi
+assiste e risponde in un colpo solo a domande che altrimenti costano giorni.
 
 ## Compilare l'eseguibile da soli
 
@@ -131,399 +246,9 @@ Distribuzione\
     Come funziona.txt                   questo documento
 ```
 
-Copia il contenuto di `Distribuzione` nella cartella di rete condivisa. Fine.
+Copia il contenuto di `Distribuzione` sulla postazione, poi collegala
+all'inventario condiviso con `Collega inventario condiviso.bat`.
 
-## Gli avvisi di sicurezza di Windows
-
-Il programma non e' firmato con un certificato: senza firma, Windows avvisa
-prima di eseguire qualsiasi cosa arrivi da Internet. **Non e' un difetto del
-programma, ed e' evitabile.**
-
-### Il passaggio che li elimina tutti
-
-**Sblocca lo zip prima di estrarlo.** Tasto destro su
-`Inventario-windows.zip` > *Proprieta'* > in fondo alla scheda Generale,
-spunta **Annulla blocco** > *Applica*.
-
-Windows marca come "scaricato da Internet" tutto cio' che viene estratto da un
-archivio bloccato, e quel marchio segue i file anche sulla share: e' lui a far
-comparire *"Windows ha protetto il PC"* su ogni postazione. Sbloccando l'archivio
-prima di aprirlo, il marchio non passa ai file estratti e nessuno vede piu'
-avvisi.
-
-**Se la casella "Annulla blocco" non c'e', non c'e' niente da sbloccare.**
-Quella spunta compare solo sui file che Windows ha marchiato: se manca, il
-marchio non e' stato messo - capita quando il download passa da un proxy
-aziendale, o quando il sito sta in una zona considerata attendibile - e i file
-estratti sono gia' puliti. E' il risultato che si voleva, ottenuto gratis.
-
-Se hai gia' estratto senza sbloccare, cancella la cartella estratta, sblocca lo
-zip e riestrai: non basta sbloccare i file uno per uno.
-
-### Gli altri due casi
-
-**"L'autore non e' verificabile"**, aprendo un programma da un percorso di rete:
-si toglie aggiungendo il server ai siti *Intranet locale* - Opzioni Internet >
-Sicurezza > Intranet locale > Siti > Avanzate > `\\server`.
-
-**L'esecuzione da share vietata da criteri di sicurezza** (AppLocker o criteri di
-restrizione software): qui il permesso NTFS c'e' ma il programma non parte lo
-stesso, e serve un'eccezione dagli amministratori.
-
-### Si puo' evitare del tutto l'eseguibile?
-
-No, e vale la pena capire perche'. Qualcosa deve essere eseguito sul PC: le
-alternative sono uno script Python, che richiederebbe Python installato su ogni
-postazione - esattamente cio' che si voleva evitare - oppure un file `.bat`, che
-Windows tratta con lo stesso sospetto e che alcuni antivirus guardano anche
-peggio.
-
-Il pacchetto usa pero' la forma **"onedir"**: l'eseguibile sta accanto alle sue
-librerie nella cartella `_internal`, invece di scompattarsi in una cartella
-temporanea a ogni avvio. Parte piu' in fretta da una share e da molti meno
-grattacapi agli antivirus, che guardano male i file che si autoestraggono.
-
-**La soluzione definitiva e' un certificato di firma del codice.** Con quello
-l'eseguibile risulta firmato dall'organizzazione e SmartScreen non dice piu'
-niente, su nessuna postazione e senza sbloccare niente. Costa qualche centinaio
-di euro all'anno e va richiesto a chi gestisce l'IT aziendale; se lo ottieni, si
-aggiunge alla compilazione con un passaggio solo.
-
-## Dove mettere il programma
-
-Ci sono due modi di distribuirlo, e cambiano solo dove sta l'eseguibile. In
-entrambi **l'inventario e' uno solo, sulla share**.
-
-### A. Tutto sulla cartella di rete
-
-E' l'impostazione di partenza: si estrae il pacchetto sulla share e si mette il
-collegamento sui desktop. Un solo posto da aggiornare, niente da toccare sulle
-postazioni.
-
-Lo svantaggio e' che l'eseguibile **viene avviato dalla rete**, e i sistemi di
-sicurezza aziendali guardano quel comportamento con attenzione: un binario non
-firmato eseguito da una share e' uno degli schemi che segnalano piu' spesso.
-
-### B. Programma sulle postazioni, dati sulla share
-
-Se la sicurezza e' un tema - o se qualcuno ha gia' segnalato l'eseguibile -
-questa e' la sistemazione piu' tranquilla, e il programma la supporta senza
-modifiche.
-
-1. copia la cartella del programma (tutto quello che c'e' nello zip tranne
-   `Produzione`) su ogni postazione, per esempio in
-   `C:\Programmi\Inventario` o in `%LOCALAPPDATA%\Inventario`;
-2. **lascia sulla share solo i dati**: la cartella `Produzione` con dentro
-   `Inventario.xlsx` e le impostazioni;
-3. su ogni postazione, accanto all'eseguibile, crea `inventario_percorso.json`
-   con il percorso di rete:
-
-```json
-{ "data_path": "\\\\server\\Condivisa\\Inventario\\Produzione\\Inventario.xlsx" }
-```
-
-   In alternativa avvia il programma una volta e indica il file quando lo chiede:
-   la scelta viene memorizzata da sola.
-
-Sulla share non resta nessun eseguibile, e nessuno lo avvia dalla rete. Le
-**copie di sicurezza seguono i dati**: finiscono in `Produzione\Backup` sulla
-share, uno solo per tutti, non sulle singole postazioni.
-
-Il prezzo e' che un aggiornamento va distribuito su ogni postazione - con una
-copia, un pacchetto software o una GPO - invece di sostituire una cartella sola.
-
-### Se l'eseguibile viene segnalato
-
-Il programma non e' firmato, quindi puo' essere intercettato. Le strade sono
-tre, in ordine di solidita':
-
-1. **un certificato di firma del codice**: risolve alla radice, su qualsiasi
-   postazione e con qualsiasi sistemazione;
-2. **una regola di autorizzazione** concordata con chi gestisce la sicurezza -
-   AppLocker o Windows Defender Application Control - su percorso o su impronta
-   del file;
-3. **usare il pacchetto senza eseguibile nostro**, che toglie di mezzo il
-   binario non firmato, ed eventualmente **spostare il programma in locale**,
-   cioe' la sistemazione B, che toglie di mezzo anche lo schema "eseguibile
-   avviato da una share". Insieme, le due cose lasciano poco da segnalare.
-
-Vale la pena parlarne con chi gestisce la sicurezza **prima** di distribuirlo su
-molte postazioni: uno strumento interno non firmato e' una situazione normale,
-che di solito si risolve con una riga di autorizzazione.
-
-## Aggiornare il programma: una cartella nuova, mai sovrascrivere
-
-Sulle share aziendali quasi nessuno ha il permesso di **cancellare**. Si puo'
-creare, si puo' scrivere, ma sostituire un file gia' li' spesso no - e allora
-l'estrazione del pacchetto nuovo sostituisce alcuni file e altri no. Il
-risultato non e' un aggiornamento a meta': e' un programma che **non parte
-piu'**, perche' i pezzi appartengono a due versioni diverse.
-
-**Quindi: ogni aggiornamento va in una cartella nuova.**
-
-```
-\\server\Condivisa\Inventario2\      <- versione precedente, si lascia dov'e'
-\\server\Condivisa\Inventario3\      <- si estrae qui il pacchetto nuovo
-```
-
-1. estrai il pacchetto nuovo in una cartella che **non esiste ancora**;
-2. copia dentro la nuova `Produzione\` il file `Inventario.xlsx` della vecchia -
-   e' l'unica cosa da portarsi dietro;
-3. rifai i collegamenti sul desktop con `Crea collegamento sul desktop.bat`;
-4. la cartella vecchia si cancella con calma, quando qualcuno con i permessi
-   giusti puo' farlo. Nel frattempo rinominala - se si riesce - in
-   `Inventario_vecchio`, cosi' e' chiaro a tutti quale non usare.
-
-Non e' un ripiego: creare una cartella nuova e' l'unica operazione che riesce
-sempre, anche senza permessi di cancellazione, e non puo' lasciare
-un'installazione mezza vecchia e mezza nuova.
-
-### E se i file risultano in sola lettura
-
-Fino alla versione 0.23.2 alcuni file del pacchetto arrivavano con l'attributo
-di **sola lettura**: venivano dal Python ufficiale copiato in fase di
-costruzione, e l'archivio se lo portava dietro. Erano quelli che poi non si
-lasciavano sostituire. Dalla 0.23.3 la costruzione toglie l'attributo e
-**verifica** che non ne resti nessuno, altrimenti il pacchetto non viene
-pubblicato.
-
-Sui file gia' finiti sulla share si toglie cosi', dal Prompt dei comandi:
-
-```
-attrib -R "\\server\Condivisa\Inventario2\*" /S
-```
-
-### La sistemazione che toglie il problema alla radice
-
-Se questa storia si ripete a ogni versione, il posto sbagliato e' la share:
-**metti il programma sulle postazioni e lascia sulla share solo i dati**. Un
-aggiornamento diventa una copia in una cartella tua, dove i permessi ce li hai,
-e la share non contiene piu' niente da sostituire. Vedi
-[Programma sulle postazioni, dati sulla share](#b-programma-sulle-postazioni-dati-sulla-share).
-
-## Il primo avvio, e un errore che costa caro
-
-Alla prima apertura il programma **crea da solo** l'inventario vuoto in
-`Produzione\Inventario.xlsx`, accanto a se stesso. Non chiede niente e non c'e'
-niente da scegliere: e' cosi' che l'inventario resta uno solo per tutti.
-
-Prima chiedeva dove fosse il file, ed era una domanda pericolosa. Chi rispondeva
-indicando un foglio Excel da caricare - il file di prova in `Collaudo\`, o
-l'inventario ricevuto da qualcun altro - **adottava quel foglio come
-inventario**. Il risultato non somiglia a un errore:
-
-- i dispositivi ci sono tutti, ma **nessuno ha una stanza** e le schede delle
-  stanze restano a zero;
-- le righe che nel foglio dividono le stanze (`SITE SERVICES BAU`, `KIOSK`...)
-  compaiono **in elenco come se fossero dispositivi**;
-- aggiungere un dispositivo a mano funziona benissimo, il che sembra escludere
-  un problema di configurazione;
-- l'esportazione riproduce le righe separatore, perche' ormai sono dati.
-
-Sembra un difetto dell'importazione, e non lo e': quel foglio non e' mai stato
-importato: e' stato *aperto*.
-
-**Un foglio Excel da caricare non si apre mai come inventario.** Si importa da
-dentro il programma, con *Importa xls...*: e' li' che le righe separatore
-vengono lette come divisioni per stanza invece che come dispositivi.
-
-Adesso il programma se ne accorge da solo: se il file aperto contiene righe
-separatore lo dice all'avvio e spiega come uscirne, e se qualcuno prova a
-sceglierlo a mano lo rifiuta.
-
-### Se ci sei gia' finito
-
-1. chiudi il programma;
-2. cancella `inventario_percorso.json` accanto al programma, se c'e': e' li' che
-   resta memorizzata la scelta sbagliata;
-3. riapri: l'inventario vuoto viene creato da solo in `Produzione\`;
-4. carica il foglio con *Importa xls...*, da dentro il programma.
-
-## Quando qualcosa non torna: la diagnostica
-
-Nella cartella del programma c'e' **`Diagnostica.bat`**. Doppio clic, e in una
-decina di secondi scrive `Diagnostica.txt` li' accanto, aprendolo nel Blocco
-note. Non modifica niente: legge e basta.
-
-Dentro c'e' quello che serve a capire un difetto senza tirare a indovinare:
-
-| Cosa dice | A cosa serve |
-| --- | --- |
-| la **versione** in uso e da quale cartella parte | quasi tutti i difetti gia' corretti riappaiono cosi': si sta usando una copia vecchia |
-| se in cartella convivono `Inventario.exe` e `python\` | due versioni nella stessa cartella, e il collegamento punta a quella sbagliata |
-| dove tiene i **dati** e se puo' scriverci | distingue un problema di permessi da un difetto del programma |
-| le **stanze** che il programma conosce | se l'elenco e' vuoto o diverso, i separatori nel foglio non possono funzionare |
-| cosa legge davvero dal **file di prova** | dice se l'importazione riconosce le stanze, riga per riga, prima ancora di importare |
-| dove Windows mette il **desktop** e se c'e' il collegamento | con OneDrive la scrivania non e' `%USERPROFILE%\Desktop` |
-
-Il file contiene percorsi e nomi di stanza, niente di riservato. Mandalo a chi
-assiste: risponde in un colpo solo a domande che altrimenti costano giorni.
-
-### Se il collegamento sul desktop non compare
-
-`Crea collegamento sul desktop.bat` stampa il percorso in cui l'ha creato:
-se quel percorso non e' la tua scrivania, il collegamento e' finito altrove.
-In quel caso fallo a mano, che non fallisce mai:
-
-- **pacchetto senza eseguibile**: tasto destro su `Avvia Inventario.bat` >
-  *Mostra altre opzioni* > *Invia a* > *Desktop (crea collegamento)*;
-- **pacchetto con l'exe**: lo stesso su `Inventario.exe`.
-
-Nella cartella del programma resta comunque una copia del collegamento,
-`Inventario dispositivi.lnk`: si puo' trascinare sul desktop, anche su quello
-degli altri utenti, senza eseguire niente.
-
-## Quale versione sta girando
-
-Il numero di versione e' scritto **nella barra del titolo della finestra** e
-sotto il titolo dentro il programma. E' la prima cosa da guardare quando
-qualcosa non funziona come dice questa pagina: quasi sempre la copia che si sta
-usando non e' quella che si crede.
-
-**Non mescolare i due pacchetti nella stessa cartella.** Se estrai il pacchetto
-senza eseguibile sopra una cartella dove c'era `Inventario.exe`, l'eseguibile
-vecchio resta li' e continua a funzionare: chi lo apre - o chi ha ancora il
-vecchio collegamento sul desktop - **usa una versione precedente del
-programma**, con i difetti che sono stati corretti nel frattempo. Cancella
-`Inventario.exe` e la cartella `_internal`, e rifai i collegamenti con
-`Crea collegamento sul desktop.bat`. Se in cartella ci sono tutti e due, il file
-`.bat` te lo dice e punta a quello nuovo.
-
-Se l'eseguibile vecchio non si lascia cancellare, vedi
-[Se `Inventario.exe` non si lascia cancellare](#se-inventarioexe-non-si-lascia-cancellare).
-
-## Come si lancia
-
-Doppio clic su **`Inventario.exe`** nella cartella di rete.
-
-Al primo avvio, se non trova ancora l'inventario, propone di crearlo li' accanto
-con il nome `Inventario.xlsx`; da quel momento in poi tutti lo aprono senza che
-venga chiesto piu' nulla. La cartella di rete diventa cosi':
-
-```
-\\server\Condivisa\Inventario\
-    Inventario.exe                  il programma
-    Inventario.xlsx                 i dati, apribili anche con Excel
-    inventario_impostazioni.json    stanze, tipi, stanze con prestito
-```
-
-Chi ha accesso alla cartella ha accesso all'inventario: i permessi sono quelli
-della cartella, non c'e' nessun altro elenco di utenti da gestire.
-
-> Una precisazione: qualunque programma viene eseguito dal PC che lo apre, anche
-> se il file risiede su una share. Quello che non serve, e che questa
-> impostazione elimina, e' **installare** qualcosa sui PC.
-
-## Collegamento sul desktop
-
-Il modo piu' rapido, senza eseguire nulla: apri la cartella di rete, tasto
-destro su `Inventario.exe` > *Mostra altre opzioni* > *Invia a* > *Desktop
-(crea collegamento)*.
-
-In alternativa, per prepararlo una volta e distribuirlo a tutti: doppio clic su
-**`Crea collegamento sul desktop.bat`** nella cartella di rete. Crea il
-collegamento sul desktop e ne lascia una copia nella cartella stessa: gli altri
-utenti possono semplicemente trascinarla sul proprio desktop, oppure la si
-distribuisce via GPO.
-
-Il collegamento punta al percorso di rete, quindi resta valido anche quando il
-programma viene aggiornato: basta sostituire `Inventario.exe` sulla share.
-
-## Aggiornare il programma
-
-Ricompila con `Compila EXE per Windows.bat`, oppure scarica il pacchetto nuovo
-dalla pagina Releases, e sostituisci il contenuto nella cartella di rete. **I
-dati non si toccano**: stanno in `Produzione`, e le cartelle `Backup` e
-`Collaudo` restano dove sono. I collegamenti sui desktop continuano a
-funzionare, perche' puntano allo stesso percorso.
-
-### Se `Inventario.exe` non si lascia cancellare
-
-Non e' un permesso mancante: **Windows blocca l'eseguibile finche' un processo
-avviato da li' e' in esecuzione**, anche quando quel processo gira sul computer
-di un altro. Basta un tecnico che ha lasciato il programma aperto. Con questo
-pacchetto sono bloccati anche i file dentro `_internal`.
-
-Capita anche che il programma sia stato chiuso ma il server tenga ancora aperto
-il collegamento: e' un handle SMB rimasto appeso.
-
-**Come trovare chi lo tiene aperto**, dal server che ospita la share:
-
-*Gestione computer* > *Cartelle condivise* > **File aperti**. Ordina per nome e
-cerca `Inventario`: vedi l'utente e il computer che lo stanno usando. Dalla
-stessa finestra, tasto destro > *Chiudi file aperto* rilascia il blocco.
-
-Con PowerShell, sempre sul server:
-
-```powershell
-Get-SmbOpenFile | Where-Object Path -like "*Inventario*" |
-    Select-Object ClientUserName, ClientComputerName, Path
-```
-
-e per rilasciarlo:
-
-```powershell
-Get-SmbOpenFile | Where-Object Path -like "*Inventario*" | Close-SmbOpenFile -Force
-```
-
-**Se non risulta aperto da nessuno** e il file resta bloccato, l'handle e'
-rimasto appeso lato server: chiuderlo dalla finestra *File aperti* di solito
-basta. In ultima istanza si riavvia il servizio Server
-(`Restart-Service LanmanServer`), che pero' disconnette tutte le sessioni SMB
-della macchina: si fa fuori orario.
-
-**Il modo per non incontrare il problema** e' fare l'aggiornamento quando non lo
-usa nessuno: dura pochi secondi, e un'occhiata a *File aperti* prima di
-cominciare dice subito se si puo' procedere.
-
-### Il file resta bloccato anche dopo aver riavviato
-
-Se hai riavviato il tuo computer e il file non si cancella lo stesso, il blocco
-non e' sul tuo PC. Prima di cercarlo altrove, un test dice subito di che
-problema si tratta.
-
-**Guarda prima l'attributo di sola lettura**: tasto destro sul file >
-*Proprieta'* > in fondo alla scheda Generale, la casella **Sola lettura**. Se e'
-spuntata, togli la spunta e riprova: e' la causa piu' banale e anche la piu'
-frequente, e non ha niente a che vedere con i blocchi. Da riga di comando:
-
-```
-attrib -R "\\server\Condivisa\Inventario\Inventario.exe"
-```
-
-Se non era quello, **prova a rinominare** `Inventario.exe` in
-`Inventario_vecchio.exe`.
-
-| Cosa succede | Che problema e' | Cosa fare |
-| --- | --- | --- |
-| La rinomina **riesce** | E' un blocco: Windows impedisce di cancellare un eseguibile in uso, ma consente di rinominarlo | Metti il nuovo `Inventario.exe` al suo posto e cancella il vecchio quando chi lo teneva aperto avra' chiuso |
-| La rinomina **fallisce** con *accesso negato* | Non e' un blocco, e' un **permesso**: sulla cartella non hai *Modifica* | Chiedi a chi gestisce la share i permessi NTFS di modifica, e verifica anche quelli della condivisione: fra i due vince il piu' restrittivo |
-| La rinomina fallisce con *file aperto in un altro programma* | Blocco confermato, da un'altra postazione o dal server | Trova chi lo tiene aperto con *File aperti* o `Get-SmbOpenFile`, come sopra |
-
-Se la share e' su un NAS invece che su un server Windows, *File aperti* non c'e':
-l'equivalente sta nel pannello di amministrazione del NAS, di solito sotto
-*Servizi SMB* o *Connessioni*. In mancanza d'altro, un riavvio del NAS fuori
-orario rilascia tutti gli handle.
-
-Controlla anche se sul tuo PC sono attivi i **File non in linea**: in quel caso
-stai lavorando su una copia locale della share, e le cancellazioni si comportano
-in modo strano finche' la sincronizzazione non e' completa.
-
-### La via che ti sblocca comunque
-
-Non sei obbligato a cancellare quel file per andare avanti. Installa il pacchetto
-nuovo **in una cartella nuova**, accanto alla vecchia:
-
-1. crea `\\server\Condivisa\Inventario2\` ed estraici il pacchetto aggiornato,
-   ricordando di sbloccare lo zip prima;
-2. **sposta** - non copiare - la cartella `Produzione` dalla vecchia
-   installazione alla nuova: dentro c'e' l'inventario vero. Sposta anche
-   `Backup`, se vuoi conservare le copie;
-3. rifai il collegamento sui desktop con `Crea collegamento sul desktop.bat`;
-4. cancella la vecchia cartella quando si sara' liberata, con calma.
-
-L'inventario non si perde e nessuno resta senza programma. E' anche la procedura
-da usare quando l'aggiornamento non puo' aspettare che tutti abbiano chiuso.
 
 ## Avvio dai sorgenti (per sviluppo)
 
@@ -841,14 +566,16 @@ Le righe delle stanze senza prestito non hanno alcun pulsante.
 
 ## Dove tenere l'inventario vero
 
-**Non dentro questa cartella.** Il repository contiene il programma e dei dati
-dimostrativi; l'inventario reale va altrove - sulla cartella di rete condivisa,
-o in una cartella locale se stai ancora provando. Cosi' i dati non finiscono in
-un repository pubblico e non vengono sovrascritti da una prova.
+**Sulla cartella di rete, in `Produzione\Inventario.xlsx`. Mai dentro la
+cartella del programma.**
 
-Il percorso si sceglie al primo avvio e resta memorizzato in
-`inventario_percorso.json`. Per cambiarlo, cancella quel file e riavvia, oppure
-modificane la voce `data_path`.
+Il programma sulla postazione contiene dati dimostrativi e file di prova:
+l'inventario reale sta altrove, uno solo, dove tutti lo vedono. Cosi' non
+finisce in un repository, non lo si sovrascrive con una prova, e nessun
+aggiornamento del programma lo sfiora.
+
+Quale inventario aprire e' scritto in `inventario_percorso.json`, accanto al
+programma. Per cambiarlo, ripassa `Collega inventario condiviso.bat`.
 
 ## Provare subito con dati di esempio
 
@@ -888,22 +615,33 @@ Due cose da sapere quando si passa da Numbers:
 Impaginazione di stampa, filtri automatici e righe di intestazione ripetute sono
 impostazioni di Excel: Numbers le ignora, ma i dati restano identici.
 
-## Cosa c'e' nella cartella di rete
+## Cosa c'e' dove
 
-| File | Contenuto |
+Sulla **cartella di rete** ci sono solo i dati:
+
+| Percorso | Contenuto |
 | --- | --- |
-| `Inventario.exe` | il programma; da solo, senza prerequisiti |
-| `Produzione\Inventario.xlsx` | i dati; e' gia' l'inventario, apribile in Excel |
+| `Produzione\Inventario.xlsx` | l'inventario; e' gia' il file da consultare, apribile in Excel |
 | `Produzione\inventario_impostazioni.json` | stanze, tipi, stanze con prestito, stanza degli iPhone, stati |
-| `Backup\` | le copie salvate prima di ogni reset e di ogni importazione in sostituzione |
-| `Collaudo\` | i file di prova e le istruzioni di collaudo |
+| `Produzione\Backup\` | le copie salvate prima di ogni reset e di ogni importazione in sostituzione |
 | `.Inventario.xlsx.lock` | presente solo per una frazione di secondo durante un salvataggio |
-| `inventario_percorso.json` | quale file apre il programma, e la preferenza di lingua |
+
+Sulla **postazione** c'e' solo il programma:
+
+| Percorso | Contenuto |
+| --- | --- |
+| `Inventario.py`, `inventario\` | il programma |
+| `python\` | il Python ufficiale di python.org |
+| `inventario_percorso.json` | quale inventario aprire, e la preferenza di lingua |
+| `Collaudo\` | i file di prova e le istruzioni di collaudo |
+
+Il programma sulla postazione e' sostituibile in qualsiasi momento senza
+conseguenze: tutto quello che conta sta sulla share.
 
 ## Provare l'importazione
 
 La cartella **`Collaudo/`** viaggia con il programma: nel pacchetto Windows sta
-accanto a `Inventario.exe`. Contiene due fogli Excel pronti da importare - uno
+accanto a `Inventario.py`. Contiene due fogli Excel pronti da importare - uno
 regolare con **30 dispositivi, 10 per stanza**, e uno con dentro apposta i casi
 che il programma deve segnalare - e le istruzioni passo passo:
 [**Come testare l'importazione**](Collaudo/README.md).
@@ -952,38 +690,29 @@ Piu' persone possono tenere aperta l'applicazione insieme.
 
 ## Permessi da dare sulla cartella di rete
 
-Non c'e' nessuna installazione: si copia l'eseguibile e basta. Servono pero' due
-permessi diversi, su due oggetti diversi.
+Un permesso solo, su un oggetto solo.
 
 | Oggetto | Permesso NTFS | Perche' |
 | --- | --- | --- |
-| `Inventario.exe` | **Lettura ed esecuzione** | senza il diritto di esecuzione Windows non avvia un programma, nemmeno se e' leggibile |
-| la **cartella** | **Modifica** | il programma vi crea, sostituisce ed elimina file, non solo scrive dentro `Inventario.xlsx` |
+| la **cartella condivisa** e quello che contiene | **Modifica** | il programma vi crea, sostituisce ed elimina file, non solo scrive dentro `Inventario.xlsx` |
 
-Il permesso *Modifica* sulla cartella serve perche' ogni salvataggio comporta tre
-operazioni, non una:
+Non serve nessun permesso di esecuzione: dalla share non viene eseguito niente,
+il programma sta sulle postazioni.
+
+*Modifica* e non *Scrittura*, perche' ogni salvataggio comporta tre operazioni:
 
 1. crea il file di lock `.Inventario.xlsx.lock`, e poi **lo elimina**;
 2. scrive un file temporaneo `Inventario.xlsx.tmp-...`;
 3. **sostituisce** `Inventario.xlsx` con il temporaneo.
 
-Dare solo *Scrittura* sul file `Inventario.xlsx` non basta: mancherebbero la
-creazione e l'eliminazione di file nella cartella, e i salvataggi fallirebbero.
-Anche la condivisione SMB, non solo NTFS, deve concedere la scrittura: fra i due
-vince il piu' restrittivo.
+Dare solo *Scrittura* sul file non basta: mancherebbero la creazione e
+l'eliminazione di file nella cartella, e i salvataggi fallirebbero. Anche la
+condivisione SMB, non solo NTFS, deve concedere la scrittura: fra i due vince il
+piu' restrittivo.
 
-**Utenti in sola lettura.** Chi ha solo *Lettura ed esecuzione* apre il programma
-e consulta l'inventario senza problemi; fallisce appena prova a modificare
-qualcosa. E' un modo legittimo di dare accesso in consultazione. La preferenza sul
-percorso del file, che l'applicazione salverebbe accanto a se stessa, in quel caso
-finisce nel profilo dell'utente.
-
-**Due cose che capitano su Windows.** Un eseguibile aperto da un percorso di rete
-puo' far comparire l'avviso *"Aprire il file? L'autore non e' verificabile"*: si
-evita aggiungendo il server ai siti *Intranet locale* nelle opzioni Internet.
-E in alcuni ambienti l'esecuzione da share e' vietata da criteri di sicurezza
-(AppLocker o criteri di restrizione software): in quel caso il permesso NTFS c'e'
-ma il programma non parte lo stesso, e serve un'eccezione dagli amministratori.
+**Utenti in sola consultazione.** Chi ha solo *Lettura* apre il programma e
+consulta l'inventario senza problemi; fallisce appena prova a modificare
+qualcosa. E' un modo legittimo di dare accesso a chi deve solo guardare.
 
 Se qualcuno tiene `Inventario.xlsx` aperto in Excel, i salvataggi possono
 fallire perche' Windows blocca il file: chiudere Excel e riprovare. Per
@@ -1353,11 +1082,15 @@ aggiornati e gli altri aggiunti.
 
 ```
 Compila EXE per Windows.bat       crea l'eseguibile autosufficiente
-Crea collegamento sul desktop.bat collegamento alla cartella di rete
+Collega inventario condiviso.bat  punta la postazione all'inventario sulla share
+Crea collegamento sul desktop.bat mette l'icona sulla scrivania dell'utente
+Diagnostica.bat                   raccoglie le informazioni per chi assiste
 Avvia Inventario.bat              avvio dai sorgenti su Windows
 Avvia Inventario.command          avvio dai sorgenti su macOS / Linux
 Inventario.py                     avvio dell'applicazione
 inventario/config.py     percorso del file dati e impostazioni condivise
+inventario/configura.py  collega la postazione all'inventario condiviso
+inventario/diagnostica.py rapporto sullo stato dell'installazione
 inventario/store.py      lettura/scrittura del file .xlsx, lock, operazioni
 inventario/excel_io.py   esportazione, impaginazione di stampa, invio a stampante
 inventario/lingua.py     traduzioni in italiano e inglese

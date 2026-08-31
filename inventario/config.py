@@ -153,15 +153,57 @@ def save_language(lingua):
     return None
 
 
-def load_data_path():
-    """Percorso del file dati da usare, oppure None se va ancora scelto."""
+def configured_data_path():
+    """L'inventario che questa installazione ha il compito di aprire.
+
+    Ritorna (percorso, sorgente) e non guarda se il file esista: dice solo che
+    cosa e' stato deciso. Serve a distinguere due situazioni che non vanno mai
+    confuse - "nessuno ha ancora detto dove sta l'inventario", e "l'inventario
+    e' sulla share ma adesso la share non risponde". Nella seconda, creare un
+    inventario nuovo in locale significherebbe far lavorare un tecnico su una
+    copia che nessun altro vede.
+    """
     path = os.environ.get("INVENTARIO_FILE")
     if path:
-        return path
+        return path, "variabile d'ambiente INVENTARIO_FILE"
     for source in (local_config_path(), user_config_path()):
         saved = _read_config_path(source)
-        if saved and os.path.exists(saved):
-            return saved
+        if saved:
+            return saved, source
+    return None, None
+
+
+def save_configured_data_path(path):
+    """Scrive nella configurazione quale inventario deve aprire il programma.
+
+    Ritorna il file scritto, o None se non si e' potuto scrivere da nessuna
+    parte. Si scrive accanto al programma, cosi' la cartella si copia gia'
+    configurata su tutte le postazioni.
+    """
+    for target in (local_config_path(), user_config_path()):
+        try:
+            try:
+                with open(target, "r", encoding="utf-8") as fh:
+                    dati = json.load(fh)
+            except (OSError, ValueError):
+                dati = {}
+            dati["data_path"] = path
+            with open(target, "w", encoding="utf-8") as fh:
+                json.dump(dati, fh, indent=2, ensure_ascii=False)
+            return target
+        except OSError:
+            continue
+    return None
+
+
+def load_data_path():
+    """Percorso del file dati da usare, oppure None se va ancora scelto."""
+    forzato = os.environ.get("INVENTARIO_FILE")
+    if forzato:
+        return forzato          # scelta esplicita: vale anche se non esiste ancora
+    scelto, _ = configured_data_path()
+    if scelto and os.path.exists(scelto):
+        return scelto
     accanto = default_data_path()
     if os.path.exists(accanto):
         return accanto
@@ -170,16 +212,8 @@ def load_data_path():
 
 def save_data_path(path):
     """Ricorda la scelta; se la cartella del programma non e' scrivibile,
-    ripiega sul profilo dell'utente."""
-    payload = json.dumps({"data_path": path}, indent=2, ensure_ascii=False)
-    for target in (local_config_path(), user_config_path()):
-        try:
-            with open(target, "w", encoding="utf-8") as fh:
-                fh.write(payload)
-            return target
-        except OSError:
-            continue
-    return None
+    ripiega sul profilo dell'utente. La lingua gia' scelta non si perde."""
+    return save_configured_data_path(path)
 
 
 def shared_config_path(data_path):

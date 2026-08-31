@@ -151,7 +151,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.23.3 · alfa</div>
+  <div class="alpha">versione 0.24.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -177,24 +177,29 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
 
 <section>
   <h2>Come si mette in funzione</h2>
-  <p class="sub">Quattro passaggi, una volta sola. Dopo, gli utenti fanno solo doppio clic.</p>
+  <p class="sub">Il programma sta sulle postazioni, l'inventario sulla cartella di rete.
+    Uno solo, per tutti. Si prepara una copia sola e si distribuisce.</p>
   <ol class="steps">
-    <li><b>Sblocca lo zip prima di estrarlo.</b> Tasto destro sul file scaricato
-      &rsaquo; <i>Proprieta'</i> &rsaquo; in fondo, spunta <b>Annulla blocco</b>.
-      E' il passaggio che evita gli avvisi di sicurezza di Windows su tutte le
-      postazioni: senza, il marchio "scaricato da Internet" passa a ogni file
-      estratto.</li>
-    <li><b>Estrai tutto nella cartella di rete condivisa.</b> Quella a cui hanno
-      gia' accesso le persone che devono usare l'inventario. Sull'eseguibile
-      serve <i>Lettura ed esecuzione</i>, sulla cartella <i>Modifica</i>: il
-      programma vi crea e sostituisce file, non scrive soltanto dentro
-      l'inventario.</li>
-    <li><b>Aprilo.</b> Al primo avvio propone di creare li' accanto
-      <code>Inventario.xlsx</code>: e' l'archivio, ed e' anche l'inventario che apri in Excel.</li>
-    <li><b>Metti il collegamento sui desktop.</b> Tasto destro sull'eseguibile &rsaquo;
-      <i>Invia a</i> &rsaquo; <i>Desktop</i>. Oppure usa
-      <code>Crea collegamento sul desktop.bat</code>, incluso nel pacchetto.</li>
+    <li><b>Estrai il pacchetto in una cartella locale</b>, per esempio
+      <code>C:\Inventario</code> &mdash; non sulla cartella di rete. Se lo zip ha la
+      spunta <i>Annulla blocco</i> nelle proprieta', usala prima di estrarre; se non
+      c'e', non serve.</li>
+    <li><b>Collegalo all'inventario condiviso.</b> Doppio clic su
+      <code>Collega inventario condiviso.bat</code> e incolla il percorso della
+      cartella di rete, per esempio <code>\\server\Condivisa\Inventario</code>.
+      Se l'inventario non c'e' ancora viene creato vuoto; se c'e', non viene toccato.
+      Su quella cartella serve il permesso di <i>Modifica</i>.</li>
+    <li><b>Porta l'inventario che hai gia'</b>, se ne hai uno: copialo in
+      <code>Produzione\Inventario.xlsx</code> dentro la cartella di rete, con
+      esattamente quel nome. Un foglio <i>da importare</i> invece non va copiato li':
+      si carica da dentro il programma con <i>Importa xls…</i>.</li>
+    <li><b>Distribuisci la cartella alle postazioni.</b> E' gia' configurata: la
+      configurazione viaggia con lei. Su ogni PC, doppio clic su
+      <code>Crea collegamento sul desktop.bat</code> per l'icona sulla scrivania.</li>
   </ol>
+  <p class="note">Sulla cartella di rete non finisce nessun programma: solo i dati.
+    Aggiornare significa sostituire la cartella locale su ogni postazione, e
+    l'inventario non viene mai sfiorato.</p>
 </section>
 
 <section>
@@ -354,7 +359,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.23.3 · alpha</div>
+  <div class="alpha">version 0.24.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -380,23 +385,29 @@ python Inventario.py</pre>
 
 <section>
   <h2>Getting it running</h2>
-  <p class="sub">Four steps, once. After that, people just double-click.</p>
+  <p class="sub">The program goes on the workstations, the inventory on the network
+    folder. One inventory, for everybody. You prepare one copy and hand it out.</p>
   <ol class="steps">
-    <li><b>Unblock the zip before extracting it.</b> Right-click the downloaded
-      file &rsaquo; <i>Properties</i> &rsaquo; at the bottom, tick <b>Unblock</b>.
-      This is the step that prevents Windows security warnings on every
-      workstation: without it, the "downloaded from the Internet" mark reaches
-      every extracted file.</li>
-    <li><b>Extract everything into the shared network folder.</b> The one the
-      people who need the inventory can already reach. The executable needs
-      <i>Read and execute</i>, the folder needs <i>Modify</i>: the program creates
-      and replaces files there, it does not merely write inside the inventory.</li>
-    <li><b>Open it.</b> On first run it offers to create <code>Inventario.xlsx</code>
-      right beside it: that is both the store and the inventory you open in Excel.</li>
-    <li><b>Put a shortcut on the desktops.</b> Right-click the executable &rsaquo;
-      <i>Send to</i> &rsaquo; <i>Desktop</i>. Or use
-      <code>Crea collegamento sul desktop.bat</code>, included in the package.</li>
+    <li><b>Extract the package into a local folder</b>, for example
+      <code>C:\Inventario</code> &mdash; not onto the network folder. If the zip has
+      the <i>Unblock</i> tick in its properties, use it before extracting; if it is
+      not there, nothing to do.</li>
+    <li><b>Link it to the shared inventory.</b> Double-click
+      <code>Collega inventario condiviso.bat</code> and paste the path of the network
+      folder, for example <code>\\server\Shared\Inventory</code>. If the inventory
+      is not there yet an empty one is created; if it is, it is left alone. You need
+      <i>Modify</i> permission on that folder.</li>
+    <li><b>Bring the inventory you already have</b>, if any: copy it to
+      <code>Produzione\Inventario.xlsx</code> inside the network folder, with exactly
+      that name. A sheet <i>to import</i>, on the other hand, does not go there: it is
+      loaded from inside the program with <i>Import xls…</i>.</li>
+    <li><b>Hand the folder out to the workstations.</b> It is already configured: the
+      configuration travels with it. On each PC, double-click
+      <code>Crea collegamento sul desktop.bat</code> for the desktop icon.</li>
   </ol>
+  <p class="note">No program ends up on the network folder: only the data. Updating
+    means replacing the local folder on each workstation, and the inventory is never
+    touched.</p>
 </section>
 
 <section>

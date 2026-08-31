@@ -2583,6 +2583,28 @@ def choose_data_file(root):
 def main():
     path = config.load_data_path()
     if not path:
+        # Se questa installazione ha gia' un inventario assegnato - il caso del
+        # programma sulle postazioni e dei dati sulla share - e non lo si
+        # raggiunge, ci si ferma. Crearne uno nuovo in locale farebbe lavorare
+        # il tecnico su una copia che nessun altro vede, ed e' il modo piu'
+        # silenzioso di perdere il lavoro di una giornata.
+        atteso, sorgente = config.configured_data_path()
+        if atteso:
+            root = tk.Tk()
+            root.withdraw()
+            messagebox.showerror(
+                T("Inventario non raggiungibile"),
+                T("Questo programma deve aprire l'inventario condiviso:\n\n%s\n\n"
+                  "In questo momento non si raggiunge. Di solito e' la cartella\n"
+                  "di rete che non risponde, o la connessione.\n\n"
+                  "Controlla di vedere quella cartella da Esplora risorse, poi\n"
+                  "riapri il programma. Non viene creato nessun inventario\n"
+                  "locale: si lavora tutti sullo stesso file.\n\n"
+                  "Il percorso e' scritto in:\n%s") % (atteso, sorgente),
+                parent=root)
+            root.destroy()
+            return 2
+    if not path:
         # Al primo avvio l'inventario si crea da solo, in Produzione accanto al
         # programma. Chiedere all'utente dove metterlo era il modo piu' rapido
         # per ritrovarsi come inventario un file di prova scelto per sbaglio:

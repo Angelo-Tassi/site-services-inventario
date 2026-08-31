@@ -31,62 +31,17 @@ out of date, and nobody knows where a device ended up any more.
 
 ## Download
 
-The Releases page offers **two different packages** that do exactly the same
-thing. They differ only in what gets executed.
+**[Download `Inventario-windows-senza-exe.zip`](../../releases/latest/download/Inventario-windows-senza-exe.zip)**
+from the Releases page. Inside are the official python.org Python, signed by the
+Python Software Foundation, and the program in plain sight as `.py` files: no
+executable built by us, so nothing unsigned to get past corporate security.
 
-| Package | What is inside | When to pick it |
-| --- | --- | --- |
-| **[`Inventario-windows-senza-exe.zip`](../../releases/latest/download/Inventario-windows-senza-exe.zip)** | the official python.org Python, signed by the Python Software Foundation, and the program in plain sight as `.py` files | **recommended.** No executable built by us: there is nothing unsigned to get past security |
-| [`Inventario-windows.zip`](../../releases/latest/download/Inventario-windows.zip) | `Inventario.exe`, the program packed into a single executable | if you prefer one file to start and warnings are not a concern |
+You may also want the **[Excel template](docs/Modello_inventario.xlsx)** if you
+have laptops and tablets already recorded elsewhere to load in bulk.
 
-You may also want the **[Excel template](docs/Modello_inventario.xlsx)** for
-loading laptops and tablets already recorded elsewhere.
-
-Something native does run either way - on Windows it has to - but in the first
-package it is `python\pythonw.exe`, that is **the official python.org binary**,
-with its signature and its reputation. Antivirus software knows it.
-`Inventario.exe`, by contrast, is a file born anew with every version, signed by
-nobody and never seen before: that is what gets it looked at with suspicion, not
-the program itself.
-
-**Nothing has to be installed on the PCs** in either case: Python and the
-libraries travel inside the package. Extract it into the shared network folder,
-and whoever can reach that folder can use the inventory.
-
-With the recommended package, the share holds this:
-
-```
-\\server\Shared\Inventory\
-    Inventario.py                   the program, readable: opens in Notepad
-    inventario\                     the rest of the program, also in plain sight
-    python\                         the official python.org Python
-    Crea collegamento sul desktop.bat   creates the desktop shortcut
-    LEGGIMI-PRIMA.txt               installation instructions
-    Produzione\
-        Inventario.xlsx             the real inventory, one for everybody
-        inventario_impostazioni.json  rooms, types, loans, statuses
-    Backup\                        copies saved before every destructive operation
-    Collaudo\                      the test files
-```
-
-With the `Inventario.exe` package instead:
-
-```
-\\server\Shared\Inventory\
-    Inventario.exe                  the program
-    _internal\                      Python and the libraries: do not move, do not rename
-    Produzione\
-        Inventario.xlsx             the real inventory, one for everybody
-        inventario_impostazioni.json  rooms, types, loans, statuses
-    Backup\                        copies saved before every destructive operation
-    Collaudo\                      the test files
-```
-
-**There is one inventory, and it lives on the share.** Every technician opens the
-same file: there are no local copies on individual workstations, and every change
-- an addition, a loan, a restore - is written straight there where everybody sees
-it. That is why saves go through a lock and the list refreshes by itself every
-fifteen seconds.
+There is also [`Inventario-windows.zip`](../../releases/latest/download/Inventario-windows.zip),
+with `Inventario.exe` in place of the `.py` files: it does exactly the same
+things, in a single file to start. The instructions below apply to both.
 
 ## In short
 
@@ -101,415 +56,213 @@ fifteen seconds.
 
 ---
 
-## Permissions on the network folder
+---
 
-There is no installation: you copy the executable and that is it. Two different
-permissions are needed, on two different objects.
+## How to install it
 
-| Object | NTFS permission | Why |
+**The program goes on the workstations. The inventory goes on the share. One
+inventory, for everybody.**
+
+That split is the whole point, and it is worth saying why.
+
+The inventory has to be **one**: if every technician kept a copy, after half a
+day they would all differ and none would be true. So the `.xlsx` file lives on
+the network folder, and every change - an addition, a loan, a return - is
+written straight there, where everybody sees it.
+
+The program, on the other hand, has nothing to share: it is the same code on
+every PC. Keeping it on the share brings no benefit and two concrete problems:
+an executable started from the network is the pattern corporate security watches
+most closely, and its files stay **locked** by Windows while anybody has it open
+- even from another computer - so they cannot be updated.
+
+```
+On each workstation                     On the network folder
+------------------------------          ----------------------------------
+C:\Inventario\                          \\server\Shared\Inventory\
+    Inventario.py                            Produzione\
+    inventario\                                  Inventario.xlsx      <- the inventory
+    python\                                      inventario_impostazioni.json
+    inventario_percorso.json                 Backup\                  <- the copies
+    Collaudo\
+```
+
+### Step 1 - prepare one copy, once
+
+On any PC:
+
+1. download the zip and **extract it into a local folder**, for example
+   `C:\Inventario`. Not onto the share;
+2. double-click **`Collega inventario condiviso.bat`** ("link shared
+   inventory");
+3. paste the path of the network folder when asked:
+
+```
+\\server\Shared\Inventory
+```
+
+The program takes it from there: if the inventory is not on the share yet, it
+creates an empty one at `Produzione\Inventario.xlsx`; if it is already there, it
+leaves it alone. Then it writes `inventario_percorso.json` beside itself, and
+that is where it remembers which inventory to open.
+
+You need **Modify** permission on that network folder. If you do not have it,
+the program says so clearly instead of failing halfway.
+
+### Step 2 - bring the inventory you already have
+
+If an inventory already exists - the file you have been working on - copy it
+onto the share **with the right name in the right place**:
+
+```
+\\server\Shared\Inventory\Produzione\Inventario.xlsx
+```
+
+The name must be exactly `Inventario.xlsx`, and it must sit inside `Produzione`.
+Close the program before replacing it, and keep a copy of the old file until you
+have checked that the inventory opens and every device is there.
+
+If instead your inventory is a sheet with other columns, or split by room with
+separator rows, **do not copy it there**: that one is loaded from inside the
+program with *Import xls...*, which is a different thing. See
+[The import template](#the-import-template).
+
+### Step 3 - hand the folder out to the workstations
+
+The `C:\Inventario` folder you prepared is already configured: the configuration
+travels with it. Copy it as it is onto every workstation - by hand, by script,
+by software package or by GPO - always to the same local path.
+
+Then, on each workstation, double-click **`Crea collegamento sul desktop.bat`**:
+it puts the icon on the user's desktop and leaves a copy in the folder.
+
+From then on the technician double-clicks the icon and works on everybody's
+inventory, knowing nothing about network paths.
+
+### What the network folder needs
+
+| Who | On what | Permission |
 | --- | --- | --- |
-| `Inventario.exe` | **Read and execute** | without the execute right Windows will not start a program, readable or not |
-| the **folder** | **Modify** | the program creates, replaces and deletes files there, it does not merely write inside `Inventario.xlsx` |
+| the technicians | `\\server\Shared\Inventory\` and everything in it | **Modify** |
 
-*Modify* on the folder is required because every save is three operations, not
-one: it creates the lock file `.Inventario.xlsx.lock` and then **deletes** it,
-writes a temporary `Inventario.xlsx.tmp-...`, and **replaces** the inventory
-with the temporary one. Granting only *Write* on the file is not enough. The SMB
-share permission counts too: the stricter of the two wins.
+That is all. No execute permission, because nothing is executed from the share;
+no user list to keep inside the program: whoever can reach the folder can use
+the inventory, whoever cannot does not open it.
 
-**Read-only users** can open the program and browse the inventory; they only
-fail when they try to change something. It is a legitimate way to grant
-consultation access.
+### If the share does not answer
 
-Two things that happen on Windows: an executable opened from a network path may
-raise the *"the publisher could not be verified"* warning, which goes away by
-adding the server to the *Local intranet* sites; and in some environments
-running from a share is forbidden by security policy (AppLocker or software
-restriction policies), in which case the NTFS permission is there but the
-program still will not start, and an exception from the administrators is needed.
-
-## Windows security warnings
-
-The program is not signed with a certificate: without a signature, Windows warns
-before running anything that came from the Internet. **It is not a fault of the
-program, and it can be avoided.**
-
-### The one step that removes them all
-
-**Unblock the zip before extracting it.** Right-click
-`Inventario-windows.zip` > *Properties* > at the bottom of the General tab, tick
-**Unblock** > *Apply*.
-
-Windows marks everything extracted from a blocked archive as "downloaded from
-the Internet", and that mark follows the files onto the share: it is what makes
-*"Windows protected your PC"* appear on every workstation. Unblocking the archive
-before opening it stops the mark reaching the extracted files, and nobody sees a
-warning again.
-
-**If the "Unblock" box is not there, there is nothing to unblock.** That
-checkbox appears only on files Windows has marked: if it is missing, the mark
-was never applied - which happens when the download goes through a corporate
-proxy, or when the site sits in a zone considered trusted - and the extracted
-files are already clean. It is the result you wanted, for free.
-
-If you already extracted without unblocking, delete the extracted folder, unblock
-the zip and extract again: unblocking the files one by one is not enough.
-
-### The other two cases
-
-**"The publisher could not be verified"**, opening a program from a network path:
-it goes away by adding the server to the *Local intranet* sites - Internet
-Options > Security > Local intranet > Sites > Advanced > `\\server`.
-
-**Running from a share forbidden by security policy** (AppLocker or software
-restriction policies): here the NTFS permission is there but the program still
-will not start, and an exception from the administrators is needed.
-
-### Can the executable be avoided altogether?
-
-No, and it is worth understanding why. Something has to run on the PC: the
-alternatives are a Python script, which would need Python installed on every
-workstation - exactly what we set out to avoid - or a `.bat` file, which Windows
-treats with the same suspicion and some antivirus products like even less.
-
-The package does use the **"onedir"** form though: the executable sits next to its
-libraries in the `_internal` folder, instead of unpacking itself into a temporary
-folder at every start. It starts faster from a share and gives antivirus software
-far less to complain about, since self-extracting files are what they look at
-hardest.
-
-**The definitive fix is a code-signing certificate.** With one, the executable is
-signed by the organisation and SmartScreen says nothing, on any workstation and
-without unblocking anything. It costs a few hundred euros a year and has to be
-requested from whoever runs corporate IT; if you get one, it is added to the build
-in a single step.
-
-## Where to put the program
-
-There are two ways to deploy it, and they differ only in where the executable
-lives. In both, **there is one inventory, on the share**.
-
-### A. Everything on the network folder
-
-This is the starting arrangement: extract the package onto the share and put the
-shortcut on the desktops. One place to update, nothing to touch on the
-workstations.
-
-The drawback is that the executable is **started from the network**, and
-corporate security systems watch that behaviour closely: an unsigned binary run
-from a share is one of the patterns they flag most often.
-
-### B. Program on the workstations, data on the share
-
-If security is a concern - or if somebody has already flagged the executable -
-this is the quieter arrangement, and the program supports it with no changes.
-
-1. copy the program folder (everything in the zip except `Produzione`) onto
-   each workstation, for example into `C:\Program Files\Inventario`
-   or `%LOCALAPPDATA%\Inventario`;
-2. **leave only the data on the share**: the `Produzione` folder with
-   `Inventario.xlsx` and the settings inside;
-3. on each workstation, next to the executable, create
-   `inventario_percorso.json` with the network path:
-
-```json
-{ "data_path": "\\\\server\\Shared\\Inventory\\Produzione\\Inventario.xlsx" }
-```
-
-   Alternatively start the program once and point it at the file when asked: the
-   choice is remembered by itself.
-
-No executable is left on the share, and nobody starts one from the network. The
-**backup copies follow the data**: they go into `Produzione\Backup` on the
-share, one set for everybody, not onto individual workstations.
-
-The price is that an update has to be distributed to every workstation - by copy,
-by software package or by GPO - instead of replacing a single folder.
-
-### If the executable gets flagged
-
-The program is not signed, so it can be intercepted. There are three routes, in
-order of solidity:
-
-1. **a code-signing certificate**: solves it at the root, on any workstation and
-   with either arrangement;
-2. **an allow rule** agreed with whoever runs security - AppLocker or Windows
-   Defender Application Control - by path or by file hash;
-3. **using the package without an executable of ours**, which removes the
-   unsigned binary, and optionally **moving the program locally**, that is
-   arrangement B, which also removes the "executable started from a share"
-   pattern. Together the two leave little to flag.
-
-It is worth talking to whoever runs security **before** deploying to many
-workstations: an unsigned internal tool is a normal situation, usually settled
-with one allow rule.
-
-## Updating the program: a new folder, never overwrite
-
-On corporate shares hardly anyone has permission to **delete**. You can create,
-you can write, but replacing a file already there often fails - and then
-extracting the new package replaces some files and not others. The result is not
-a half-update: it is a program that **no longer starts**, because the pieces
-belong to two different versions.
-
-**So: every update goes into a new folder.**
-
-```
-\\server\Shared\Inventory2\       <- previous version, left where it is
-\\server\Shared\Inventory3\       <- the new package is extracted here
-```
-
-1. extract the new package into a folder that **does not exist yet**;
-2. copy `Inventario.xlsx` from the old `Produzione\` into the new one - it is
-   the only thing to carry over;
-3. redo the desktop shortcuts with `Crea collegamento sul desktop.bat`;
-4. delete the old folder later, when somebody with the right permissions can.
-   Meanwhile rename it - if you can - to `Inventario_old`, so everyone can see
-   which one not to use.
-
-This is not a workaround: creating a new folder is the one operation that always
-succeeds, even without delete permission, and it cannot leave an installation
-half old and half new.
-
-### If files turn out to be read-only
-
-Up to version 0.23.2 some files in the package arrived with the **read-only**
-attribute: they came from the official Python copied in at build time, and the
-archive carried it along. Those were the ones that would not be replaced. From
-0.23.3 the build clears the attribute and **verifies** that none is left,
-otherwise the package is not published.
-
-On files already on the share, clear it from the command prompt:
-
-```
-attrib -R "\\server\Shared\Inventory2\*" /S
-```
-
-### The arrangement that removes the problem at the root
-
-If this repeats with every version, the share is the wrong place: **put the
-program on the workstations and leave only the data on the share**. An update
-becomes a copy into a folder of your own, where you do have permissions, and the
-share no longer holds anything to replace. See
-[Program on the workstations, data on the share](#b-program-on-the-workstations-data-on-the-share).
-
-## The first launch, and a costly mistake
-
-On first opening, the program **creates the empty inventory by itself** in
-`Produzione\Inventario.xlsx`, next to itself. It asks nothing and there is
-nothing to choose: that is how the inventory stays one for everybody.
-
-It used to ask where the file was, and that was a dangerous question. Anyone who
-answered by pointing at an Excel sheet meant for loading - the test file in
-`Collaudo\`, or an inventory received from somebody else - **adopted that sheet
-as the inventory**. The result does not look like an error:
-
-- every device is there, but **none has a room** and the room cards stay at
-  zero;
-- the rows that separate the rooms in the sheet (`SITE SERVICES BAU`,
-  `KIOSK`...) appear **in the list as if they were devices**;
-- adding a device by hand works perfectly, which seems to rule out a
-  configuration problem;
-- the export reproduces the separator rows, because by now they are data.
-
-It looks like an import defect, and it is not: that sheet was never imported -
-it was *opened*.
-
-**An Excel sheet meant for loading is never opened as an inventory.** It is
-imported from inside the program, with *Import xls...*: that is where separator
-rows are read as room divisions rather than as devices.
-
-The program now notices by itself: if the open file contains separator rows it
-says so at startup and explains the way out, and if somebody tries to pick one
-by hand it refuses.
-
-### If you are already in this state
-
-1. close the program;
-2. delete `inventario_percorso.json` next to the program, if it is there: that
-   is where the wrong choice is remembered;
-3. reopen: the empty inventory is created by itself in `Produzione\`;
-4. load the sheet with *Import xls...*, from inside the program.
-
-## When something is off: the diagnostic
-
-The program folder holds **`Diagnostica.bat`**. Double-click it and in about ten
-seconds it writes `Diagnostica.txt` beside it, opening it in Notepad. It changes
-nothing: it only reads.
-
-Inside is what it takes to understand a defect without guessing:
-
-| What it says | What for |
-| --- | --- |
-| the **version** in use and which folder it starts from | nearly every already-fixed defect reappears this way: an old copy is in use |
-| whether `Inventario.exe` and `python\` coexist in the folder | two versions in one folder, with the shortcut pointing at the wrong one |
-| where it keeps the **data** and whether it can write there | separates a permission problem from a defect in the program |
-| the **rooms** the program knows | if that list is empty or different, separators in the sheet cannot work |
-| what it actually reads from the **test file** | says whether the import recognises the rooms, row by row, before importing anything |
-| where Windows puts the **desktop** and whether the shortcut is there | with OneDrive the desktop is not `%USERPROFILE%\Desktop` |
-
-The file holds paths and room names, nothing confidential. Send it to whoever
-helps you: it answers in one go questions that otherwise cost days.
-
-### If the desktop shortcut does not appear
-
-`Crea collegamento sul desktop.bat` prints the path where it created it: if that
-path is not your desktop, the shortcut went elsewhere. Then do it by hand, which
-never fails:
-
-- **package without the executable**: right-click `Avvia Inventario.bat` >
-  *Show more options* > *Send to* > *Desktop (create shortcut)*;
-- **package with the exe**: the same on `Inventario.exe`.
-
-A copy of the shortcut stays in the program folder as
-`Inventario dispositivi.lnk`: it can be dragged onto the desktop, including
-other users' desktops, without running anything.
-
-## Which version is running
-
-The version number is written **in the window title bar** and under the title
-inside the program. It is the first thing to check when something does not
-behave as this page says: nearly always the copy in use is not the one you
-think.
-
-**Do not mix the two packages in one folder.** If you extract the package
-without an executable over a folder that held `Inventario.exe`, the old
-executable stays there and still works: whoever opens it - or still has the old
-desktop shortcut - **runs an earlier version of the program**, with the defects
-fixed since. Delete `Inventario.exe` and the `_internal` folder, and redo the
-shortcuts with `Crea collegamento sul desktop.bat`. If both are in the folder,
-the `.bat` tells you and points at the new one.
-
-If the old executable will not delete, see
-[If `Inventario.exe` will not delete](#if-inventarioexe-will-not-delete).
+The program **stops and says so**, naming the inventory it expected to find. It
+does not create a local one: working on a copy nobody else sees would be the
+quietest way to lose a day's work.
 
 ## Running it
 
-Double-click **`Inventario.exe`** in the network folder.
+Double-click the **Inventario dispositivi** icon on the desktop.
 
-On first run, if it does not find the inventory yet, it offers to create
-`Inventario.xlsx` right beside itself; from then on everybody opens it without
-being asked anything. The quickest desktop shortcut: right-click the executable
-> *Show more options* > *Send to* > *Desktop (create shortcut)*. Alternatively
-`Crea collegamento sul desktop.bat`, included in the package, creates one and
-leaves a copy in the network folder for the others to drag onto their desktop.
+The window opens on the shared inventory. The version number is in the title
+bar: it tells you, when in doubt, which copy you are using.
 
-### Building the package yourself
+## Updating the program
+
+Now that the program lives on the workstations, an update is a copy into a
+folder of your own, where you do have permissions:
+
+1. download the new package;
+2. on each workstation, **replace the local program folder**;
+3. **do not touch `inventario_percorso.json`**: that is the line saying where
+   the shared inventory is. If you overwrite it, run
+   `Collega inventario condiviso.bat` again.
+
+**The data is never touched**: it lives on the share, and no program update goes
+near it. The desktop shortcuts stay valid too, because they point at the same
+local path.
+
+## Windows security warnings
+
+The recommended package contains no executable built by us, which removes the
+most common cause of a warning. One precaution remains, at download time:
+
+**Unblock the zip before extracting it.** Right-click the downloaded file >
+*Properties* > at the bottom of the General tab, tick **Unblock** > *Apply*.
+
+Windows marks everything extracted from a marked archive as "downloaded from the
+Internet", and that mark follows the files. Unblocking the archive before opening
+it stops the mark reaching anything.
+
+**If the "Unblock" box is not there, there is nothing to unblock**: it means
+Windows never applied the mark - which happens when the download goes through a
+corporate proxy - and the extracted files are already clean.
+
+If running unsigned programs is governed by security policy in your company
+(AppLocker, Windows Defender Application Control), you need an allowance from the
+administrators: a binary signed by the Python Software Foundation, installed
+locally, is however the easiest case to get approved.
+
+## A sheet to import is not an inventory
+
+They are two different things and must never be swapped:
+
+- **the inventory** is `Produzione\Inventario.xlsx` on the share: the program
+  opens it and writes into it;
+- **a sheet to import** is an Excel file holding devices to load, often split by
+  rows carrying a room name. It is loaded with *Import xls...*, from inside the
+  program.
+
+If a sheet to import is opened *as* an inventory, the separator rows become
+devices and no device has a room. The program notices and warns, but the rule
+stands: sheets are imported, not opened.
+
+## When something is off: the diagnostic
+
+The program folder holds **`Diagnostica.bat`**. Double-click it and it writes
+`Diagnostica.txt` beside it, opening it in Notepad. It changes nothing.
+
+Inside is what it takes to understand a problem without guessing: the version in
+use and where it starts from, which inventory it opens and whether it can write
+there, the rooms it knows, what it actually reads from an Excel file, the size of
+the window and of the table, and where Windows puts the user's desktop.
+
+The file holds paths and room names, nothing confidential: send it to whoever
+helps you and it answers in one go questions that otherwise cost days.
+
+## Building the package yourself
 
 Not needed if you download the release: it is built automatically by
 [GitHub Actions](.github/workflows/build-windows.yml) on a Windows machine at
 every published version. To build it yourself, on any Windows PC with Python,
 double-click `Compila EXE per Windows.bat`: it produces the `Distribuzione`
-folder, ready to be copied onto the share.
+folder, ready to be copied onto a workstation and linked to the shared
+inventory.
 
-### Updating the program
+## Permissions on the network folder
 
-Rebuild with `Compila EXE per Windows.bat`, or download the new package from the
-Releases page, and replace the contents in the network folder. **The data is
-untouched**: it lives in `Produzione`, and the `Backup` and `Collaudo` folders
-stay where they are. The desktop shortcuts keep working, because they point at
-the same path.
+One permission, on one object.
 
-#### If `Inventario.exe` will not delete
-
-It is not a missing permission: **Windows locks the executable while a process
-started from it is running**, even when that process runs on somebody else's
-computer. One technician who left the program open is enough. With this package
-the files inside `_internal` are locked too.
-
-It also happens that the program was closed but the server still holds the
-connection open: a stale SMB handle.
-
-**How to find who is holding it**, from the server hosting the share:
-
-*Computer Management* > *Shared Folders* > **Open Files**. Sort by name and look
-for `Inventario`: you see the user and the computer using it. From the same
-window, right-click > *Close Open File* releases the lock.
-
-With PowerShell, on the server:
-
-```powershell
-Get-SmbOpenFile | Where-Object Path -like "*Inventario*" |
-    Select-Object ClientUserName, ClientComputerName, Path
-```
-
-and to release it:
-
-```powershell
-Get-SmbOpenFile | Where-Object Path -like "*Inventario*" | Close-SmbOpenFile -Force
-```
-
-**If nobody appears to have it open** and the file stays locked, the handle is
-stale on the server side: closing it from the *Open Files* window usually does
-it. As a last resort, restart the Server service (`Restart-Service LanmanServer`),
-which disconnects every SMB session on that machine: do it out of hours.
-
-**The way to avoid the problem** is to update when nobody is using it: it takes
-a few seconds, and a glance at *Open Files* before starting tells you straight
-away whether you can go ahead.
-
-#### The file stays locked even after a reboot
-
-If you rebooted your computer and the file still will not delete, the lock is not
-on your PC. Before looking elsewhere, one test tells you straight away which
-problem you have.
-
-**Check the read-only attribute first**: right-click the file > *Properties* >
-at the bottom of the General tab, the **Read-only** box. If it is ticked, clear
-it and try again: it is the most banal cause and also the most common, and has
-nothing to do with locks. From the command line:
-
-```
-attrib -R "\\server\Shared\Inventory\Inventario.exe"
-```
-
-If that was not it, **try renaming** `Inventario.exe` to `Inventario_old.exe`.
-
-| What happens | Which problem it is | What to do |
+| Object | NTFS permission | Why |
 | --- | --- | --- |
-| The rename **succeeds** | It is a lock: Windows refuses to delete an executable in use, but allows renaming it | Put the new `Inventario.exe` in its place and delete the old one once whoever held it has closed |
-| The rename **fails** with *access denied* | Not a lock, a **permission**: you do not have *Modify* on the folder | Ask whoever runs the share for NTFS modify rights, and check the share permissions too: the stricter of the two wins |
-| The rename fails with *file open in another program* | Lock confirmed, from another workstation or from the server | Find who is holding it with *Open Files* or `Get-SmbOpenFile`, as above |
+| the **shared folder** and everything in it | **Modify** | the program creates, replaces and deletes files there, not just writes inside `Inventario.xlsx` |
 
-If the share is on a NAS rather than a Windows server, *Open Files* is not there:
-the equivalent lives in the NAS admin panel, usually under *SMB service* or
-*Connections*. Failing that, rebooting the NAS out of hours releases every handle.
+No execute permission is needed: nothing runs from the share, the program lives
+on the workstations.
 
-Check as well whether **Offline Files** is enabled on your PC: in that case you
-are working on a local copy of the share, and deletions behave oddly until
-synchronisation has caught up.
+*Modify* and not *Write*, because every save is three operations:
 
-#### The way that unblocks you anyway
+1. it creates the lock file `.Inventario.xlsx.lock`, then **deletes it**;
+2. it writes a temporary file `Inventario.xlsx.tmp-...`;
+3. it **replaces** `Inventario.xlsx` with the temporary one.
 
-You are not obliged to delete that file to move on. Install the new package **in
-a new folder**, next to the old one:
+Granting only *Write* on the file is not enough: creating and deleting files in
+the folder would be missing, and saves would fail. The SMB share, not just NTFS,
+must grant write access too: the more restrictive of the two wins.
 
-1. create `\\server\Shared\Inventory2\` and extract the updated package there,
-   remembering to unblock the zip first;
-2. **move** - do not copy - the `Produzione` folder from the old installation to
-   the new one: the real inventory is in there. Move `Backup` too, if you want to
-   keep the copies;
-3. redo the desktop shortcuts with `Crea collegamento sul desktop.bat`;
-4. delete the old folder once it frees up, at your leisure.
+**Read-only users.** Anyone with only *Read* opens the program and consults the
+inventory fine; it fails as soon as they try to change something. It is a
+legitimate way to give consultation access.
 
-The inventory is not lost and nobody is left without the program. This is also
-the procedure to use when an update cannot wait for everyone to close.
+If somebody keeps `Inventario.xlsx` open in Excel, saves can fail because Windows
+locks the file: close Excel and try again. To look at the data in Excel safely,
+use *Export xls...*.
 
-### Running from source
-
-Needs Python 3.8+ and `openpyxl`. On macOS the system Python uses **Tk 8.5**,
-Apple's deprecated build, which makes windows quit right after opening: use the
-Python from [python.org](https://www.python.org/downloads/macos/), which carries
-Tk 9.0, and rebuild the virtual environment with it.
-
-```bash
-git clone https://github.com/Angelo-Tassi/site-services-inventario.git
-cd site-services-inventario
-pip install -r requirements.txt
-python Inventario.py
-```
-
----
 
 ## What it does
 
@@ -991,17 +744,28 @@ and *Status* in the template - the allowed values stay written in the
 program cannot read: to reimport a file edited there, use *File > Export to >
 Excel*.
 
-## What is in the network folder
+## What is where
 
-| File | Contents |
+The **network folder** holds only the data:
+
+| Path | Contents |
 | --- | --- |
-| `Inventario.exe` | the program; on its own, with no prerequisites |
-| `Produzione\Inventario.xlsx` | the data; it is the inventory itself, openable in Excel |
-| `Produzione\inventario_impostazioni.json` | rooms, types, rooms with loans, iPhone room, statuses |
-| `Backup\` | the copies saved before every reset and every replacing import |
-| `Collaudo\` | the test files and the trial instructions |
-| `.Inventario.xlsx.lock` | present for a fraction of a second during a save |
-| `inventario_percorso.json` | which file the program opens, and the language preference |
+| `Produzione\Inventario.xlsx` | the inventory; already the file to consult, openable in Excel |
+| `Produzione\inventario_impostazioni.json` | rooms, types, loan rooms, iPhone room, statuses |
+| `Produzione\Backup\` | copies saved before every reset and every replacing import |
+| `.Inventario.xlsx.lock` | present only for a fraction of a second during a save |
+
+The **workstation** holds only the program:
+
+| Path | Contents |
+| --- | --- |
+| `Inventario.py`, `inventario\` | the program |
+| `python\` | the official python.org Python |
+| `inventario_percorso.json` | which inventory to open, and the language preference |
+| `Collaudo\` | the test files and the test instructions |
+
+The program on the workstation can be replaced at any moment with no
+consequences: everything that matters is on the share.
 
 ## Simultaneous access
 
@@ -1036,18 +800,16 @@ safely, use *Export xls...*.
 
 ## Where to keep the real inventory
 
-**Not inside this folder.** The repository holds the program and some
-demonstration data; the real inventory belongs elsewhere - on the shared network
-folder, or in a local folder while you are still trying things out. That way the
-data never ends up in a public repository and is never overwritten by a test.
+**On the network folder, at `Produzione\Inventario.xlsx`. Never inside the
+program folder.**
 
-The path is chosen on first run and remembered in `inventario_percorso.json`. To
-change it, delete that file and restart, or edit its `data_path` entry.
+The program on the workstation carries demo data and test files: the real
+inventory lives elsewhere, one of it, where everybody sees it. That way it does
+not end up in a repository, does not get overwritten by a test, and no program
+update goes near it.
 
-The `Esempio/` folder contains an `Inventario.xlsx` with thirteen **fake**
-devices across the three rooms, two of them on loan in the Digital Kiosk. It is
-there to show the program to whoever opens it for the first time, and can be
-regenerated with `.venv/bin/python tests/genera_esempio.py`.
+Which inventory to open is written in `inventario_percorso.json`, beside the
+program. To change it, run `Collega inventario condiviso.bat` again.
 
 ## Trying the import
 

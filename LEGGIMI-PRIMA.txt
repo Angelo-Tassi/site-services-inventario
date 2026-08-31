@@ -7,227 +7,170 @@
 ITALIANO
 --------------------------------------------------------------------
 
-Tre passaggi. Il primo e' il piu' importante: evita gli avvisi di
-sicurezza di Windows su tutte le postazioni.
+L'IDEA IN UNA RIGA
 
-I pacchetti sono due e fanno la stessa cosa:
+   Il programma sta sulle postazioni. L'inventario sta sulla
+   cartella di rete. Uno solo, per tutti.
 
-  Inventario-windows-senza-exe.zip   CONSIGLIATO. Dentro c'e' il Python
-      ufficiale di python.org, firmato dalla Python Software Foundation,
-      e il programma in chiaro come file .py. Nessun eseguibile
-      costruito da noi, quindi niente di non firmato da far passare.
-
-  Inventario-windows.zip             contiene Inventario.exe, il
-      programma in un eseguibile unico. Piu' comodo, ma e' un file non
-      firmato che nasce nuovo a ogni versione: e' quello che gli
-      antivirus guardano con sospetto.
-
-Le istruzioni qui sotto valgono per tutti e due: dove leggi
-Inventario.exe, con il pacchetto consigliato leggi Inventario.py.
+   L'inventario deve essere uno: se ogni tecnico ne tenesse una
+   copia, dopo mezza giornata sarebbero tutte diverse e nessuna
+   vera. Il programma invece e' lo stesso codice su ogni PC, non
+   c'e' niente da condividere.
 
 
-1) SBLOCCA IL FILE ZIP, PRIMA DI ESTRARLO
+1) PREPARA UNA COPIA, UNA VOLTA SOLA
 
-   Tasto destro sul file Inventario-windows.zip  >  Proprieta'
-   In fondo alla scheda Generale, spunta  [x] Annulla blocco
-   Applica  >  OK
+   Su un PC qualsiasi:
 
-   Windows marca come "scaricato da Internet" tutto cio' che estrai
-   da un archivio bloccato. Sbloccando lo zip PRIMA di estrarlo, il
-   marchio non passa ai file, e il programma parte senza avvisi.
+   a) estrai questo pacchetto in una cartella LOCALE, per esempio
+      C:\Inventario     (non sulla cartella di rete);
 
-   Se hai gia' estratto senza sbloccare: cancella la cartella
-   estratta, sblocca lo zip e riestrai.
+   b) doppio clic su  "Collega inventario condiviso.bat";
 
-   Se la casella "Annulla blocco" NON c'e', va benissimo: vuol dire
-   che Windows non ha marchiato il file e non c'e' niente da
-   sbloccare. Vai avanti al passaggio 2.
+   c) incolla il percorso della cartella di rete, per esempio
+         \\server\Condivisa\Inventario
 
+   Se sulla rete l'inventario non c'e' ancora viene creato vuoto,
+   in Produzione\Inventario.xlsx. Se c'e' gia', non viene toccato.
 
-2) ESTRAI LA CARTELLA SULLA CARTELLA DI RETE CONDIVISA
-
-   Estrai tutto il contenuto dello zip in una cartella della share,
-   per esempio:   \\server\Condivisa\Inventario\
-
-   Con il pacchetto consigliato dentro trovi Inventario.py, la
-   cartella inventario e la cartella python, insieme alle cartelle di
-   lavoro (Produzione, Backup, Collaudo). Con l'altro pacchetto trovi
-   Inventario.exe e _internal al loro posto. In nessuno dei due casi
-   spostare o rinominare le sottocartelle: il programma non partirebbe
-   piu'.
-
-   Servono i permessi NTFS:
-     - sul programma:    Lettura ed esecuzione
-     - sulla cartella:   Modifica
+   Serve il permesso di MODIFICA su quella cartella di rete.
 
 
-3) CREA IL COLLEGAMENTO SUL DESKTOP DI OGNI POSTAZIONE
+2) PORTA L'INVENTARIO CHE HAI GIA'
 
-   Doppio clic su "Crea collegamento sul desktop.bat": riconosce da
-   solo quale dei due pacchetti hai estratto, mette il collegamento sul
-   desktop e ne lascia una copia nella cartella, da trascinare sul
-   desktop degli altri.
+   Se un inventario esiste gia', copialo sulla rete con il nome
+   giusto e nel posto giusto:
 
-   Con il pacchetto Inventario.exe va bene anche tasto destro
-   sull'eseguibile > Mostra altre opzioni > Invia a > Desktop (crea
-   collegamento).
+      \\server\Condivisa\Inventario\Produzione\Inventario.xlsx
+
+   Il nome dev'essere esattamente Inventario.xlsx, dentro la
+   cartella Produzione. Chiudi il programma prima di sostituirlo, e
+   tieni una copia del file vecchio finche' non hai verificato che
+   l'inventario si apra e i dispositivi ci siano tutti.
+
+   ATTENZIONE: un foglio Excel DA IMPORTARE - con altre colonne, o
+   diviso per stanze con le righe separatore - NON va copiato li'.
+   Quello si carica da dentro il programma, con  Importa xls...
+
+
+3) DISTRIBUISCI LA CARTELLA ALLE POSTAZIONI
+
+   La cartella che hai preparato e' gia' configurata: la
+   configurazione viaggia con lei. Copiala tale e quale su ogni
+   postazione, sempre nello stesso percorso locale.
+
+   Su ogni postazione, doppio clic su
+   "Crea collegamento sul desktop.bat": mette l'icona sulla
+   scrivania dell'utente.
+
+   Da li' in poi si apre con doppio clic sull'icona.
 
 
 AGGIORNARE IL PROGRAMMA PIU' AVANTI
 
-   NON sovrascrivere la cartella esistente: estrai il pacchetto nuovo
-   in una cartella NUOVA (Inventario3, Inventario4...) e copia dentro
-   la sua Produzione il file Inventario.xlsx della vecchia. Sulle share
-   quasi nessuno ha il permesso di cancellare, e una sovrascrittura a
-   meta' lascia un programma che non parte. Se prima c'era Inventario.exe e adesso usi il pacchetto
-   senza eseguibile, CANCELLA Inventario.exe e la cartella _internal:
-   altrimenti restano li' e chi li apre usa la versione vecchia del
-   programma. Poi rifai i collegamenti sui desktop.
+   Scarica il pacchetto nuovo e sostituisci la cartella locale del
+   programma su ogni postazione. NON toccare
+   inventario_percorso.json: e' la riga che dice dove sta
+   l'inventario condiviso. Se lo sovrascrivi, ripassa
+   "Collega inventario condiviso.bat".
 
-   La versione in uso e' scritta nella barra del titolo della
-   finestra: e' il modo per accorgersene. I dati non si toccano: stanno in Produzione, e Backup e
-   Collaudo restano dove sono.
-
-   Se un file non si lascia cancellare, guarda PRIMA la sola lettura:
-   tasto destro > Proprieta' > in fondo alla scheda Generale, togli la
-   spunta da [x] Sola lettura. E' la causa piu' banale e anche la piu'
-   frequente.
-
-   Se non era quello, e' perche' qualcuno lo sta usando: Windows blocca
-   l'eseguibile finche' un processo avviato da li' e' in esecuzione,
-   anche da un altro computer.
-   Sul server: Gestione computer > Cartelle condivise > File aperti,
-   cerca "Inventario", vedi chi lo tiene aperto e chiudilo da li'.
-   Poi riprova.
+   I dati non si toccano mai: stanno sulla rete.
 
 
-SE COMPARE ANCORA UN AVVISO
+SE QUALCOSA NON TORNA
 
-   "Windows ha protetto il PC"  ->  Ulteriori informazioni  >
-   Esegui comunque. Succede la prima volta se lo zip non era stato
-   sbloccato.
+   Doppio clic su  "Diagnostica.bat".  Scrive Diagnostica.txt qui
+   accanto e te lo apre: dentro c'e' la versione in uso, quale
+   inventario apre, se puo' scriverci, e cosa legge dai file Excel.
+   Non modifica niente. Mandalo a chi ti assiste.
 
-   "L'autore non e' verificabile"  ->  aggiungi il server ai siti
-   Intranet locale: Opzioni Internet > Sicurezza > Intranet locale >
-   Siti > Avanzate > aggiungi  \\server
-
-   In alcune aziende l'esecuzione da share e' vietata da criteri di
-   sicurezza (AppLocker): in quel caso serve un'eccezione dagli
-   amministratori. Non e' un problema del programma.
+   La versione in uso e' scritta anche nella barra del titolo
+   della finestra.
 
 
 --------------------------------------------------------------------
 ENGLISH
 --------------------------------------------------------------------
 
-Three steps. The first one matters most: it prevents Windows security
-warnings on every workstation.
+THE IDEA IN ONE LINE
 
-There are two packages and they do the same thing:
+   The program goes on the workstations. The inventory goes on the
+   network folder. One inventory, for everybody.
 
-  Inventario-windows-senza-exe.zip   RECOMMENDED. Inside are the
-      official python.org Python, signed by the Python Software
-      Foundation, and the program in plain sight as .py files. No
-      executable built by us, so nothing unsigned to get past security.
-
-  Inventario-windows.zip             holds Inventario.exe, the program
-      packed into a single executable. Handier, but it is an unsigned
-      file born anew with every version: that is what antivirus
-      software looks at with suspicion.
-
-The instructions below apply to both: where you read Inventario.exe,
-with the recommended package read Inventario.py.
+   The inventory has to be one: if every technician kept a copy,
+   after half a day they would all differ and none would be true.
+   The program is the same code on every PC, with nothing to share.
 
 
-1) UNBLOCK THE ZIP FILE, BEFORE EXTRACTING IT
+1) PREPARE ONE COPY, ONCE
 
-   Right-click Inventario-windows.zip  >  Properties
-   At the bottom of the General tab, tick  [x] Unblock
-   Apply  >  OK
+   On any PC:
 
-   Windows marks everything extracted from a blocked archive as
-   "downloaded from the Internet". Unblocking the zip BEFORE
-   extracting stops that mark reaching the files, and the program
-   starts with no warnings.
+   a) extract this package into a LOCAL folder, for example
+      C:\Inventario     (not onto the network folder);
 
-   If you already extracted without unblocking: delete the extracted
-   folder, unblock the zip and extract again.
+   b) double-click  "Collega inventario condiviso.bat"
+      (link shared inventory);
 
-   If the "Unblock" box is NOT there, that is fine: it means Windows
-   did not mark the file and there is nothing to unblock. Go on to
-   step 2.
+   c) paste the path of the network folder, for example
+         \\server\Shared\Inventory
 
+   If the inventory is not on the network yet, an empty one is
+   created at Produzione\Inventario.xlsx. If it is there already,
+   it is left alone.
 
-2) EXTRACT THE FOLDER ONTO THE SHARED NETWORK FOLDER
-
-   Extract the whole contents of the zip into a folder on the share,
-   for example:   \\server\Shared\Inventory\
-
-   With the recommended package you find Inventario.py, the inventario
-   folder and the python folder, together with the working folders
-   (Produzione, Backup, Collaudo). With the other package you find
-   Inventario.exe and _internal in their place. In neither case move or
-   rename the subfolders: the program would no longer start.
-
-   NTFS permissions needed:
-     - on the program:     Read and execute
-     - on the folder:      Modify
+   You need MODIFY permission on that network folder.
 
 
-3) CREATE THE DESKTOP SHORTCUT ON EVERY WORKSTATION
+2) BRING THE INVENTORY YOU ALREADY HAVE
 
-   Double-click "Crea collegamento sul desktop.bat": it works out by
-   itself which of the two packages you extracted, puts the shortcut on
-   the desktop and leaves a copy in the folder, to drag onto the
-   others' desktops.
+   If an inventory already exists, copy it onto the network with
+   the right name in the right place:
 
-   With the Inventario.exe package you can also right-click the
-   executable > Show more options > Send to > Desktop (create
-   shortcut).
+      \\server\Shared\Inventory\Produzione\Inventario.xlsx
+
+   The name must be exactly Inventario.xlsx, inside the Produzione
+   folder. Close the program before replacing it, and keep a copy
+   of the old file until you have checked that the inventory opens
+   and every device is there.
+
+   CAREFUL: an Excel sheet TO IMPORT - with other columns, or split
+   by room with separator rows - must NOT be copied there. That one
+   is loaded from inside the program, with  Import xls...
+
+
+3) HAND THE FOLDER OUT TO THE WORKSTATIONS
+
+   The folder you prepared is already configured: the configuration
+   travels with it. Copy it as it is onto every workstation, always
+   to the same local path.
+
+   On each workstation, double-click
+   "Crea collegamento sul desktop.bat": it puts the icon on the
+   user's desktop.
+
+   From then on it opens with a double-click on the icon.
 
 
 UPDATING THE PROGRAM LATER
 
-   Do NOT overwrite the existing folder: extract the new package into
-   a NEW folder (Inventory3, Inventory4...) and copy Inventario.xlsx
-   from the old Produzione into the new one. On shares hardly anyone
-   has delete permission, and a half-finished overwrite leaves a
-   program that will not start.
-   If Inventario.exe was there before and you now use the package
-   without an executable, DELETE Inventario.exe and the _internal
-   folder: otherwise they stay and whoever opens them runs the old
-   version of the program. Then redo the desktop shortcuts.
+   Download the new package and replace the local program folder on
+   each workstation. Do NOT touch inventario_percorso.json: that is
+   the line saying where the shared inventory is. If you overwrite
+   it, run "Collega inventario condiviso.bat" again.
 
-   The version in use is written in the window title bar: that is how
-   you notice.
-   The data is untouched: it lives in Produzione, and Backup and
-   Collaudo stay where they are.
-
-   If a file will not delete, check the read-only attribute FIRST:
-   right-click > Properties > at the bottom of the General tab, clear
-   the [x] Read-only box. It is the most banal cause and also the most
-   common.
-
-   If that was not it, it is because somebody is using it: Windows
-   locks the executable while a process started from it is running,
-   even from another computer.
-   On the server: Computer Management > Shared Folders > Open Files,
-   look for "Inventario", see who is holding it and close it there.
-   Then try again.
+   The data is never touched: it lives on the network.
 
 
-IF A WARNING STILL APPEARS
+IF SOMETHING IS OFF
 
-   "Windows protected your PC"  ->  More info > Run anyway. This
-   happens the first time if the zip had not been unblocked.
+   Double-click  "Diagnostica.bat".  It writes Diagnostica.txt
+   beside it and opens it: inside are the version in use, which
+   inventory it opens, whether it can write there, and what it
+   reads from Excel files. It changes nothing. Send it to whoever
+   helps you.
 
-   "The publisher could not be verified"  ->  add the server to the
-   Local intranet sites: Internet Options > Security > Local
-   intranet > Sites > Advanced > add  \\server
-
-   In some companies running from a share is forbidden by security
-   policy (AppLocker): that needs an exception from the
-   administrators. It is not a problem with the program.
+   The version in use is also written in the window title bar.
 
 ====================================================================
  https://angelo-tassi.github.io/site-services-inventario/

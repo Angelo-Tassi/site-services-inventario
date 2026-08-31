@@ -7,20 +7,25 @@ l'importazione con dati finti, prima di caricare l'inventario vero.
 
 ## Dove sono i file
 
-Sono nella cartella **`Collaudo`**, accanto a `Inventario.exe`:
+Sono nella cartella **`Collaudo`**, dentro la cartella del programma sulla
+postazione:
 
 ```
-\\server\Condivisa\Inventario\
-    Inventario.exe
-    _internal\                Python e le librerie: non spostare
-    Produzione\
-        Inventario.xlsx      l'inventario vero, uno solo per tutti
-    Backup\                  le copie di sicurezza
+C:\Inventario\                      il programma, sulla postazione
+    Inventario.py
+    inventario\
+    python\
+    inventario_percorso.json     dice quale inventario aprire
     Collaudo\
         Inventario_di_prova.xlsx
         Inventario_di_prova_con_difetti.xlsx
-        README.md            questo documento
-        README.en.md         la versione inglese
+        README.md                questo documento
+        README.en.md             la versione inglese
+
+\\server\Condivisa\Inventario\      la cartella di rete: solo dati
+    Produzione\
+        Inventario.xlsx          l'inventario vero, uno solo per tutti
+        Backup\                  le copie di sicurezza
 ```
 
 Se hai scaricato lo zip `Inventario-windows.zip` dalla pagina Releases, la
@@ -91,8 +96,8 @@ Due motivi:
 
 - la cartella del programma viene **sostituita a ogni aggiornamento**: un file
   lasciato li' si perde senza preavviso;
-- se il programma sta su una cartella di rete condivisa, quel file sarebbe
-  visibile a tutti, anche a chi non deve leggerlo.
+- e' una cartella locale della tua postazione: quello che ci lasci non lo vede
+  nessun altro, e non e' un posto dove tenere qualcosa che conta.
 
 Vale anche per i file che **esporti** dal programma e per le copie di sicurezza
 che decidi di conservare: salvali in una cartella tua.
@@ -100,13 +105,12 @@ che decidi di conservare: salvali in una cartella tua.
 ## Da non confondere: il file che il programma usa
 
 Diverso e' il file su cui il programma lavora, quello che legge e scrive di
-continuo. Non lo importi: lo apre e basta. Il suo percorso si sceglie al primo
-avvio e resta memorizzato in `inventario_percorso.json`, accanto
-all'eseguibile; per cambiarlo, cancella quel file e riavvia.
+continuo. Non lo importi: lo apre e basta. Sta sulla **cartella di rete
+condivisa**, in `Produzione\Inventario.xlsx`, ed e' lo stesso per tutti i
+tecnici.
 
-Quello va dove serve a chi lo usa: sulla **cartella di rete condivisa** se
-l'inventario e' di tutti, in una cartella personale se stai ancora provando da
-solo.
+Quale sia e' scritto in `inventario_percorso.json`, accanto al programma sulla
+postazione; per cambiarlo si ripassa `Collega inventario condiviso.bat`.
 
 ---
 

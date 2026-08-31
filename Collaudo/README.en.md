@@ -7,20 +7,25 @@ import with fake data, before loading the real inventory.
 
 ## Where the files are
 
-They are in the **`Collaudo`** folder, next to `Inventario.exe`:
+They are in the **`Collaudo`** folder, inside the program folder on the
+workstation:
 
 ```
-\\server\Shared\Inventory\
-    Inventario.exe
-    _internal\                Python and the libraries: do not move
-    Produzione\
-        Inventario.xlsx      the real inventory, one for everybody
-    Backup\                  the backup copies
+C:\Inventario\                      the program, on the workstation
+    Inventario.py
+    inventario\
+    python\
+    inventario_percorso.json     says which inventory to open
     Collaudo\
         Inventario_di_prova.xlsx
         Inventario_di_prova_con_difetti.xlsx
-        README.md            the Italian version
-        README.en.md         this document
+        README.md                the Italian version
+        README.en.md             this document
+
+\\server\Shared\Inventory\          the network folder: data only
+    Produzione\
+        Inventario.xlsx          the real inventory, one for everybody
+        Backup\                  the backup copies
 ```
 
 If you downloaded `Inventario-windows.zip` from the Releases page, the
@@ -91,8 +96,8 @@ Two reasons:
 
 - the program folder is **replaced at every update**: a file left there is lost
   without warning;
-- if the program sits on a shared network folder, that file would be visible to
-  everyone, including people who should not read it.
+- it is a local folder on your own workstation: whatever you leave there nobody
+  else sees, and it is no place for anything that matters.
 
 The same goes for the files you **export** from the program and for any backup
 copies you decide to keep: save them in a folder of your own.
@@ -100,13 +105,12 @@ copies you decide to keep: save them in a folder of your own.
 ## Not to be confused: the file the program uses
 
 A different thing is the file the program works on, the one it reads and writes
-continuously. You do not import it: it simply opens it. Its path is chosen on
-first run and remembered in `inventario_percorso.json`, next to the executable;
-to change it, delete that file and restart.
+continuously. You do not import it: it simply opens it. It lives on the **shared
+network folder**, at `Produzione\Inventario.xlsx`, and it is the same one for
+every technician.
 
-That one goes wherever the people using it need it: on the **shared network
-folder** if the inventory belongs to everybody, in a personal folder while you
-are still trying things out on your own.
+Which one it is is written in `inventario_percorso.json`, next to the program on
+the workstation; to change it, run `Collega inventario condiviso.bat` again.
 
 ---
 
