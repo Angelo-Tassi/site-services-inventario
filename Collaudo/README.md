@@ -12,6 +12,7 @@ Sono nella cartella **`Collaudo`**, accanto a `Inventario.exe`:
 ```
 \\server\Condivisa\Inventario\
     Inventario.exe
+    _internal\                Python e le librerie: non spostare
     Produzione\
         Inventario.xlsx      l'inventario vero, uno solo per tutti
     Backup\                  le copie di sicurezza

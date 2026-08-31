@@ -22,13 +22,17 @@ echo [1/3] Installazione degli strumenti di compilazione...
 python -m pip install --upgrade --quiet pyinstaller openpyxl
 if errorlevel 1 (echo Installazione non riuscita.& pause& popd& exit /b 1)
 
-echo [2/3] Compilazione dell'eseguibile (puo' richiedere qualche minuto)...
-python -m PyInstaller --noconfirm --clean --onefile --noconsole --name Inventario --collect-submodules openpyxl Inventario.py
+echo [2/3] Compilazione (puo' richiedere qualche minuto)...
+rem forma "onedir": l'eseguibile sta accanto alle sue librerie invece di
+rem scompattarsi in una cartella temporanea a ogni avvio. Parte piu' in fretta
+rem da una share e da meno problemi con gli antivirus.
+python -m PyInstaller --noconfirm --clean --onedir --noconsole --name Inventario --collect-submodules openpyxl Inventario.py
 if errorlevel 1 (echo Compilazione non riuscita.& pause& popd& exit /b 1)
 
 echo [3/3] Preparazione della cartella da copiare in rete...
 if not exist "Distribuzione" mkdir "Distribuzione"
-copy /y "dist\Inventario.exe" "Distribuzione\Inventario.exe" >nul
+xcopy /e /i /y "dist\Inventario\*" "Distribuzione\" >nul
+copy /y "LEGGIMI-PRIMA.txt" "Distribuzione\" >nul
 copy /y "Crea collegamento sul desktop.bat" "Distribuzione\" >nul
 copy /y "README.md" "Distribuzione\Come funziona.txt" >nul
 rem le cartelle di lavoro esistono gia' quando il programma parte
@@ -46,7 +50,9 @@ copy /y "Collaudo\README.en.md" "Distribuzione\Collaudo\" >nul
 echo.
 echo ===========================================================================
 echo  Fatto. Copia il CONTENUTO della cartella "Distribuzione" nella cartella
-echo  di rete condivisa. Al primo avvio il programma crea li' Inventario.xlsx.
+echo  di rete condivisa: dentro c'e' Inventario.exe con la cartella _internal,
+echo  che non va spostata ne' rinominata. Le istruzioni per gli utenti sono in
+echo  LEGGIMI-PRIMA.txt.
 echo ===========================================================================
 echo.
 popd

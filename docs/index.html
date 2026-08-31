@@ -151,31 +151,37 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.20.2 · alfa</div>
+  <div class="alpha">versione 0.21.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
-    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Scarica Inventario.exe</a>
+    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip">Scarica il pacchetto</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest">Tutte le versioni</a>
     <a class="btn alt" href="Modello_inventario.xlsx" download>Modello Excel da compilare</a>
     <a class="btn alt" href="formato-xls.html">Come preparare il file Excel</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/tree/main/Collaudo">Come testare l'importazione</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario">Codice e documentazione</a>
   </div>
-  <p class="note">Un file solo, per Windows. Contiene Python e tutte le librerie:
-    sui PC non va installato niente. Il modello Excel serve a caricare in blocco
-    laptop e tablet gia' censiti altrove.</p>
+  <p class="note">Un pacchetto zip da estrarre sulla share, per Windows. Contiene
+    Python e tutte le librerie: sui PC non va installato niente. Sblocca lo zip
+    prima di estrarlo ed eviti gli avvisi di sicurezza. Il modello Excel serve a
+    caricare in blocco laptop e tablet gia' censiti altrove.</p>
 </header>
 
 <section>
   <h2>Come si mette in funzione</h2>
-  <p class="sub">Tre passaggi, una volta sola. Dopo, gli utenti fanno solo doppio clic.</p>
+  <p class="sub">Quattro passaggi, una volta sola. Dopo, gli utenti fanno solo doppio clic.</p>
   <ol class="steps">
-    <li><b>Copia <code>Inventario.exe</code> nella cartella di rete condivisa.</b>
-      Quella a cui hanno gia' accesso le persone che devono usare l'inventario.
-      Sull'eseguibile serve <i>Lettura ed esecuzione</i>, sulla cartella
-      <i>Modifica</i>: il programma vi crea e sostituisce file, non scrive
-      soltanto dentro l'inventario.</li>
+    <li><b>Sblocca lo zip prima di estrarlo.</b> Tasto destro sul file scaricato
+      &rsaquo; <i>Proprieta'</i> &rsaquo; in fondo, spunta <b>Annulla blocco</b>.
+      E' il passaggio che evita gli avvisi di sicurezza di Windows su tutte le
+      postazioni: senza, il marchio "scaricato da Internet" passa a ogni file
+      estratto.</li>
+    <li><b>Estrai tutto nella cartella di rete condivisa.</b> Quella a cui hanno
+      gia' accesso le persone che devono usare l'inventario. Sull'eseguibile
+      serve <i>Lettura ed esecuzione</i>, sulla cartella <i>Modifica</i>: il
+      programma vi crea e sostituisce file, non scrive soltanto dentro
+      l'inventario.</li>
     <li><b>Aprilo.</b> Al primo avvio propone di creare li' accanto
       <code>Inventario.xlsx</code>: e' l'archivio, ed e' anche l'inventario che apri in Excel.</li>
     <li><b>Metti il collegamento sui desktop.</b> Tasto destro sull'eseguibile &rsaquo;
@@ -341,31 +347,36 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.20.2 · alpha</div>
+  <div class="alpha">version 0.21.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
-    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario.exe">Download Inventario.exe</a>
+    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip">Download the package</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest">All versions</a>
     <a class="btn alt" href="Import_template.xlsx" download>Excel template</a>
     <a class="btn alt" href="formato-xls.html?lang=en">How to prepare the Excel file</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/blob/main/Collaudo/README.en.md">How to test the import</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/blob/main/README.en.md">Code and documentation</a>
   </div>
-  <p class="note">One file, for Windows. It carries Python and every library:
-    nothing has to be installed on the PCs. The Excel template is for loading
-    laptops and tablets already recorded elsewhere.</p>
+  <p class="note">A zip package to extract onto the share, for Windows. It carries
+    Python and every library: nothing has to be installed on the PCs. Unblock the
+    zip before extracting and you avoid the security warnings. The Excel template
+    is for loading laptops and tablets already recorded elsewhere.</p>
 </header>
 
 <section>
   <h2>Getting it running</h2>
-  <p class="sub">Three steps, once. After that, people just double-click.</p>
+  <p class="sub">Four steps, once. After that, people just double-click.</p>
   <ol class="steps">
-    <li><b>Copy <code>Inventario.exe</code> into the shared network folder.</b>
-      The one the people who need the inventory can already reach. The executable
-      needs <i>Read and execute</i>, the folder needs <i>Modify</i>: the program
-      creates and replaces files there, it does not merely write inside the
-      inventory.</li>
+    <li><b>Unblock the zip before extracting it.</b> Right-click the downloaded
+      file &rsaquo; <i>Properties</i> &rsaquo; at the bottom, tick <b>Unblock</b>.
+      This is the step that prevents Windows security warnings on every
+      workstation: without it, the "downloaded from the Internet" mark reaches
+      every extracted file.</li>
+    <li><b>Extract everything into the shared network folder.</b> The one the
+      people who need the inventory can already reach. The executable needs
+      <i>Read and execute</i>, the folder needs <i>Modify</i>: the program creates
+      and replaces files there, it does not merely write inside the inventory.</li>
     <li><b>Open it.</b> On first run it offers to create <code>Inventario.xlsx</code>
       right beside it: that is both the store and the inventory you open in Excel.</li>
     <li><b>Put a shortcut on the desktops.</b> Right-click the executable &rsaquo;

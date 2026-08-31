@@ -31,18 +31,31 @@ gia' vecchio, e nessuno sa piu' dove sia finito un dispositivo.
 
 ## Scarica
 
-**[Scarica l'ultima versione](../../releases/latest)** dalla pagina Releases.
-Serve anche il **[modello Excel da compilare](docs/Modello_inventario.xlsx)** per
-caricare in blocco laptop e tablet gia' censiti altrove.
+**[Scarica `Inventario-windows.zip`](../../releases/latest)** dalla pagina
+Releases: e' il pacchetto completo da estrarre sulla share. Serve anche il
+**[modello Excel da compilare](docs/Modello_inventario.xlsx)** per caricare in
+blocco laptop e tablet gia' censiti altrove.
 
-Nel pacchetto trovi `Inventario.exe`: un file solo, che contiene Python e tutte
-le librerie. **Sui PC non va installato niente.** Lo copi nella cartella di rete
-condivisa, ci fai doppio clic, e chi ha accesso a quella cartella ha accesso
-all'inventario.
+**Sui PC non va installato niente**: il pacchetto contiene Python e tutte le
+librerie. Quattro passaggi, una volta sola:
+
+1. scarica lo zip;
+2. **sbloccalo** prima di estrarlo - tasto destro > *Proprieta'* >
+   **Annulla blocco**. E' il passaggio che evita gli avvisi di sicurezza su
+   tutte le postazioni: vedi [Gli avvisi di sicurezza di
+   Windows](#gli-avvisi-di-sicurezza-di-windows);
+3. estrai tutto il contenuto nella cartella di rete condivisa;
+4. su ogni postazione, tasto destro su `Inventario.exe` > *Invia a* >
+   *Desktop (crea collegamento)*.
+
+Chi ha accesso a quella cartella ha accesso all'inventario. Nello zip c'e' anche
+`LEGGIMI-PRIMA.txt` con questi passaggi in italiano e in inglese.
 
 ```
 \\server\Condivisa\Inventario\
     Inventario.exe                  il programma
+    _internal\                      Python e le librerie: non spostare, non rinominare
+    LEGGIMI-PRIMA.txt               istruzioni di installazione
     Produzione\
         Inventario.xlsx             l'inventario vero, uno solo per tutti
         inventario_impostazioni.json  stanze, tipi, prestiti, stati
@@ -85,6 +98,56 @@ Distribuzione\
 ```
 
 Copia il contenuto di `Distribuzione` nella cartella di rete condivisa. Fine.
+
+## Gli avvisi di sicurezza di Windows
+
+Il programma non e' firmato con un certificato: senza firma, Windows avvisa
+prima di eseguire qualsiasi cosa arrivi da Internet. **Non e' un difetto del
+programma, ed e' evitabile.**
+
+### Il passaggio che li elimina tutti
+
+**Sblocca lo zip prima di estrarlo.** Tasto destro su
+`Inventario-windows.zip` > *Proprieta'* > in fondo alla scheda Generale,
+spunta **Annulla blocco** > *Applica*.
+
+Windows marca come "scaricato da Internet" tutto cio' che viene estratto da un
+archivio bloccato, e quel marchio segue i file anche sulla share: e' lui a far
+comparire *"Windows ha protetto il PC"* su ogni postazione. Sbloccando l'archivio
+prima di aprirlo, il marchio non passa ai file estratti e nessuno vede piu'
+avvisi.
+
+Se hai gia' estratto senza sbloccare, cancella la cartella estratta, sblocca lo
+zip e riestrai: non basta sbloccare i file uno per uno.
+
+### Gli altri due casi
+
+**"L'autore non e' verificabile"**, aprendo un programma da un percorso di rete:
+si toglie aggiungendo il server ai siti *Intranet locale* - Opzioni Internet >
+Sicurezza > Intranet locale > Siti > Avanzate > `\\server`.
+
+**L'esecuzione da share vietata da criteri di sicurezza** (AppLocker o criteri di
+restrizione software): qui il permesso NTFS c'e' ma il programma non parte lo
+stesso, e serve un'eccezione dagli amministratori.
+
+### Si puo' evitare del tutto l'eseguibile?
+
+No, e vale la pena capire perche'. Qualcosa deve essere eseguito sul PC: le
+alternative sono uno script Python, che richiederebbe Python installato su ogni
+postazione - esattamente cio' che si voleva evitare - oppure un file `.bat`, che
+Windows tratta con lo stesso sospetto e che alcuni antivirus guardano anche
+peggio.
+
+Il pacchetto usa pero' la forma **"onedir"**: l'eseguibile sta accanto alle sue
+librerie nella cartella `_internal`, invece di scompattarsi in una cartella
+temporanea a ogni avvio. Parte piu' in fretta da una share e da molti meno
+grattacapi agli antivirus, che guardano male i file che si autoestraggono.
+
+**La soluzione definitiva e' un certificato di firma del codice.** Con quello
+l'eseguibile risulta firmato dall'organizzazione e SmartScreen non dice piu'
+niente, su nessuna postazione e senza sbloccare niente. Costa qualche centinaio
+di euro all'anno e va richiesto a chi gestisce l'IT aziendale; se lo ottieni, si
+aggiunge alla compilazione con un passaggio solo.
 
 ## Come si lancia
 

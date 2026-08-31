@@ -1,7 +1,13 @@
 name: Compila l'eseguibile Windows
 
-# Ad ogni tag "v*" costruisce Inventario.exe su una macchina Windows e lo
-# allega alla release: chi scarica trova un file solo, senza prerequisiti.
+# Ad ogni tag "v*" costruisce il programma su una macchina Windows e allega alla
+# release due cose: il pacchetto zip da estrarre sulla share, che e' il modo
+# consigliato, e il singolo eseguibile per chi lo preferisce.
+#
+# Il pacchetto usa la forma "onedir": l'eseguibile sta accanto alle sue
+# librerie invece di scompattarsi in una cartella temporanea a ogni avvio.
+# Parte piu' in fretta da una share e da molti meno grattacapi agli antivirus,
+# che guardano male i file che si autoestraggono.
 on:
   push:
     tags: ["v*"]
@@ -23,16 +29,23 @@ jobs:
       - name: Installa le dipendenze
         run: python -m pip install --upgrade pip pyinstaller openpyxl
 
-      - name: Compila
+      - name: Compila il pacchetto da estrarre sulla share
+        run: >
+          python -m PyInstaller --noconfirm --clean --onedir --noconsole
+          --name Inventario --collect-submodules openpyxl Inventario.py
+
+      - name: Compila anche il singolo eseguibile
         run: >
           python -m PyInstaller --noconfirm --clean --onefile --noconsole
+          --distpath dist-unico --workpath build-unico
           --name Inventario --collect-submodules openpyxl Inventario.py
 
       - name: Prepara la cartella da copiare in rete
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path Distribuzione | Out-Null
-          Copy-Item dist\Inventario.exe Distribuzione\
+          Copy-Item dist\Inventario\* Distribuzione\ -Recurse
+          Copy-Item LEGGIMI-PRIMA.txt Distribuzione\
           Copy-Item "Crea collegamento sul desktop.bat" Distribuzione\
           Copy-Item README.md Distribuzione\"Come funziona.txt"
           # le cartelle di lavoro esistono gia' quando il programma parte
@@ -57,5 +70,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/Inventario.exe
             Inventario-windows.zip
+            dist-unico/Inventario.exe

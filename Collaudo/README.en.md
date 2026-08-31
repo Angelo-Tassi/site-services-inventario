@@ -12,6 +12,7 @@ They are in the **`Collaudo`** folder, next to `Inventario.exe`:
 ```
 \\server\Shared\Inventory\
     Inventario.exe
+    _internal\                Python and the libraries: do not move
     Produzione\
         Inventario.xlsx      the real inventory, one for everybody
     Backup\                  the backup copies

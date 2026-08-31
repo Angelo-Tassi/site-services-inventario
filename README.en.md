@@ -96,6 +96,56 @@ running from a share is forbidden by security policy (AppLocker or software
 restriction policies), in which case the NTFS permission is there but the
 program still will not start, and an exception from the administrators is needed.
 
+## Windows security warnings
+
+The program is not signed with a certificate: without a signature, Windows warns
+before running anything that came from the Internet. **It is not a fault of the
+program, and it can be avoided.**
+
+### The one step that removes them all
+
+**Unblock the zip before extracting it.** Right-click
+`Inventario-windows.zip` > *Properties* > at the bottom of the General tab, tick
+**Unblock** > *Apply*.
+
+Windows marks everything extracted from a blocked archive as "downloaded from
+the Internet", and that mark follows the files onto the share: it is what makes
+*"Windows protected your PC"* appear on every workstation. Unblocking the archive
+before opening it stops the mark reaching the extracted files, and nobody sees a
+warning again.
+
+If you already extracted without unblocking, delete the extracted folder, unblock
+the zip and extract again: unblocking the files one by one is not enough.
+
+### The other two cases
+
+**"The publisher could not be verified"**, opening a program from a network path:
+it goes away by adding the server to the *Local intranet* sites - Internet
+Options > Security > Local intranet > Sites > Advanced > `\\server`.
+
+**Running from a share forbidden by security policy** (AppLocker or software
+restriction policies): here the NTFS permission is there but the program still
+will not start, and an exception from the administrators is needed.
+
+### Can the executable be avoided altogether?
+
+No, and it is worth understanding why. Something has to run on the PC: the
+alternatives are a Python script, which would need Python installed on every
+workstation - exactly what we set out to avoid - or a `.bat` file, which Windows
+treats with the same suspicion and some antivirus products like even less.
+
+The package does use the **"onedir"** form though: the executable sits next to its
+libraries in the `_internal` folder, instead of unpacking itself into a temporary
+folder at every start. It starts faster from a share and gives antivirus software
+far less to complain about, since self-extracting files are what they look at
+hardest.
+
+**The definitive fix is a code-signing certificate.** With one, the executable is
+signed by the organisation and SmartScreen says nothing, on any workstation and
+without unblocking anything. It costs a few hundred euros a year and has to be
+requested from whoever runs corporate IT; if you get one, it is added to the build
+in a single step.
+
 ## Running it
 
 Double-click **`Inventario.exe`** in the network folder.
@@ -107,12 +157,13 @@ being asked anything. The quickest desktop shortcut: right-click the executable
 `Crea collegamento sul desktop.bat`, included in the package, creates one and
 leaves a copy in the network folder for the others to drag onto their desktop.
 
-### Building the executable yourself
+### Building the package yourself
 
 Not needed if you download the release: it is built automatically by
 [GitHub Actions](.github/workflows/build-windows.yml) on a Windows machine at
 every published version. To build it yourself, on any Windows PC with Python,
-double-click `Compila EXE per Windows.bat`.
+double-click `Compila EXE per Windows.bat`: it produces the `Distribuzione`
+folder, ready to be copied onto the share.
 
 ### Updating the program
 

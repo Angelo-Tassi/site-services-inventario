@@ -1,0 +1,129 @@
+====================================================================
+  Site Services - Inventario Iphone, Laptop e Tablet
+  ISTRUZIONI DI INSTALLAZIONE  /  INSTALLATION INSTRUCTIONS
+====================================================================
+
+--------------------------------------------------------------------
+ITALIANO
+--------------------------------------------------------------------
+
+Tre passaggi. Il primo e' il piu' importante: evita gli avvisi di
+sicurezza di Windows su tutte le postazioni.
+
+
+1) SBLOCCA IL FILE ZIP, PRIMA DI ESTRARLO
+
+   Tasto destro sul file Inventario-windows.zip  >  Proprieta'
+   In fondo alla scheda Generale, spunta  [x] Annulla blocco
+   Applica  >  OK
+
+   Windows marca come "scaricato da Internet" tutto cio' che estrai
+   da un archivio bloccato. Sbloccando lo zip PRIMA di estrarlo, il
+   marchio non passa ai file, e il programma parte senza avvisi.
+
+   Se hai gia' estratto senza sbloccare: cancella la cartella
+   estratta, sblocca lo zip e riestrai.
+
+
+2) ESTRAI LA CARTELLA SULLA CARTELLA DI RETE CONDIVISA
+
+   Estrai tutto il contenuto dello zip in una cartella della share,
+   per esempio:   \\server\Condivisa\Inventario\
+
+   Dentro trovi Inventario.exe insieme alle cartelle di lavoro
+   (_internal, Produzione, Backup, Collaudo). Non spostare e non
+   rinominare _internal: il programma non partirebbe piu'.
+
+   Servono i permessi NTFS:
+     - sull'eseguibile:  Lettura ed esecuzione
+     - sulla cartella:   Modifica
+
+
+3) CREA IL COLLEGAMENTO SUL DESKTOP DI OGNI POSTAZIONE
+
+   Apri la cartella di rete, tasto destro su Inventario.exe
+   > Mostra altre opzioni > Invia a > Desktop (crea collegamento)
+
+   In alternativa, un doppio clic su
+   "Crea collegamento sul desktop.bat" lo crea e ne lascia una copia
+   nella cartella, da trascinare sul desktop degli altri.
+
+
+SE COMPARE ANCORA UN AVVISO
+
+   "Windows ha protetto il PC"  ->  Ulteriori informazioni  >
+   Esegui comunque. Succede la prima volta se lo zip non era stato
+   sbloccato.
+
+   "L'autore non e' verificabile"  ->  aggiungi il server ai siti
+   Intranet locale: Opzioni Internet > Sicurezza > Intranet locale >
+   Siti > Avanzate > aggiungi  \\server
+
+   In alcune aziende l'esecuzione da share e' vietata da criteri di
+   sicurezza (AppLocker): in quel caso serve un'eccezione dagli
+   amministratori. Non e' un problema del programma.
+
+
+--------------------------------------------------------------------
+ENGLISH
+--------------------------------------------------------------------
+
+Three steps. The first one matters most: it prevents Windows security
+warnings on every workstation.
+
+
+1) UNBLOCK THE ZIP FILE, BEFORE EXTRACTING IT
+
+   Right-click Inventario-windows.zip  >  Properties
+   At the bottom of the General tab, tick  [x] Unblock
+   Apply  >  OK
+
+   Windows marks everything extracted from a blocked archive as
+   "downloaded from the Internet". Unblocking the zip BEFORE
+   extracting stops that mark reaching the files, and the program
+   starts with no warnings.
+
+   If you already extracted without unblocking: delete the extracted
+   folder, unblock the zip and extract again.
+
+
+2) EXTRACT THE FOLDER ONTO THE SHARED NETWORK FOLDER
+
+   Extract the whole contents of the zip into a folder on the share,
+   for example:   \\server\Shared\Inventory\
+
+   Inside you find Inventario.exe together with the working folders
+   (_internal, Produzione, Backup, Collaudo). Do not move or rename
+   _internal: the program would no longer start.
+
+   NTFS permissions needed:
+     - on the executable:  Read and execute
+     - on the folder:      Modify
+
+
+3) CREATE THE DESKTOP SHORTCUT ON EVERY WORKSTATION
+
+   Open the network folder, right-click Inventario.exe
+   > Show more options > Send to > Desktop (create shortcut)
+
+   Alternatively, double-clicking "Crea collegamento sul desktop.bat"
+   creates one and leaves a copy in the folder, to drag onto the
+   others' desktops.
+
+
+IF A WARNING STILL APPEARS
+
+   "Windows protected your PC"  ->  More info > Run anyway. This
+   happens the first time if the zip had not been unblocked.
+
+   "The publisher could not be verified"  ->  add the server to the
+   Local intranet sites: Internet Options > Security > Local
+   intranet > Sites > Advanced > add  \\server
+
+   In some companies running from a share is forbidden by security
+   policy (AppLocker): that needs an exception from the
+   administrators. It is not a problem with the program.
+
+====================================================================
+ https://angelo-tassi.github.io/site-services-inventario/
+====================================================================
