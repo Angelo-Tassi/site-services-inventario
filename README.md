@@ -233,11 +233,44 @@ della macchina: si fa fuori orario.
 usa nessuno: dura pochi secondi, e un'occhiata a *File aperti* prima di
 cominciare dice subito se si puo' procedere.
 
-Se devi liberare il nome subito e non puoi aspettare, Windows consente di
-**rinominare** un eseguibile in uso anche quando non consente di cancellarlo:
-rinomina `Inventario.exe` in `Inventario_vecchio.exe`, metti al suo posto quello
-nuovo, e cancella il vecchio quando la postazione che lo teneva aperto avra'
-chiuso. La cartella `_internal`, invece, va sostituita a programma chiuso.
+### Il file resta bloccato anche dopo aver riavviato
+
+Se hai riavviato il tuo computer e il file non si cancella lo stesso, il blocco
+non e' sul tuo PC. Prima di cercarlo altrove, un test dice subito di che
+problema si tratta.
+
+**Prova a rinominare** `Inventario.exe` in `Inventario_vecchio.exe`.
+
+| Cosa succede | Che problema e' | Cosa fare |
+| --- | --- | --- |
+| La rinomina **riesce** | E' un blocco: Windows impedisce di cancellare un eseguibile in uso, ma consente di rinominarlo | Metti il nuovo `Inventario.exe` al suo posto e cancella il vecchio quando chi lo teneva aperto avra' chiuso |
+| La rinomina **fallisce** con *accesso negato* | Non e' un blocco, e' un **permesso**: sulla cartella non hai *Modifica* | Chiedi a chi gestisce la share i permessi NTFS di modifica, e verifica anche quelli della condivisione: fra i due vince il piu' restrittivo |
+| La rinomina fallisce con *file aperto in un altro programma* | Blocco confermato, da un'altra postazione o dal server | Trova chi lo tiene aperto con *File aperti* o `Get-SmbOpenFile`, come sopra |
+
+Se la share e' su un NAS invece che su un server Windows, *File aperti* non c'e':
+l'equivalente sta nel pannello di amministrazione del NAS, di solito sotto
+*Servizi SMB* o *Connessioni*. In mancanza d'altro, un riavvio del NAS fuori
+orario rilascia tutti gli handle.
+
+Controlla anche se sul tuo PC sono attivi i **File non in linea**: in quel caso
+stai lavorando su una copia locale della share, e le cancellazioni si comportano
+in modo strano finche' la sincronizzazione non e' completa.
+
+### La via che ti sblocca comunque
+
+Non sei obbligato a cancellare quel file per andare avanti. Installa il pacchetto
+nuovo **in una cartella nuova**, accanto alla vecchia:
+
+1. crea `\\server\Condivisa\Inventario2\` ed estraici il pacchetto aggiornato,
+   ricordando di sbloccare lo zip prima;
+2. **sposta** - non copiare - la cartella `Produzione` dalla vecchia
+   installazione alla nuova: dentro c'e' l'inventario vero. Sposta anche
+   `Backup`, se vuoi conservare le copie;
+3. rifai il collegamento sui desktop puntando al nuovo `Inventario.exe`;
+4. cancella la vecchia cartella quando si sara' liberata, con calma.
+
+L'inventario non si perde e nessuno resta senza programma. E' anche la procedura
+da usare quando l'aggiornamento non puo' aspettare che tutti abbiano chiuso.
 
 ## Avvio dai sorgenti (per sviluppo)
 

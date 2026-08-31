@@ -211,11 +211,43 @@ which disconnects every SMB session on that machine: do it out of hours.
 a few seconds, and a glance at *Open Files* before starting tells you straight
 away whether you can go ahead.
 
-If you need the name free right now and cannot wait, Windows lets you **rename**
-an executable in use even when it will not let you delete it: rename
-`Inventario.exe` to `Inventario_old.exe`, put the new one in its place, and
-delete the old one once the workstation holding it has closed. The `_internal`
-folder, on the other hand, has to be replaced with the program closed.
+#### The file stays locked even after a reboot
+
+If you rebooted your computer and the file still will not delete, the lock is not
+on your PC. Before looking elsewhere, one test tells you straight away which
+problem you have.
+
+**Try renaming** `Inventario.exe` to `Inventario_old.exe`.
+
+| What happens | Which problem it is | What to do |
+| --- | --- | --- |
+| The rename **succeeds** | It is a lock: Windows refuses to delete an executable in use, but allows renaming it | Put the new `Inventario.exe` in its place and delete the old one once whoever held it has closed |
+| The rename **fails** with *access denied* | Not a lock, a **permission**: you do not have *Modify* on the folder | Ask whoever runs the share for NTFS modify rights, and check the share permissions too: the stricter of the two wins |
+| The rename fails with *file open in another program* | Lock confirmed, from another workstation or from the server | Find who is holding it with *Open Files* or `Get-SmbOpenFile`, as above |
+
+If the share is on a NAS rather than a Windows server, *Open Files* is not there:
+the equivalent lives in the NAS admin panel, usually under *SMB service* or
+*Connections*. Failing that, rebooting the NAS out of hours releases every handle.
+
+Check as well whether **Offline Files** is enabled on your PC: in that case you
+are working on a local copy of the share, and deletions behave oddly until
+synchronisation has caught up.
+
+#### The way that unblocks you anyway
+
+You are not obliged to delete that file to move on. Install the new package **in
+a new folder**, next to the old one:
+
+1. create `\\server\Shared\Inventory2\` and extract the updated package there,
+   remembering to unblock the zip first;
+2. **move** - do not copy - the `Produzione` folder from the old installation to
+   the new one: the real inventory is in there. Move `Backup` too, if you want to
+   keep the copies;
+3. redo the desktop shortcuts pointing at the new `Inventario.exe`;
+4. delete the old folder once it frees up, at your leisure.
+
+The inventory is not lost and nobody is left without the program. This is also
+the procedure to use when an update cannot wait for everyone to close.
 
 ### Running from source
 
