@@ -54,7 +54,8 @@ librerie viaggiano dentro il pacchetto. Quattro passaggi, una volta sola:
 
 1. scarica lo zip;
 2. **sbloccalo** prima di estrarlo - tasto destro > *Proprieta'* >
-   **Annulla blocco**. E' il passaggio che evita gli avvisi di sicurezza su
+   **Annulla blocco**. Se quella casella non c'e', non serve: vuol dire che
+   Windows non ha marchiato il file. E' il passaggio che evita gli avvisi di sicurezza su
    tutte le postazioni: vedi [Gli avvisi di sicurezza di
    Windows](#gli-avvisi-di-sicurezza-di-windows);
 3. estrai tutto il contenuto nella cartella di rete condivisa;
@@ -149,6 +150,12 @@ archivio bloccato, e quel marchio segue i file anche sulla share: e' lui a far
 comparire *"Windows ha protetto il PC"* su ogni postazione. Sbloccando l'archivio
 prima di aprirlo, il marchio non passa ai file estratti e nessuno vede piu'
 avvisi.
+
+**Se la casella "Annulla blocco" non c'e', non c'e' niente da sbloccare.**
+Quella spunta compare solo sui file che Windows ha marchiato: se manca, il
+marchio non e' stato messo - capita quando il download passa da un proxy
+aziendale, o quando il sito sta in una zona considerata attendibile - e i file
+estratti sono gia' puliti. E' il risultato che si voleva, ottenuto gratis.
 
 Se hai gia' estratto senza sbloccare, cancella la cartella estratta, sblocca lo
 zip e riestrai: non basta sbloccare i file uno per uno.

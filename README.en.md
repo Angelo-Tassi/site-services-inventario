@@ -146,6 +146,12 @@ the Internet", and that mark follows the files onto the share: it is what makes
 before opening it stops the mark reaching the extracted files, and nobody sees a
 warning again.
 
+**If the "Unblock" box is not there, there is nothing to unblock.** That
+checkbox appears only on files Windows has marked: if it is missing, the mark
+was never applied - which happens when the download goes through a corporate
+proxy, or when the site sits in a zone considered trusted - and the extracted
+files are already clean. It is the result you wanted, for free.
+
 If you already extracted without unblocking, delete the extracted folder, unblock
 the zip and extract again: unblocking the files one by one is not enough.
 

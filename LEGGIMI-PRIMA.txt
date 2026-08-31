@@ -39,6 +39,10 @@ Inventario.exe, con il pacchetto consigliato leggi Inventario.py.
    Se hai gia' estratto senza sbloccare: cancella la cartella
    estratta, sblocca lo zip e riestrai.
 
+   Se la casella "Annulla blocco" NON c'e', va benissimo: vuol dire
+   che Windows non ha marchiato il file e non c'e' niente da
+   sbloccare. Vai avanti al passaggio 2.
+
 
 2) ESTRAI LA CARTELLA SULLA CARTELLA DI RETE CONDIVISA
 
@@ -145,6 +149,10 @@ with the recommended package read Inventario.py.
 
    If you already extracted without unblocking: delete the extracted
    folder, unblock the zip and extract again.
+
+   If the "Unblock" box is NOT there, that is fine: it means Windows
+   did not mark the file and there is nothing to unblock. Go on to
+   step 2.
 
 
 2) EXTRACT THE FOLDER ONTO THE SHARED NETWORK FOLDER
