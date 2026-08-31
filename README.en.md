@@ -238,6 +238,40 @@ It is worth talking to whoever runs security **before** deploying to many
 workstations: an unsigned internal tool is a normal situation, usually settled
 with one allow rule.
 
+## When something is off: the diagnostic
+
+The program folder holds **`Diagnostica.bat`**. Double-click it and in about ten
+seconds it writes `Diagnostica.txt` beside it, opening it in Notepad. It changes
+nothing: it only reads.
+
+Inside is what it takes to understand a defect without guessing:
+
+| What it says | What for |
+| --- | --- |
+| the **version** in use and which folder it starts from | nearly every already-fixed defect reappears this way: an old copy is in use |
+| whether `Inventario.exe` and `python\` coexist in the folder | two versions in one folder, with the shortcut pointing at the wrong one |
+| where it keeps the **data** and whether it can write there | separates a permission problem from a defect in the program |
+| the **rooms** the program knows | if that list is empty or different, separators in the sheet cannot work |
+| what it actually reads from the **test file** | says whether the import recognises the rooms, row by row, before importing anything |
+| where Windows puts the **desktop** and whether the shortcut is there | with OneDrive the desktop is not `%USERPROFILE%\Desktop` |
+
+The file holds paths and room names, nothing confidential. Send it to whoever
+helps you: it answers in one go questions that otherwise cost days.
+
+### If the desktop shortcut does not appear
+
+`Crea collegamento sul desktop.bat` prints the path where it created it: if that
+path is not your desktop, the shortcut went elsewhere. Then do it by hand, which
+never fails:
+
+- **package without the executable**: right-click `Avvia Inventario.bat` >
+  *Show more options* > *Send to* > *Desktop (create shortcut)*;
+- **package with the exe**: the same on `Inventario.exe`.
+
+A copy of the shortcut stays in the program folder as
+`Inventario dispositivi.lnk`: it can be dragged onto the desktop, including
+other users' desktops, without running anything.
+
 ## Which version is running
 
 The version number is written **in the window title bar** and under the title

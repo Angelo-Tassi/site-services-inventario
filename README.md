@@ -244,6 +244,40 @@ Vale la pena parlarne con chi gestisce la sicurezza **prima** di distribuirlo su
 molte postazioni: uno strumento interno non firmato e' una situazione normale,
 che di solito si risolve con una riga di autorizzazione.
 
+## Quando qualcosa non torna: la diagnostica
+
+Nella cartella del programma c'e' **`Diagnostica.bat`**. Doppio clic, e in una
+decina di secondi scrive `Diagnostica.txt` li' accanto, aprendolo nel Blocco
+note. Non modifica niente: legge e basta.
+
+Dentro c'e' quello che serve a capire un difetto senza tirare a indovinare:
+
+| Cosa dice | A cosa serve |
+| --- | --- |
+| la **versione** in uso e da quale cartella parte | quasi tutti i difetti gia' corretti riappaiono cosi': si sta usando una copia vecchia |
+| se in cartella convivono `Inventario.exe` e `python\` | due versioni nella stessa cartella, e il collegamento punta a quella sbagliata |
+| dove tiene i **dati** e se puo' scriverci | distingue un problema di permessi da un difetto del programma |
+| le **stanze** che il programma conosce | se l'elenco e' vuoto o diverso, i separatori nel foglio non possono funzionare |
+| cosa legge davvero dal **file di prova** | dice se l'importazione riconosce le stanze, riga per riga, prima ancora di importare |
+| dove Windows mette il **desktop** e se c'e' il collegamento | con OneDrive la scrivania non e' `%USERPROFILE%\Desktop` |
+
+Il file contiene percorsi e nomi di stanza, niente di riservato. Mandalo a chi
+assiste: risponde in un colpo solo a domande che altrimenti costano giorni.
+
+### Se il collegamento sul desktop non compare
+
+`Crea collegamento sul desktop.bat` stampa il percorso in cui l'ha creato:
+se quel percorso non e' la tua scrivania, il collegamento e' finito altrove.
+In quel caso fallo a mano, che non fallisce mai:
+
+- **pacchetto senza eseguibile**: tasto destro su `Avvia Inventario.bat` >
+  *Mostra altre opzioni* > *Invia a* > *Desktop (crea collegamento)*;
+- **pacchetto con l'exe**: lo stesso su `Inventario.exe`.
+
+Nella cartella del programma resta comunque una copia del collegamento,
+`Inventario dispositivi.lnk`: si puo' trascinare sul desktop, anche su quello
+degli altri utenti, senza eseguire niente.
+
 ## Quale versione sta girando
 
 Il numero di versione e' scritto **nella barra del titolo della finestra** e

@@ -80,6 +80,7 @@ jobs:
           Copy-Item LEGGIMI-PRIMA.txt Portatile\
           Copy-Item "Crea collegamento sul desktop.bat" Portatile\
           Copy-Item "Avvia Inventario.bat" Portatile\
+          Copy-Item "Diagnostica.bat" Portatile\
           Copy-Item README.md Portatile\"Come funziona.txt"
           New-Item -ItemType Directory -Force -Path Portatile\Backup | Out-Null
           Copy-Item Backup\.gitignore Portatile\Backup\ -ErrorAction SilentlyContinue
@@ -116,6 +117,7 @@ jobs:
           Copy-Item dist\Inventario\* Distribuzione\ -Recurse
           Copy-Item LEGGIMI-PRIMA.txt Distribuzione\
           Copy-Item "Crea collegamento sul desktop.bat" Distribuzione\
+          Copy-Item "Diagnostica.bat" Distribuzione\
           Copy-Item README.md Distribuzione\"Come funziona.txt"
           # le cartelle di lavoro esistono gia' quando il programma parte
           New-Item -ItemType Directory -Force -Path Distribuzione\Backup | Out-Null
