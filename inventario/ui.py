@@ -1327,8 +1327,20 @@ class App(tk.Tk):
         self._row_buttons = {}
 
     def _sync_row_buttons(self):
-        """Disegna un vero pulsante sulla cella Prestito delle righe visibili."""
-        if self.tree is None or not self.action_column_visible():
+        """Disegna un vero pulsante sulla cella Prestito delle righe visibili.
+
+        Viene chiamata anche dalle barre di scorrimento, cioe' mentre Tk sta
+        ancora disegnando: se qui scappasse un'eccezione, quella finirebbe
+        dentro il disegno della tabella. Per questo non solleva mai niente.
+        """
+        try:
+            self._disegna_pulsanti_riga()
+        except tk.TclError:
+            pass          # tabella in ricostruzione: al prossimo giro ci sara'
+
+    def _disegna_pulsanti_riga(self):
+        if getattr(self, "tree", None) is None or not self.tree.winfo_exists() \
+                or not self.action_column_visible():
             return
         if not hasattr(self, "_row_buttons"):
             self._row_buttons = {}
