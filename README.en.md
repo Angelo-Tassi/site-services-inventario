@@ -826,7 +826,7 @@ program. To change it, run `Collega inventario condiviso.bat` again.
 ## Trying the import
 
 The **`Collaudo/`** folder travels with the program: in the Windows package it
-sits next to `Inventario.exe`. It contains two Excel sheets ready to import - a
+sits next to `Inventario.py`. It contains two Excel sheets ready to import - a
 regular one with **30 devices, 10 per room**, and one deliberately carrying the
 cases the program has to report - and step-by-step instructions in
 [`Collaudo/README.en.md`](Collaudo/README.en.md).

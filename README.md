@@ -295,9 +295,12 @@ Il problema riguarda **solo** l'esecuzione dai sorgenti su Mac: l'eseguibile
 Windows costruito con PyInstaller si porta dietro Tcl/Tk 8.6 e non ne risente.
 
 Il percorso del file dati si determina in quest'ordine: la variabile d'ambiente
-`INVENTARIO_FILE`, poi un eventuale `inventario_percorso.json` accanto al
-programma o nel profilo utente, poi `Inventario.xlsx` nella cartella del
-programma, e solo in ultimo lo si chiede all'utente.
+`INVENTARIO_FILE`, poi `inventario_percorso.json` accanto al programma o nel
+profilo utente - e' quello che scrive *Collega inventario condiviso* - e infine
+`Produzione\Inventario.xlsx` accanto al programma.
+
+Se il percorso e' configurato ma non si raggiunge, il programma si ferma e lo
+dice: non crea mai un inventario locale al posto di quello condiviso.
 
 ## Cosa fa
 
