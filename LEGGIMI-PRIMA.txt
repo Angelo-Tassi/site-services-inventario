@@ -49,6 +49,20 @@ sicurezza di Windows su tutte le postazioni.
    nella cartella, da trascinare sul desktop degli altri.
 
 
+AGGIORNARE IL PROGRAMMA PIU' AVANTI
+
+   Sostituisci il contenuto della cartella con quello del pacchetto
+   nuovo. I dati non si toccano: stanno in Produzione, e Backup e
+   Collaudo restano dove sono.
+
+   Se Inventario.exe non si lascia cancellare, e' perche' qualcuno lo
+   sta usando: Windows blocca l'eseguibile finche' un processo
+   avviato da li' e' in esecuzione, anche da un altro computer.
+   Sul server: Gestione computer > Cartelle condivise > File aperti,
+   cerca "Inventario", vedi chi lo tiene aperto e chiudilo da li'.
+   Poi riprova.
+
+
 SE COMPARE ANCORA UN AVVISO
 
    "Windows ha protetto il PC"  ->  Ulteriori informazioni  >
@@ -109,6 +123,20 @@ warnings on every workstation.
    Alternatively, double-clicking "Crea collegamento sul desktop.bat"
    creates one and leaves a copy in the folder, to drag onto the
    others' desktops.
+
+
+UPDATING THE PROGRAM LATER
+
+   Replace the contents of the folder with those of the new package.
+   The data is untouched: it lives in Produzione, and Backup and
+   Collaudo stay where they are.
+
+   If Inventario.exe will not delete, it is because somebody is using
+   it: Windows locks the executable while a process started from it
+   is running, even from another computer.
+   On the server: Computer Management > Shared Folders > Open Files,
+   look for "Inventario", see who is holding it and close it there.
+   Then try again.
 
 
 IF A WARNING STILL APPEARS

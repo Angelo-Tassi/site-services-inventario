@@ -167,10 +167,55 @@ folder, ready to be copied onto the share.
 
 ### Updating the program
 
-Rebuild with `Compila EXE per Windows.bat` and replace `Inventario.exe` in the
-network folder, with nobody using it at that moment. The data is untouched: it
-lives in `Produzione\Inventario.xlsx`, a separate file, and so do the `Backup`
-and `Collaudo` folders.
+Rebuild with `Compila EXE per Windows.bat`, or download the new package from the
+Releases page, and replace the contents in the network folder. **The data is
+untouched**: it lives in `Produzione`, and the `Backup` and `Collaudo` folders
+stay where they are. The desktop shortcuts keep working, because they point at
+the same path.
+
+#### If `Inventario.exe` will not delete
+
+It is not a missing permission: **Windows locks the executable while a process
+started from it is running**, even when that process runs on somebody else's
+computer. One technician who left the program open is enough. With this package
+the files inside `_internal` are locked too.
+
+It also happens that the program was closed but the server still holds the
+connection open: a stale SMB handle.
+
+**How to find who is holding it**, from the server hosting the share:
+
+*Computer Management* > *Shared Folders* > **Open Files**. Sort by name and look
+for `Inventario`: you see the user and the computer using it. From the same
+window, right-click > *Close Open File* releases the lock.
+
+With PowerShell, on the server:
+
+```powershell
+Get-SmbOpenFile | Where-Object Path -like "*Inventario*" |
+    Select-Object ClientUserName, ClientComputerName, Path
+```
+
+and to release it:
+
+```powershell
+Get-SmbOpenFile | Where-Object Path -like "*Inventario*" | Close-SmbOpenFile -Force
+```
+
+**If nobody appears to have it open** and the file stays locked, the handle is
+stale on the server side: closing it from the *Open Files* window usually does
+it. As a last resort, restart the Server service (`Restart-Service LanmanServer`),
+which disconnects every SMB session on that machine: do it out of hours.
+
+**The way to avoid the problem** is to update when nobody is using it: it takes
+a few seconds, and a glance at *Open Files* before starting tells you straight
+away whether you can go ahead.
+
+If you need the name free right now and cannot wait, Windows lets you **rename**
+an executable in use even when it will not let you delete it: rename
+`Inventario.exe` to `Inventario_old.exe`, put the new one in its place, and
+delete the old one once the workstation holding it has closed. The `_internal`
+folder, on the other hand, has to be replaced with the program closed.
 
 ### Running from source
 

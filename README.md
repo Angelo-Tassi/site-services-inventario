@@ -188,9 +188,56 @@ programma viene aggiornato: basta sostituire `Inventario.exe` sulla share.
 
 ## Aggiornare il programma
 
-Ricompila con `Compila EXE per Windows.bat` e sostituisci `Inventario.exe` nella
-cartella di rete, con nessuno che lo sta usando in quel momento. I dati non si
-toccano: stanno in `Inventario.xlsx`, che e' un file separato.
+Ricompila con `Compila EXE per Windows.bat`, oppure scarica il pacchetto nuovo
+dalla pagina Releases, e sostituisci il contenuto nella cartella di rete. **I
+dati non si toccano**: stanno in `Produzione`, e le cartelle `Backup` e
+`Collaudo` restano dove sono. I collegamenti sui desktop continuano a
+funzionare, perche' puntano allo stesso percorso.
+
+### Se `Inventario.exe` non si lascia cancellare
+
+Non e' un permesso mancante: **Windows blocca l'eseguibile finche' un processo
+avviato da li' e' in esecuzione**, anche quando quel processo gira sul computer
+di un altro. Basta un tecnico che ha lasciato il programma aperto. Con questo
+pacchetto sono bloccati anche i file dentro `_internal`.
+
+Capita anche che il programma sia stato chiuso ma il server tenga ancora aperto
+il collegamento: e' un handle SMB rimasto appeso.
+
+**Come trovare chi lo tiene aperto**, dal server che ospita la share:
+
+*Gestione computer* > *Cartelle condivise* > **File aperti**. Ordina per nome e
+cerca `Inventario`: vedi l'utente e il computer che lo stanno usando. Dalla
+stessa finestra, tasto destro > *Chiudi file aperto* rilascia il blocco.
+
+Con PowerShell, sempre sul server:
+
+```powershell
+Get-SmbOpenFile | Where-Object Path -like "*Inventario*" |
+    Select-Object ClientUserName, ClientComputerName, Path
+```
+
+e per rilasciarlo:
+
+```powershell
+Get-SmbOpenFile | Where-Object Path -like "*Inventario*" | Close-SmbOpenFile -Force
+```
+
+**Se non risulta aperto da nessuno** e il file resta bloccato, l'handle e'
+rimasto appeso lato server: chiuderlo dalla finestra *File aperti* di solito
+basta. In ultima istanza si riavvia il servizio Server
+(`Restart-Service LanmanServer`), che pero' disconnette tutte le sessioni SMB
+della macchina: si fa fuori orario.
+
+**Il modo per non incontrare il problema** e' fare l'aggiornamento quando non lo
+usa nessuno: dura pochi secondi, e un'occhiata a *File aperti* prima di
+cominciare dice subito se si puo' procedere.
+
+Se devi liberare il nome subito e non puoi aspettare, Windows consente di
+**rinominare** un eseguibile in uso anche quando non consente di cancellarlo:
+rinomina `Inventario.exe` in `Inventario_vecchio.exe`, metti al suo posto quello
+nuovo, e cancella il vecchio quando la postazione che lo teneva aperto avra'
+chiuso. La cartella `_internal`, invece, va sostituita a programma chiuso.
 
 ## Avvio dai sorgenti (per sviluppo)
 
