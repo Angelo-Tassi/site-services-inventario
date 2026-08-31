@@ -134,14 +134,6 @@ def raccogli():
                                          else "%d byte" % os.path.getsize(pieno)))
     except OSError as exc:
         righe.append("  non elencabile: %s" % exc)
-    doppioni = [n for n in ("Inventario.exe", "_internal")
-                if os.path.exists(os.path.join(config.app_dir(), n))]
-    if doppioni and os.path.isdir(os.path.join(config.app_dir(), "python")):
-        righe.append("")
-        righe.append("  ATTENZIONE: qui convivono due versioni del programma.")
-        righe.append("  Resti di un pacchetto precedente: %s" % ", ".join(doppioni))
-        righe.append("  Chi apre il vecchio .exe usa una versione superata.")
-
     _sezione(righe, "dati")
     percorso = config.load_data_path()
     if percorso:

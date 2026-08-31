@@ -19,8 +19,7 @@ if exist "%~dp0python\python.exe" (
 if errorlevel 1 (
     echo.
     echo Non e' stato possibile eseguire la diagnostica.
-    echo Se in questa cartella c'e' solo Inventario.exe, usa il pacchetto
-    echo senza eseguibile: la diagnostica ha bisogno dei file .py.
+    echo Controlla di aver estratto il pacchetto per intero in questa cartella.
 )
 
 rem  la finestra del blocco note aiuta a ritrovare il file da allegare

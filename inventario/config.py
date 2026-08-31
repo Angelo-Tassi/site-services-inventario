@@ -14,7 +14,6 @@ cosi' sono uguali per tutti gli utenti.
 
 import json
 import os
-import sys
 
 from . import store
 
@@ -32,9 +31,7 @@ DEFAULT_IPHONE_ROOM = "Site Services BAU"
 
 
 def app_dir():
-    """Cartella in cui si trova lo script (o l'eseguibile PyInstaller)."""
-    if getattr(sys, "frozen", False):
-        return os.path.dirname(os.path.abspath(sys.executable))
+    """Cartella del programma: quella che contiene Inventario.py."""
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 

@@ -1,6 +1,6 @@
 # Site Services : Inventario Iphone, Laptop e Tablet
 
-### [Apri la pagina del progetto](https://angelo-tassi.github.io/site-services-inventario/) &nbsp;·&nbsp; [Scarica il programma](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows-senza-exe.zip) &nbsp;·&nbsp; [English](README.en.md)
+### [Apri la pagina del progetto](https://angelo-tassi.github.io/site-services-inventario/) &nbsp;·&nbsp; [Scarica il programma](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip) &nbsp;·&nbsp; [English](README.en.md)
 
 > **Pagina del progetto:** <https://angelo-tassi.github.io/site-services-inventario/>
 > Da li' si scarica il programma, il modello Excel e si leggono le guide, in
@@ -31,7 +31,7 @@ gia' vecchio, e nessuno sa piu' dove sia finito un dispositivo.
 
 ## Scarica
 
-**[Scarica `Inventario-windows-senza-exe.zip`](../../releases/latest/download/Inventario-windows-senza-exe.zip)**
+**[Scarica `Inventario-windows.zip`](../../releases/latest/download/Inventario-windows.zip)**
 dalla pagina Releases. Dentro ci sono il Python ufficiale di python.org,
 firmato dalla Python Software Foundation, e il programma in chiaro come file
 `.py`: nessun eseguibile costruito da noi, quindi niente di non firmato da far
@@ -39,10 +39,6 @@ passare alla sicurezza aziendale.
 
 Serve anche il **[modello Excel da compilare](docs/Modello_inventario.xlsx)**,
 se hai laptop e tablet gia' censiti altrove da caricare in blocco.
-
-C'e' anche [`Inventario-windows.zip`](../../releases/latest/download/Inventario-windows.zip),
-con `Inventario.exe` al posto dei file `.py`: fa esattamente le stesse cose, in
-un file solo da avviare. Le istruzioni che seguono valgono per tutti e due.
 
 ## In due parole
 
@@ -193,7 +189,7 @@ puntano allo stesso percorso locale.
 
 ## Gli avvisi di sicurezza di Windows
 
-Il pacchetto consigliato non contiene nessun eseguibile costruito da noi, il che
+Il pacchetto non contiene nessun eseguibile costruito da noi, il che
 toglie di mezzo la causa piu' comune di segnalazione. Resta una sola accortezza,
 al momento del download:
 
@@ -241,26 +237,13 @@ finestra e della tabella, e dove Windows mette il desktop dell'utente.
 Il file contiene percorsi e nomi di stanza, niente di riservato: si manda a chi
 assiste e risponde in un colpo solo a domande che altrimenti costano giorni.
 
-## Compilare l'eseguibile da soli
+## Come viene costruito il pacchetto
 
-Non serve, se scarichi la release: l'eseguibile viene costruito
-automaticamente da [GitHub Actions](.github/workflows/build-windows.yml) su una
-macchina Windows a ogni versione pubblicata.
-
-Se preferisci compilarlo tu, su un qualsiasi PC Windows con Python installato
-doppio clic su **`Compila EXE per Windows.bat`**. Scarica gli strumenti
-necessari, compila e lascia tutto pronto nella cartella `Distribuzione`:
-
-```
-Distribuzione\
-    Inventario.exe                      il programma, ~15 MB, si basta da solo
-    Crea collegamento sul desktop.bat   utility per il collegamento
-    Come funziona.txt                   questo documento
-```
-
-Copia il contenuto di `Distribuzione` sulla postazione, poi collegala
-all'inventario condiviso con `Collega inventario condiviso.bat`.
-
+Non serve costruirlo: lo fa [GitHub Actions](.github/workflows/build-windows.yml)
+su una macchina Windows a ogni versione pubblicata. Il pacchetto e' il Python
+incorporabile ufficiale di python.org piu' il programma; la compilazione
+controlla la firma di `pythonw.exe`, prova un avvio vero e rifiuta di
+pubblicare se resta anche un solo file in sola lettura.
 
 ## Avvio dai sorgenti (per sviluppo)
 
@@ -291,8 +274,8 @@ va rifatto, non basta installare il nuovo Python.
 non ne trova nessuno lo dice con un avviso invece di chiudersi in silenzio;
 il diario di avvio finisce in `avvio.log`.
 
-Il problema riguarda **solo** l'esecuzione dai sorgenti su Mac: l'eseguibile
-Windows costruito con PyInstaller si porta dietro Tcl/Tk 8.6 e non ne risente.
+Il problema riguarda **solo** l'esecuzione dai sorgenti su Mac: il pacchetto
+Windows si porta dietro il suo Python con Tcl/Tk 8.6 e non ne risente.
 
 Il percorso del file dati si determina in quest'ordine: la variabile d'ambiente
 `INVENTARIO_FILE`, poi `inventario_percorso.json` accanto al programma o nel
@@ -1096,7 +1079,6 @@ aggiornati e gli altri aggiunti.
 ## Struttura del codice
 
 ```
-Compila EXE per Windows.bat       crea l'eseguibile autosufficiente
 Collega inventario condiviso.bat  punta la postazione all'inventario sulla share
 Crea collegamento sul desktop.bat mette l'icona sulla scrivania dell'utente
 Diagnostica.bat                   raccoglie le informazioni per chi assiste

@@ -1,6 +1,6 @@
 # Site Services : iPhone, Laptop and Tablet Inventory
 
-### [Open the project page](https://angelo-tassi.github.io/site-services-inventario/?lang=en) &nbsp;·&nbsp; [Download the program](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows-senza-exe.zip) &nbsp;·&nbsp; [Italiano](README.md)
+### [Open the project page](https://angelo-tassi.github.io/site-services-inventario/?lang=en) &nbsp;·&nbsp; [Download the program](https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip) &nbsp;·&nbsp; [Italiano](README.md)
 
 > **Project page:** <https://angelo-tassi.github.io/site-services-inventario/?lang=en>
 > From there you download the program and the Excel template, and read the
@@ -31,17 +31,13 @@ out of date, and nobody knows where a device ended up any more.
 
 ## Download
 
-**[Download `Inventario-windows-senza-exe.zip`](../../releases/latest/download/Inventario-windows-senza-exe.zip)**
+**[Download `Inventario-windows.zip`](../../releases/latest/download/Inventario-windows.zip)**
 from the Releases page. Inside are the official python.org Python, signed by the
 Python Software Foundation, and the program in plain sight as `.py` files: no
 executable built by us, so nothing unsigned to get past corporate security.
 
 You may also want the **[Excel template](docs/Modello_inventario.xlsx)** if you
 have laptops and tablets already recorded elsewhere to load in bulk.
-
-There is also [`Inventario-windows.zip`](../../releases/latest/download/Inventario-windows.zip),
-with `Inventario.exe` in place of the `.py` files: it does exactly the same
-things, in a single file to start. The instructions below apply to both.
 
 ## In short
 
@@ -191,7 +187,7 @@ local path.
 
 ## Windows security warnings
 
-The recommended package contains no executable built by us, which removes the
+The package contains no executable built by us, which removes the
 most common cause of a warning. One precaution remains, at download time:
 
 **Unblock the zip before extracting it.** Right-click the downloaded file >
@@ -237,14 +233,13 @@ the window and of the table, and where Windows puts the user's desktop.
 The file holds paths and room names, nothing confidential: send it to whoever
 helps you and it answers in one go questions that otherwise cost days.
 
-## Building the package yourself
+## How the package is built
 
-Not needed if you download the release: it is built automatically by
-[GitHub Actions](.github/workflows/build-windows.yml) on a Windows machine at
-every published version. To build it yourself, on any Windows PC with Python,
-double-click `Compila EXE per Windows.bat`: it produces the `Distribuzione`
-folder, ready to be copied onto a workstation and linked to the shared
-inventory.
+There is no need to build it: [GitHub Actions](.github/workflows/build-windows.yml)
+does it on a Windows machine at every published version. The package is the
+official python.org embeddable Python plus the program; the build checks the
+signature of `pythonw.exe`, tries a real start, and refuses to publish if even
+one file is left read-only.
 
 ## Permissions on the network folder
 

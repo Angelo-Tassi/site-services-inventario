@@ -151,12 +151,11 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.24.3 · alfa</div>
+  <div class="alpha">versione 0.25.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
-    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows-senza-exe.zip">Scarica il pacchetto</a>
-    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip">Versione con .exe</a>
+    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip">Scarica il pacchetto</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest">Tutte le versioni</a>
     <a class="btn alt" href="Modello_inventario.xlsx" download>Modello Excel da compilare</a>
     <a class="btn alt" href="formato-xls.html">Come preparare il file Excel</a>
@@ -168,12 +167,11 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
     invece sta sulla cartella di rete, uno solo per tutti, e il programma ci si
     collega in due clic. Il modello Excel serve a caricare in blocco laptop e tablet
     gia' censiti altrove.</p>
-  <p class="note"><b>Il pacchetto consigliato non contiene nessun eseguibile
-    costruito da noi</b>: dentro ci sono il Python ufficiale di python.org,
-    firmato dalla Python Software Foundation, e il programma in chiaro come file
-    <code>.py</code>. E' la versione da preferire dove la sicurezza aziendale
-    guarda gli eseguibili non firmati. La <i>Versione con .exe</i> fa esattamente
-    le stesse cose, in un file solo da avviare.</p>
+  <p class="note"><b>Nel pacchetto non c'e' nessun eseguibile costruito da
+    noi</b>: dentro ci sono il Python ufficiale di python.org, firmato dalla Python
+    Software Foundation, e il programma in chiaro come file <code>.py</code>. E'
+    quello che permette di installarlo anche dove la sicurezza aziendale guarda con
+    sospetto i binari non firmati.</p>
 </header>
 
 <section>
@@ -343,8 +341,9 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
 cd site-services-inventario
 pip install -r requirements.txt
 python Inventario.py</pre>
-  <p class="note">Su Windows c'e' anche <code>Compila EXE per Windows.bat</code>, che fa
-    tutto da solo. Su macOS serve un Python con Tk 8.6 o superiore: quello di python.org va bene.</p>
+  <p class="note">Su macOS serve un Python con Tk 8.6 o superiore: quello di
+    python.org va bene. Su Windows non serve niente di tutto questo: il pacchetto
+    pronto si porta dietro il suo Python.</p>
 </section>
 
 <footer>
@@ -360,12 +359,11 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.24.3 · alpha</div>
+  <div class="alpha">version 0.25.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
-    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows-senza-exe.zip">Download the package</a>
-    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip">Version with the .exe</a>
+    <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest/download/Inventario-windows.zip">Download the package</a>
     <a class="btn alt" href="https://github.com/Angelo-Tassi/site-services-inventario/releases/latest">All versions</a>
     <a class="btn alt" href="Import_template.xlsx" download>Excel template</a>
     <a class="btn alt" href="formato-xls.html?lang=en">How to prepare the Excel file</a>
@@ -377,12 +375,11 @@ python Inventario.py</pre>
     lives on the network folder instead, one for everybody, and the program links to
     it in two clicks. The Excel template is for loading laptops and tablets already
     recorded elsewhere.</p>
-  <p class="note"><b>The recommended package contains no executable built by
-    us</b>: inside there are the official python.org Python, signed by the Python
-    Software Foundation, and the program in plain sight as <code>.py</code>
-    files. It is the one to prefer where corporate security watches unsigned
-    executables. The <i>Version with the .exe</i> does exactly the same things,
-    in a single file to start.</p>
+  <p class="note"><b>There is no executable built by us in the package</b>:
+    inside there are the official python.org Python, signed by the Python Software
+    Foundation, and the program in plain sight as <code>.py</code> files. That is
+    what lets it be installed even where corporate security looks at unsigned
+    binaries with suspicion.</p>
 </header>
 
 <section>
@@ -549,9 +546,9 @@ python Inventario.py</pre>
 cd site-services-inventario
 pip install -r requirements.txt
 python Inventario.py</pre>
-  <p class="note">On Windows there is also <code>Compila EXE per Windows.bat</code>,
-    which does everything by itself. On macOS you need a Python with Tk 8.6 or newer:
-    the one from python.org works.</p>
+  <p class="note">On macOS you need a Python with Tk 8.6 or newer: the one from
+    python.org works. On Windows none of this is needed: the ready-made package
+    carries its own Python.</p>
 </section>
 
 <footer>

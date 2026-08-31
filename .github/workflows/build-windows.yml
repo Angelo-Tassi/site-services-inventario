@@ -1,18 +1,12 @@
-name: Compila i pacchetti Windows
+name: Compila il pacchetto Windows
 
-# Ad ogni tag "v*" costruisce il programma su una macchina Windows e allega alla
-# release tre cose:
-#   1. il pacchetto SENZA eseguibile nostro, che e' quello consigliato dove la
-#      sicurezza aziendale e' un tema: dentro c'e' il Python ufficiale di
-#      python.org, firmato dalla Python Software Foundation, e il programma in
-#      chiaro come file .py. Nessun binario prodotto da noi;
-#   2. il pacchetto con Inventario.exe da estrarre sulla share;
-#   3. il singolo eseguibile per chi lo preferisce.
+# Ad ogni tag "v*" costruisce il pacchetto su una macchina Windows e lo allega
+# alla release.
 #
-# Il pacchetto usa la forma "onedir": l'eseguibile sta accanto alle sue
-# librerie invece di scompattarsi in una cartella temporanea a ogni avvio.
-# Parte piu' in fretta da una share e da molti meno grattacapi agli antivirus,
-# che guardano male i file che si autoestraggono.
+# Dentro non c'e' nessun eseguibile costruito da noi: ci sono il Python
+# incorporabile ufficiale di python.org, firmato dalla Python Software
+# Foundation, e il programma in chiaro come file .py. E' quello che permette di
+# installarlo dove la sicurezza aziendale guarda i binari non firmati.
 on:
   push:
     tags: ["v*"]
@@ -32,127 +26,79 @@ jobs:
           python-version: "3.12"
 
       - name: Installa le dipendenze
-        run: python -m pip install --upgrade pip pyinstaller openpyxl
+        run: python -m pip install --upgrade pip openpyxl
 
-      - name: Prepara il pacchetto senza eseguibile nostro
+      - name: Monta il Python incorporabile
         shell: pwsh
         run: |
           $ver = "3.12.10"
           $zip = "python-$ver-embed-amd64.zip"
           Invoke-WebRequest "https://www.python.org/ftp/python/$ver/$zip" -OutFile $zip
-          New-Item -ItemType Directory -Force -Path Portatile\python | Out-Null
-          Expand-Archive $zip -DestinationPath Portatile\python
+          New-Item -ItemType Directory -Force -Path Pacchetto\python | Out-Null
+          Expand-Archive $zip -DestinationPath Pacchetto\python
 
           # Il pacchetto incorporabile di python.org non contiene Tkinter: si
           # prende dalla stessa versione ufficiale gia' installata sul runner.
           $full = $env:pythonLocation
-          Copy-Item "$full\DLLs\_tkinter.pyd" Portatile\python\
-          Copy-Item "$full\DLLs\tcl86t.dll"   Portatile\python\
-          Copy-Item "$full\DLLs\tk86t.dll"    Portatile\python\
-          Copy-Item "$full\DLLs\zlib1.dll"    Portatile\python\ -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force -Path Portatile\python\Lib | Out-Null
-          Copy-Item "$full\Lib\tkinter" Portatile\python\Lib\ -Recurse
-          Copy-Item "$full\tcl" Portatile\python\tcl -Recurse
+          Copy-Item "$full\DLLs\_tkinter.pyd" Pacchetto\python\
+          Copy-Item "$full\DLLs\tcl86t.dll"   Pacchetto\python\
+          Copy-Item "$full\DLLs\tk86t.dll"    Pacchetto\python\
+          Copy-Item "$full\DLLs\zlib1.dll"    Pacchetto\python\ -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path Pacchetto\python\Lib | Out-Null
+          Copy-Item "$full\Lib\tkinter" Pacchetto\python\Lib\ -Recurse
+          Copy-Item "$full\tcl" Pacchetto\python\tcl -Recurse
 
           # Percorsi di ricerca: la libreria compressa, questa cartella, la
           # cartella del programma (..), Lib e le librerie installate.
-          $pth = Get-ChildItem Portatile\python\python*._pth | Select-Object -First 1
+          $pth = Get-ChildItem Pacchetto\python\python*._pth | Select-Object -First 1
           $lib = (Get-Content $pth.FullName)[0]
           @(
             $lib, ".", "..", "Lib", "Lib\site-packages", "import site"
           ) | Set-Content $pth.FullName -Encoding ascii
 
-          python -m pip install --no-compile --target Portatile\python\Lib\site-packages openpyxl
+          python -m pip install --no-compile --target Pacchetto\python\Lib\site-packages openpyxl
 
       - name: Controlla la firma e che il programma parta davvero
         shell: pwsh
         run: |
-          Get-AuthenticodeSignature Portatile\python\pythonw.exe |
+          Get-AuthenticodeSignature Pacchetto\python\pythonw.exe |
             Format-List Status, StatusMessage, SignerCertificate
-          Copy-Item Inventario.py Portatile\
-          Copy-Item inventario Portatile\inventario -Recurse
+          Copy-Item Inventario.py Pacchetto\
+          Copy-Item inventario Pacchetto\inventario -Recurse
           # import di tutto quello che serve, con i percorsi veri del pacchetto
-          Portatile\python\python.exe -c "import tkinter, openpyxl, inventario.ui; print('avvio possibile')"
+          Pacchetto\python\python.exe -c "import tkinter, openpyxl, inventario.ui; print('avvio possibile')"
 
-      - name: Prepara la cartella senza eseguibile da copiare in rete
+      - name: Prepara la cartella da distribuire
         shell: pwsh
         run: |
-          Copy-Item LEGGIMI-PRIMA.txt Portatile\
-          Copy-Item "Crea collegamento sul desktop.bat" Portatile\
-          Copy-Item "Avvia Inventario.bat" Portatile\
-          Copy-Item "Diagnostica.bat" Portatile\
-          Copy-Item "Collega inventario condiviso.bat" Portatile\
-          Copy-Item README.md Portatile\"Come funziona.txt"
-          New-Item -ItemType Directory -Force -Path Portatile\Backup | Out-Null
-          Copy-Item Backup\.gitignore Portatile\Backup\ -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force -Path Portatile\Produzione | Out-Null
-          Copy-Item Produzione\.gitignore Portatile\Produzione\ -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force -Path Portatile\Collaudo | Out-Null
-          Copy-Item Collaudo\*.xlsx Portatile\Collaudo\
-          Copy-Item Collaudo\README.md Portatile\Collaudo\
-          Copy-Item Collaudo\README.en.md Portatile\Collaudo\
-          # le cartelle di lavoro del build non viaggiano con il pacchetto
-          Remove-Item Portatile\inventario\__pycache__ -Recurse -ErrorAction SilentlyContinue
-          # I file presi dal Python installato sul runner arrivano con
-          # l'attributo di sola lettura, e l'archivio se lo porta dietro fino
-          # alla share: chi poi deve aggiornare il programma si ritrova file
-          # che non si lasciano sostituire. Si toglie qui, una volta per tutte.
-          Get-ChildItem Portatile -Recurse -File | ForEach-Object {
+          Copy-Item LEGGIMI-PRIMA.txt Pacchetto\
+          Copy-Item "Crea collegamento sul desktop.bat" Pacchetto\
+          Copy-Item "Collega inventario condiviso.bat" Pacchetto\
+          Copy-Item "Diagnostica.bat" Pacchetto\
+          Copy-Item "Avvia Inventario.bat" Pacchetto\
+          Copy-Item README.md Pacchetto\"Come funziona.txt"
+          New-Item -ItemType Directory -Force -Path Pacchetto\Produzione | Out-Null
+          Copy-Item Produzione\.gitignore Pacchetto\Produzione\ -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path Pacchetto\Collaudo | Out-Null
+          Copy-Item Collaudo\*.xlsx Pacchetto\Collaudo\
+          Copy-Item Collaudo\README.md Pacchetto\Collaudo\
+          Copy-Item Collaudo\README.en.md Pacchetto\Collaudo\
+          Remove-Item Pacchetto\inventario\__pycache__ -Recurse -ErrorAction SilentlyContinue
+          Get-ChildItem Pacchetto -Recurse -File | ForEach-Object {
             if ($_.IsReadOnly) { $_.IsReadOnly = $false }
           }
-          Compress-Archive -Path Portatile\* -DestinationPath Inventario-windows-senza-exe.zip
+          Compress-Archive -Path Pacchetto\* -DestinationPath Inventario-windows.zip
 
       - name: Nessun file in sola lettura nel pacchetto
         shell: pwsh
         run: |
-          $bloccati = Get-ChildItem Portatile -Recurse -File |
+          $bloccati = Get-ChildItem Pacchetto -Recurse -File |
             Where-Object { $_.IsReadOnly }
           if ($bloccati) {
             $bloccati | Select-Object -First 10 FullName | Format-Table
-            throw "$($bloccati.Count) file sono in sola lettura: sulla share non si lasceranno aggiornare."
+            throw "$($bloccati.Count) file sono in sola lettura: sulla postazione non si lasceranno aggiornare."
           }
           Write-Host "Nessun file in sola lettura."
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Inventario-windows-senza-exe
-          path: Inventario-windows-senza-exe.zip
-
-      - name: Compila il pacchetto da estrarre sulla share
-        run: >
-          python -m PyInstaller --noconfirm --clean --onedir --noconsole
-          --name Inventario --collect-submodules openpyxl Inventario.py
-
-      - name: Compila anche il singolo eseguibile
-        run: >
-          python -m PyInstaller --noconfirm --clean --onefile --noconsole
-          --distpath dist-unico --workpath build-unico
-          --name Inventario --collect-submodules openpyxl Inventario.py
-
-      - name: Prepara la cartella da copiare in rete
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path Distribuzione | Out-Null
-          Copy-Item dist\Inventario\* Distribuzione\ -Recurse
-          Copy-Item LEGGIMI-PRIMA.txt Distribuzione\
-          Copy-Item "Crea collegamento sul desktop.bat" Distribuzione\
-          Copy-Item "Diagnostica.bat" Distribuzione\
-          Copy-Item "Collega inventario condiviso.bat" Distribuzione\
-          Copy-Item README.md Distribuzione\"Come funziona.txt"
-          # le cartelle di lavoro esistono gia' quando il programma parte
-          New-Item -ItemType Directory -Force -Path Distribuzione\Backup | Out-Null
-          Copy-Item Backup\.gitignore Distribuzione\Backup\ -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force -Path Distribuzione\Produzione | Out-Null
-          Copy-Item Produzione\.gitignore Distribuzione\Produzione\ -ErrorAction SilentlyContinue
-          # i file di collaudo viaggiano con il programma
-          New-Item -ItemType Directory -Force -Path Distribuzione\Collaudo | Out-Null
-          Copy-Item Collaudo\*.xlsx Distribuzione\Collaudo\
-          Copy-Item Collaudo\README.md Distribuzione\Collaudo\
-          Copy-Item Collaudo\README.en.md Distribuzione\Collaudo\
-          Get-ChildItem Distribuzione -Recurse -File | ForEach-Object {
-            if ($_.IsReadOnly) { $_.IsReadOnly = $false }
-          }
-          Compress-Archive -Path Distribuzione\* -DestinationPath Inventario-windows.zip
 
       - uses: actions/upload-artifact@v4
         with:
@@ -163,7 +109,4 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            Inventario-windows-senza-exe.zip
-            Inventario-windows.zip
-            dist-unico/Inventario.exe
+          files: Inventario-windows.zip
