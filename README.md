@@ -94,11 +94,13 @@ Su un PC qualsiasi:
 1. scarica lo zip ed **estrailo in una cartella locale**, per esempio
    `C:\Inventario`. Non sulla share;
 2. doppio clic su **`Collega inventario condiviso.bat`**;
-3. incolla il percorso della cartella di rete quando lo chiede:
+3. **si apre una finestra**: sfoglia fino alla cartella di rete e scegli quella.
+   Niente percorsi da copiare.
 
-```
-\\server\Condivisa\Inventario
-```
+Se la finestra non si aprisse, il percorso si puo' sempre incollare a mano -
+`\\server\Condivisa\Inventario`, o la lettera dell'unita' mappata,
+`F:\Inventario`. Virgolette, barre al contrario e una barra finale di troppo
+non danno fastidio.
 
 Il programma ci pensa lui: se sulla share l'inventario non c'e' ancora, lo crea
 vuoto in `Produzione\Inventario.xlsx`; se c'e' gia', non lo tocca. Poi scrive
@@ -139,6 +141,16 @@ mette l'icona sulla scrivania dell'utente e ne lascia una copia nella cartella.
 
 Da quel momento il tecnico fa doppio clic sull'icona e lavora sull'inventario di
 tutti, senza sapere niente di percorsi di rete.
+
+### Cambiare inventario dopo
+
+Si puo' fare anche dal programma, senza toccare nessun file: *Impostazioni* >
+**Collega inventario condiviso...**, si sfoglia fino alla cartella e si
+conferma. Il programma dice prima cosa succedera' - se l'inventario e' gia' li'
+non lo tocca, se non c'e' ne crea uno vuoto - e poi va riaperto.
+
+E' la strada comoda quando ogni tecnico si installa il programma da solo: apre,
+sceglie la cartella dell'inventario di produzione, e ha finito.
 
 ### Cosa serve sulla cartella di rete
 

@@ -130,16 +130,13 @@ def main():
     print("  Collega questa postazione all'inventario condiviso")
     print("=" * 68)
     print()
-    print("Serve il percorso della cartella condivisa in cui sta - o in cui")
-    print("va creato - l'inventario di tutti. Per esempio:")
+    print("Serve la cartella condivisa in cui sta - o in cui va creato -")
+    print("l'inventario di tutti. Per esempio:")
     print()
     print("   \\\\server\\Condivisa\\Inventario")
     print("   F:\\Inventario")
     print()
-    print("Per copiarlo: in Esplora risorse, Maiusc + tasto destro sulla")
-    print("cartella  >  Copia come percorso. Le virgolette non danno")
-    print("fastidio, e vanno bene anche le barre al contrario.")
-    print()
+
     attuale, sorgente = config.configured_data_path()
     if attuale:
         print("Adesso questa installazione apre:")
@@ -147,13 +144,16 @@ def main():
         print("   (scritto in %s)" % sorgente)
         print()
 
-    print("Incollalo qui sotto e premi Invio.")
-    print("Oppure premi solo Invio: si apre una finestra per sceglierla.")
+    print("Si apre una finestra per scegliere la cartella.")
     print()
-    cartella = _chiedi("Cartella condivisa: ")
+    cartella = scegli_cartella()
     if not cartella:
-        print("Apro la finestra di scelta...")
-        cartella = scegli_cartella()
+        # niente finestra, o annullata: resta la strada di scriverlo
+        print("Nessuna cartella scelta dalla finestra.")
+        print("Puoi incollare il percorso qui sotto, oppure premere Invio")
+        print("per annullare.")
+        print()
+        cartella = _chiedi("Cartella condivisa: ")
     if not cartella:
         print("\nAnnullato: non e' stato cambiato niente.")
         return 1

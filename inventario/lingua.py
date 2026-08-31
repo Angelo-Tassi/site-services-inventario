@@ -470,6 +470,32 @@ EN = {
         "You are about to empty everyone's inventory.\n\nTo go ahead, type exactly:\n%s",
     'Stampare una pagina separata per ogni stanza?\n\nNo = un unico elenco.':
         'Print a separate page for each room?\n\nNo = a single list.',
+    'Collega inventario condiviso...':
+        'Link shared inventory...',
+    "Scegli la cartella condivisa dell'inventario":
+        'Choose the shared inventory folder',
+    "Gia' collegato":
+        'Already linked',
+    "E' gia' questo l'inventario aperto:\n\n%s":
+        'This is already the inventory in use:\n\n%s',
+    'Collega inventario condiviso':
+        'Link shared inventory',
+    "L'inventario e' gia' li' e non verra' toccato.":
+        'The inventory is already there and will not be touched.',
+    "Li' non c'e' ancora nessun inventario: ne verra' creato uno vuoto.":
+        'There is no inventory there yet: an empty one will be created.',
+    "%s\n\n%s\n\nDa adesso questa postazione lavorera' su quel file, e\nl'inventario aperto ora non verra' piu' usato ne' modificato.\n\nIl programma va chiuso e riaperto. Procedo?":
+        '%s\n\n%s\n\nFrom now on this workstation will work on that file, and the\ninventory open now will no longer be used or changed.\n\nThe program has to be closed and reopened. Go ahead?',
+    'Collegamento non riuscito':
+        'Linking failed',
+    'Collegato':
+        'Linked',
+    'Questa postazione ora apre:\n\n%s\n\nRiapri il programma per lavorarci.':
+        'This workstation now opens:\n\n%s\n\nReopen the program to work on it.',
+    'Inventario non raggiungibile':
+        'Inventory not reachable',
+    "Questo programma deve aprire l'inventario condiviso:\n\n%s\n\nIn questo momento non si raggiunge. Di solito e' la cartella\ndi rete che non risponde, o la connessione.\n\nControlla di vedere quella cartella da Esplora risorse, poi\nriapri il programma. Non viene creato nessun inventario\nlocale: si lavora tutti sullo stesso file.\n\nIl percorso e' scritto in:\n%s":
+        'This program has to open the shared inventory:\n\n%s\n\nIt cannot be reached right now. Usually it is the network\nfolder not answering, or the connection.\n\nCheck that you can see that folder in File Explorer, then\nreopen the program. No local inventory is created: everybody\nworks on the same file.\n\nThe path is written in:\n%s',
 }
 
 # ------------------------------------------------- colonne dei file prodotti

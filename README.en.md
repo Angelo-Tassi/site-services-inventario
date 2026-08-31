@@ -95,11 +95,12 @@ On any PC:
    `C:\Inventario`. Not onto the share;
 2. double-click **`Collega inventario condiviso.bat`** ("link shared
    inventory");
-3. paste the path of the network folder when asked:
+3. **a window opens**: browse to the network folder and pick it. No paths to
+   copy.
 
-```
-\\server\Shared\Inventory
-```
+If the window does not open, the path can always be pasted by hand -
+`\\server\Shared\Inventory`, or the mapped drive letter, `F:\Inventory`.
+Quotes, reversed slashes and one trailing slash too many do no harm.
 
 The program takes it from there: if the inventory is not on the share yet, it
 creates an empty one at `Produzione\Inventario.xlsx`; if it is already there, it
@@ -138,6 +139,17 @@ it puts the icon on the user's desktop and leaves a copy in the folder.
 
 From then on the technician double-clicks the icon and works on everybody's
 inventory, knowing nothing about network paths.
+
+### Changing inventory later
+
+It can also be done from the program, touching no files: *Settings* > **Link
+shared inventory...**, browse to the folder and confirm. The program says first
+what will happen - if the inventory is already there it is left alone, if not an
+empty one is created - and then it has to be reopened.
+
+It is the convenient route when each technician installs the program
+themselves: they open it, pick the production inventory folder, and they are
+done.
 
 ### What the network folder needs
 

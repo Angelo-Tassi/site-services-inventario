@@ -367,11 +367,17 @@ class RoomsDialog(_Modal):
         ).grid(row=4, column=0, columnspan=3, sticky="w", pady=(10, 0))
         buttons = ttk.Frame(body)
         buttons.grid(row=5, column=0, columnspan=3, sticky="we", pady=(16, 0))
+        ttk.Button(buttons, text=T("Collega inventario condiviso..."),
+                   command=self._collega).pack(side="left", padx=(0, 8))
         ttk.Button(buttons, text=T("Ripristina da una copia..."),
                    command=self._ripristina).pack(side="left")
         ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
         ttk.Button(buttons, text=T("Salva"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
+
+    def _collega(self):
+        self.result = {"collega": True}
+        self.destroy()
 
     def _ripristina(self):
         self.result = {"ripristina": True}
@@ -2501,12 +2507,53 @@ class App(tk.Tk):
             % (ripristinati, quando.strftime("%d/%m/%Y %H:%M:%S"), precedente),
             parent=self)
 
+    def on_collega(self):
+        """Sceglie la cartella condivisa in cui sta l'inventario di tutti."""
+        from . import configura
+        attuale = os.path.dirname(os.path.dirname(os.path.abspath(self.store.path)))
+        cartella = filedialog.askdirectory(
+            parent=self, title=T("Scegli la cartella condivisa dell'inventario"),
+            initialdir=attuale if os.path.isdir(attuale) else None)
+        if not cartella:
+            return
+        percorso = configura.percorso_inventario(cartella)
+        if os.path.abspath(percorso) == os.path.abspath(self.store.path):
+            messagebox.showinfo(
+                T("Gia' collegato"),
+                T("E' gia' questo l'inventario aperto:\n\n%s") % percorso,
+                parent=self)
+            return
+        esiste = os.path.exists(percorso)
+        if not messagebox.askyesno(
+            T("Collega inventario condiviso"),
+            T("%s\n\n%s\n\nDa adesso questa postazione lavorera' su quel file, e\n"
+              "l'inventario aperto ora non verra' piu' usato ne' modificato.\n\n"
+              "Il programma va chiuso e riaperto. Procedo?")
+            % (percorso, T("L'inventario e' gia' li' e non verra' toccato.") if esiste
+               else T("Li' non c'e' ancora nessun inventario: ne verra' creato uno vuoto.")),
+            parent=self
+        ):
+            return
+        try:
+            percorso, _ = configura.collega(cartella)
+        except InventoryError as exc:
+            messagebox.showerror(T("Collegamento non riuscito"), str(exc), parent=self)
+            return
+        messagebox.showinfo(
+            T("Collegato"),
+            T("Questa postazione ora apre:\n\n%s\n\nRiapri il programma per lavorarci.")
+            % percorso, parent=self)
+        self.destroy()
+
     def on_settings(self):
         result = RoomsDialog(self, self.cfg["rooms"], self.cfg["types"],
                              self.cfg.get("loan_rooms", []),
                              self.cfg.get("iphone_room", ""),
                              lang.corrente()).show()
         if not result:
+            return
+        if result.get("collega"):
+            self.on_collega()
             return
         if result.get("ripristina"):
             self.on_restore(scegli=True)

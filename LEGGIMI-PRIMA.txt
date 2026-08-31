@@ -27,15 +27,14 @@ L'IDEA IN UNA RIGA
 
    b) doppio clic su  "Collega inventario condiviso.bat";
 
-   c) incolla il percorso della cartella di rete, per esempio
+   c) si apre una finestra: sfoglia fino alla cartella di rete e
+      scegli quella. Niente percorsi da copiare.
+
+      Se la finestra non si aprisse, si puo' incollare il percorso
+      a mano, per esempio
          \\server\Condivisa\Inventario
       oppure
          F:\Inventario
-
-      Per copiarlo: in Esplora risorse, Maiusc + tasto destro sulla
-      cartella > Copia come percorso. Le virgolette non danno
-      fastidio. Se preferisci, premi solo Invio: si apre una
-      finestra per scegliere la cartella.
 
    Se sulla rete l'inventario non c'e' ancora viene creato vuoto,
    in Produzione\Inventario.xlsx. Se c'e' gia', non viene toccato.
@@ -71,6 +70,9 @@ L'IDEA IN UNA RIGA
    scrivania dell'utente.
 
    Da li' in poi si apre con doppio clic sull'icona.
+
+   In qualsiasi momento si puo' cambiare inventario dal programma:
+   Impostazioni > Collega inventario condiviso...
 
 
 AGGIORNARE IL PROGRAMMA PIU' AVANTI
@@ -119,8 +121,14 @@ THE IDEA IN ONE LINE
    b) double-click  "Collega inventario condiviso.bat"
       (link shared inventory);
 
-   c) paste the path of the network folder, for example
+   c) a window opens: browse to the network folder and pick it.
+      No paths to copy.
+
+      If the window does not open, the path can be pasted by hand,
+      for example
          \\server\Shared\Inventory
+      or
+         F:\Inventory
       or
          F:\Inventory
 
@@ -163,6 +171,9 @@ THE IDEA IN ONE LINE
    user's desktop.
 
    From then on it opens with a double-click on the icon.
+
+   The inventory can be changed at any time from the program:
+   Settings > Link shared inventory...
 
 
 UPDATING THE PROGRAM LATER
