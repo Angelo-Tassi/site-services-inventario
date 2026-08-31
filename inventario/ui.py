@@ -17,7 +17,8 @@ from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
                     MESI_CONSERVAZIONE,
                     InventoryStore, NON_DISPONIBILE, SPEDITO, clean,
                     is_iphone, is_on_loan, is_shipped, new_item, norm_tag,
-                    puo_essere_eliminato, rows_from_workbook, testo_spedizione,
+                    puo_essere_eliminato, righe_separatore, rows_from_workbook,
+                    sembra_un_foglio_da_importare, testo_spedizione,
                     valore_visibile)
 
 NO_ROOM_IT = "(senza stanza)"
@@ -1638,6 +1639,31 @@ class App(tk.Tk):
             return
         self._sync_filter_values()
         self.show_home()
+        self._avvisa_se_foglio_da_importare()
+
+    def _avvisa_se_foglio_da_importare(self):
+        """Dice all'utente se il file aperto e' un foglio da importare.
+
+        Chi ci finisce dentro vede un inventario che sembra caricato ma con le
+        stanze vuote e i nomi delle stanze in elenco come dispositivi, e non ha
+        nessun modo di capire perche'. Vale la pena dirlo subito.
+        """
+        separatori = righe_separatore(self.store.items, self.cfg.get("rooms"))
+        if not separatori:
+            return
+        messagebox.showwarning(
+            T("Questo file non e' un inventario"),
+            T("Il file aperto e' un foglio da IMPORTARE, non un inventario:\n%s\n\n"
+              "Contiene le righe che dividono i dispositivi per stanza (%s),\n"
+              "che qui compaiono in elenco come se fossero dispositivi. Per\n"
+              "questo le stanze restano vuote.\n\n"
+              "Come sistemare:\n"
+              "1. chiudi il programma;\n"
+              "2. cancella il file inventario_percorso.json accanto al programma,\n"
+              "   se c'e': e' li' che resta memorizzata la scelta sbagliata;\n"
+              "3. riapri: l'inventario vuoto viene creato da solo in Produzione;\n"
+              "4. carica questo foglio con  Importa xls...  da dentro il programma.")
+            % (self.store.path, ", ".join(separatori[:3])), parent=self)
 
     def _sync_filter_values(self):
         rooms = list(self.cfg["rooms"])
@@ -2508,10 +2534,27 @@ def choose_data_file(root):
     if answer is None:
         return None
     if answer:
-        return filedialog.askopenfilename(
-            parent=root, title=T("Seleziona il file inventario"),
-            initialdir=cartella,
-            filetypes=[(T("File Excel"), "*.xlsx")]) or None
+        while True:
+            scelto = filedialog.askopenfilename(
+                parent=root, title=T("Seleziona il file inventario"),
+                initialdir=config.production_dir() if os.path.isdir(
+                    config.production_dir()) else cartella,
+                filetypes=[(T("File Excel"), "*.xlsx")]) or None
+            if not scelto:
+                return None
+            da_importare, motivo = sembra_un_foglio_da_importare(
+                scelto, config.load_shared_config(scelto).get("rooms"))
+            if not da_importare:
+                return scelto
+            messagebox.showwarning(
+                T("Questo non e' un inventario"),
+                T("%s\n\n%s\n\nUn foglio del genere si CARICA in un inventario con\n"
+                  "Importa xls..., non si apre come inventario: aprendolo, le\n"
+                  "righe separatore diventerebbero dispositivi e nessun\n"
+                  "dispositivo avrebbe una stanza.\n\n"
+                  "Scegli Annulla, lascia creare l'inventario vuoto, e importa\n"
+                  "questo file da dentro il programma.")
+                % (os.path.basename(scelto), motivo), parent=root)
     return filedialog.asksaveasfilename(
         parent=root, title=T("Crea il file inventario"),
         defaultextension=".xlsx", initialdir=cartella,
@@ -2521,6 +2564,20 @@ def choose_data_file(root):
 
 def main():
     path = config.load_data_path()
+    if not path:
+        # Al primo avvio l'inventario si crea da solo, in Produzione accanto al
+        # programma. Chiedere all'utente dove metterlo era il modo piu' rapido
+        # per ritrovarsi come inventario un file di prova scelto per sbaglio:
+        # la domanda si fa solo se qui non si puo' scrivere davvero.
+        candidato = config.default_data_path()
+        try:
+            cartella = os.path.dirname(os.path.abspath(candidato))
+            if not os.path.isdir(cartella):
+                os.makedirs(cartella)
+            InventoryStore(candidato).create_if_missing()
+            path = candidato
+        except (OSError, InventoryError):
+            path = None
     if not path or not os.path.isdir(os.path.dirname(os.path.abspath(path))):
         root = tk.Tk()
         root.withdraw()

@@ -170,6 +170,46 @@ def separatore_con_avanzi(row, mapping, tags):
     return tags[testo]
 
 
+def righe_separatore(items, rooms):
+    """I dispositivi che in realta' sono righe separatore di stanza.
+
+    Se ne compaiono, il file aperto non e' un inventario ma un foglio da
+    importare: l'inventario vero non contiene una riga il cui identificativo e'
+    il nome di una stanza. E' l'unico modo, guardando i dati, di accorgersi che
+    e' stato scambiato un file per l'altro.
+    """
+    tags = tag_stanze(rooms or [])
+    trovate = []
+    for it in items or []:
+        testo = clean(it.get("asset_tag")).upper().strip(" :-\u2013\u2014.\t")
+        if testo in tags and not clean(it.get("tipo")) and not clean(it.get("modello")):
+            trovate.append(it.get("asset_tag"))
+    return trovate
+
+
+def sembra_un_foglio_da_importare(path, rooms):
+    """Guarda un file gia' esistente e dice se e' un foglio da importare.
+
+    Ritorna (si_o_no, motivo). Serve prima di adottare un file come inventario:
+    scegliere per sbaglio un file di prova significa ritrovarsi le righe
+    separatore in elenco come se fossero dispositivi, e nessuna stanza.
+    """
+    try:
+        store = InventoryStore(path)
+        items = store.load()
+    except Exception:
+        return False, ""
+    separatori = righe_separatore(items, rooms)
+    if separatori:
+        return True, ("Contiene righe separatore di stanza (%s): sono le righe "
+                      "che dividono un foglio da importare."
+                      % ", ".join(separatori[:3]))
+    if items and not any(clean(it.get("stanza")) for it in items):
+        return True, ("Nessuno dei %d dispositivi ha una stanza: manca la "
+                      "colonna Stanza." % len(items))
+    return False, ""
+
+
 LOCK_TIMEOUT = 20.0     # secondi di attesa prima di rinunciare
 LOCK_STALE_AFTER = 120  # secondi dopo i quali un lock e' considerato abbandonato
 

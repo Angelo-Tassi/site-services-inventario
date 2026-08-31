@@ -72,8 +72,13 @@ regenerated with `.venv/bin/python tests/genera_file_di_prova.py`.
 
 Do not move them and do not copy them elsewhere: they are part of the program,
 they are updated along with it and they serve anyone who has to run the trial
-again. When the program asks you for a file, open them straight from this
-folder.
+again.
+
+**These files are loaded only with  Import xls...  from inside the program.**
+They are not inventories: they are sheets to import, and they contain the
+separator rows that divide devices by room. Open one *as* an inventory and those
+rows become devices, and no device has a room. The program now notices and tells
+you, but the rule stands: they are imported, not opened.
 
 ## Real inventories live outside
 

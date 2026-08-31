@@ -4,4 +4,4 @@ Applicazione desktop per Windows con i dati in un unico file .xlsx
 su cartella di rete.
 """
 
-__version__ = "0.22.2-alpha"
+__version__ = "0.23.0-alpha"

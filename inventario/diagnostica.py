@@ -39,7 +39,8 @@ def _desktop():
 
 def raccogli():
     from . import __version__, config
-    from .store import InventoryStore, rows_from_workbook
+    from .store import (InventoryStore, righe_separatore,
+                        rows_from_workbook)
 
     righe = ["RAPPORTO DI DIAGNOSTICA - Inventario Site Services",
              "generato il %s" % datetime.now().strftime("%d/%m/%Y %H:%M:%S")]
@@ -70,7 +71,12 @@ def raccogli():
 
     _sezione(righe, "dati")
     percorso = config.load_data_path()
-    righe.append("percorso inventario : %s" % percorso)
+    if percorso:
+        righe.append("percorso inventario : %s" % percorso)
+    else:
+        percorso = config.default_data_path()
+        righe.append("percorso inventario : nessuno ancora scelto")
+        righe.append("verra' creato in    : %s" % percorso)
     righe.append("esiste              : %s" % os.path.exists(percorso or ""))
     if percorso and os.path.exists(percorso):
         righe.append("dimensione          : %d byte" % os.path.getsize(percorso))
@@ -100,14 +106,14 @@ def raccogli():
                 conteggio.get(it.get("stanza") or "(senza stanza)", 0) + 1
         for stanza, quanti in sorted(conteggio.items()):
             righe.append("  %-34s %d" % (stanza, quanti))
-        sospetti = [it["asset_tag"] for it in items
-                    if it["asset_tag"].upper() in
-                    {str(r).upper() for r in cfg.get("rooms") or []}
-                    or it["asset_tag"].upper() in ("BAU", "KIOSK", "DISASTER")]
+        sospetti = righe_separatore(items, cfg.get("rooms"))
         if sospetti:
             righe.append("")
-            righe.append("  ATTENZIONE: righe separatore finite in inventario come")
-            righe.append("  se fossero dispositivi: %s" % ", ".join(sospetti))
+            righe.append("  ATTENZIONE: questo file NON e' un inventario, e' un foglio")
+            righe.append("  da importare. Contiene le righe separatore di stanza")
+            righe.append("  (%s)," % ", ".join(sospetti[:3]))
+            righe.append("  che qui compaiono come se fossero dispositivi: per questo")
+            righe.append("  le stanze restano vuote.")
     except Exception as exc:
         righe.append("lettura non riuscita: %r" % exc)
 

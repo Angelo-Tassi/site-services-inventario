@@ -244,6 +244,44 @@ Vale la pena parlarne con chi gestisce la sicurezza **prima** di distribuirlo su
 molte postazioni: uno strumento interno non firmato e' una situazione normale,
 che di solito si risolve con una riga di autorizzazione.
 
+## Il primo avvio, e un errore che costa caro
+
+Alla prima apertura il programma **crea da solo** l'inventario vuoto in
+`Produzione\Inventario.xlsx`, accanto a se stesso. Non chiede niente e non c'e'
+niente da scegliere: e' cosi' che l'inventario resta uno solo per tutti.
+
+Prima chiedeva dove fosse il file, ed era una domanda pericolosa. Chi rispondeva
+indicando un foglio Excel da caricare - il file di prova in `Collaudo\`, o
+l'inventario ricevuto da qualcun altro - **adottava quel foglio come
+inventario**. Il risultato non somiglia a un errore:
+
+- i dispositivi ci sono tutti, ma **nessuno ha una stanza** e le schede delle
+  stanze restano a zero;
+- le righe che nel foglio dividono le stanze (`SITE SERVICES BAU`, `KIOSK`...)
+  compaiono **in elenco come se fossero dispositivi**;
+- aggiungere un dispositivo a mano funziona benissimo, il che sembra escludere
+  un problema di configurazione;
+- l'esportazione riproduce le righe separatore, perche' ormai sono dati.
+
+Sembra un difetto dell'importazione, e non lo e': quel foglio non e' mai stato
+importato: e' stato *aperto*.
+
+**Un foglio Excel da caricare non si apre mai come inventario.** Si importa da
+dentro il programma, con *Importa xls...*: e' li' che le righe separatore
+vengono lette come divisioni per stanza invece che come dispositivi.
+
+Adesso il programma se ne accorge da solo: se il file aperto contiene righe
+separatore lo dice all'avvio e spiega come uscirne, e se qualcuno prova a
+sceglierlo a mano lo rifiuta.
+
+### Se ci sei gia' finito
+
+1. chiudi il programma;
+2. cancella `inventario_percorso.json` accanto al programma, se c'e': e' li' che
+   resta memorizzata la scelta sbagliata;
+3. riapri: l'inventario vuoto viene creato da solo in `Produzione\`;
+4. carica il foglio con *Importa xls...*, da dentro il programma.
+
 ## Quando qualcosa non torna: la diagnostica
 
 Nella cartella del programma c'e' **`Diagnostica.bat`**. Doppio clic, e in una

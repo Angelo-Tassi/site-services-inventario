@@ -71,8 +71,14 @@ con `.venv/bin/python tests/genera_file_di_prova.py`.
 ## I file di prova restano qui
 
 Non spostarli e non copiarli altrove: fanno parte del programma, vengono
-aggiornati insieme a lui e servono a chiunque debba rifare il collaudo. Quando
-il programma ti chiede un file, aprili direttamente da questa cartella.
+aggiornati insieme a lui e servono a chiunque debba rifare il collaudo.
+
+**Questi file si caricano solo con  Importa xls...  da dentro il programma.**
+Non sono inventari: sono fogli da importare, e contengono le righe separatore
+che dividono i dispositivi per stanza. Se ne apri uno *come* inventario, quelle
+righe diventano dispositivi e nessun dispositivo ha una stanza. Il programma
+ormai se ne accorge e te lo dice, ma la regola resta: si importano, non si
+aprono.
 
 ## Gli inventari veri stanno fuori
 

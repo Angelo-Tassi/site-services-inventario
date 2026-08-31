@@ -238,6 +238,44 @@ It is worth talking to whoever runs security **before** deploying to many
 workstations: an unsigned internal tool is a normal situation, usually settled
 with one allow rule.
 
+## The first launch, and a costly mistake
+
+On first opening, the program **creates the empty inventory by itself** in
+`Produzione\Inventario.xlsx`, next to itself. It asks nothing and there is
+nothing to choose: that is how the inventory stays one for everybody.
+
+It used to ask where the file was, and that was a dangerous question. Anyone who
+answered by pointing at an Excel sheet meant for loading - the test file in
+`Collaudo\`, or an inventory received from somebody else - **adopted that sheet
+as the inventory**. The result does not look like an error:
+
+- every device is there, but **none has a room** and the room cards stay at
+  zero;
+- the rows that separate the rooms in the sheet (`SITE SERVICES BAU`,
+  `KIOSK`...) appear **in the list as if they were devices**;
+- adding a device by hand works perfectly, which seems to rule out a
+  configuration problem;
+- the export reproduces the separator rows, because by now they are data.
+
+It looks like an import defect, and it is not: that sheet was never imported -
+it was *opened*.
+
+**An Excel sheet meant for loading is never opened as an inventory.** It is
+imported from inside the program, with *Import xls...*: that is where separator
+rows are read as room divisions rather than as devices.
+
+The program now notices by itself: if the open file contains separator rows it
+says so at startup and explains the way out, and if somebody tries to pick one
+by hand it refuses.
+
+### If you are already in this state
+
+1. close the program;
+2. delete `inventario_percorso.json` next to the program, if it is there: that
+   is where the wrong choice is remembered;
+3. reopen: the empty inventory is created by itself in `Produzione\`;
+4. load the sheet with *Import xls...*, from inside the program.
+
 ## When something is off: the diagnostic
 
 The program folder holds **`Diagnostica.bat`**. Double-click it and in about ten
