@@ -1304,11 +1304,21 @@ class App(tk.Tk):
             self._sync_row_buttons()
             return "break"
 
-        tree.bind("<Shift-MouseWheel>", rotella_orizzontale)
-        tree.bind("<Button-6>", lambda e: (tree.xview_scroll(-1, "units"),
-                                           self._sync_row_buttons()))
-        tree.bind("<Button-7>", lambda e: (tree.xview_scroll(1, "units"),
-                                           self._sync_row_buttons()))
+        def scorri_di_lato(passi):
+            tree.xview_scroll(passi, "units")
+            self._sync_row_buttons()
+
+        # I pulsanti 6 e 7 sono la rotella orizzontale di X11: su Windows non
+        # esistono e Tk rifiuta il collegamento con un errore. Ogni scorciatoia
+        # si aggiunge per conto suo, perche' una non disponibile non deve
+        # impedire alla tabella di comparire.
+        for evento, azione in (("<Shift-MouseWheel>", rotella_orizzontale),
+                               ("<Button-6>", lambda e: scorri_di_lato(-1)),
+                               ("<Button-7>", lambda e: scorri_di_lato(1))):
+            try:
+                tree.bind(evento, azione)
+            except tk.TclError:
+                continue          # scorciatoia non disponibile su questo sistema
         tree.tag_configure("odd", background=theme.ROW_ALT)
         tree.tag_configure("loan", background=theme.LOAN_BG, foreground=theme.LOAN_FG)
         tree.tag_configure("loan_alt", background=theme.LOAN_BG_ALT, foreground=theme.LOAN_FG)
