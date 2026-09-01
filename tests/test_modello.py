@@ -19,6 +19,15 @@ ws = wb["Inventario"]
 
 # ---- solo le colonne che servono a laptop e tablet
 assert [c.value for c in ws[1]] == [HEADERS[f] for f in excel_io.TEMPLATE_FIELDS]
+# le tendine devono stare sulle colonne di tipo e stato, comunque siano ordinate
+from openpyxl.utils import get_column_letter
+attese = {get_column_letter(excel_io.TEMPLATE_FIELDS.index(c) + 1) for c in ("tipo", "stato")}
+trovate = {str(dv.sqref).split("2:")[0] for dv in ws.data_validations.dataValidation}
+assert trovate == attese, (trovate, attese)
+# e nessuna colonna piu' stretta della propria intestazione
+for i, campo in enumerate(excel_io.TEMPLATE_FIELDS, start=1):
+    larghezza = ws.column_dimensions[get_column_letter(i)].width
+    assert larghezza >= len(HEADERS[campo]), (campo, larghezza)
 assert "IMEI" not in [c.value for c in ws[1]]
 assert "Stanza" not in [c.value for c in ws[1]], "la stanza arriva dai separatori"
 

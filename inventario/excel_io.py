@@ -252,7 +252,22 @@ def build_print_file(items, group_by_room=False, rooms=None):
                   for_print=True, con_iphone=True)
 
 
-TEMPLATE_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "stato", "note"]
+# Le stesse colonne dell'elenco, nello stesso ordine: chi compila il modello
+# ritrova quello che vede nel programma. La stanza non c'e' perche' la dicono le
+# righe separatore.
+TEMPLATE_FIELDS = ["asset_tag", "tipo", "stato", "note", "modello", "seriale"]
+
+# Un valore d'esempio per ogni colonna, che serve solo a darle una larghezza
+# sensata: il modello e' vuoto, quindi non c'e' contenuto da misurare, ma chi
+# scrive dentro deve poterci stare comodo.
+TEMPLATE_ESEMPI = {
+    "asset_tag": "IT-0000",
+    "tipo": "Laptop",
+    "stato": "Guasto in attesa tecnico",
+    "note": "Batteria da sostituire, rientro",
+    "modello": "Lenovo ThinkPad T14 Gen 5",
+    "seriale": "PF4A1B2C",
+}
 TEMPLATE_TIPI = ["Laptop", "Tablet"]
 RIGHE_PER_STANZA = 8
 
@@ -366,7 +381,8 @@ def build_template(path, rooms, stati=None, lingua=None):
     else:
         tipi.error, tipi.errorTitle = "Scegli Laptop o Tablet.", "Tipo non valido"
     ws.add_data_validation(tipi)
-    tipi.add("B2:B%d" % ultima)
+    colonna_tipo = get_column_letter(TEMPLATE_FIELDS.index("tipo") + 1)
+    tipi.add("%s2:%s%d" % (colonna_tipo, colonna_tipo, ultima))
 
     stati_mostrati = [traduci_stato(v, lingua) for v in stati]
     scelte = DataValidation(type="list", formula1='"%s"' % ",".join(stati_mostrati),
@@ -376,12 +392,12 @@ def build_template(path, rooms, stati=None, lingua=None):
     else:
         scelte.error, scelte.errorTitle = "Scegli uno degli stati previsti.", "Stato non valido"
     ws.add_data_validation(scelte)
-    scelte.add("E2:E%d" % ultima)
+    colonna_stato = get_column_letter(TEMPLATE_FIELDS.index("stato") + 1)
+    scelte.add("%s2:%s%d" % (colonna_stato, colonna_stato, ultima))
 
-    larghezze = {"asset_tag": 18, "tipo": 14, "modello": 38, "seriale": 22,
-                 "stato": 24, "note": 42}
     for i, campo in enumerate(TEMPLATE_FIELDS, start=1):
-        ws.column_dimensions[get_column_letter(i)].width = larghezze[campo]
+        ws.column_dimensions[get_column_letter(i)].width = larghezza_colonna(
+            intestazione(HEADERS[campo], lingua), [TEMPLATE_ESEMPI[campo]])
 
     guida = wb.create_sheet("Istruzioni" if lingua != "en" else "Instructions")
     testo = list(ISTRUZIONI_EN if lingua == "en" else ISTRUZIONI_IT)

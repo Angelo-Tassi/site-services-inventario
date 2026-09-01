@@ -62,8 +62,9 @@ assert "IMEI" in colonne and "Restituito da" in colonne, colonne
 modello = os.path.join(fuori, "modello.xlsx")
 excel_io.build_template(modello, [BAU, KIOSK, DR])
 colonne = intestazioni(modello)
-assert colonne == ["Asset Tag", "Tipo", "Modello/Descrizione",
-                   "Numero di serie", "Stato", "Note"], colonne
+# il modello segue lo stesso ordine dell'elenco nel programma
+assert colonne == ["Asset Tag", "Tipo", "Stato", "Note",
+                   "Modello/Descrizione", "Numero di serie"], colonne
 # il modello da compilare resta piu' ricco dell'esportazione: serve a caricare
 # dispositivi nuovi, non a documentare quelli che ci sono gia'
 assert set(excel_io.CAMPI_ESPORTAZIONE) - set(TEMPLATE_FIELDS) == {"stanza"}
