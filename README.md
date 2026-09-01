@@ -317,10 +317,17 @@ dice: non crea mai un inventario locale al posto di quello condiviso.
   cosa si puo' leggere con il lettore. Se manca un dato obbligatorio il
   programma elenca quali e non inserisce nulla finche' non sono compilati.
 
-| Tipo | Campi obbligatori |
-| --- | --- |
-| Laptop, Tablet, ... | Asset Tag, Modello, Numero di serie, Stanza |
-| iPhone | IMEI, Modello, Restituito da, Stanza |
+| Tipo | Campo obbligatorio | Il resto |
+| --- | --- | --- |
+| Laptop, Tablet, ... | **Asset Tag** | modello, numero di serie, note: si completano poi |
+| iPhone | **IMEI** | modello, restituito da, note: si completano poi |
+
+  Obbligatorio e' **solo l'identificativo**: e' l'unica cosa senza la quale il
+  dispositivo non esiste in inventario. Il modello e il numero di serie spesso
+  non si hanno sottomano nel momento in cui si registra un arrivo, e pretenderli
+  significa far rimandare l'inserimento - cioe' perdere la riga. La **stanza**
+  non blocca il salvataggio: e' una tendina, e se non viene scelta parte dalla
+  prima, cosi' nessun dispositivo resta senza.
 
   Un iPhone **non ha asset tag**: l'IMEI e' il suo unico identificativo. La
   colonna *Asset Tag* resta vuota per i telefoni nell'elenco, nella stampa e nel
@@ -401,6 +408,13 @@ stato a riassumerle: *In prestito*, *Spedito al servizio telefonia*.
 | **Digital Kiosk** | Stanza, IMEI, Restituito da, Spedito il |
 | **Magazzino Disaster Recovery** | Stanza, prestiti e campi degli iPhone |
 | **Contenitore Iphone** | Asset tag, seriale, prestiti, stanza e tipo |
+
+Una **riga verticale colorata** divide una colonna dall'altra, e la stessa tinta
+compare come barretta nell'intestazione: serve a non perdere la colonna mentre si
+scorre un elenco largo. Il colore raggruppa per significato - blu gli
+identificativi, verde che cos'e' il dispositivo, viola dov'e', rosso come sta,
+ambra il prestito. Il testo resta nero su bianco: il colore sta nelle divisioni e
+nelle intestazioni, non dentro le celle.
 
 La colonna **Stanza** sparisce sempre dentro una stanza: sarebbe uguale su ogni
 riga, e il nome e' gia' scritto sopra l'elenco. Lo stesso vale per il **tipo**

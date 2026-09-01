@@ -329,6 +329,15 @@ table{min-width:520px}
   <p class="note">La colonna <b>Stanza</b> sparisce sempre dentro una stanza: sarebbe
     uguale su ogni riga, e il nome e' gia' scritto sopra l'elenco. Lo stesso vale per il
     <b>tipo</b> dentro il contenitore Iphone.</p>
+
+  <h3>Ogni colonna ha il suo colore</h3>
+  <p class="sub">Una riga verticale colorata divide una colonna dall'altra, e la stessa
+    tinta compare come barretta nell'intestazione: serve a non perdere la colonna mentre
+    si scorre un elenco largo. Il colore raggruppa per significato - blu gli
+    identificativi, verde che cos'e' il dispositivo, viola dov'e', rosso come sta, ambra
+    il prestito.</p>
+  <p class="note">Il testo resta nero su bianco, che e' la combinazione piu' leggibile:
+    il colore sta nelle righe di divisione e nelle intestazioni, non dentro le celle.</p>
   <div class="avviso">Le colonne dipendono da <b>come e' configurato l'inventario</b>, non
     dai dispositivi presenti in quel momento: una stanza vuota mostra le stesse colonne di
     quando sara' piena, e nulla balla mentre lavori. Se dalle impostazioni attivi i
@@ -357,9 +366,12 @@ table{min-width:520px}
       Con il lettore i campi si riempiono man mano che scansioni; se un codice non si
       legge, il pulsante <i>non riesco a scansionare</i> ti fa scrivere quel campo a mano
       senza ricominciare.</li>
-    <li><b>Compila.</b> Per laptop e tablet servono asset tag, modello e numero di serie.
-      Per gli iPhone servono <b>IMEI</b> e <b>Restituito da</b>: asset tag e numero di
-      serie non esistono proprio.</li>
+    <li><b>Compila.</b> L'unico campo obbligatorio e' l'identificativo: l'<b>asset tag</b>
+      per laptop e tablet, l'<b>IMEI</b> per gli iPhone, che asset tag e numero di serie
+      non ce l'hanno proprio. Modello, numero di serie e <i>Restituito da</i> si possono
+      lasciare vuoti e completare quando li hai sottomano: pretenderli subito vuol dire
+      solo far rimandare l'inserimento, cioe' perdere la riga. La stanza non blocca
+      niente: se non la scegli parte dalla prima.</li>
   </ol>
   <p class="note">Il dispositivo appena inserito compare in cima all'elenco: e' ordinato
     per ultima modifica, cosi' si vede subito che e' arrivato.</p>
@@ -741,6 +753,15 @@ table{min-width:520px}
   <p class="note">The <b>Room</b> column always disappears inside a room: it would be the
     same on every row, and the name is already written above the list. The same goes for
     <b>type</b> inside the Iphone container.</p>
+
+  <h3>Every column has its own colour</h3>
+  <p class="sub">A coloured vertical line divides one column from the next, and the same
+    tint appears as a small bar in the heading: it is there so you do not lose the column
+    while scrolling a wide list. The colour groups by meaning - blue for identifiers, green
+    for what the device is, purple for where it is, red for how it is, amber for the
+    loan.</p>
+  <p class="note">The text stays black on white, the most legible combination there is:
+    the colour lives in the dividing lines and the headings, not inside the cells.</p>
   <div class="avviso">The columns depend on <b>how the inventory is configured</b>, not on
     the devices present at that moment: an empty room shows the same columns it will show
     when it is full, and nothing dances while you work. Turn loans on for another room in
@@ -767,9 +788,12 @@ table{min-width:520px}
     <li><b>Choose how to enter it.</b> By hand, or with the barcode reader. With the reader
       the fields fill in as you scan; if a code will not read, the <i>I cannot scan</i>
       button lets you type that one field without starting over.</li>
-    <li><b>Fill it in.</b> Laptops and tablets need asset tag, model and serial number.
-      iPhones need <b>IMEI</b> and <b>Returned by</b>: asset tag and serial number do not
-      exist for them at all.</li>
+    <li><b>Fill it in.</b> The only mandatory field is the identifier: the <b>asset tag</b>
+      for laptops and tablets, the <b>IMEI</b> for iPhones, which have no asset tag or
+      serial number at all. Model, serial number and <i>Returned by</i> can be left empty
+      and completed when you have them to hand: demanding them up front only postpones the
+      entry, which means losing the row. The room blocks nothing: if you do not pick one it
+      starts from the first.</li>
   </ol>
   <p class="note">A device just entered appears at the top of the list: it is sorted by
     last change, so you can see it arrived.</p>

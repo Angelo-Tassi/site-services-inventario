@@ -33,13 +33,20 @@ except InventoryError as e:
 forzato = dict(salvato)
 forzato.update(seriale="XYZ", prestato_a="Caio", prestato_il="02/01/2026 09:00")
 app._run(lambda: app.store.update("356938035643809", forzato), "ok")
+def etichette_scheda(dialogo):
+    return [str(w.cget("text")).rstrip(" *") for w in dialogo.fields.winfo_children()
+            if w.winfo_class() == "TLabel" and w.grid_info().get("column") == 0]
+
 pulito = app._item_by_tag("356938035643809")
 assert pulito["seriale"] == "" and pulito["prestato_a"] == "" and pulito["prestato_il"] == ""
 
 # la scheda di un iPhone non mostra il numero di serie
 dlg = ItemDialog(app, app.cfg["rooms"], app.cfg["types"], pulito,
                  iphone_room=app.iphone_room(), stati=app.cfg["states"])
-assert [l for l, _v, _w in dlg.required] == ["IMEI", "Modello", "Restituito da", "Stanza"]
+# per un iPhone l'unico campo che non si puo' non avere e' l'IMEI
+assert [l for l, _v, _w in dlg.required] == ["IMEI"]
+assert etichette_scheda(dlg) == ["IMEI", "Modello", "Restituito da", "Stanza",
+                                 "Stato", "Note"], etichette_scheda(dlg)
 assert dlg._loan == ("", "")
 dlg._ok()
 assert dlg.result["seriale"] == "" and dlg.result["prestato_a"] == ""
@@ -74,9 +81,9 @@ preset_tel = new_item(tipo=app.iphone_type(), imei=passo_imei.result,
 scheda = ItemDialog(app, app.cfg["rooms"], app.cfg["types"], preset_tel,
                     iphone_room=app.iphone_room(), stati=app.cfg["states"])
 assert scheda.is_iphone()
-assert [l for l, _v, _w in scheda.required] == ["IMEI", "Modello", "Restituito da", "Stanza"]
+assert [l for l, _v, _w in scheda.required] == ["IMEI"]
 assert scheda.var_imei.get() == "351234567890123"
-assert scheda.missing_fields() == ["Modello", "Restituito da"]
+assert scheda.missing_fields() == [], "con l'IMEI si salva anche senza il resto"
 scheda.var_modello.set("Apple iPhone 13"); scheda.var_restituito.set("E. Rossi")
 scheda._ok()
 assert scheda.result["asset_tag"] == "351234567890123"

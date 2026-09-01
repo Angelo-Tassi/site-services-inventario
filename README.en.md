@@ -300,10 +300,16 @@ use *Export xls...*.
 
 ### Required fields
 
-| Type | Required |
-| --- | --- |
-| Laptop, Tablet, ... | Asset Tag, Model, Serial number, Room |
-| iPhone | IMEI, Model, Returned by, Room |
+| Type | Required field | The rest |
+| --- | --- | --- |
+| Laptop, Tablet, ... | **Asset Tag** | model, serial number, notes: filled in later |
+| iPhone | **IMEI** | model, returned by, notes: filled in later |
+
+Only the **identifier** is required: it is the one thing without which the device
+does not exist in the inventory. Model and serial number are often not to hand at
+the moment an arrival is recorded, and demanding them postpones the entry - which
+means losing the row. The **room** does not block saving: it is a dropdown, and
+if it is not chosen it starts from the first, so no device is left without one.
 
 An iPhone has **no asset tag, no serial number, and is never lent**. The IMEI is
 its only identifier. The rule lives in the data store: even when importing or
@@ -476,6 +482,13 @@ status sums them up: *On loan*, *Shipped to the phone service*.
 | **Digital Kiosk** | Room, IMEI, Returned by, Shipped on |
 | **Magazzino Disaster Recovery** | Room, loans and the iPhone fields |
 | **Iphone container** | Asset tag, serial, loans, room and type |
+
+A **coloured vertical line** divides one column from the next, and the same tint
+appears as a small bar in the heading: it is there so you do not lose the column
+while scrolling a wide list. The colour groups by meaning - blue for identifiers,
+green for what the device is, purple for where it is, red for how it is, amber
+for the loan. The text stays black on white: the colour lives in the dividers and
+the headings, not inside the cells.
 
 The **Room** column always disappears inside a room: it would be the same on
 every row, and the name is already written above the list. The same goes for

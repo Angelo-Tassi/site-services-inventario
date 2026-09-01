@@ -208,24 +208,35 @@ class ItemDialog(_Modal):
         for child in self.fields.winfo_children():
             child.destroy()
 
+        # Obbligatorio e' solo l'identificativo: e' l'unica cosa senza la quale
+        # il dispositivo non esiste in inventario. Il resto spesso non si ha
+        # sottomano nel momento in cui si registra un arrivo, e pretenderlo
+        # significa solo far rimandare l'inserimento - cioe' perdere la riga.
         if self.is_iphone():
-            righe = [(T("IMEI *"), self.var_imei),
-                     (T("Modello *"), self.var_modello),
-                     (T("Restituito da *"), self.var_restituito)]
+            righe = [(T("IMEI"), self.var_imei, True),
+                     (T("Modello"), self.var_modello, False),
+                     (T("Restituito da"), self.var_restituito, False)]
         else:
-            righe = [(T("Asset Tag *"), self.var_tag),
-                     (T("Modello *"), self.var_modello),
-                     (T("Numero di serie *"), self.var_seriale)]
+            righe = [(T("Asset Tag"), self.var_tag, True),
+                     (T("Modello"), self.var_modello, False),
+                     (T("Numero di serie"), self.var_seriale, False)]
 
         self.required = []
-        for riga, (etichetta, var) in enumerate(righe):
-            ttk.Label(self.fields, text=etichetta).grid(row=riga, column=0, sticky="w", pady=5)
+        for riga, (etichetta, var, obbligatorio) in enumerate(righe):
+            ttk.Label(self.fields, text=etichetta + (" *" if obbligatorio else "")).grid(
+                row=riga, column=0, sticky="w", pady=5)
             entry = ttk.Entry(self.fields, textvariable=var, width=34)
             entry.grid(row=riga, column=1, sticky="we", pady=5)
-            self.required.append((etichetta.rstrip(" *"), var, entry))
+            if obbligatorio:
+                self.required.append((etichetta, var, entry))
 
         riga = len(righe)
-        ttk.Label(self.fields, text=T("Stanza *")).grid(row=riga, column=0, sticky="w", pady=5)
+        # La stanza non blocca il salvataggio: e' una tendina, e se non e' stata
+        # scelta si parte dalla prima invece di lasciare un dispositivo senza
+        # stanza, che non comparirebbe in nessuna scheda.
+        if not self.var_stanza.get() and self.rooms:
+            self.var_stanza.set(self.rooms[0])
+        ttk.Label(self.fields, text=T("Stanza")).grid(row=riga, column=0, sticky="w", pady=5)
         if self.is_iphone():
             # Gli iPhone appartengono sempre alla loro stanza: campo mostrato ma bloccato.
             self.var_stanza.set(self.iphone_room)
@@ -235,7 +246,6 @@ class ItemDialog(_Modal):
             combo = ttk.Combobox(self.fields, textvariable=self.var_stanza, values=self.rooms,
                                  state="readonly", width=32)
         combo.grid(row=riga, column=1, sticky="we", pady=5)
-        self.required.append(("Stanza", self.var_stanza, combo))
         riga += 1
         if self.is_iphone():
             ttk.Label(self.fields, style="Muted.TLabel",
@@ -1339,6 +1349,7 @@ class App(tk.Tk):
             if field == self.sort_field:
                 arrow = "  ▾" if self.sort_reverse else "  ▴"
             tree.heading(field, text=intestazione(HEADERS[field]) + arrow,
+                         image=self._segno_colonna(field),
                          command=lambda f=field: self.sort_by(f))
             tree.column(field, width=COLUMN_WIDTHS[field], anchor="w",
                         stretch=(field in ("modello", "note")))
@@ -1348,10 +1359,12 @@ class App(tk.Tk):
         def on_scroll(primo, ultimo):
             scroll.set(primo, ultimo)
             self._sync_row_buttons()
+            self._sync_righelli()
 
         def on_scroll_x(primo, ultimo):
             scroll_x.set(primo, ultimo)
             self._sync_row_buttons()
+            self._sync_righelli()
 
         tree.configure(yscrollcommand=on_scroll, xscrollcommand=on_scroll_x)
         # con la griglia le due barre restano ai bordi giusti anche quando la
@@ -1399,11 +1412,69 @@ class App(tk.Tk):
         tree.tag_configure("iphone_alt", background=theme.IPHONE_ROW_ALT)
         tree.tag_configure("tablet", background=theme.TABLET_ROW)
         tree.tag_configure("tablet_alt", background=theme.TABLET_ROW_ALT)
+        self._righelli = []
         tree.bind("<Button-1>", self._on_click)
         tree.bind("<Double-1>", self._on_double_click)
         tree.bind("<<TreeviewSelect>>", self._on_select)
-        tree.bind("<Configure>", lambda e: self._sync_row_buttons())
+        tree.bind("<Configure>", lambda e: (self._sync_row_buttons(),
+                                            self._sync_righelli()))
         return tree
+
+    # --------------------------------------------- colori delle colonne
+
+    def _segno_colonna(self, field):
+        """Barretta colorata da mettere nell'intestazione della colonna.
+
+        ttk non sa colorare una colonna: lo stile della tabella vale per tutte.
+        Un'immaginetta nell'intestazione invece si puo', ed e' quanto basta per
+        dare a ogni colonna un colore suo senza toccare il testo, che resta
+        scuro su bianco.
+        """
+        if not hasattr(self, "_segni"):
+            self._segni = {}
+        if field not in self._segni:
+            colore = theme.COLORE_COLONNA.get(field, theme.COLORE_COLONNA_ALTRO)
+            immagine = tk.PhotoImage(width=4, height=14)
+            immagine.put(colore, to=(0, 0, 4, 14))
+            self._segni[field] = immagine       # va tenuta, o Tk la butta via
+        return self._segni[field]
+
+    def _sync_righelli(self):
+        """Righe verticali colorate fra una colonna e l'altra.
+
+        Servono a non perdere la colonna scorrendo un elenco largo. Si disegnano
+        sopra la tabella, come i pulsanti delle righe, perche' ttk non ha le
+        righe di griglia verticali.
+        """
+        try:
+            self._disegna_righelli()
+        except tk.TclError:
+            pass          # tabella in ricostruzione: al prossimo giro ci sara'
+
+    def _disegna_righelli(self):
+        if getattr(self, "tree", None) is None or not self.tree.winfo_exists():
+            return
+        colonne = self._columns()
+        larghezze = [int(self.tree.column(c, "width")) for c in colonne]
+        totale = sum(larghezze) or 1
+        primo, ultimo = self.tree.xview()
+        scostamento = primo * totale if ultimo < 1.0 else 0
+        altezza = self.tree.winfo_height()
+        larghezza = self.tree.winfo_width()
+        for riga in self._righelli:
+            riga.place_forget()
+        x = -scostamento
+        for indice, campo in enumerate(colonne[:-1]):
+            x += larghezze[indice]
+            if not (0 < x < larghezza):
+                continue
+            colore = theme.COLORE_COLONNA.get(colonne[indice + 1],
+                                              theme.COLORE_COLONNA_ALTRO)
+            if indice >= len(self._righelli):
+                self._righelli.append(tk.Frame(self.tree, width=2))
+            riga = self._righelli[indice]
+            riga.configure(bg=colore, width=2)
+            riga.place(x=int(x) - 1, y=0, height=altezza)
 
     # ------------------------------------------- pulsanti veri sulle righe
 

@@ -20,6 +20,12 @@ def apri(item=None):
                       iphone_room=app.iphone_room(), stati=STATI)
 
 def etichette(d):
+    """Le etichette dei campi del modulo, senza l'asterisco."""
+    return [str(w.cget("text")).rstrip(" *") for w in d.fields.winfo_children()
+            if w.winfo_class() == "TLabel" and w.grid_info().get("column") == 0]
+
+
+def obbligatori(d):
     return [lbl for lbl, _v, _w in d.required]
 
 # ---- il tipo e' il primo campo
@@ -28,17 +34,25 @@ corpo = dlg.winfo_children()[0]
 prima = [w.cget("text") for w in corpo.winfo_children()
          if w.grid_info().get("row") == 0 and w.grid_info().get("column") == 0]
 assert prima == ["Tipo *"], prima
-assert etichette(dlg) == ["Asset Tag", "Modello", "Numero di serie", "Stanza"]
+assert etichette(dlg) == ["Asset Tag", "Modello", "Numero di serie", "Stanza",
+                          "Stato", "Note"], etichette(dlg)
+assert obbligatori(dlg) == ["Asset Tag"], obbligatori(dlg)
 assert dlg.var_stato.get() == DISPONIBILE
 
-# ---- obbligatori: niente inserimento finche' mancano
-assert dlg.missing_fields() == ["Asset Tag", "Modello", "Numero di serie"]
+# ---- obbligatorio e' solo l'identificativo: senza quello il dispositivo non
+# esiste, il resto si completa quando lo si ha sottomano
+assert dlg.missing_fields() == ["Asset Tag"]
 dlg._ok()
 assert dlg.result is None and errori[-1][0] == "Dati mancanti"
 assert dlg.winfo_exists(), "il popup resta aperto"
-dlg.var_tag.set("IT-0700"); dlg.var_modello.set("   ")
-assert dlg.missing_fields() == ["Modello", "Numero di serie"]
+dlg.var_tag.set("   ")
+assert dlg.missing_fields() == ["Asset Tag"], "gli spazi non contano"
 dlg._ok(); assert dlg.result is None
+# con il solo asset tag si salva: modello e seriale restano da completare
+dlg.var_tag.set("IT-0700")
+assert dlg.missing_fields() == []
+# la stanza non blocca: se non e' stata scelta si parte dalla prima
+assert dlg.var_stanza.get() in dlg.rooms, dlg.var_stanza.get()
 
 # ---- inserimento completo, con stato scelto
 dlg.var_modello.set("Lenovo ThinkPad T14 Gen 5"); dlg.var_seriale.set("PF5NEW9")
@@ -54,12 +68,15 @@ assert app.store.set_stato("IT-0700", "Da rebuildare") is True
 dlg = apri()
 dlg.var_tipo.set(TIPO); dlg._build_fields()
 assert dlg.is_iphone()
-assert etichette(dlg) == ["IMEI", "Modello", "Restituito da", "Stanza"]
-combo_stanza = [w for lbl, v, w in dlg.required if lbl == "Stanza"][0]
+assert etichette(dlg) == ["IMEI", "Modello", "Restituito da", "Stanza",
+                          "Stato", "Note"], etichette(dlg)
+assert obbligatori(dlg) == ["IMEI"], obbligatori(dlg)
+combo_stanza = [w for w in dlg.fields.winfo_children()
+                if w.winfo_class() == "TCombobox"][0]
 assert str(combo_stanza.cget("state")) == "disabled"
 assert dlg.var_stanza.get() == BAU and list(combo_stanza.cget("values")) == [BAU]
 assert dlg.var_stato.get() == DA_RISPEDIRE
-assert dlg.missing_fields() == ["IMEI", "Modello", "Restituito da"]
+assert dlg.missing_fields() == ["IMEI"]
 dlg._ok(); assert dlg.result is None
 
 # la nota e i valori sopravvivono al cambio di tipo

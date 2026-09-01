@@ -40,6 +40,30 @@ AZIONE_ARANCIO_BG = "#FDF0E0"    # importazioni: i dati entrano
 AZIONE_ARANCIO_BG_ON = "#F8E2C8"
 AZIONE_ARANCIO_FG = "#8A5316"
 
+# Colonne dell'elenco. ttk non permette di colorare una cella o una colonna -
+# lo stile vale per tutta la tabella - ma permette di colorare cio' che le
+# delimita e le intesta: una riga verticale fra una colonna e l'altra, e una
+# barretta nell'intestazione. Bastano a non perdere la colonna mentre si scorre
+# un elenco largo, senza toccare la leggibilita' del testo, che resta scuro su
+# bianco.
+COLORE_COLONNA = {
+    "asset_tag": "#1F4E79",       # identificativi: blu istituzionale
+    "imei": "#1F4E79",
+    "seriale": "#5B8DB8",
+    "tipo": "#16A085",            # che cos'e': verde
+    "modello": "#16A085",
+    "stanza": "#8E44AD",          # dov'e': viola
+    "stato": "#C0392B",           # come sta: rosso
+    "prestato_a": "#B36B06",      # prestito: ambra scura, per staccare dal bianco
+    "prestato_il": "#B36B06",
+    "restituito_da": "#6C3483",   # telefoni: lo stesso viola della spedizione
+    "spedito_il": "#6C3483",
+    "note": "#7F8C8D",            # contorno: grigio
+    "modificato_il": "#78888A",
+    "modificato_da": "#78888A",
+}
+COLORE_COLONNA_ALTRO = "#78888A"
+
 ROOM_COLORS = ["#2E86C1", "#16A085", "#8E44AD", "#D68910", "#C0392B"]
 IPHONE_COLOR = "#5D6D7E"   # scheda di comodo, non una stanza vera
 
