@@ -409,6 +409,11 @@ stato a riassumerle: *In prestito*, *Spedito al servizio telefonia*.
 | **Magazzino Disaster Recovery** | Stanza, prestiti e campi degli iPhone |
 | **Contenitore Iphone** | Asset tag, seriale, prestiti, stanza e tipo |
 
+Ogni colonna e' **larga quanto serve** a mostrare per intero quello che contiene:
+niente testo tagliato, niente colonne da allargare a mano. Una colonna vuota resta
+comunque larga almeno quanto il suo nome. Se l'elenco supera la finestra si scorre
+con la barra in basso o con Maiusc + rotella.
+
 Una **riga verticale colorata** divide una colonna dall'altra, e la stessa tinta
 compare come barretta nell'intestazione: serve a non perdere la colonna mentre si
 scorre un elenco largo. Il colore raggruppa per significato - blu gli

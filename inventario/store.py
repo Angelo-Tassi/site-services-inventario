@@ -69,7 +69,7 @@ ALL_FIELDS = FIELDS + AUDIT_FIELDS
 HEADERS = {
     "asset_tag": "Asset Tag",
     "tipo": "Tipo",
-    "modello": "Modello",
+    "modello": "Modello/Descrizione",
     "seriale": "Numero di serie",
     "imei": "IMEI",
     "restituito_da": "Restituito da",
@@ -87,7 +87,8 @@ HEADERS = {
 HEADER_ALIASES = {
     "asset_tag": ["asset tag", "assettag", "asset", "tag", "etichetta", "inventario"],
     "tipo": ["tipo", "tipologia", "categoria", "device type", "type"],
-    "modello": ["modello", "model", "descrizione", "dispositivo", "device"],
+    "modello": ["modello", "model", "modello/descrizione", "model/description",
+                "descrizione", "description", "dispositivo", "device"],
     "seriale": ["numero di serie", "seriale", "serial", "serial number", "s/n",
                 "sn", "matricola", "service tag"],
     "imei": ["imei", "imei/meid", "meid", "codice imei"],
@@ -934,22 +935,33 @@ class InventoryStore(object):
 
         return self._apply(op)
 
-    def set_note(self, tag, note):
-        """Aggiorna soltanto le note (modifica al volo dall'elenco)."""
+    # Campi che si cambiano direttamente nell'elenco, senza aprire la scheda:
+    # sono quelli che cambiano spesso e che si correggono guardando l'oggetto
+    # che si ha in mano.
+    CAMPI_AL_VOLO = ("note", "modello")
+
+    def set_campo(self, tag, campo, valore):
+        """Aggiorna un solo campo di testo (modifica al volo dall'elenco)."""
+        if campo not in self.CAMPI_AL_VOLO:
+            raise InventoryError("Il campo %s non si modifica dall'elenco." % campo)
         tag = norm_tag(tag)
-        note = clean(note)
+        valore = clean(valore)
 
         def op(items):
             index = _index_of(items, tag)
             if index is None:
                 raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
-            if items[index].get("note", "") == note:
+            if items[index].get(campo, "") == valore:
                 return False
-            items[index]["note"] = note
+            items[index][campo] = valore
             _stamp_item(items[index])
             return True
 
         return self._apply(op)
+
+    def set_note(self, tag, note):
+        """Aggiorna soltanto le note (modifica al volo dall'elenco)."""
+        return self.set_campo(tag, "note", note)
 
     def import_items(self, incoming, mode="merge", stanza=None):
         """Carica i dispositivi letti da un file.

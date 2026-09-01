@@ -34,7 +34,8 @@ def intestazioni(file_prodotto):
 
 # ---- un file esportato e' l'inventario, non la sua cronaca: stesse colonne
 # ovunque, e sono quelle del modello da compilare piu' la stanza
-ATTESE = ["Asset Tag", "Tipo", "Modello", "Numero di serie", "Stanza", "Stato", "Note"]
+ATTESE = ["Asset Tag", "Tipo", "Modello/Descrizione", "Numero di serie",
+          "Stanza", "Stato", "Note"]
 colonne = intestazioni(excel_io.export(items, os.path.join(fuori, "tutto.xlsx"),
                                        rooms=[BAU, KIOSK, DR]))
 assert colonne == ATTESE, colonne
@@ -61,8 +62,8 @@ assert "IMEI" in colonne and "Restituito da" in colonne, colonne
 modello = os.path.join(fuori, "modello.xlsx")
 excel_io.build_template(modello, [BAU, KIOSK, DR])
 colonne = intestazioni(modello)
-assert colonne == ["Asset Tag", "Tipo", "Modello", "Numero di serie", "Stato",
-                   "Note"], colonne
+assert colonne == ["Asset Tag", "Tipo", "Modello/Descrizione",
+                   "Numero di serie", "Stato", "Note"], colonne
 
 # ---- un file per stanza: tutti con la stessa forma
 cartella = tempfile.mkdtemp()

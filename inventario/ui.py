@@ -8,7 +8,7 @@ Due schermate:
 import os
 import tkinter as tk
 from datetime import datetime
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, font as tkfont, messagebox, ttk
 
 from . import __version__, config, excel_io, theme
 from . import lingua as lang
@@ -22,6 +22,9 @@ from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
                     valore_visibile)
 
 ALTEZZA_MINIMA_TABELLA = 160   # pixel: circa cinque righe
+SPAZIO_CELLA = 22              # margini della cella, perche' il testo non tocchi i bordi
+SPAZIO_INTESTAZIONE = 34       # margini piu' la barretta colorata e la freccia
+LARGHEZZA_MINIMA = 46
 
 NO_ROOM_IT = "(senza stanza)"
 
@@ -1326,6 +1329,53 @@ class App(tk.Tk):
             colonne.append(ACTION_COLUMN)
         return colonne + self._campi_visibili()
 
+    def _larghezze_colonne(self, columns):
+        """Quanto deve essere larga ogni colonna perche' il testo si legga tutto.
+
+        Una colonna che taglia il testo costringe ad allargarla a mano ogni
+        volta, e intanto quello che nasconde non si sa. Si misura il contenuto
+        con il font vero e si prende il piu' largo, mai meno dell'intestazione:
+        una colonna vuota deve comunque poter mostrare il proprio nome, o non si
+        capisce nemmeno che cosa contiene.
+        """
+        # i font del tema sono tuple (famiglia, corpo): per misurare servono
+        # oggetti Font veri, che si costruiscono una volta sola
+        if not hasattr(self, "_font_misura"):
+            self._font_misura = {
+                "base": tkfont.Font(root=self, font=self.fonts["base"]),
+                "bold": tkfont.Font(root=self, font=self.fonts["bold"]),
+            }
+        base = self._font_misura["base"]
+        grassetto = self._font_misura["bold"]
+        larghezze = {}
+        for campo in columns:
+            if campo in (CHECK_COLUMN, ACTION_COLUMN):
+                larghezze[campo] = COLUMN_WIDTHS[campo]
+                continue
+            # l'intestazione porta anche la freccia dell'ordinamento e la
+            # barretta colorata: vanno contate, o il nome viene tagliato
+            titolo = intestazione(HEADERS[campo])
+            minimo = grassetto.measure(titolo + "  \u25be") + SPAZIO_INTESTAZIONE
+            valori = [valore_visibile(i, campo) for i in self.visible]
+            # misurare tutto e' inutile: bastano i piu' lunghi, che con un font
+            # proporzionale non sono sempre quelli con piu' caratteri
+            candidati = sorted(set(v for v in valori if v), key=len, reverse=True)[:5]
+            largo = max([base.measure(v) for v in candidati] or [0]) + SPAZIO_CELLA
+            larghezze[campo] = max(minimo, largo, LARGHEZZA_MINIMA)
+        return larghezze
+
+    def _applica_larghezze(self):
+        """Adatta le colonne al contenuto che si sta mostrando."""
+        if getattr(self, "tree", None) is None or not self.tree.winfo_exists():
+            return
+        colonne = self._columns()
+        try:
+            for campo, largo in self._larghezze_colonne(colonne).items():
+                self.tree.column(campo, width=largo, minwidth=largo)
+        except tk.TclError:
+            return          # tabella in ricostruzione
+        self._sync_righelli()
+
     def _make_table(self, parent):
         wrap = tk.Frame(parent, bg=theme.CARD, highlightthickness=1,
                         highlightbackground=theme.BORDER)
@@ -1352,7 +1402,7 @@ class App(tk.Tk):
                          image=self._segno_colonna(field),
                          command=lambda f=field: self.sort_by(f))
             tree.column(field, width=COLUMN_WIDTHS[field], anchor="w",
-                        stretch=(field in ("modello", "note")))
+                        stretch=False)
         scroll = ttk.Scrollbar(wrap, orient="vertical", command=tree.yview)
         scroll_x = ttk.Scrollbar(wrap, orient="horizontal", command=tree.xview)
 
@@ -1604,8 +1654,8 @@ class App(tk.Tk):
         tag, column = self._cell_at(event)
         if column in (ACTION_COLUMN, CHECK_COLUMN):
             return "break"
-        if column == "note" and tag:
-            self.edit_note_inline(tag)
+        if tag and column in InventoryStore.CAMPI_AL_VOLO:
+            self.edit_testo_inline(tag, column)
             return "break"
         if column == "stato" and tag:
             self.edit_stato_inline(tag)
@@ -1667,17 +1717,23 @@ class App(tk.Tk):
 
     def edit_note_inline(self, tag):
         """Modifica la nota direttamente nell'elenco."""
+        return self.edit_testo_inline(tag, "note")
+
+    def edit_testo_inline(self, tag, campo):
+        """Modifica un campo di testo direttamente nell'elenco, senza popup."""
         item = self._item_by_tag(tag)
         if item is None:
             return
         columns = self._columns()
-        box = self.tree.bbox(tag, columns.index("note"))
+        if campo not in columns:
+            return
+        box = self.tree.bbox(tag, columns.index(campo))
         if not box:
             return
         entry = tk.Entry(self.tree, relief="solid", borderwidth=1,
                          highlightthickness=1, highlightcolor=theme.ACCENT,
                          bg=theme.CARD, fg=theme.TEXT, font=self.fonts["base"])
-        entry.insert(0, item.get("note", ""))
+        entry.insert(0, item.get(campo, ""))
         entry.select_range(0, "end")
         entry.place(x=box[0], y=box[1], width=box[2], height=box[3])
         entry.focus_set()
@@ -1690,8 +1746,9 @@ class App(tk.Tk):
             text = entry.get()
             entry.destroy()
             if save:
-                self._run(lambda: self.store.set_note(tag, text),
-                          T("Nota aggiornata su %s.") % tag)
+                self._run(lambda: self.store.set_campo(tag, campo, text),
+                          T("%s aggiornato su %s.")
+                          % (intestazione(HEADERS[campo]), tag))
 
         entry.bind("<Return>", lambda e: close(True))
         entry.bind("<Escape>", lambda e: close(False))
@@ -1925,6 +1982,7 @@ class App(tk.Tk):
             self.tree.selection_set(restore[:1])
             self.tree.see(restore[0])
         self._update_status()
+        self._applica_larghezze()
         self._sync_row_buttons()
 
     def _update_status(self):

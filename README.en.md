@@ -483,6 +483,11 @@ status sums them up: *On loan*, *Shipped to the phone service*.
 | **Magazzino Disaster Recovery** | Room, loans and the iPhone fields |
 | **Iphone container** | Asset tag, serial, loans, room and type |
 
+Every column is **as wide as it needs to be** to show what it holds in full: no
+truncated text, no columns to widen by hand. An empty column stays at least as wide
+as its own name. If the list outgrows the window you scroll with the bar at the
+bottom or with Shift + wheel.
+
 A **coloured vertical line** divides one column from the next, and the same tint
 appears as a small bar in the heading: it is there so you do not lose the column
 while scrolling a wide list. The colour groups by meaning - blue for identifiers,

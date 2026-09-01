@@ -103,7 +103,7 @@ EN = {
     "l'IMEI del telefono": "the phone's IMEI",
     "Asset tag": "Asset tag",
     "Numero di serie": "Serial number",
-    "Modello": "Model",
+    "Modello/Descrizione": "Model/Description",
     "IMEI": "IMEI",
     "Non riesco a scansionare - inserisci a mano":
         "I can't scan it - type it instead",
@@ -523,7 +523,7 @@ EN = {
 INTESTAZIONI_EN = {
     "Asset Tag": "Asset Tag",
     "Tipo": "Type",
-    "Modello": "Model",
+    "Modello/Descrizione": "Model/Description",
     "Numero di serie": "Serial number",
     "IMEI": "IMEI",
     "Restituito da": "Returned by",
