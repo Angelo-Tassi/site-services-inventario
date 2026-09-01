@@ -47,7 +47,8 @@ se hai laptop e tablet gia' censiti altrove da caricare in blocco.
 - **I permessi sono quelli della cartella.** Nessun elenco di utenti da gestire.
 - **Piu' persone insieme.** Ogni salvataggio passa da un lock esclusivo e
   riscrive il file in modo atomico; l'elenco si aggiorna da solo.
-- **Prestiti**, **stati**, **stanze** e **note** modificabili al volo.
+- **Prestiti**, **stati**, **tipi**, **stanze**, **note** e **descrizioni**
+  modificabili al volo, con un doppio clic sulla cella.
 
 ---
 
@@ -294,7 +295,7 @@ dice: non crea mai un inventario locale al posto di quello condiviso.
   stanza: e' una scorciatoia che raccoglie automaticamente tutti i telefoni, per
   arrivarci con un clic. Gli iPhone restano registrati nella loro stanza e
   compaiono normalmente anche li'.
-- Elenco dei dispositivi con **Asset Tag**, **Tipo**, **Modello**, **Numero di
+- Elenco dei dispositivi con **Asset Tag**, **Tipo**, **Modello/Descrizione**, **Numero di
   serie**, **IMEI**, **Restituito da**, **Stanza**, **Stato**, **In prestito a**,
   **Prestato il** e **Note**, piu' data e autore dell'ultima modifica.
   L'asset tag e' la chiave univoca dell'inventario.
@@ -355,9 +356,13 @@ dice: non crea mai un inventario locale al posto di quello condiviso.
   rilettura la chiave viene ricostruita dall'IMEI. Il tipo e' riconosciuto senza
   badare a maiuscole e minuscole: *iPhone*, *Iphone* e *IPHONE* sono la stessa
   cosa.
-- **Note modificabili al volo**: doppio clic sulla cella *Note* per correggerla
-  direttamente nell'elenco (`Invio` salva, `Esc` annulla). Doppio clic su una
-  qualsiasi altra colonna apre la scheda completa.
+- **Modifica al volo**, senza aprire nessuna finestra: doppio clic sulla cella
+  *Note* o *Modello/Descrizione* per scriverci (`Invio` salva, `Esc` annulla),
+  su *Stato* o *Tipo* per la tendina. Doppio clic su una qualsiasi altra colonna
+  apre la scheda completa.
+- **Elimina +** toglie molti dispositivi in una volta: si incollano i codici da
+  Excel, si legge che cosa sparisce e da quale stanza, e si conferma scrivendo
+  `ACCETTO`.
 - Aggiunta, modifica ed eliminazione; spostamento di un dispositivo da una
   stanza all'altra; **esportazione della singola stanza** e **reset completo**
   dell'inventario con copia di sicurezza. Gli iPhone fanno eccezione: non si spostano, e se una
@@ -811,7 +816,9 @@ consultare i dati in Excel senza rischi, usa *Esporta xls...*.
 | `Canc` | elimina il dispositivo spuntato |
 | clic sulla casella | spunta o toglie la spunta alla riga |
 | doppio clic sulle note | modifica la nota nell'elenco |
+| doppio clic su modello/descrizione | modifica la descrizione nell'elenco |
 | doppio clic sullo stato | tendina per cambiare stato nell'elenco |
+| doppio clic sul tipo | tendina per cambiare tipo nell'elenco |
 | doppio clic altrove | apre la scheda del dispositivo |
 
 ## Aggiungere con il lettore di codici a barre
@@ -1023,8 +1030,9 @@ ottiene in due modi:
   [`docs/Import_template.xlsx`](docs/Import_template.xlsx) (inglese).
 
 Contiene solo le colonne che servono a laptop e tablet - *Asset Tag*, *Tipo*,
-*Modello*, *Numero di serie*, *Stato*, *Note* - gia' divise per stanza dalle
-righe-separatore, con le tendine su *Tipo* e *Stato* e un foglio *Istruzioni*.
+*Stato*, *Note*, *Modello/Descrizione*, *Numero di serie* - nello stesso ordine
+in cui compaiono nel programma, gia' divise per stanza dalle righe-separatore,
+con le tendine su *Tipo* e *Stato* e un foglio *Istruzioni*.
 Il modello generato dal programma rispecchia le stanze e gli stati configurati
 in quel momento.
 
@@ -1129,7 +1137,7 @@ Una riga con **una sola cella scritta**, contenente il nome di una stanza,
 assegna quella stanza a tutte le righe che seguono, fino al separatore
 successivo.
 
-| Asset Tag | Tipo | Modello | Numero di serie |
+| Asset Tag | Tipo | Modello/Descrizione | Numero di serie |
 | --- | --- | --- | --- |
 | **BAU** | | | |
 | IT-0101 | Laptop | Lenovo ThinkPad T14 Gen 4 | PF4A1B2C |
@@ -1169,7 +1177,7 @@ altre sono riconosciute per nome, in italiano o in inglese, per esempio:
 | --- | --- |
 | Asset Tag | Asset Tag, Asset, Tag, Etichetta, Inventario |
 | Tipo | Tipo, Tipologia, Categoria, Type |
-| Modello | Modello, Model, Descrizione, Dispositivo |
+| Modello/Descrizione | Modello, Modello/Descrizione, Model, Descrizione, Dispositivo |
 | Numero di serie | Numero di serie, Seriale, Serial Number, S/N, Matricola, Service Tag |
 | IMEI | IMEI, IMEI/MEID, MEID, Codice IMEI |
 | Restituito da | Restituito da, Proprietario, Consegnato da, Riconsegnato da, Owner |
