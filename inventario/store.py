@@ -1182,6 +1182,27 @@ def rows_from_workbook(path, rooms=None):
         wb.close()
 
 
+# Excel misura le colonne in caratteri del font predefinito, non in pixel. La
+# corrispondenza non e' esatta - le lettere non sono tutte larghe uguali - per
+# questo si aggiunge un margine invece di fidarsi del conteggio secco.
+MARGINE_COLONNA = 3
+LARGHEZZA_COLONNA_MIN = 9
+LARGHEZZA_COLONNA_MAX = 80
+
+
+def larghezza_colonna(titolo, valori):
+    """Quanto deve essere larga una colonna del foglio perche' si legga tutta.
+
+    Le larghezze fisse tagliavano il testo, o lo facevano sbordare sulla cella
+    accanto: chi apre il file si trova a doverle allargare a mano una per una.
+    Si misura invece il contenuto vero, e non si scende mai sotto il titolo -
+    una colonna vuota deve comunque dire che cosa conterrebbe.
+    """
+    piu_lungo = max([len(str(v)) for v in valori if v] or [0])
+    largo = max(len(titolo), piu_lungo) + MARGINE_COLONNA
+    return min(max(largo, LARGHEZZA_COLONNA_MIN), LARGHEZZA_COLONNA_MAX)
+
+
 def _style_sheet(ws, row_count):
     """Formattazione minima del file dati (l'export di stampa e' piu' curato)."""
     from openpyxl.styles import Alignment, Font, PatternFill
@@ -1192,12 +1213,11 @@ def _style_sheet(ws, row_count):
         cell.fill = fill
         cell.alignment = Alignment(vertical="center")
     ws.freeze_panes = "A2"
-    widths = {"asset_tag": 18, "tipo": 12, "modello": 32, "seriale": 20,
-              "imei": 20, "restituito_da": 22, "stanza": 24, "stato": 26,
-              "prestato_a": 24, "prestato_il": 18, "spedito_il": 18, "note": 38,
-              "modificato_il": 20, "modificato_da": 24}
+    # anche il file dati si apre in Excel: le colonne si misurano sul contenuto
     for i, field in enumerate(ALL_FIELDS, start=1):
-        ws.column_dimensions[ws.cell(row=1, column=i).column_letter].width = widths[field]
+        valori = [ws.cell(row=r, column=i).value for r in range(2, row_count + 2)]
+        ws.column_dimensions[ws.cell(row=1, column=i).column_letter].width = \
+            larghezza_colonna(HEADERS[field], valori)
     if row_count:
         ws.auto_filter.ref = "A1:%s%d" % (
             ws.cell(row=1, column=len(ALL_FIELDS)).column_letter, row_count + 1)

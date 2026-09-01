@@ -12,7 +12,8 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
 from .store import (ALL_FIELDS, HEADERS, InventoryError, NON_DISPONIBILE,
-                    SPEDITO, STATI, clean, is_iphone, valore_visibile)
+                    SPEDITO, STATI, clean, is_iphone, larghezza_colonna,
+                    valore_visibile)
 from .lingua import T, intestazione, stato as traduci_stato
 
 PRINT_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
@@ -82,7 +83,10 @@ def _write_table(ws, items, fields, title=None, subtitle=None, lingua=None):
                 cell.fill = _BAND_FILL
 
     for col, field in enumerate(fields, start=1):
-        ws.column_dimensions[get_column_letter(col)].width = PRINT_WIDTHS.get(field, 20)
+        ws.column_dimensions[get_column_letter(col)].width = larghezza_colonna(
+            intestazione(HEADERS[field], lingua),
+            [traduci_stato(valore_visibile(i, field), lingua) if field == "stato"
+             else valore_visibile(i, field) for i in items])
 
     ws.freeze_panes = ws.cell(row=header_row + 1, column=1)
     if items:

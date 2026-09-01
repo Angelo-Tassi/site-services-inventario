@@ -162,7 +162,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.32.0 · alfa</div>
+  <div class="alpha">versione 0.32.1 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -186,12 +186,15 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
 
 <section>
   <h2>Ultime modifiche</h2>
-  <p class="sub">Che cosa e' cambiato nelle ultime due versioni.</p>
+  <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
     <div class="rilascio">
-      <h3>v0.32.0</h3>
+      <h3>v0.32.1</h3>
       <p class="quando">1 settembre 2026</p>
       <ul>
+        <li><b>Le colonne dei file Excel si adattano al contenuto</b>: niente piu' testo
+          tagliato o sbordato, e nessuna colonna da allargare a mano. Vale per le
+          esportazioni, per la stampa e per il file dell'inventario.</li>
         <li><b>Il tipo si cambia dall'elenco</b>, con la tendina, come lo stato e le
           note. Un iPhone non si trasforma in un laptop: si perderebbe
           l'identificativo, e il programma lo rifiuta spiegando perche'.</li>
@@ -218,7 +221,32 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           dispositivo: asset tag, o IMEI per gli iPhone. Il resto si completa dopo.</li>
       </ul>
     </div>
-  </div>
+      <div class="rilascio">
+      <h3>v0.30.0</h3>
+      <p class="quando">31 agosto 2026</p>
+      <ul>
+        <li><b>Colori sui pulsanti</b>, per famiglia: arancione i dati che entrano,
+          verde quelli che escono, rosso quello che riscrive l'inventario di tutti.</li>
+        <li><b>Copia locale dell'inventario</b>: <i>Salva copia in locale…</i> mette
+          dove vuoi tu una copia dell'inventario com'e' in quel secondo, con le
+          impostazioni accanto. E' la protezione contro la cartella di rete che
+          sparisce.</li>
+        <li><b>Il manuale completo</b>, in italiano e inglese, raggiungibile dal
+          pulsante qui sopra.</li>
+      </ul>
+    </div>
+    <div class="rilascio">
+      <h3>v0.29.0</h3>
+      <p class="quando">31 agosto 2026</p>
+      <ul>
+        <li><b>Ogni stanza mostra solo le colonne che le servono</b>: il prestito dove
+          i prestiti esistono, l'IMEI dove ci sono i telefoni, e mai la stanza dentro
+          una stanza sola.</li>
+        <li><b>Lo stato di un dispositivo prestato si chiama "In prestito"</b>, non piu'
+          "Non disponibile": dice quello che e' successo invece di quello che manca.</li>
+      </ul>
+    </div>
+</div>
 </section>
 
 <section>
@@ -394,7 +422,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.32.0 · alpha</div>
+  <div class="alpha">version 0.32.1 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -418,12 +446,15 @@ python Inventario.py</pre>
 
 <section>
   <h2>Latest changes</h2>
-  <p class="sub">What changed in the last two versions.</p>
+  <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
     <div class="rilascio">
-      <h3>v0.32.0</h3>
+      <h3>v0.32.1</h3>
       <p class="quando">1 September 2026</p>
       <ul>
+        <li><b>Excel columns size themselves to their content</b>: no more truncated or
+          overflowing text, and no columns to widen by hand. It applies to exports, to
+          printing and to the inventory file itself.</li>
         <li><b>The type is changed from the list</b>, with a dropdown, like the status
           and the notes. An iPhone does not turn into a laptop: the identifier would be
           lost, and the program refuses, explaining why.</li>
@@ -450,7 +481,31 @@ python Inventario.py</pre>
           IMEI for iPhones. The rest is filled in later.</li>
       </ul>
     </div>
-  </div>
+      <div class="rilascio">
+      <h3>v0.30.0</h3>
+      <p class="quando">31 August 2026</p>
+      <ul>
+        <li><b>Colours on the buttons</b>, by family: orange for data coming in, green
+          for data going out, red for what rewrites everybody's inventory.</li>
+        <li><b>Local copy of the inventory</b>: <i>Save a local copy…</i> puts a copy of
+          the inventory as it is at that second wherever you want, with the settings
+          beside it. It is the protection against the network folder disappearing.</li>
+        <li><b>The full manual</b>, in Italian and English, reachable from the button
+          above.</li>
+      </ul>
+    </div>
+    <div class="rilascio">
+      <h3>v0.29.0</h3>
+      <p class="quando">31 August 2026</p>
+      <ul>
+        <li><b>Each room shows only the columns it needs</b>: the loan where loans
+          exist, the IMEI where the phones are, and never the room inside a single
+          room.</li>
+        <li><b>The status of a lent device is called "On loan"</b>, no longer "Not
+          available": it says what happened instead of what is missing.</li>
+      </ul>
+    </div>
+</div>
 </section>
 
 <section>
