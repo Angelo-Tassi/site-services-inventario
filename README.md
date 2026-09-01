@@ -432,19 +432,17 @@ un'altra stanza dalle impostazioni, le due colonne compaiono li'.
 
 ### La stessa regola nei file che escono
 
-Un file esportato porta **l'inventario**, non la sua cronaca: asset tag, tipo,
-modello, numero di serie, stanza, stato e note. Sono esattamente le colonne del
-[modello da compilare](#il-modello-di-importazione) piu' la stanza, quindi un
-file esportato si reimporta senza perdere niente.
+Un file esportato risponde a una domanda sola: **che cosa abbiamo, di che tipo,
+dove sta e in che condizioni**. Quattro colonne: asset tag, tipo, stanza, stato.
 
-Prestiti, IMEI, restituito da e spedizioni restano fuori: servono a chi lavora
-davanti all'elenco, dentro la stanza che li riguarda, non a chi riceve il file.
-La **stampa** invece li porta, perche' e' fatta per chi lavora.
+Modello, numero di serie, note, prestiti, IMEI, spedizioni e ultima modifica
+restano fuori: servono a chi lavora davanti all'elenco, dentro la stanza che li
+riguarda, non a chi riceve il file. La **stampa** invece li porta, perche' e'
+fatta per chi lavora.
 
-**Una conseguenza da conoscere:** un prestito in corso non sopravvive a un giro
-*esporta -> reimporta*, perche' nel file non c'e'. Per rimettere in piedi un
-inventario per intero non si usa un'esportazione ma *Salva copia in locale...*,
-che copia il file vero e si porta dietro tutto.
+**Da un'esportazione non si ricostruisce un inventario**, perche' quei campi nel
+file non ci sono. Per rimettere in piedi l'inventario per intero si usa *Salva
+copia in locale...*, che copia il file vero e si porta dietro tutto.
 
 ## Prestiti
 

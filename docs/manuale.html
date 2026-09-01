@@ -351,16 +351,15 @@ table{min-width:520px}
     prestiti in un'altra stanza, le due colonne compaiono li'.</div>
 
   <h3>La stessa regola nei file che escono</h3>
-  <p class="sub">Un file esportato porta <b>l'inventario</b>, non la sua cronaca: asset
-    tag, tipo, modello, numero di serie, stanza, stato e note. Sono esattamente le colonne
-    del modello da compilare, piu' la stanza: per questo un file esportato si reimporta
-    senza perdere niente.</p>
-  <p class="sub">Prestiti, IMEI, restituito da e spedizioni restano fuori: servono a chi
-    lavora davanti all'elenco, dentro la stanza che li riguarda, e non a chi riceve il
-    file. La <b>stampa</b> invece li porta, perche' e' fatta per chi lavora.</p>
-  <div class="avviso"><b>Una conseguenza da conoscere.</b> Un prestito in corso non
-    sopravvive a un giro esporta &rarr; reimporta: nel file non c'e'. Per rimettere in
-    piedi un inventario per intero non si usa un'esportazione ma
+  <p class="sub">Un file esportato risponde a una domanda sola: <b>che cosa abbiamo, di
+    che tipo, dove sta e in che condizioni</b>. Quattro colonne: asset tag, tipo, stanza,
+    stato.</p>
+  <p class="sub">Modello, numero di serie, note, prestiti, IMEI, spedizioni e ultima
+    modifica restano fuori: servono a chi lavora davanti all'elenco, dentro la stanza che
+    li riguarda, non a chi riceve il file. La <b>stampa</b> invece li porta, perche' e'
+    fatta per chi lavora.</p>
+  <div class="avviso"><b>Da un'esportazione non si ricostruisce un inventario</b>, perche'
+    quei campi nel file non ci sono. Per rimettere in piedi l'inventario per intero si usa
     <span class="k verde">Salva copia in locale…</span>, che copia il file vero e si porta
     dietro tutto.</div>
 </section>
@@ -393,6 +392,9 @@ table{min-width:520px}
         attesa ritiro, Guasto in attesa tecnico, Da rebuildare, Controllare.</p></div>
     <div class="card"><h3>Note</h3>
       <p>Doppio clic sulla cella <b>Note</b> e si scrive. Invio per confermare.</p></div>
+    <div class="card"><h3>Tipo</h3>
+      <p>Doppio clic sulla cella <b>Tipo</b>: tendina con i tipi configurati. Un iPhone
+        non si trasforma in un laptop, e viceversa: si perderebbe l'identificativo.</p></div>
     <div class="card"><h3>Modello/Descrizione</h3>
       <p>Stessa cosa: doppio clic e si scrive. La colonna accetta anche una descrizione
         libera, per quando il modello esatto non basta a riconoscere l'oggetto.</p></div>
@@ -784,17 +786,17 @@ table{min-width:520px}
     the settings and the two columns appear there.</div>
 
   <h3>The same rule in the files that come out</h3>
-  <p class="sub">An exported file carries <b>the inventory</b>, not its chronicle: asset
-    tag, type, model, serial number, room, status and notes. They are exactly the columns
-    of the template to fill in, plus the room: that is why an exported file can be
-    reimported without losing anything.</p>
-  <p class="sub">Loans, IMEI, returned by and shipments stay out: they serve whoever is
-    working in front of the list, inside the room they belong to, not whoever receives the
-    file. <b>Printing</b> does carry them, because it is made for whoever is working.</p>
-  <div class="avviso"><b>A consequence worth knowing.</b> A loan in progress does not
-    survive an export &rarr; reimport round trip: it is not in the file. To rebuild a whole
-    inventory you do not use an export but <span class="k verde">Save a local copy…</span>,
-    which copies the real file and carries everything with it.</div>
+  <p class="sub">An exported file answers a single question: <b>what do we have, of what
+    type, where is it and in what condition</b>. Four columns: asset tag, type, room,
+    status.</p>
+  <p class="sub">Model, serial number, notes, loans, IMEI, shipments and last change stay
+    out: they serve whoever is working in front of the list, inside the room they belong
+    to, not whoever receives the file. <b>Printing</b> does carry them, because it is made
+    for whoever is working.</p>
+  <div class="avviso"><b>An inventory cannot be rebuilt from an export</b>, because those
+    fields are not in the file. To put the whole inventory back you use
+    <span class="k verde">Save a local copy…</span>, which copies the real file and carries
+    everything with it.</div>
 </section>
 
 <section id="aggiungere-en">
@@ -824,6 +826,10 @@ table{min-width:520px}
         collection, Faulty - awaiting technician, To be rebuilt, To be checked.</p></div>
     <div class="card"><h3>Notes</h3>
       <p>Double-click the <b>Notes</b> cell and type. Enter to confirm.</p></div>
+    <div class="card"><h3>Type</h3>
+      <p>Double-click the <b>Type</b> cell: a dropdown with the configured types. An
+        iPhone does not turn into a laptop, or the other way round: the identifier would
+        be lost.</p></div>
     <div class="card"><h3>Model/Description</h3>
       <p>The same: double-click and type. The column takes a free description too, for when
         the exact model is not enough to recognise the thing.</p></div>

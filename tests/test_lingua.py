@@ -90,7 +90,9 @@ assert len(righe) == 13, len(righe)
 assert {i["stato"] for i in righe} <= set(STATI + ["In prestito"]), \
     "rileggendo, gli stati tornano in italiano"
 assert any(i["stato"] == DISPONIBILE for i in righe)
-assert all(i["seriale"] or i["imei"] for i in righe if i["tipo"] != "Iphone")
+# l'esportazione porta quattro campi: il seriale non c'e' piu', e va bene cosi'
+assert all(not i["seriale"] for i in righe), "l'export non porta il seriale"
+assert all(i["asset_tag"] and i["stanza"] for i in righe)
 
 # un file inglese si importa davvero
 nuovo = InventoryStore(os.path.join(d, "Inventario.xlsx"), iphone_room=BAU)

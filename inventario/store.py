@@ -959,6 +959,38 @@ class InventoryStore(object):
 
         return self._apply(op)
 
+    def set_tipo(self, tag, tipo):
+        """Cambia il tipo di un dispositivo (modifica al volo dall'elenco).
+
+        Un iPhone non si trasforma in un laptop e viceversa: il passaggio
+        cancellerebbe l'identificativo - l'IMEI da una parte, l'asset tag e il
+        seriale dall'altra - e sarebbe una perdita silenziosa. Per quello serve
+        eliminare e reinserire, che almeno si vede.
+        """
+        tag = norm_tag(tag)
+        tipo = clean(tipo)
+
+        def op(items):
+            index = _index_of(items, tag)
+            if index is None:
+                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+            attuale = items[index]
+            if clean(attuale.get("tipo")) == tipo:
+                return False
+            if is_iphone(attuale.get("tipo")) != is_iphone(tipo):
+                raise InventoryError(
+                    "Non si passa da iPhone a un altro tipo, ne' viceversa.\n\n"
+                    "Un iPhone e' identificato dall'IMEI, gli altri dispositivi "
+                    "dall'asset tag\ne dal numero di serie: il passaggio "
+                    "cancellerebbe l'identificativo.\n\n"
+                    "Elimina il dispositivo e reinseriscilo con il tipo giusto.")
+            attuale["tipo"] = tipo
+            normalize_state(attuale, self.stati)
+            _stamp_item(attuale)
+            return True
+
+        return self._apply(op)
+
     def set_note(self, tag, note):
         """Aggiorna soltanto le note (modifica al volo dall'elenco)."""
         return self.set_campo(tag, "note", note)

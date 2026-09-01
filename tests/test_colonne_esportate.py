@@ -11,7 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fixture
 from openpyxl import load_workbook
 from inventario import excel_io
-from inventario.excel_io import CAMPI_PORTANTI, campi_con_valore
+from inventario.excel_io import (CAMPI_PORTANTI, TEMPLATE_FIELDS,
+                                 campi_con_valore)
 from inventario.store import ALL_FIELDS, InventoryStore, new_item
 
 BAU, KIOSK, DR = fixture.BAU, fixture.KIOSK, fixture.DR
@@ -32,10 +33,9 @@ def intestazioni(file_prodotto):
     finally:
         wb.close()
 
-# ---- un file esportato e' l'inventario, non la sua cronaca: stesse colonne
-# ovunque, e sono quelle del modello da compilare piu' la stanza
-ATTESE = ["Asset Tag", "Tipo", "Modello/Descrizione", "Numero di serie",
-          "Stanza", "Stato", "Note"]
+# ---- un file esportato risponde a una domanda sola: che cosa abbiamo, di che
+# tipo, dove sta e in che condizioni. Stesse quattro colonne ovunque.
+ATTESE = ["Asset Tag", "Tipo", "Stanza", "Stato"]
 colonne = intestazioni(excel_io.export(items, os.path.join(fuori, "tutto.xlsx"),
                                        rooms=[BAU, KIOSK, DR]))
 assert colonne == ATTESE, colonne
@@ -64,6 +64,9 @@ excel_io.build_template(modello, [BAU, KIOSK, DR])
 colonne = intestazioni(modello)
 assert colonne == ["Asset Tag", "Tipo", "Modello/Descrizione",
                    "Numero di serie", "Stato", "Note"], colonne
+# il modello da compilare resta piu' ricco dell'esportazione: serve a caricare
+# dispositivi nuovi, non a documentare quelli che ci sono gia'
+assert set(excel_io.CAMPI_ESPORTAZIONE) - set(TEMPLATE_FIELDS) == {"stanza"}
 
 # ---- un file per stanza: tutti con la stessa forma
 cartella = tempfile.mkdtemp()
@@ -72,11 +75,13 @@ assert len(scritti) == 3, scritti
 for f in scritti:
     assert intestazioni(f) == ATTESE, (f, intestazioni(f))
 
-# ---- quello che esce si reimporta senza perdere niente: le colonne del file
-# esportato sono quelle del modello, piu' la stanza
-from inventario.excel_io import TEMPLATE_FIELDS
-assert excel_io.CAMPI_ESPORTAZIONE == TEMPLATE_FIELDS[:4] + ["stanza"] + TEMPLATE_FIELDS[4:], \
-    excel_io.CAMPI_ESPORTAZIONE
+# ---- da un'esportazione NON si ricostruisce un inventario: modello, seriale e
+# note non ci sono. E' il motivo per cui la copia locale esiste.
+from inventario.store import rows_from_workbook
+riletti, _ = rows_from_workbook(scritti[0], [BAU, KIOSK, DR])
+assert riletti, scritti[0]
+assert all(not i["modello"] and not i["seriale"] and not i["note"] for i in riletti)
+assert all(i["asset_tag"] and i["stanza"] for i in riletti)
 
 # ---- le colonne portanti restano anche quando non c'e' niente da scrivere
 assert campi_con_valore([], list(ALL_FIELDS)) == CAMPI_PORTANTI

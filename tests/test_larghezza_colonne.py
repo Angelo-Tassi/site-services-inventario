@@ -68,6 +68,31 @@ try:
 except Exception as exc:
     assert "non si modifica" in str(exc), exc
 
+# ---- anche il tipo si cambia dall'elenco, con la tendina dei tipi configurati
+app.show_home(); app.update()
+prima = app._item_by_tag("IT-8000")["tipo"]
+assert prima == "Laptop", prima
+app._run(lambda: app.store.set_tipo("IT-8000", "Tablet"), "ok")
+assert app._item_by_tag("IT-8000")["tipo"] == "Tablet"
+
+# ---- ma un iPhone non diventa un laptop: si perderebbe l'identificativo
+telefono = new_item(tipo=fixture.TIPO_IPHONE, modello="Apple iPhone 14",
+                    imei="356938035643809", restituito_da="M. B.")
+app._run(lambda: app.store.add(telefono), "ok")
+try:
+    app.store.set_tipo("356938035643809", "Laptop")
+    raise AssertionError("doveva rifiutare")
+except Exception as exc:
+    assert "iPhone" in str(exc), exc
+assert app._item_by_tag("356938035643809")["imei"] == "356938035643809"
+# e nemmeno il contrario
+try:
+    app.store.set_tipo("IT-8000", fixture.TIPO_IPHONE)
+    raise AssertionError("doveva rifiutare")
+except Exception as exc:
+    assert "iPhone" in str(exc), exc
+assert app._item_by_tag("IT-8000")["asset_tag"] == "IT-8000"
+
 # ---- l'intestazione del modello dice anche che ci si scrive una descrizione
 assert HEADERS["modello"] == "Modello/Descrizione"
 assert intestazione(HEADERS["modello"]) == "Modello/Descrizione"

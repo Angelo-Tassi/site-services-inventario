@@ -117,13 +117,14 @@ def _sottotitolo(stamp, quanti, lingua):
 # danno al file la forma che chi lo apre - o chi lo reimporta - si aspetta.
 CAMPI_PORTANTI = ["asset_tag", "tipo", "modello", "seriale", "stanza", "stato", "note"]
 
-# Quello che esce dal programma in un file .xlsx e' l'inventario, non la sua
-# cronaca. Chi ha in mano un dispositivo prestato, da quando, chi ha restituito
-# un telefono, chi ha toccato per ultimo la riga: sono dati che servono a chi
-# lavora nella stanza, davanti all'elenco, e non a chi riceve il file. Non a
-# caso queste colonne non esistono nemmeno nel modello da compilare, quindi un
-# file esportato si reimporta senza perdere niente.
-CAMPI_ESPORTAZIONE = list(CAMPI_PORTANTI)
+# Un file esportato risponde a una domanda sola: che cosa abbiamo, di che tipo,
+# dove sta e in che condizioni. Tutto il resto - modello, numero di serie, note,
+# prestiti, IMEI, chi ha toccato la riga per ultimo - serve a chi lavora davanti
+# all'elenco, dentro la stanza che lo riguarda, e non a chi riceve il file.
+#
+# Attenzione: da un'esportazione non si ricostruisce un inventario, perche' quei
+# campi non ci sono. Per quello c'e' la copia locale, che copia il file vero.
+CAMPI_ESPORTAZIONE = ["asset_tag", "tipo", "stanza", "stato"]
 
 
 def campi_con_valore(items, fields):

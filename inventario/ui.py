@@ -26,6 +26,16 @@ SPAZIO_CELLA = 22              # margini della cella, perche' il testo non tocch
 SPAZIO_INTESTAZIONE = 34       # margini piu' la barretta colorata e la freccia
 LARGHEZZA_MINIMA = 46
 
+# L'ordine in cui si leggono le colonne: prima quello che si cerca a colpo
+# d'occhio - qual e' l'oggetto, dov'e', come sta, che cosa c'e' da sapere - e
+# per ultimi i campi lunghi, che si leggono solo quando servono davvero. Il
+# contenitore Iphone non segue questo ordine: li' l'IMEI e' l'identificativo e
+# viene per primo.
+ORDINE_COLONNE = ["asset_tag", "tipo", "stanza", "stato", "note",
+                  "modello", "seriale",
+                  "imei", "restituito_da", "prestato_a", "prestato_il",
+                  "spedito_il", "modificato_il", "modificato_da"]
+
 NO_ROOM_IT = "(senza stanza)"
 
 
@@ -1312,6 +1322,10 @@ class App(tk.Tk):
         if not si_presta:
             togli("prestato_a", "prestato_il")
 
+        if not contenitore_iphone:      # la vista degli iPhone ha un ordine suo
+            campi.sort(key=lambda c: ORDINE_COLONNE.index(c)
+                       if c in ORDINE_COLONNE else len(ORDINE_COLONNE))
+
         # L'inventario completo e' una panoramica, non una scheda: deve dire in
         # una riga che cos'e' un dispositivo, dov'e' e come sta. Chi e' l'ha in
         # prestito, quando e' stato spedito, chi l'ha restituito e chi ha
@@ -1660,6 +1674,9 @@ class App(tk.Tk):
         if column == "stato" and tag:
             self.edit_stato_inline(tag)
             return "break"
+        if column == "tipo" and tag:
+            self.edit_tipo_inline(tag)
+            return "break"
         self.on_edit()
         return "break"
 
@@ -1710,6 +1727,44 @@ class App(tk.Tk):
         combo.bind("<Escape>", lambda e: chiudi(False))
         combo.bind("<FocusOut>", lambda e: chiudi(False))
         combo.event_generate("<Button-1>")      # apre subito la tendina
+
+    def edit_tipo_inline(self, tag):
+        """Cambia il tipo con una tendina direttamente nell'elenco."""
+        item = self._item_by_tag(tag)
+        if item is None:
+            return
+        tipi = [t for t in (self.cfg.get("types") or [])
+                if is_iphone(t) == is_iphone(item.get("tipo"))]
+        if len(tipi) < 2:
+            self._segnala(T("Non c'e' un altro tipo in cui trasformarlo."))
+            return
+        colonne = self._columns()
+        if "tipo" not in colonne:
+            return
+        box = self.tree.bbox(tag, colonne.index("tipo"))
+        if not box:
+            return
+        var = tk.StringVar(value=item.get("tipo") or tipi[0])
+        combo = ttk.Combobox(self.tree, textvariable=var, values=tipi,
+                             state="readonly", font=self.fonts["base"])
+        combo.place(x=box[0], y=box[1], width=box[2], height=box[3])
+        combo.focus_set()
+        fatto = {"chiuso": False}
+
+        def chiudi(salva):
+            if fatto["chiuso"]:
+                return
+            fatto["chiuso"] = True
+            scelto = var.get()
+            combo.destroy()
+            if salva and scelto != item.get("tipo"):
+                self._run(lambda: self.store.set_tipo(tag, scelto),
+                          T("%s: %s.") % (tag, scelto))
+
+        combo.bind("<<ComboboxSelected>>", lambda e: chiudi(True))
+        combo.bind("<Escape>", lambda e: chiudi(False))
+        combo.bind("<FocusOut>", lambda e: chiudi(False))
+        combo.event_generate("<Button-1>")
 
     def _segnala(self, messaggio):
         """Avviso discreto nella barra di stato, senza aprire finestre."""

@@ -132,6 +132,17 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
 .lingua select{font:inherit;color:var(--ink);background:var(--panel);
   border:1px solid var(--line);border-radius:4px;padding:7px 10px}
 [hidden]{display:none !important}
+
+/* ultime modifiche */
+.novita{display:grid;gap:16px}
+.rilascio{background:var(--panel);border:1px solid var(--line);border-radius:5px;
+  padding:18px 20px}
+.rilascio h3{margin:0 0 3px;font-family:"IBM Plex Mono",monospace;font-size:14px;
+  font-weight:500;color:var(--accent);letter-spacing:0}
+.rilascio .quando{font-size:12px;color:var(--ink-faint);margin:0 0 10px}
+.rilascio ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--ink-soft)}
+.rilascio li{margin:0 0 6px}
+.rilascio b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -151,7 +162,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.31.0 · alfa</div>
+  <div class="alpha">versione 0.32.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -172,6 +183,43 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
     quello che permette di installarlo anche dove la sicurezza aziendale guarda con
     sospetto i binari non firmati.</p>
 </header>
+
+<section>
+  <h2>Ultime modifiche</h2>
+  <p class="sub">Che cosa e' cambiato nelle ultime due versioni.</p>
+  <div class="novita">
+    <div class="rilascio">
+      <h3>v0.32.0</h3>
+      <p class="quando">1 settembre 2026</p>
+      <ul>
+        <li><b>Il tipo si cambia dall'elenco</b>, con la tendina, come lo stato e le
+          note. Un iPhone non si trasforma in un laptop: si perderebbe
+          l'identificativo, e il programma lo rifiuta spiegando perche'.</li>
+        <li><b>Colonne in ordine di lettura</b>: asset tag, tipo, stanza, stato, note,
+          e per ultimi modello/descrizione e numero di serie, che si leggono solo
+          quando servono. Il contenitore Iphone mantiene il suo ordine.</li>
+        <li><b>L'esportazione porta quattro campi</b>: asset tag, tipo, stanza e stato.
+          Un file esportato risponde a "che cosa abbiamo, dove sta, come sta", non a
+          tutto il resto. Per ricostruire un inventario si usa la copia locale.</li>
+      </ul>
+    </div>
+    <div class="rilascio">
+      <h3>v0.31.0</h3>
+      <p class="quando">1 settembre 2026</p>
+      <ul>
+        <li><b>Nessuna colonna taglia piu' il testo</b>: ognuna si misura sul contenuto
+          e non scende mai sotto la larghezza della propria intestazione, cosi' anche
+          una colonna vuota dice che cosa conterrebbe.</li>
+        <li><b>Modello diventa Modello/Descrizione</b> e si modifica dall'elenco con un
+          doppio clic. L'importazione accetta ancora la vecchia intestazione.</li>
+        <li><b>Ogni colonna ha il suo colore</b> nella riga di divisione e
+          nell'intestazione, per non perderla scorrendo un elenco largo.</li>
+        <li><b>Obbligatorio solo l'identificativo</b> quando si aggiunge un
+          dispositivo: asset tag, o IMEI per gli iPhone. Il resto si completa dopo.</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
 <section>
   <h2>Come si mette in funzione</h2>
@@ -239,21 +287,15 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
       </div>
       <div class="tw">
         <table>
-          <thead><tr><th></th><th>Asset Tag</th><th>Tipo</th><th>Modello/Descrizione</th>
-            <th>Numero di serie</th><th>Stanza</th><th>Stato</th><th>Note</th></tr></thead>
+          <thead><tr><th></th><th>Asset Tag</th><th>Tipo</th><th>Stanza</th>
+            <th>Stato</th><th>Note</th><th>Modello/Descrizione</th><th>Numero di serie</th></tr></thead>
           <tbody>
-            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td>
-              <td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td><td>Site Services BAU</td><td>Disponibile</td><td>Postazione reception</td></tr>
-            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td>
-              <td>Apple iPhone 14</td><td class="mono">—</td><td>Site Services BAU</td><td>Da Rispedire</td><td>Restituito da M. Bianchi</td></tr>
-            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td>
-              <td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td><td>Site Services BAU</td><td>Controllare</td><td>Con tastiera e pennino</td></tr>
-            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td>
-              <td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td><td>Digital Kiosk</td><td>In prestito</td><td>—</td></tr>
-            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td>
-              <td>Apple iPhone 13</td><td class="mono">—</td><td>Site Services BAU</td><td>Spedito al servizio telefonia</td><td>Rispedito il 28/08/2026</td></tr>
-            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td>
-              <td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td><td>Magazzino DR</td><td>Da rebuildare</td><td>Scorta sigillata</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Disponibile</td><td>Postazione reception</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
+            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Da Rispedire</td><td>Restituito da M. Bianchi</td><td>Apple iPhone 14</td><td class="mono">—</td></tr>
+            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>Controllare</td><td>Con tastiera e pennino</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
+            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>In prestito</td><td>—</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td></tr>
+            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Spedito al servizio telefonia</td><td>Rispedito il 28/08/2026</td><td>Apple iPhone 13</td><td class="mono">—</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>Da rebuildare</td><td>Scorta sigillata</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td></tr>
           </tbody>
         </table>
       </div>
@@ -352,7 +394,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.31.0 · alpha</div>
+  <div class="alpha">version 0.32.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -373,6 +415,43 @@ python Inventario.py</pre>
     what lets it be installed even where corporate security looks at unsigned
     binaries with suspicion.</p>
 </header>
+
+<section>
+  <h2>Latest changes</h2>
+  <p class="sub">What changed in the last two versions.</p>
+  <div class="novita">
+    <div class="rilascio">
+      <h3>v0.32.0</h3>
+      <p class="quando">1 September 2026</p>
+      <ul>
+        <li><b>The type is changed from the list</b>, with a dropdown, like the status
+          and the notes. An iPhone does not turn into a laptop: the identifier would be
+          lost, and the program refuses, explaining why.</li>
+        <li><b>Columns in reading order</b>: asset tag, type, room, status, notes, and
+          last model/description and serial number, which are read only when needed. The
+          Iphone container keeps its own order.</li>
+        <li><b>Exports carry four fields</b>: asset tag, type, room and status. An
+          exported file answers "what do we have, where is it, how is it", not
+          everything else. To rebuild an inventory you use the local copy.</li>
+      </ul>
+    </div>
+    <div class="rilascio">
+      <h3>v0.31.0</h3>
+      <p class="quando">1 September 2026</p>
+      <ul>
+        <li><b>No column truncates its text any more</b>: each one sizes itself to its
+          content and never goes below the width of its own heading, so even an empty
+          column says what it would hold.</li>
+        <li><b>Model becomes Model/Description</b> and is edited from the list with a
+          double-click. Importing still accepts the old heading.</li>
+        <li><b>Every column has its own colour</b> in the dividing line and the heading,
+          so you do not lose it while scrolling a wide list.</li>
+        <li><b>Only the identifier is required</b> when adding a device: asset tag, or
+          IMEI for iPhones. The rest is filled in later.</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
 <section>
   <h2>Getting it running</h2>
@@ -439,21 +518,15 @@ python Inventario.py</pre>
       </div>
       <div class="tw">
         <table>
-          <thead><tr><th></th><th>Asset Tag</th><th>Type</th><th>Model/Description</th>
-            <th>Serial number</th><th>Room</th><th>Status</th><th>Notes</th></tr></thead>
+          <thead><tr><th></th><th>Asset Tag</th><th>Type</th><th>Room</th>
+            <th>Status</th><th>Notes</th><th>Model/Description</th><th>Serial number</th></tr></thead>
           <tbody>
-            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td>
-              <td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td><td>Site Services BAU</td><td>Available</td><td>Reception desk</td></tr>
-            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td>
-              <td>Apple iPhone 14</td><td class="mono">—</td><td>Site Services BAU</td><td>To be shipped back</td><td>Returned by M. Bianchi</td></tr>
-            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td>
-              <td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td><td>Site Services BAU</td><td>To be checked</td><td>With keyboard and stylus</td></tr>
-            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td>
-              <td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td><td>Digital Kiosk</td><td>On loan</td><td>—</td></tr>
-            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td>
-              <td>Apple iPhone 13</td><td class="mono">—</td><td>Site Services BAU</td><td>Shipped to the phone service</td><td>Shipped on 28/08/2026</td></tr>
-            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td>
-              <td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td><td>Magazzino DR</td><td>To be rebuilt</td><td>Sealed spare</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Available</td><td>Reception desk</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
+            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>To be shipped back</td><td>Returned by M. Bianchi</td><td>Apple iPhone 14</td><td class="mono">—</td></tr>
+            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>To be checked</td><td>With keyboard and stylus</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
+            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>On loan</td><td>—</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td></tr>
+            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Shipped to the phone service</td><td>Shipped on 28/08/2026</td><td>Apple iPhone 13</td><td class="mono">—</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>To be rebuilt</td><td>Sealed spare</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td></tr>
           </tbody>
         </table>
       </div>

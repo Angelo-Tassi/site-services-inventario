@@ -506,19 +506,17 @@ the settings and the two columns appear there.
 
 ### The same rule in the files that come out
 
-An exported file carries **the inventory**, not its chronicle: asset tag, type,
-model, serial number, room, status and notes. They are exactly the columns of
-the [template to fill in](#the-import-template) plus the room, so an exported
-file can be reimported without losing anything.
+An exported file answers a single question: **what do we have, of what type,
+where is it and in what condition**. Four columns: asset tag, type, room, status.
 
-Loans, IMEI, returned by and shipments stay out: they serve whoever is working
-in front of the list, inside the room they belong to, not whoever receives the
-file. **Printing** does carry them, because it is made for whoever is working.
+Model, serial number, notes, loans, IMEI, shipments and last change stay out:
+they serve whoever is working in front of the list, inside the room they belong
+to, not whoever receives the file. **Printing** does carry them, because it is
+made for whoever is working.
 
-**A consequence worth knowing:** a loan in progress does not survive an
-*export -> reimport* round trip, because it is not in the file. To rebuild a
-whole inventory you do not use an export but *Save a local copy...*, which
-copies the real file and carries everything with it.
+**An inventory cannot be rebuilt from an export**, because those fields are not
+in the file. To put the whole inventory back you use *Save a local copy...*,
+which copies the real file and carries everything with it.
 
 ## Loans
 

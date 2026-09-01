@@ -26,8 +26,10 @@ def campi():
 # ---- home: una panoramica, non una scheda. Dice che cos'e' un dispositivo,
 # dov'e' e come sta; il resto si guarda dentro la stanza che lo riguarda
 app.show_home()
-assert campi() == ["asset_tag", "tipo", "modello", "seriale", "stanza",
-                   "stato", "note"], campi()
+# l'ordine conta: prima quello che si cerca a colpo d'occhio, per ultimi i
+# campi lunghi che si leggono solo quando servono
+assert campi() == ["asset_tag", "tipo", "stanza", "stato", "note",
+                   "modello", "seriale"], campi()
 # l'IMEI e' l'identificativo dei soli telefoni: si guarda dove stanno loro
 assert "imei" not in campi()
 assert app._columns() == [CHECK_COLUMN] + campi()
@@ -61,7 +63,7 @@ assert app._columns()[:2] == [CHECK_COLUMN, ACTION_COLUMN]
 # ---- Magazzino Disaster Recovery: ne' prestiti ne' telefoni, la piu' pulita
 app.show_room(DR)
 assert not any(c in campi() for c in IPHONE + PRESTITO), campi()
-assert campi() == ["asset_tag", "tipo", "modello", "seriale", "stato", "note",
+assert campi() == ["asset_tag", "tipo", "stato", "note", "modello", "seriale",
                    "modificato_il", "modificato_da"], campi()
 
 # ---- contenitore iPhone: niente asset tag, niente seriale, niente prestiti,
