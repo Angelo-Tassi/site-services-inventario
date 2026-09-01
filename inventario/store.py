@@ -995,6 +995,92 @@ class InventoryStore(object):
         """Aggiorna soltanto le note (modifica al volo dall'elenco)."""
         return self.set_campo(tag, "note", note)
 
+    def anteprima_eliminazione(self, codici):
+        """Che cosa succederebbe eliminando i codici indicati, senza toccarli.
+
+        Serve all'eliminazione in blocco: prima di cancellare trenta righe
+        bisogna poter leggere che cosa sparisce e da dove. Un codice puo'
+        arrivare incollato da Excel come riga intera, quindi si prova ogni
+        pezzo della riga: il primo che corrisponde a un dispositivo vince.
+
+        Ritorna (da_eliminare, non_trovati, bloccati), dove bloccati e' una
+        lista di (dispositivo, motivo).
+        """
+        items = self.load()
+        per_tag = {}
+        for it in items:
+            per_tag[norm_tag(it["asset_tag"])] = it
+        da_eliminare, non_trovati, bloccati = [], [], []
+        gia_visti = set()
+        for riga in codici:
+            trovato = None
+            for pezzo in _pezzi_di_riga(riga):
+                trovato = per_tag.get(norm_tag(pezzo))
+                if trovato is not None:
+                    break
+            if trovato is None:
+                if clean(riga):
+                    non_trovati.append(clean(riga))
+                continue
+            tag = norm_tag(trovato["asset_tag"])
+            if tag in gia_visti:
+                continue                  # la stessa riga incollata due volte
+            gia_visti.add(tag)
+            libero, sblocco = puo_essere_eliminato(trovato)
+            if not libero:
+                if sblocco is None:
+                    motivo = "iPhone non ancora rispedito al servizio telefonia"
+                else:
+                    motivo = "in conservazione fino al %s" % sblocco.strftime("%d/%m/%Y")
+                bloccati.append((trovato, motivo))
+                continue
+            da_eliminare.append(trovato)
+        return da_eliminare, non_trovati, bloccati
+
+    def anteprima_importazione(self, incoming, mode="merge", stanza=None):
+        """Che cosa succederebbe importando, senza scrivere niente.
+
+        Un riepilogo con dei numeri soltanto - "12 aggiunti, 3 aggiornati" - non
+        dice dove finiranno i dispositivi ne' che cosa si sta per perdere. Qui si
+        contano le aggiunte e gli aggiornamenti stanza per stanza, e si dice
+        quanti dispositivi ci saranno alla fine.
+        """
+        items = self.load()
+        presenti = set(norm_tag(i["asset_tag"]) for i in items)
+        per_stanza = {}
+        senza_identificativo = 0
+        for raw in incoming:
+            item = dict(raw)
+            tag = norm_tag(item.get("asset_tag"))
+            if not tag:
+                senza_identificativo += 1
+                continue
+            dove = clean(stanza) if stanza is not None else clean(item.get("stanza"))
+            riga = per_stanza.setdefault(dove or SENZA_STANZA,
+                                         {"aggiunti": 0, "aggiornati": 0})
+            if tag in presenti:
+                riga["aggiornati"] += 1
+            else:
+                riga["aggiunti"] += 1
+                presenti.add(tag)
+
+        eliminati = 0
+        if mode == "replace":
+            eliminati = sum(1 for it in items
+                            if not is_iphone(it.get("tipo"))
+                            and (stanza is None or it.get("stanza") == stanza)
+                            and puo_essere_eliminato(it)[0])
+        aggiunti = sum(r["aggiunti"] for r in per_stanza.values())
+        return {
+            "per_stanza": per_stanza,
+            "aggiunti": aggiunti,
+            "aggiornati": sum(r["aggiornati"] for r in per_stanza.values()),
+            "eliminati": eliminati,
+            "senza_identificativo": senza_identificativo,
+            "prima": len(items),
+            "dopo": len(items) - eliminati + aggiunti,
+        }
+
     def import_items(self, incoming, mode="merge", stanza=None):
         """Carica i dispositivi letti da un file.
 
@@ -1043,6 +1129,22 @@ class InventoryStore(object):
 
 
 # ------------------------------------------------------------- utilita'
+
+
+SENZA_STANZA = "(senza stanza)"
+
+
+def _pezzi_di_riga(riga):
+    """I possibili identificativi in una riga incollata da Excel.
+
+    Incollando da un foglio si porta dietro tutta la riga, separata da
+    tabulazioni; incollando una colonna sola arriva un codice per riga. Vanno
+    bene tutti e due.
+    """
+    testo = str(riga or "")
+    for separatore in ("\t", ";", ","):
+        testo = testo.replace(separatore, "\x00")
+    return [p.strip() for p in testo.split("\x00") if p.strip()]
 
 
 def _index_of(items, tag):

@@ -389,6 +389,27 @@ dice: non crea mai un inventario locale al posto di quello condiviso.
 Le stanze predefinite sono **Site Services BAU**, **Digital Kiosk** e
 **Magazzino Disaster Recovery**; i prestiti sono attivi sul Digital Kiosk.
 
+## Eliminare piu' dispositivi in una volta
+
+**`Elimina +`**, accanto a *Elimina*, serve a togliere trenta dispositivi senza
+cercarli uno per uno - e senza rinunciare a sapere che cosa sparisce.
+
+1. si **incollano i codici** presi da un foglio Excel, uno per riga. Va bene una
+   colonna di asset tag o righe intere: viene letto il primo codice che
+   corrisponde a un dispositivo in inventario;
+2. si preme **Controlla**. Il programma non tocca niente e mostra:
+   - i dispositivi che **verranno eliminati**, raggruppati per stanza, con il
+     modello e la segnalazione di quelli **in prestito**;
+   - quelli **saltati perche' non si possono eliminare** - un iPhone non ancora
+     rispedito, uno in conservazione - con il motivo e la data;
+   - quelli **saltati perche' non sono in inventario**, elencati;
+3. per procedere si scrive **`ACCETTO`**. Prima di eliminare viene salvata una
+   copia di sicurezza, e alla fine il programma dice quanti dispositivi
+   restano.
+
+I doppioni contano una volta sola, le righe vuote si ignorano, e gli iPhone
+mantengono tutte le loro protezioni.
+
 ## Le colonne di ogni stanza
 
 Ogni vista mostra **solo** le colonne che li' possono avere un valore. Una

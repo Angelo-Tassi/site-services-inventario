@@ -280,6 +280,7 @@ table{min-width:520px}
     <tr><td><span class="k blu">Aggiungi</span></td><td class="d">Chiede prima <b>che tipo</b> di dispositivo, poi se inserirlo a mano o con il lettore di codici a barre.</td></tr>
     <tr><td><span class="k grigio">Modifica</span></td><td class="d">Apre il dispositivo selezionato per cambiarne i campi.</td></tr>
     <tr><td><span class="k grigio">Elimina</span></td><td class="d">Toglie il dispositivo selezionato, con conferma. Gli iPhone hanno protezioni in piu': vedi <a href="#iphone">iPhone</a>.</td></tr>
+    <tr><td><span class="k rosso">Elimina +</span></td><td class="d"><b>Eliminazione in blocco.</b> Si incollano i codici presi da Excel, uno per riga; il programma dice quali esistono, da quale stanza spariranno e che cosa salta e perche'. Per procedere si scrive <span class="mono">ACCETTO</span>. Una copia di sicurezza viene salvata comunque prima.</td></tr>
     <tr><td><span class="k grigio">Sposta in stanza…</span></td><td class="d">Cambia la stanza del dispositivo selezionato. Gli iPhone non si spostano.</td></tr>
     <tr><td><span class="k arancio">Importa xls…</span></td><td class="d">Carica dispositivi da un foglio Excel. Prima chiede <b>che cosa</b> importare e <b>come</b>. Vedi <a href="#importare">Importare</a>.</td></tr>
     <tr><td><span class="k verde">Esporta xls…</span></td><td class="d">Produce un file Excel dell'inventario. Prima chiede ambito e forma. Vedi <a href="#esportare">Esportare</a>.</td></tr>
@@ -468,10 +469,15 @@ table{min-width:520px}
     Vanno bene anche le abbreviazioni <span class="mono">BAU</span>,
     <span class="mono">KIOSK</span>, <span class="mono">DISASTER</span>.</p>
 
-  <div class="avviso">Prima di importare, il programma mostra un riepilogo: quante righe
-    valide ha trovato, quali stanze ha riconosciuto, quali colonne non ha capito e quante
-    righe scarta. <b>Se nel foglio non trova nessuna stanza te lo dice li'</b>, prima di
-    toccare qualsiasi cosa, perche' altrimenti i dispositivi finirebbero senza stanza.</div>
+  <h3>Il riepilogo prima di importare</h3>
+  <p class="sub">Niente viene scritto finche' non confermi, e prima di confermare vedi:</p>
+  <div class="tw"><table class="man">
+    <tr><th>Che cosa dice</th><th>A che serve</th></tr>
+    <tr><td class="d"><b>Dove finiscono</b>, stanza per stanza</td><td class="d">quanti dispositivi <i>nuovi</i> e quanti <i>aggiornati</i> in ognuna: si vede subito se una stanza sta per riempirsi di roba che non le appartiene.</td></tr>
+    <tr><td class="d"><b>Quante righe vengono saltate</b>, e perche'</td><td class="d">senza identificativo, iPhone (che si inseriscono solo a mano), righe di altre stanze, colonne non riconosciute.</td></tr>
+    <tr><td class="d"><b>Quanti dispositivi ci sono adesso e quanti dopo</b></td><td class="d">e' il numero che dice se sta per succedere quello che pensi. Con la sostituzione dice anche quanti ne spariscono prima.</td></tr>
+    <tr><td class="d">Le stanze riconosciute dal foglio</td><td class="d">se non ne trova nessuna te lo dice li', prima di toccare qualsiasi cosa: altrimenti i dispositivi finirebbero senza stanza.</td></tr>
+  </table></div>
 
   <p class="note">Un foglio da importare non e' un inventario e non va mai aperto come
     tale: si carica da qui.</p>
@@ -720,6 +726,7 @@ table{min-width:520px}
     <tr><td><span class="k blu">Add</span></td><td class="d">Asks first <b>which type</b> of device, then whether to enter it by hand or with the barcode reader.</td></tr>
     <tr><td><span class="k grigio">Edit</span></td><td class="d">Opens the selected device to change its fields.</td></tr>
     <tr><td><span class="k grigio">Delete</span></td><td class="d">Removes the selected device, with confirmation. iPhones have extra protection: see <a href="#iphone-en">iPhones</a>.</td></tr>
+    <tr><td><span class="k rosso">Delete +</span></td><td class="d"><b>Bulk deletion.</b> You paste the codes from Excel, one per line; the program says which exist, which room they will disappear from, and what it skips and why. To go ahead you type <span class="mono">ACCETTO</span>. A backup copy is saved first anyway.</td></tr>
     <tr><td><span class="k grigio">Move to room…</span></td><td class="d">Changes the selected device's room. iPhones do not move.</td></tr>
     <tr><td><span class="k arancio">Import xls…</span></td><td class="d">Loads devices from an Excel sheet. It asks first <b>what</b> to import and <b>how</b>. See <a href="#importare-en">Importing</a>.</td></tr>
     <tr><td><span class="k verde">Export xls…</span></td><td class="d">Produces an Excel file of the inventory. It asks first for scope and shape. See <a href="#esportare-en">Exporting</a>.</td></tr>
@@ -906,10 +913,15 @@ table{min-width:520px}
     <span class="mono">BAU</span>, <span class="mono">KIOSK</span> and
     <span class="mono">DISASTER</span> work too.</p>
 
-  <div class="avviso">Before importing, the program shows a summary: how many valid rows it
-    found, which rooms it recognised, which columns it did not understand and how many rows
-    it discards. <b>If it finds no room in the sheet it tells you right there</b>, before
-    touching anything, because otherwise the devices would end up with no room.</div>
+  <h3>The summary before importing</h3>
+  <p class="sub">Nothing is written until you confirm, and before confirming you see:</p>
+  <div class="tw"><table class="man">
+    <tr><th>What it says</th><th>What for</th></tr>
+    <tr><td class="d"><b>Where they go</b>, room by room</td><td class="d">how many devices are <i>new</i> and how many <i>updated</i> in each: you see at once if a room is about to fill with things that do not belong to it.</td></tr>
+    <tr><td class="d"><b>How many rows are skipped</b>, and why</td><td class="d">no identifier, iPhones (which are entered by hand only), rows of other rooms, columns not recognised.</td></tr>
+    <tr><td class="d"><b>How many devices there are now and how many after</b></td><td class="d">that is the number that tells you whether what you think is about to happen. With Replace it also says how many disappear first.</td></tr>
+    <tr><td class="d">The rooms recognised in the sheet</td><td class="d">if it finds none it tells you right there, before touching anything: otherwise the devices would end up with no room.</td></tr>
+  </table></div>
 
   <p class="note">A sheet to import is not an inventory and must never be opened as one: it
     is loaded from here.</p>

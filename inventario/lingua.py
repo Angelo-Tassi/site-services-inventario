@@ -516,6 +516,64 @@ EN = {
         'The inventory is gone:\n%s',
     'Non riesco a salvare la copia:\n%s':
         'I cannot save the copy:\n%s',
+    'Elimina +':
+        'Delete +',
+    "Elimina piu' dispositivi":
+        'Delete several devices',
+    'Incolla qui i dispositivi da eliminare':
+        'Paste the devices to delete here',
+    'Uno per riga. Va bene incollare una colonna di asset tag da\nExcel, o righe intere: viene letto il primo codice che\ncorrisponde a un dispositivo in inventario.':
+        'One per line. Pasting a column of asset tags from Excel is fine,\nor whole rows: the first code matching a device in the\ninventory is the one used.',
+    'Controlla':
+        'Check',
+    'Non hai incollato niente.':
+        'You have not pasted anything.',
+    'Righe incollate: %d':
+        'Lines pasted: %d',
+    'VERRANNO ELIMINATI: %d':
+        'WILL BE DELETED: %d',
+    '  %s - %d dispositivi':
+        '  %s - %d devices',
+    '   [in prestito a %s]':
+        '   [on loan to %s]',
+    "Non c'e' niente da eliminare.":
+        'There is nothing to delete.',
+    "SALTATI perche' non si possono eliminare: %d":
+        'SKIPPED because they cannot be deleted: %d',
+    "SALTATI perche' non sono in inventario: %d":
+        'SKIPPED because they are not in the inventory: %d',
+    '    e altri %d':
+        '    and %d more',
+    'Per eliminare questi %d dispositivi, scrivi   %s':
+        'To delete these %d devices, type   %s',
+    "Stai per eliminare %d dispositivi dall'inventario di tutti.\n\nPer procedere scrivi esattamente:\n%s":
+        "You are about to delete %d devices from everybody's inventory.\n\nTo go ahead type exactly:\n%s",
+    'Eliminazione annullata':
+        'Deletion cancelled',
+    'Eliminati %d dispositivi.':
+        '%d devices deleted.',
+    'Eliminazione completata':
+        'Deletion complete',
+    '%d dispositivi eliminati.\n\nIn inventario ne restano %d.\n\nCopia di sicurezza del file precedente:\n%s':
+        '%d devices deleted.\n\n%d are left in the inventory.\n\nBackup copy of the previous file:\n%s',
+    'Dove finiscono:':
+        'Where they go:',
+    '%d nuovi':
+        '%d new',
+    '%d aggiornati':
+        '%d updated',
+    'niente':
+        'nothing',
+    'Saltate:':
+        'Skipped:',
+    '  %d senza identificativo':
+        '  %d with no identifier',
+    'Prima eliminati: %d':
+        'Deleted first: %d',
+    'In inventario adesso: %d':
+        'In the inventory now: %d',
+    "Dopo l'importazione: %d":
+        'After the import: %d',
 }
 
 # ------------------------------------------------- colonne dei file prodotti

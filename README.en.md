@@ -463,6 +463,26 @@ opening a window.
 The status is never written by hand into the file: if an import brings an
 unexpected status, it is reset to *Available*.
 
+## Deleting several devices at once
+
+**`Delete +`**, next to *Delete*, is for removing thirty devices without hunting
+them one by one - and without giving up knowing what disappears.
+
+1. **paste the codes** taken from an Excel sheet, one per line. A column of asset
+   tags is fine, or whole rows: the first code matching a device in the inventory
+   is the one used;
+2. press **Check**. The program touches nothing and shows:
+   - the devices that **will be deleted**, grouped by room, with the model and a
+     flag on the ones **on loan**;
+   - those **skipped because they cannot be deleted** - an iPhone not yet shipped
+     back, one still in retention - with the reason and the date;
+   - those **skipped because they are not in the inventory**, listed;
+3. to go ahead you type **`ACCETTO`**. A backup copy is saved before deleting,
+   and at the end the program says how many devices are left.
+
+Duplicates count once, empty lines are ignored, and iPhones keep every one of
+their protections.
+
 ## The columns of each room
 
 Each view shows **only** the columns that can hold a value there. A column empty

@@ -573,6 +573,7 @@ class ScanDialog(_Modal):
 
 
 PAROLA_RESET = "ELIMINA TUTTO"
+PAROLA_ELIMINA = "ACCETTO"
 
 
 class ResetDialog(_Modal):
@@ -901,7 +902,7 @@ class ImportDialog(_Modal):
     """Riepilogo di quello che si sta per caricare, e conferma finale."""
 
     def __init__(self, parent, path, count, esito=None, opzioni=None,
-                 da_eliminare=0):
+                 da_eliminare=0, anteprima=None):
         _Modal.__init__(self, parent, T("Importa inventario"))
         opzioni = opzioni or {"stanza": None, "mode": "merge"}
         self.opzioni = opzioni
@@ -927,6 +928,9 @@ class ImportDialog(_Modal):
                          "in %s.") % opzioni["stanza"])
         ttk.Label(body, text=T("\n").join(righe), style="Muted.TLabel",
                   justify="left").pack(anchor="w", pady=(2, 8))
+
+        if anteprima:
+            self._dettaglio(body, anteprima, opzioni)
 
         for testo in self._avvertenze(esito, opzioni, count):
             avviso = tk.Label(body, text=testo, justify="left", anchor="w",
@@ -959,6 +963,49 @@ class ImportDialog(_Modal):
         ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
         ttk.Button(buttons, text=T("Importa"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
+
+    def _dettaglio(self, body, anteprima, opzioni):
+        """Che cosa entra, dove, e quanti dispositivi ci saranno alla fine.
+
+        Un riepilogo con due numeri - "12 aggiunti, 3 aggiornati" - non dice in
+        quale stanza finiscono ne' se l'inventario raddoppia. Chi sta per
+        riscrivere l'inventario di tutti ha il diritto di vederlo prima.
+        """
+        cornice = tk.Frame(body, bg=theme.CARD, highlightthickness=1,
+                           highlightbackground=theme.BORDER)
+        cornice.pack(fill="both", expand=True, pady=(0, 10))
+        righe = []
+        per_stanza = anteprima.get("per_stanza") or {}
+        for stanza in sorted(per_stanza):
+            conto = per_stanza[stanza]
+            pezzi = []
+            if conto["aggiunti"]:
+                pezzi.append(T("%d nuovi") % conto["aggiunti"])
+            if conto["aggiornati"]:
+                pezzi.append(T("%d aggiornati") % conto["aggiornati"])
+            righe.append("  %-30s %s" % (stanza, ", ".join(pezzi) or T("niente")))
+        if righe:
+            righe.insert(0, T("Dove finiscono:"))
+        saltate = []
+        if anteprima.get("senza_identificativo"):
+            saltate.append(T("  %d senza identificativo")
+                           % anteprima["senza_identificativo"])
+        if saltate:
+            righe.append("")
+            righe.append(T("Saltate:"))
+            righe.extend(saltate)
+        righe.append("")
+        if anteprima.get("eliminati"):
+            righe.append(T("Prima eliminati: %d") % anteprima["eliminati"])
+        righe.append(T("In inventario adesso: %d") % anteprima.get("prima", 0))
+        righe.append(T("Dopo l'importazione: %d") % anteprima.get("dopo", 0))
+        testo = tk.Text(cornice, width=46,
+                        height=min(14, max(4, len(righe))), wrap="none",
+                        relief="flat", highlightthickness=0,
+                        bg=theme.CARD, fg=theme.TEXT, font=self.master.fonts["base"])
+        testo.insert("1.0", "\n".join(righe))
+        testo.configure(state="disabled")
+        testo.pack(fill="both", expand=True, padx=10, pady=8)
 
     @staticmethod
     def _avvertenze(esito, opzioni=None, count=0):
@@ -1006,6 +1053,140 @@ class ImportDialog(_Modal):
 
 
 # ------------------------------------------------------------ scheda stanza
+
+
+class EliminaPlusDialog(_Modal):
+    """Eliminazione in blocco: si incollano i codici, si legge, si conferma.
+
+    Il senso e' togliere trenta dispositivi senza cercarli uno per uno, ma senza
+    rinunciare a sapere che cosa sparisce: prima di eliminare si vede l'elenco
+    completo, diviso per stanza, con quello che verra' saltato e perche'.
+    """
+
+    def __init__(self, parent, store):
+        _Modal.__init__(self, parent, T("Elimina piu' dispositivi"))
+        self.store = store
+        self.esito = None
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+
+        ttk.Label(body, text=T("Incolla qui i dispositivi da eliminare"),
+                  style="Section.TLabel").pack(anchor="w")
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text=T("Uno per riga. Va bene incollare una colonna di asset tag da\n"
+                         "Excel, o righe intere: viene letto il primo codice che\n"
+                         "corrisponde a un dispositivo in inventario.")).pack(
+            anchor="w", pady=(2, 8))
+
+        cornice = tk.Frame(body, bg=theme.CARD, highlightthickness=1,
+                           highlightbackground=theme.BORDER)
+        cornice.pack(fill="both", expand=True)
+        self.testo = tk.Text(cornice, width=46, height=8, wrap="none", relief="flat",
+                             highlightthickness=0, bg=theme.CARD, fg=theme.TEXT)
+        barra = ttk.Scrollbar(cornice, orient="vertical", command=self.testo.yview)
+        self.testo.configure(yscrollcommand=barra.set)
+        self.testo.pack(side="left", fill="both", expand=True)
+        barra.pack(side="right", fill="y")
+        self.testo.focus_set()
+
+        ttk.Button(body, text=T("Controlla"), style="Primary.TButton",
+                   command=self._controlla).pack(anchor="w", pady=(10, 0))
+
+        self.riepilogo = tk.Text(body, width=46, height=12, wrap="word", relief="solid",
+                                 borderwidth=1, highlightthickness=0, bg=theme.CARD,
+                                 fg=theme.TEXT, state="disabled")
+        self.riepilogo.pack(fill="both", expand=True, pady=(12, 0))
+
+        self.conferma = ttk.Frame(body)
+        self.conferma.pack(fill="x", pady=(10, 0))
+        self.var_conferma = tk.StringVar()
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(14, 0))
+        ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
+        self.btn_elimina = ttk.Button(buttons, text=T("Elimina"), style="Rosso.TButton",
+                                      command=self._ok, state="disabled")
+        self.btn_elimina.pack(side="right")
+
+    # ------------------------------------------------------------ controllo
+
+    def righe_incollate(self):
+        return [r for r in self.testo.get("1.0", "end").splitlines() if r.strip()]
+
+    def _controlla(self):
+        righe = self.righe_incollate()
+        if not righe:
+            self._scrivi([T("Non hai incollato niente.")])
+            return
+        da_eliminare, non_trovati, bloccati = self.store.anteprima_eliminazione(righe)
+        self.esito = (da_eliminare, non_trovati, bloccati)
+        self._scrivi(self._testo_riepilogo(righe, da_eliminare, non_trovati, bloccati))
+        for figlio in self.conferma.winfo_children():
+            figlio.destroy()
+        if not da_eliminare:
+            self.btn_elimina.state(["disabled"])
+            return
+        ttk.Label(self.conferma,
+                  text=T("Per eliminare questi %d dispositivi, scrivi   %s")
+                  % (len(da_eliminare), PAROLA_ELIMINA)).pack(anchor="w")
+        self.var_conferma.set("")
+        ttk.Entry(self.conferma, textvariable=self.var_conferma,
+                  width=34).pack(fill="x", pady=(4, 0))
+        self.btn_elimina.state(["!disabled"])
+
+    def _testo_riepilogo(self, righe, da_eliminare, non_trovati, bloccati):
+        fuori = [T("Righe incollate: %d") % len(righe), ""]
+        if da_eliminare:
+            per_stanza = {}
+            for item in da_eliminare:
+                per_stanza.setdefault(item.get("stanza") or T("(senza stanza)"),
+                                      []).append(item)
+            fuori.append(T("VERRANNO ELIMINATI: %d") % len(da_eliminare))
+            for stanza in sorted(per_stanza):
+                elenco = per_stanza[stanza]
+                fuori.append("")
+                fuori.append(T("  %s - %d dispositivi") % (stanza, len(elenco)))
+                for item in elenco:
+                    riga = "    %s  %s" % (valore_visibile(item, "asset_tag"),
+                                           item.get("modello") or "")
+                    if item.get("prestato_a"):
+                        riga += T("   [in prestito a %s]") % item["prestato_a"]
+                    fuori.append(riga.rstrip())
+        else:
+            fuori.append(T("Non c'e' niente da eliminare."))
+        if bloccati:
+            fuori.append("")
+            fuori.append(T("SALTATI perche' non si possono eliminare: %d") % len(bloccati))
+            for item, motivo in bloccati:
+                fuori.append("    %s  -  %s"
+                             % (valore_visibile(item, "asset_tag"), motivo))
+        if non_trovati:
+            fuori.append("")
+            fuori.append(T("SALTATI perche' non sono in inventario: %d") % len(non_trovati))
+            for codice in non_trovati[:20]:
+                fuori.append("    %s" % codice)
+            if len(non_trovati) > 20:
+                fuori.append(T("    e altri %d") % (len(non_trovati) - 20))
+        return fuori
+
+    def _scrivi(self, righe):
+        self.riepilogo.configure(state="normal")
+        self.riepilogo.delete("1.0", "end")
+        self.riepilogo.insert("1.0", "\n".join(righe))
+        self.riepilogo.configure(state="disabled")
+
+    def _ok(self):
+        if not self.esito or not self.esito[0]:
+            return
+        if self.var_conferma.get().strip().upper() != PAROLA_ELIMINA:
+            messagebox.showwarning(
+                T("Conferma non valida"),
+                T("Stai per eliminare %d dispositivi dall'inventario di tutti.\n\n"
+                  "Per procedere scrivi esattamente:\n%s")
+                % (len(self.esito[0]), PAROLA_ELIMINA), parent=self)
+            return
+        self.result = [i["asset_tag"] for i in self.esito[0]]
+        self.destroy()
 
 
 class RoomCard(tk.Frame):
@@ -1155,12 +1336,12 @@ class App(tk.Tk):
         self.btn_home.pack(side="left", padx=(0, 10))
         ttk.Button(bar, text=T("Aggiungi"), style="Primary.TButton",
                    command=self.on_add).pack(side="left", padx=(0, 6))
-        for text, command in (
-            ("Modifica", self.on_edit),
-            ("Elimina", self.on_delete),
-            ("Sposta in stanza...", self.on_move),
-        ):
+        for text, command in (("Modifica", self.on_edit), ("Elimina", self.on_delete)):
             ttk.Button(bar, text=T(text), command=command).pack(side="left", padx=(0, 6))
+        ttk.Button(bar, text=T("Elimina +"), style="Rosso.TButton",
+                   command=self.on_delete_many).pack(side="left", padx=(0, 6))
+        ttk.Button(bar, text=T("Sposta in stanza..."),
+                   command=self.on_move).pack(side="left", padx=(0, 6))
         ttk.Separator(bar, orient="vertical").pack(side="left", fill="y", padx=10)
         # Il colore dice a quale famiglia appartiene il comando: arancione i
         # dati che entrano, verde quelli che escono, rosso quello che riscrive
@@ -2270,6 +2451,28 @@ class App(tk.Tk):
             return
         self._run(lambda: self.store.delete(tags), T("Eliminato %s.") % tags[0])
 
+    def on_delete_many(self):
+        """Eliminazione in blocco, incollando i codici da un foglio."""
+        tags = EliminaPlusDialog(self, self.store).show()
+        if not tags:
+            return
+        copia = None
+        try:
+            copia = self.store.copia_di_sicurezza()
+        except InventoryError as exc:
+            messagebox.showerror(T("Eliminazione annullata"), str(exc), parent=self)
+            return
+        if not self._run(lambda: self.store.delete(tags),
+                         T("Eliminati %d dispositivi.") % len(tags)):
+            return
+        self.refresh_table()
+        self.show_home() if self.view == "home" else self._render()
+        messagebox.showinfo(
+            T("Eliminazione completata"),
+            T("%d dispositivi eliminati.\n\nIn inventario ne restano %d.\n\n"
+              "Copia di sicurezza del file precedente:\n%s")
+            % (len(tags), len(self.store.items), copia), parent=self)
+
     def on_move(self):
         tags = self.selected_tags()
         if not tags:
@@ -2483,8 +2686,10 @@ class App(tk.Tk):
             esito = dict(esito)
             esito["altre_stanze"] = scartati
             esito["regola"] = regola
-        conferma = ImportDialog(self, path, len(items), esito, opzioni,
-                                self.contati_in_eliminazione(opzioni)).show()
+        conferma = ImportDialog(
+            self, path, len(items), esito, opzioni,
+            self.contati_in_eliminazione(opzioni),
+            self.store.anteprima_importazione(items, opzioni["mode"], stanza)).show()
         if not conferma:
             return
         risultato = self._run(lambda: self.store.import_items(
@@ -2534,8 +2739,10 @@ class App(tk.Tk):
         esito_stanza = dict(esito)
         esito_stanza["altre_stanze"] = scartati
         esito_stanza["regola"] = regola
-        conferma = ImportDialog(self, path, len(miei), esito_stanza, opzioni,
-                                self.contati_in_eliminazione(opzioni)).show()
+        conferma = ImportDialog(
+            self, path, len(miei), esito_stanza, opzioni,
+            self.contati_in_eliminazione(opzioni),
+            self.store.anteprima_importazione(miei, opzioni["mode"], stanza)).show()
         if not conferma:
             return
         risultato = self._run(lambda: self.store.import_items(

@@ -39,18 +39,34 @@ app._initial_load()
 app.geometry("1250x640")
 app.update()
 
-# ---- una riga verticale fra ogni coppia di colonne, e nessuna di piu'
+def confini(app):
+    """(indice della colonna, riga verticale) per i confini che si vedono.
+
+    Le colonne si adattano al contenuto, quindi la tabella puo' essere piu'
+    larga della finestra: i confini oltre il bordo non si disegnano, ed e'
+    giusto cosi'.
+    """
+    colonne = app._columns()
+    larghezze = [int(app.tree.column(c, "width")) for c in colonne]
+    disponibile = app.tree.winfo_width()
+    fuori, x = [], 0
+    for indice in range(len(colonne) - 1):
+        x += larghezze[indice]
+        if 0 < x < disponibile:
+            fuori.append((indice, x, app._righelli[indice]))
+    return fuori
+
 app._sync_righelli()
 app.update()
 colonne = app._columns()
+visibili = confini(app)
+assert visibili, "nessun confine visibile: la tabella non e' stata disegnata"
 disegnati = [r for r in app._righelli if r.winfo_ismapped()]
-assert len(disegnati) == len(colonne) - 1, (len(disegnati), len(colonne))
+assert len(disegnati) == len(visibili), (len(disegnati), len(visibili))
 
 # ---- ogni riga sta al confine giusto e porta il colore della colonna che apre
-larghezze = [int(app.tree.column(c, "width")) for c in colonne]
-x = 0
-for indice, riga in enumerate(disegnati):
-    x += larghezze[indice]
+for indice, x, riga in visibili:
+    assert riga.winfo_ismapped(), indice
     assert abs(riga.winfo_x() - (x - 1)) <= 1, (indice, riga.winfo_x(), x)
     atteso = theme.COLORE_COLONNA.get(colonne[indice + 1], theme.COLORE_COLONNA_ALTRO)
     assert str(riga.cget("bg")) == atteso, (colonne[indice + 1], riga.cget("bg"))
@@ -69,9 +85,12 @@ app.update()
 app._sync_righelli()
 app.update()
 colonne = app._columns()
-disegnati = [r for r in app._righelli if r.winfo_ismapped()]
-assert len(disegnati) == len(colonne) - 1, (len(disegnati), len(colonne))
-assert str(disegnati[-1].cget("bg")) == theme.COLORE_COLONNA[colonne[-1]]
+visibili = confini(app)
+assert visibili, "nel Kiosk nessun confine visibile"
+assert len([r for r in app._righelli if r.winfo_ismapped()]) == len(visibili)
+for indice, _x, riga in visibili:
+    atteso = theme.COLORE_COLONNA.get(colonne[indice + 1], theme.COLORE_COLONNA_ALTRO)
+    assert str(riga.cget("bg")) == atteso, (colonne[indice + 1], riga.cget("bg"))
 
 app.destroy()
 print("COLORI COLONNE OK")
