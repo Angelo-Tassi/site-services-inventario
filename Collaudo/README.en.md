@@ -48,10 +48,15 @@ per block.
 | --- | --- |
 | Asset Tag | `IT-BAU-101` ... `IT-KSK-210` ... `IT-DRC-310`, one series per room |
 | Type | seven Laptops and three Tablets per room |
-| Model/Description | Lenovo ThinkPad T14 Gen 4 and Gen 5, Dell Latitude 7320 Detachable and 7230 Rugged Extreme |
-| Serial number | plausible serials, all different |
 | Status | a mix of the five statuses, to see how they behave |
 | Notes | some filled in, some empty |
+| Model/Description | Lenovo ThinkPad T14 Gen 4 and Gen 5, Dell Latitude 7320 Detachable and 7230 Rugged Extreme |
+| Serial number | plausible serials, all different |
+
+The columns are in the same order as the
+[template to fill in](../docs/Import_template.xlsx) and as the list in the
+program. The order does not matter anyway: the import recognises columns by
+name.
 
 No iPhones: phones are entered by hand only.
 

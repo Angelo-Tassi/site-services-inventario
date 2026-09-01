@@ -48,10 +48,14 @@ Dieci dispositivi per blocco.
 | --- | --- |
 | Asset Tag | `IT-BAU-101` ... `IT-KSK-210` ... `IT-DRC-310`, uno per ogni stanza |
 | Tipo | sette Laptop e tre Tablet per stanza |
-| Modello/Descrizione | Lenovo ThinkPad T14 Gen 4 e Gen 5, Dell Latitude 7320 Detachable e 7230 Rugged Extreme |
-| Numero di serie | seriali plausibili, tutti diversi |
 | Stato | un misto dei cinque stati, per vedere come si comportano |
 | Note | alcune compilate, altre vuote |
+| Modello/Descrizione | Lenovo ThinkPad T14 Gen 4 e Gen 5, Dell Latitude 7320 Detachable e 7230 Rugged Extreme |
+| Numero di serie | seriali plausibili, tutti diversi |
+
+Le colonne sono nello stesso ordine del [modello da compilare](../docs/Modello_inventario.xlsx)
+e dell'elenco nel programma. L'ordine comunque non conta: l'importazione
+riconosce le colonne dal nome.
 
 Nessun iPhone: i telefoni si inseriscono solo a mano.
 

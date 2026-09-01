@@ -12,10 +12,18 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 
+from inventario.excel_io import TEMPLATE_FIELDS
+from inventario.store import HEADERS, larghezza_colonna
+
 RADICE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CARTELLA = os.path.join(RADICE, "Collaudo")
 
-INTESTAZIONI = ["Asset Tag", "Tipo", "Modello", "Numero di serie", "Stato", "Note"]
+# I file di prova devono somigliare a quelli veri: stesse colonne e stesso
+# ordine del modello da compilare, che e' anche l'ordine dell'elenco nel
+# programma. Derivandoli invece di riscriverli, un prossimo riordino li porta
+# dietro da solo.
+CAMPI = list(TEMPLATE_FIELDS)
+INTESTAZIONI = [HEADERS[c] for c in CAMPI]
 
 LAPTOP = ["Lenovo ThinkPad T14 Gen 4", "Lenovo ThinkPad T14 Gen 5"]
 TABLET = ["Dell Latitude 7320 Detachable", "Dell Latitude 7230 Rugged Extreme"]
@@ -45,8 +53,10 @@ def _dispositivo(prefisso, base, indice):
         modello = TABLET[indice % len(TABLET)]
         seriale = "%dH%s%03d" % (4 + indice % 5, prefisso[:1], numero % 1000)
         tipo = "Tablet"
-    return ["IT-%s-%03d" % (prefisso, numero), tipo, modello, seriale,
-            STATI[indice - 1], NOTE[indice - 1]]
+    valori = {"asset_tag": "IT-%s-%03d" % (prefisso, numero), "tipo": tipo,
+              "modello": modello, "seriale": seriale,
+              "stato": STATI[indice - 1], "note": NOTE[indice - 1]}
+    return [valori[c] for c in CAMPI]
 
 
 def _intesta(ws):
@@ -56,8 +66,18 @@ def _intesta(ws):
         cella.fill = PatternFill("solid", fgColor="1F4E79")
         cella.alignment = Alignment(vertical="center")
     ws.freeze_panes = "A2"
-    for lettera, larghezza in zip("ABCDEF", (16, 12, 36, 20, 24, 30)):
-        ws.column_dimensions[lettera].width = larghezza
+    _larghezze(ws)
+
+
+def _larghezze(ws):
+    """Colonne larghe quanto serve, come in tutti gli altri file prodotti."""
+    from openpyxl.utils import get_column_letter
+    for colonna in range(1, ws.max_column + 1):
+        valori = [ws.cell(row=r, column=colonna).value
+                  for r in range(2, ws.max_row + 1)]
+        titolo = str(ws.cell(row=1, column=colonna).value or "")
+        ws.column_dimensions[get_column_letter(colonna)].width = larghezza_colonna(
+            titolo, valori)
 
 
 def _separatore(ws, testo):
@@ -79,6 +99,7 @@ def inventario_completo(percorso):
         _separatore(ws, tag)
         for indice in range(1, 11):
             ws.append(_dispositivo(prefisso, base, indice))
+    _larghezze(ws)
     wb.save(percorso)
     wb.close()
     return percorso
@@ -89,23 +110,38 @@ def inventario_con_difetti(percorso):
     wb = Workbook()
     ws = wb.active
     ws.title = "Inventario"
-    ws.append(INTESTAZIONI + ["IMEI", "Costo", "Fornitore", "Centro di costo"])
+    extra = ["IMEI", "Costo", "Fornitore", "Centro di costo"]
+    ws.append(INTESTAZIONI + extra)
     for cella in ws[1]:
         cella.font = Font(bold=True, color="FFFFFF")
         cella.fill = PatternFill("solid", fgColor="1F4E79")
+
+    def riga(**valori):
+        base = dict.fromkeys(CAMPI, "")
+        base.update((k, v) for k, v in valori.items() if k in base)
+        return ([base[c] for c in CAMPI]
+                + [valori.get("imei", ""), valori.get("costo", ""),
+                   valori.get("fornitore", ""), valori.get("cc", "")])
+
     _separatore(ws, "BAU")
-    ws.append(["IT-BAU-901", "Laptop", "Lenovo ThinkPad T14 Gen 5", "PF4BAU01",
-               "Disponibile", "riga regolare", "", 1200, "Dell Italia", "CC-01"])
-    ws.append(["IT-BAU-902", "Laptop", "", "PF4BAU02", "Disponibile",
-               "senza modello", "", 1150, "Dell Italia", "CC-01"])
-    ws.append([None] * 10)
+    ws.append(riga(asset_tag="IT-BAU-901", tipo="Laptop",
+                   modello="Lenovo ThinkPad T14 Gen 5", seriale="PF4BAU01",
+                   stato="Disponibile", note="riga regolare",
+                   costo=1200, fornitore="Dell Italia", cc="CC-01"))
+    ws.append(riga(asset_tag="IT-BAU-902", tipo="Laptop", seriale="PF4BAU02",
+                   stato="Disponibile", note="senza modello",
+                   costo=1150, fornitore="Dell Italia", cc="CC-01"))
+    ws.append([None] * (len(CAMPI) + len(extra)))
     _separatore(ws, "KIOSK")
-    ws.append(["IT-KSK-903", "Tablet", "Dell Latitude 7320 Detachable", "8HK903",
-               "Controllare", "", "", 900, "Dell Italia", "CC-02"])
-    ws.append(["", "Laptop", "senza identificativo", "", "", "verra' scartata",
-               "", 800, "Dell Italia", "CC-02"])
-    ws.append(["", "Iphone", "Apple iPhone 14", "", "", "verra' ignorato",
-               "356938035643809", 1000, "Apple", "CC-03"])
+    ws.append(riga(asset_tag="IT-KSK-903", tipo="Tablet",
+                   modello="Dell Latitude 7320 Detachable", seriale="8HK903",
+                   stato="Controllare", costo=900, fornitore="Dell Italia", cc="CC-02"))
+    ws.append(riga(tipo="Laptop", modello="senza identificativo",
+                   note="verra' scartata", costo=800, fornitore="Dell Italia",
+                   cc="CC-02"))
+    ws.append(riga(tipo="Iphone", modello="Apple iPhone 14", note="verra' ignorato",
+                   imei="356938035643809", costo=1000, fornitore="Apple", cc="CC-03"))
+    _larghezze(ws)
     wb.save(percorso)
     wb.close()
     return percorso
