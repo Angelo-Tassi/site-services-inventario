@@ -415,11 +415,11 @@ o un IMEI - gia' presente, il programma **non inserisce niente** e dice dove sta
 quello che ce l'ha gia', con il modello e la stanza: si capisce subito se e' un
 errore di battitura o un dispositivo gia' registrato.
 
-**Ogni cinque dispositivi toccati, ricorda la copia locale.** Aggiunte,
+**Ogni dieci dispositivi toccati, ricorda la copia locale.** Aggiunte,
 modifiche ed eliminazioni si contano insieme - e contano i *record*, quindi
-un'eliminazione in blocco di trenta li conta tutti e trenta. Al quinto il
+un'eliminazione in blocco di trenta li conta tutti e trenta. Al decimo il
 programma chiede se vuoi salvare una copia sul tuo computer, e si puo' dire di
-no: torna a chiedere dopo altri cinque. Salvando una copia il conto riparte.
+no: torna a chiedere dopo altri dieci. Salvando una copia il conto riparte.
 
 Serve perche' le copie automatiche stanno sulla cartella di rete accanto ai
 dati: coprono l'errore umano, non la cartella che sparisce.
@@ -457,16 +457,16 @@ Entrano da un'altra strada: il file dati e' un `.xlsx` che si puo' aprire e
 correggere a mano. Per quello c'e' **`Controllo generale duplicati`**, accanto
 al pulsante del modello in home:
 
-- cerca in **tutto l'inventario** i dispositivi registrati piu' volte con lo
-  stesso identificativo;
+- confronta l'**asset tag** di tutti i dispositivi - e' quello l'identificativo,
+  per gli iPhone e' l'IMEI - e cerca chi compare piu' di una volta;
 - mostra **ogni gruppo**: quale registrazione tiene e quali elimina, con stanza,
   modello e data dell'ultima modifica. Tiene la piu' recente;
 - chiede conferma e **salva una copia di sicurezza** prima di eliminare;
 - alla fine dice che cosa ha eliminato, che cosa non ha potuto toccare - gli
   iPhone protetti - quanti dispositivi c'erano e quanti ce ne sono adesso;
-- segnala a parte i **numeri di serie ripetuti** su dispositivi diversi: quelli
-  non li tocca, perche' duplicati non sono, ma quasi sempre sono un errore di
-  battitura.
+- segnala a parte i **numeri di serie ripetuti** su asset tag diversi: il
+  seriale non identifica il dispositivo, quindi quelli **non sono duplicati** e
+  non vengono toccati - ma quasi sempre sono un errore di battitura.
 
 ## Le colonne di ogni stanza
 

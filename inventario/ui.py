@@ -21,7 +21,7 @@ from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
                     sembra_un_foglio_da_importare, testo_spedizione,
                     valore_visibile)
 
-MODIFICHE_PER_PROMEMORIA = 5   # record toccati prima di ricordare la copia
+MODIFICHE_PER_PROMEMORIA = 10   # record toccati prima di ricordare la copia
 ALTEZZA_MINIMA_TABELLA = 160   # pixel: circa cinque righe
 SPAZIO_CELLA = 22              # margini della cella, perche' il testo non tocchi i bordi
 SPAZIO_INTESTAZIONE = 34       # margini piu' la barretta colorata e la freccia
@@ -1079,7 +1079,7 @@ class ImportDialog(_Modal):
         esito = esito or {}
         righe = [T("%d righe valide trovate.") % count]
         if esito.get("scartate"):
-            righe.append(T("%d righe ignorate: manca l'identificativo.") % esito["scartate"])
+            righe.append(T("%d righe ignorate: manca l'asset tag.") % esito["scartate"])
         if esito.get("da_tag"):
             righe.append(T("%d righe hanno preso la stanza dai separatori nel foglio.")
                          % esito["da_tag"])
@@ -1087,7 +1087,7 @@ class ImportDialog(_Modal):
             righe.append(T("%d iPhone ignorati: si inseriscono solo a mano.") % esito["iphone"])
         doppioni = esito.get("doppioni") or []
         if doppioni:
-            righe.append(T("%d identificativi compaiono piu' volte nel foglio (%s): "
+            righe.append(T("%d asset tag compaiono piu' volte nel foglio (%s): "
                            "vale l'ultima riga.")
                          % (len(doppioni), ", ".join(doppioni[:3])
                             + (T(" e altri") if len(doppioni) > 3 else "")))
@@ -1158,7 +1158,7 @@ class ImportDialog(_Modal):
             righe.insert(0, T("Dove finiscono:"))
         saltate = []
         if anteprima.get("senza_identificativo"):
-            saltate.append(T("  %d senza identificativo")
+            saltate.append(T("  %d senza asset tag")
                            % anteprima["senza_identificativo"])
         if saltate:
             righe.append("")
@@ -1880,8 +1880,11 @@ class App(tk.Tk):
         riga = self.tree.identify_row(evento.y)
         if riga:
             self.tree.selection_set(riga)
+        item = self._item_by_tag(riga) if riga else None
+        etichetta = (T("Copia l'IMEI") if item is not None and is_iphone(item.get("tipo"))
+                     else T("Copia l'asset tag"))
         menu = tk.Menu(self, tearoff=0)
-        menu.add_command(label=T("Copia l'identificativo"),
+        menu.add_command(label=etichetta,
                          command=lambda: self._copia_selezione(solo_identificativo=True))
         menu.add_command(label=T("Copia la riga"), command=self._copia_selezione)
         menu.add_separator()
@@ -2907,16 +2910,19 @@ class App(tk.Tk):
         if not gruppi and not seriali:
             messagebox.showinfo(
                 T("Nessun duplicato"),
-                T("Ho controllato %d dispositivi: ognuno compare una volta sola.\n\n"
-                  "Nessun numero di serie e' ripetuto su due dispositivi diversi.")
+                T("Ho confrontato l'ASSET TAG di %d dispositivi: ognuno compare una\n"
+                  "volta sola. E' quello l'identificativo, e su quello si controlla.\n\n"
+                  "Nemmeno un numero di serie risulta ripetuto, ma quella e' solo una\n"
+                  "verifica in piu': il seriale non identifica il dispositivo.")
                 % len(self.store.items), parent=self)
             return
 
-        righe = [T("Controllati %d dispositivi.") % len(self.store.items), ""]
+        righe = [T("Confrontato l'asset tag di %d dispositivi.")
+                 % len(self.store.items), ""]
         if gruppi:
             quanti = sum(len(e) - 1 for _t, e in gruppi)
-            righe.append(T("DOPPIONI TROVATI: %d identificativi, %d righe in piu'.")
-                         % (len(gruppi), quanti))
+            righe.append(T("DOPPIONI TROVATI: %d asset tag registrati piu' volte, "
+                           "%d righe in piu'.") % (len(gruppi), quanti))
             for tag, elenco in gruppi[:12]:
                 tenuto = self.store._piu_recente(elenco)
                 righe.append("")
@@ -2929,17 +2935,19 @@ class App(tk.Tk):
                                     item.get("modificato_il") or ""))
             if len(gruppi) > 12:
                 righe.append("")
-                righe.append(T("  ... e altri %d identificativi") % (len(gruppi) - 12))
+                righe.append(T("  ... e altri %d asset tag") % (len(gruppi) - 12))
             righe.append("")
             righe.append(T("Si tiene la registrazione modificata piu' di recente."))
         if seriali:
             righe.append("")
-            righe.append(T("NUMERI DI SERIE RIPETUTI su dispositivi diversi: %d")
-                         % len(seriali))
+            righe.append(T("Nota a margine - numeri di serie ripetuti su asset tag\n"
+                           "diversi: %d") % len(seriali))
             for seriale, elenco in seriali[:8]:
                 righe.append("    %s  ->  %s" % (seriale, ", ".join(
                     valore_visibile(i, "asset_tag") for i in elenco)))
-            righe.append(T("Questi non vengono toccati: vanno guardati a mano."))
+            righe.append(T("Il seriale non identifica il dispositivo, quindi questi\n"
+                           "NON sono duplicati e non vengono toccati. Di solito pero'\n"
+                           "sono un errore di battitura, e conviene guardarli."))
 
         if not gruppi:
             messagebox.showwarning(T("Controllo duplicati"), "\n".join(righe),
@@ -3072,7 +3080,7 @@ class App(tk.Tk):
 
         saltate = []
         if esito.get("scartate"):
-            saltate.append(T("  %d senza identificativo") % esito["scartate"])
+            saltate.append(T("  %d senza asset tag") % esito["scartate"])
         if esito.get("iphone"):
             saltate.append(T("  %d iPhone: si inseriscono solo a mano") % esito["iphone"])
         if scartati:

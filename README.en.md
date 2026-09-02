@@ -489,11 +489,11 @@ IMEI - already present, the program **inserts nothing** and says where the one
 holding it is, with its model and room: you see at once whether it is a typo or
 a device already recorded.
 
-**Every five devices touched, it reminds you of the local copy.** Additions,
+**Every ten devices touched, it reminds you of the local copy.** Additions,
 edits and deletions are counted together - and it counts *records*, so a bulk
-deletion of thirty counts all thirty. On the fifth the program asks whether you
+deletion of thirty counts all thirty. On the tenth the program asks whether you
 want to save a copy on your own computer, and you can say no: it comes back
-after another five. Saving a copy resets the count.
+after another ten. Saving a copy resets the count.
 
 It is there because the automatic copies live on the network folder next to the
 data: they cover human error, not the folder disappearing.
@@ -530,16 +530,16 @@ They get in another way: the data file is an `.xlsx` anyone can open and correct
 by hand. That is what **`General duplicate check`** is for, next to the template
 button on the home screen:
 
-- it searches **the whole inventory** for devices recorded more than once under
-  the same identifier;
+- it compares the **asset tag** of every device - that is the identifier, and
+  for iPhones it is the IMEI - and looks for any that appears more than once;
 - it shows **every group**: which record it keeps and which it deletes, with
   room, model and the date of the last change. It keeps the most recent one;
 - it asks for confirmation and **saves a backup copy** before deleting;
 - at the end it says what it deleted, what it could not touch - protected
   iPhones - how many devices there were and how many there are now;
-- it separately flags **serial numbers repeated** on different devices: those it
-  does not touch, because they are not duplicates, but they are almost always a
-  typo.
+- it separately flags **serial numbers repeated** on different asset tags: the
+  serial does not identify the device, so those are **not duplicates** and are
+  not touched - but they are almost always a typo.
 
 ## The columns of each room
 

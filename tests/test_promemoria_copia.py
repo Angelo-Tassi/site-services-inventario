@@ -35,26 +35,36 @@ assert store.modifiche == 2
 app._run(lambda: store.set_campo("IT-9001", "note", "provata"))
 assert store.modifiche == 2, "una modifica a vuoto non conta"
 
-# ---- al quinto record il programma lo chiede
-app._run(lambda: store.delete(["IT-9001", "IT-0101", "IT-0102"]))
-assert store.modifiche == 5, store.modifiche
+# ---- fino alla soglia non chiede niente
+mancanti = MODIFICHE_PER_PROMEMORIA - store.modifiche
+da_togliere = [i["asset_tag"] for i in store.items
+               if i["asset_tag"] not in ("IT-9001",)
+               and not i["asset_tag"].startswith("35")][:mancanti - 1]
+app._run(lambda: store.delete(da_togliere))
+assert store.modifiche == MODIFICHE_PER_PROMEMORIA - 1, store.modifiche
+assert not chieste, "un record prima della soglia non si chiede ancora"
+
+# ---- al record numero MODIFICHE_PER_PROMEMORIA lo chiede
+app._run(lambda: store.delete(["IT-9001"]))
+assert store.modifiche == MODIFICHE_PER_PROMEMORIA, store.modifiche
 assert len(chieste) == 1, chieste
-assert "5 dispositivi" in chieste[0], chieste[0]
+assert "%d dispositivi" % MODIFICHE_PER_PROMEMORIA in chieste[0], chieste[0]
 
 # ---- e non lo richiede a ogni modifica successiva: riparte da capo
-app._run(lambda: store.set_campo("IT-0103", "note", "una"))
+app._run(lambda: store.set_campo(store.items[0]["asset_tag"], "note", "una"))
 assert len(chieste) == 1, "non deve insistere"
-app._run(lambda: store.delete(["IT-0104", "IT-0105", "IT-0106", "IT-0107"]))
-assert len(chieste) == 2, chieste
-assert "5 dispositivi" in chieste[1], chieste[1]
 
-# ---- eliminandone parecchi in blocco lo chiede subito: contano i record
-prima = len(chieste)
-molti = [i["asset_tag"] for i in store.items
-         if not i["asset_tag"].startswith("35")][:MODIFICHE_PER_PROMEMORIA]
-assert len(molti) == MODIFICHE_PER_PROMEMORIA, molti
-app._run(lambda: store.delete(molti))
-assert len(chieste) == prima + 1, chieste
+# ---- eliminandone parecchi in blocco lo chiede subito: contano i record, non
+# le operazioni, e un'eliminazione da dieci li conta tutti e dieci
+nuovi = ["IT-95%02d" % n for n in range(MODIFICHE_PER_PROMEMORIA)]
+for tag in nuovi:
+    store.add(new_item(tag, "Laptop", "T14", "PF" + tag, fixture.DR, ""))
+store.load()
+chieste[:] = []
+app._modifiche_alla_copia = store.modifiche      # si riparte da zero
+app._run(lambda: store.delete(nuovi))
+assert len(chieste) == 1, chieste
+assert "%d dispositivi" % MODIFICHE_PER_PROMEMORIA in chieste[0], chieste[0]
 
 # ---- un asset tag gia' presente non entra, e il messaggio dice chi ce l'ha
 esistente = store.items[0]

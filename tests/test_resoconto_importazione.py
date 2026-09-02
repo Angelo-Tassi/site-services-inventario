@@ -26,7 +26,7 @@ assert "Unione in tutto l'inventario." in testo, testo
 assert "Aggiunti: 12" in testo and "Aggiornati: 3" in testo
 
 # ---- e che cosa non e' stato caricato, con il motivo di ognuno
-assert "2 senza identificativo" in testo, testo
+assert "2 senza asset tag" in testo, testo
 assert "1 iPhone" in testo, testo
 assert "5 di altre stanze" in testo, testo
 assert "2 doppioni nel foglio" in testo, testo

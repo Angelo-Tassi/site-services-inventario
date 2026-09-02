@@ -85,6 +85,33 @@ rapporto = store.rimuovi_duplicati()
 assert rapporto["eliminati"] == [], "un seriale ripetuto non si cancella da solo"
 assert len([i for i in store.load() if i["seriale"] == "SERIALE-X"]) == 2
 
+# ---- la chiave e' l'asset tag, non il numero di serie: due dispositivi
+# diversi con lo stesso seriale restano due dispositivi
+pulito2 = InventoryStore(fixture.build(), iphone_room=BAU)
+pulito2.load()
+pulito2.add(new_item("IT-9001", "Laptop", "T14", "STESSO-SERIALE", DR, ""))
+pulito2.add(new_item("IT-9002", "Laptop", "T14", "STESSO-SERIALE", DR, ""))
+gruppi, seriali = pulito2.trova_duplicati()
+assert gruppi == [], "seriali uguali non fanno un duplicato"
+assert len(seriali) == 1, seriali
+prima = len(pulito2.load())
+assert pulito2.rimuovi_duplicati()["eliminati"] == []
+assert len(pulito2.load()) == prima, "non si elimina niente per un seriale ripetuto"
+
+# ---- mentre due righe con lo stesso asset tag e seriali diversi sono duplicati
+pulito3 = InventoryStore(fixture.build(), iphone_room=BAU)
+pulito3.load()
+wb = load_workbook(pulito3.path); ws = wb.active
+righe_file = list(ws.iter_rows(values_only=True))
+riga = list(righe_file[1])
+intestazioni = [str(c or "") for c in righe_file[0]]
+riga[intestazioni.index("Numero di serie")] = "SERIALE-DIVERSO"
+ws.append(riga)
+wb.save(pulito3.path); wb.close()
+gruppi, _seriali = pulito3.trova_duplicati()
+assert len(gruppi) == 1, gruppi
+assert len(pulito3.rimuovi_duplicati()["eliminati"]) == 1
+
 # ---- un inventario pulito non ha niente da segnalare
 pulito = InventoryStore(fixture.build(), iphone_room=BAU)
 assert pulito.trova_duplicati() == ([], [])
