@@ -282,7 +282,35 @@ resterebbero dentro insieme ai tuoi.
 Ci sono due modi. Fanno la stessa cosa; cambia solo quando avviene lo
 svuotamento.
 
-## 9. Copia e incolla
+## 9. Selezione multipla
+
+Serve a verificare che si possa lavorare su piu' dispositivi in un colpo, e che
+prima di farlo si legga esattamente che cosa succedera'.
+
+1. nell'elenco, clic su una riga: si accende il cerchio nella prima colonna;
+2. **Ctrl+clic** su altre due righe lontane: devono restare accese tutte e tre,
+   con lo sfondo ambra, e accanto al titolo dell'elenco deve comparire
+   *3 selezionati*;
+3. clic su una riga qualsiasi **senza tenere premuto niente**: la selezione
+   riparte da quella sola;
+4. clic su una riga, poi **Maiusc+clic** su una riga piu' in basso: si accende
+   tutto l'intervallo;
+5. con tre righe scelte premi **Sposta in stanza...**, scegli una stanza e leggi
+   il riepilogo: da quali stanze partono, quanti iPhone restano fermi, e come
+   restano le stanze prima e dopo. Premi **Annulla**;
+6. seleziona due laptop **e un iPhone mai spedito**, poi premi **Elimina**: il
+   riepilogo deve elencare i due laptop fra quelli che spariscono e l'iPhone fra
+   i saltati, con il motivo. Conferma;
+7. controlla che siano spariti **solo i due laptop** e che l'iPhone sia ancora
+   nel suo contenitore;
+8. l'ultimo messaggio deve dire quanti dispositivi restano e dove si trova la
+   copia di sicurezza: aprila e verifica che ci siano ancora tutti.
+
+**Cosa deve succedere:** la selezione non si perde da sola - nemmeno quando
+l'elenco si ricarica - le due operazioni mostrano sempre il riepilogo prima di
+agire, e un iPhone protetto non impedisce di eliminare gli altri.
+
+## 10. Copia e incolla
 
 Serve a verificare che i campi accettino quello che arriva da Excel, e che
 dall'elenco si possa portare via un identificativo.

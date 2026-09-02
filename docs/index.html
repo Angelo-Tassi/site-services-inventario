@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.37.2 · alfa</div>
+  <div class="alpha">versione 0.38.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -195,6 +195,24 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
     <div class="rilascio">
+      <h3>v0.38.0</h3>
+      <p class="quando">2 settembre 2026</p>
+      <ul>
+        <li><b>Selezione multipla</b>: Ctrl+clic per righe anche lontane, Maiusc+clic
+          per l'intervallo. La fa Tk, quindi l'elenco non rallenta di un millisecondo.
+          Le righe scelte hanno lo sfondo ambra, l'unica tinta che nessuna categoria
+          usa, e il conteggio si legge accanto al titolo.</li>
+        <li><b>Elimina e Sposta agiscono su tutte le righe scelte</b>, e prima mostrano
+          il riepilogo: quali dispositivi, da quale stanza, che cosa viene saltato e
+          perche', come restano le stanze. Prima di eliminare viene salvata una copia
+          di sicurezza.</li>
+        <li><b>Un iPhone protetto non blocca piu' gli altri</b>: prima bastava averne
+          uno nella selezione perche' non si eliminasse niente.</li>
+        <li><b>Il promemoria della copia locale arriva ogni venti modifiche</b> invece
+          di dieci.</li>
+      </ul>
+    </div>
+    <div class="rilascio">
       <h3>v0.37.2</h3>
       <p class="quando">2 settembre 2026</p>
       <ul>
@@ -202,8 +220,8 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           controllo duplicati e i riepiloghi di importazione parlavano di
           "identificativo", e nel controllo si leggeva prima il numero di serie, che
           invece serve solo per consultazione.</li>
-        <li><b>Il promemoria della copia locale arriva ogni dieci modifiche</b> invece di
-          cinque.</li>
+        <li><b>Il promemoria della copia locale arriva ogni venti modifiche</b> invece di
+          dieci.</li>
         <li><b>L'inglese e' completo</b>: i messaggi di errore dell'archivio e le righe
           del riepilogo di importazione restavano in italiano anche cambiando lingua.
           Ora tutto passa dalla traduzione, e un test lo verifica a ogni modifica.</li>
@@ -246,19 +264,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
         <li><b>Il collegamento sul desktop punta al file di avvio</b> e non
           all'eseguibile con argomenti, che su alcune postazioni veniva rifiutato. Se
           non compare lo stesso, il programma spiega come farlo a mano.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.34.1</h3>
-      <p class="quando">1 settembre 2026</p>
-      <ul>
-        <li><b>Un identificativo non si ripete</b>: inserendo un asset tag gia' presente
-          non viene inserito niente, e il programma dice dove sta quello che ce l'ha
-          gia'.</li>
-        <li><b>Ogni cinque dispositivi toccati, ricorda la copia locale.</b> Si puo' dire
-          di no: torna a chiedere dopo altri cinque.</li>
-        <li><b>Note prima di Stato</b> nell'elenco e nei modelli, e
-          <b>l'esportazione porta quattro campi</b>: asset tag, tipo, stanza, note.</li>
       </ul>
     </div>
   </div>
@@ -442,7 +447,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.37.2 · alpha</div>
+  <div class="alpha">version 0.38.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -469,13 +474,30 @@ python Inventario.py</pre>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
     <div class="rilascio">
+      <h3>v0.38.0</h3>
+      <p class="quando">2 September 2026</p>
+      <ul>
+        <li><b>Multiple selection</b>: Ctrl+click for rows however far apart,
+          Shift+click for a range. Tk does it, so the list does not slow down by a
+          millisecond. The chosen rows get an amber background, the one tint no
+          category uses, and the count is written next to the title.</li>
+        <li><b>Delete and Move act on every chosen row</b>, and show the summary first:
+          which devices, from which room, what is skipped and why, how the rooms end
+          up. A backup copy is saved before deleting.</li>
+        <li><b>A protected iPhone no longer blocks the others</b>: before, one in the
+          selection was enough for nothing to be deleted.</li>
+        <li><b>The local-copy reminder comes every twenty changes</b> instead of
+          ten.</li>
+      </ul>
+    </div>
+    <div class="rilascio">
       <h3>v0.37.2</h3>
       <p class="quando">2 September 2026</p>
       <ul>
         <li><b>The messages say "asset tag"</b> where the asset tag is the key: the
           duplicate check and the import summaries talked about an "identifier", and the
           check led with the serial number, which is only there for reference.</li>
-        <li><b>The local-copy reminder comes every ten changes</b> instead of five.</li>
+        <li><b>The local-copy reminder comes every twenty changes</b> instead of ten.</li>
         <li><b>English is complete</b>: the store's error messages and the import summary
           lines stayed in Italian even after switching language. Everything now goes
           through the translation, and a test checks it on every change.</li>
@@ -518,18 +540,6 @@ python Inventario.py</pre>
         <li><b>The desktop shortcut points at the launch file</b> and not at the
           executable with arguments, which some workstations refused. If it still does
           not appear, the program explains how to do it by hand.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.34.1</h3>
-      <p class="quando">1 September 2026</p>
-      <ul>
-        <li><b>An identifier is never repeated</b>: adding an asset tag already present
-          inserts nothing, and the program says where the one holding it is.</li>
-        <li><b>Every five devices touched, it reminds you of the local copy.</b> You can
-          say no: it comes back after another five.</li>
-        <li><b>Notes before Status</b> in the list and in the templates, and
-          <b>exports carry four fields</b>: asset tag, type, room, notes.</li>
       </ul>
     </div>
   </div>

@@ -776,6 +776,50 @@ EN = {
         'Copy the asset tag',
     "Copia l'IMEI":
         'Copy the IMEI',
+    '  -  %d selezionati':
+        '  -  %d selected',
+    'Spunta i dispositivi da eliminare.':
+        'Tick the devices to delete.',
+    'Spunta i dispositivi da spostare.':
+        'Tick the devices to move.',
+    'In inventario resteranno %d dispositivi.':
+        '%d devices will be left in the inventory.',
+    'Eliminare %d dispositivi?':
+        'Delete %d devices?',
+    'Eliminare questo dispositivo?':
+        'Delete this device?',
+    "Stai per eliminare %d dispositivi dall'inventario di tutti.\nUna copia del file dati viene salvata prima di procedere.":
+        "You are about to delete %d devices from everybody's inventory.\nA copy of the data file is saved before proceeding.",
+    "Il dispositivo sparisce dall'inventario di tutti.\nUna copia del file dati viene salvata prima di procedere.":
+        "The device disappears from everybody's inventory.\nA copy of the data file is saved before proceeding.",
+    'Eliminati %d dispositivi.\n\nIn inventario ne restano %d.\n\nCopia di sicurezza del file precedente:\n%s':
+        '%d devices deleted.\n\n%d are left in the inventory.\n\nBackup copy of the previous file:\n%s',
+    'SPOSTATI IN %s: %d':
+        'MOVED TO %s: %d',
+    '  da %s - %d dispositivi':
+        '  from %s - %d devices',
+    "Nessun cambiamento: sono gia' tutti in %s.":
+        'Nothing changes: they are already all in %s.',
+    "Gia' in %s, restano dove sono: %d":
+        'Already in %s, they stay put: %d',
+    "RESTANO FERMI perche' sono iPhone: %d":
+        'THEY STAY PUT because they are iPhones: %d',
+    'Gli iPhone sono sempre registrati in %s.':
+        'iPhones are always recorded in %s.',
+    'Come restano le stanze:':
+        'How the rooms end up:',
+    'Conferma spostamento':
+        'Confirm move',
+    'Sposta %d dispositivi in:':
+        'Move %d devices to:',
+    'Spostare %d dispositivi in %s?':
+        'Move %d devices to %s?',
+    'Spostare questo dispositivo in %s?':
+        'Move this device to %s?',
+    'iPhone non ancora rispedito al servizio telefonia':
+        'iPhone not yet sent back to the phone service',
+    'in conservazione fino al %s':
+        'kept until %s',
 }
 
 # ------------------------------------------------- colonne dei file prodotti

@@ -316,9 +316,14 @@ dice: non crea mai un inventario locale al posto di quello condiviso.
   rispediti, rosso quelli in prestito. In caso di sovrapposizione vince
   l'informazione piu' urgente: prestito, poi spedizione, poi tipo. I tablet Dell si riconoscono dal modello, che
   deve contenere la parola *Dell* (come *Dell Latitude 7320 Detachable*).
-- **Selezione con la casella**: la prima colonna dell'elenco e' una casella di
-  spunta. Si lavora **su un dispositivo alla volta**: spuntandone un altro il
-  primo si deseleziona, e cliccando di nuovo sulla casella si toglie la spunta.
+- **Selezione**: la prima colonna dell'elenco e' una casella di spunta. Un clic
+  sceglie una riga; **Ctrl+clic** ne aggiunge altre, anche lontane fra loro, e
+  **Shift+clic** prende tutto l'intervallo fino a quella riga. I tasti vanno
+  tenuti premuti: un clic senza tasti riparte da una riga sola, come su Windows.
+  Quante righe sono scelte si legge accanto al titolo dell'elenco.
+- Su piu' righe insieme agiscono **Elimina** e **Sposta in stanza...**, che prima
+  di procedere mostrano il riepilogo di quello che stanno per fare. *Modifica*
+  resta a un dispositivo per volta: una scheda si apre da sola.
 - **Prestiti**: la colonna *Prestito*, con il pulsante vero su ogni riga,
   compare **solo quando si apre una stanza che gestisce i prestiti** (il Digital
   Kiosk). Nell'inventario completo, nelle altre stanze e nel contenitore iPhone
@@ -415,11 +420,11 @@ o un IMEI - gia' presente, il programma **non inserisce niente** e dice dove sta
 quello che ce l'ha gia', con il modello e la stanza: si capisce subito se e' un
 errore di battitura o un dispositivo gia' registrato.
 
-**Ogni dieci dispositivi toccati, ricorda la copia locale.** Aggiunte,
+**Ogni venti dispositivi toccati, ricorda la copia locale.** Aggiunte,
 modifiche ed eliminazioni si contano insieme - e contano i *record*, quindi
 un'eliminazione in blocco di trenta li conta tutti e trenta. Al decimo il
 programma chiede se vuoi salvare una copia sul tuo computer, e si puo' dire di
-no: torna a chiedere dopo altri dieci. Salvando una copia il conto riparte.
+no: torna a chiedere dopo altri venti. Salvando una copia il conto riparte.
 
 Serve perche' le copie automatiche stanno sulla cartella di rete accanto ai
 dati: coprono l'errore umano, non la cartella che sparisce.
@@ -444,6 +449,44 @@ cercarli uno per uno - e senza rinunciare a sapere che cosa sparisce.
 
 I doppioni contano una volta sola, le righe vuote si ignorano, e gli iPhone
 mantengono tutte le loro protezioni.
+
+## Selezionare piu' dispositivi
+
+Un clic sceglie una riga. **Ctrl+clic** ne aggiunge altre, anche lontane fra
+loro; **Maiusc+clic** prende tutto l'intervallo fino a quella riga. I tasti
+vanno tenuti premuti: appena si clicca senza, la selezione riparte da una riga
+sola - il comportamento di Windows.
+
+Le righe scelte si riconoscono dal cerchio pieno nella prima colonna e dallo
+sfondo ambra, che e' l'unica tinta che nessuna categoria usa: cosi' una riga
+selezionata non si confonde mai con un tablet o un iPhone. Quante sono si legge
+accanto al titolo dell'elenco.
+
+La selezione tiene **solo le righe visibili**: filtrando o cercando si
+assottiglia, e cancellando il filtro non torna. E' voluto - impedisce di
+eliminare dispositivi che non si stanno guardando.
+
+Su piu' righe agiscono **Elimina** e **Sposta in stanza...**. *Modifica* resta a
+un dispositivo per volta, e *Elimina +* non c'entra: quello serve a incollare
+codici presi da Excel.
+
+### Il riepilogo prima di agire
+
+Nessuna delle due operazioni parte senza mostrare prima che cosa fara'.
+
+**Elimina** elenca i dispositivi che spariscono, raggruppati per stanza, con il
+modello e la segnalazione di quelli **in prestito**; poi quelli **saltati perche'
+non si possono eliminare** - un iPhone non ancora rispedito, uno in
+conservazione - con il motivo; e quanti dispositivi resteranno. Una **copia di
+sicurezza** viene salvata prima di procedere, e alla fine il programma dice dove
+sta.
+
+Se nella selezione c'e' un iPhone protetto, **spariscono solo gli altri**: il
+telefono resta, e il riepilogo dice perche'.
+
+**Sposta in stanza...** elenca i dispositivi divisi per stanza di provenienza,
+quanti iPhone restano fermi, e come restano le stanze prima e dopo. Se sono
+gia' tutti nella stanza scelta lo dice, invece di lasciarlo scoprire alla fine.
 
 ## I doppioni
 
@@ -885,8 +928,10 @@ consultare i dati in Excel senza rischi, usa *Esporta xls...*.
 | `Ctrl+P` | stampa la vista corrente |
 | `Esc` | torna alla home |
 | `F5` | ricarica dalla rete |
-| `Canc` | elimina il dispositivo spuntato |
+| `Canc` | elimina i dispositivi spuntati |
 | clic sulla casella | spunta o toglie la spunta alla riga |
+| `Ctrl`+clic | aggiunge una riga alla selezione, anche lontana |
+| `Maiusc`+clic | seleziona tutto l'intervallo fino a quella riga |
 | doppio clic sulle note | modifica la nota nell'elenco |
 | doppio clic su modello/descrizione | modifica la descrizione nell'elenco |
 | doppio clic sullo stato | tendina per cambiare stato nell'elenco |

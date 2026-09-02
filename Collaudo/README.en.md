@@ -281,7 +281,34 @@ in alongside yours.
 There are two ways. They do the same thing; only the moment of the emptying
 differs.
 
-## 9. Copy and paste
+## 9. Multiple selection
+
+This checks that you can work on several devices at once, and that before doing
+so you read exactly what will happen.
+
+1. in the list, click a row: the circle in the first column lights up;
+2. **Ctrl+click** two other distant rows: all three must stay lit, with the amber
+   background, and *3 selected* must appear next to the list title;
+3. click any row **without holding anything down**: the selection starts again
+   from that one alone;
+4. click a row, then **Shift+click** a row further down: the whole range lights
+   up;
+5. with three rows picked press **Move to room...**, choose a room and read the
+   summary: which rooms they come from, how many iPhones stay put, and how the
+   rooms stand before and after. Press **Cancel**;
+6. select two laptops **and an iPhone never shipped back**, then press
+   **Delete**: the summary must list the two laptops among those disappearing and
+   the iPhone among the skipped, with the reason. Confirm;
+7. check that **only the two laptops** are gone and that the iPhone is still in
+   its container;
+8. the last message must say how many devices are left and where the backup copy
+   is: open it and check they are all still there.
+
+**What must happen:** the selection is not lost on its own - not even when the
+list reloads - both operations always show the summary before acting, and a
+protected iPhone does not stop the others being deleted.
+
+## 10. Copy and paste
 
 This checks that the fields accept what comes from Excel, and that an identifier
 can be taken out of the list.

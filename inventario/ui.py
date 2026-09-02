@@ -21,7 +21,7 @@ from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
                     sembra_un_foglio_da_importare, testo_spedizione,
                     valore_visibile)
 
-MODIFICHE_PER_PROMEMORIA = 10   # record toccati prima di ricordare la copia
+MODIFICHE_PER_PROMEMORIA = 20   # record toccati prima di ricordare la copia
 ALTEZZA_MINIMA_TABELLA = 160   # pixel: circa cinque righe
 SPAZIO_CELLA = 22              # margini della cella, perche' il testo non tocchi i bordi
 SPAZIO_INTESTAZIONE = 34       # margini piu' la barretta colorata e la freccia
@@ -111,6 +111,21 @@ ACTION_COLUMN = "_azione"
 # Un iPhone non ha numero di serie e non si presta: nel suo contenitore quelle
 # colonne sarebbero sempre vuote.
 COLONNE_NON_IPHONE = ("asset_tag", "seriale", "prestato_a", "prestato_il")
+# Bit dei modificatori dentro `event.state`. Mod1 si legge solo dove Command
+# esiste davvero: su Windows quello stesso bit e' il Bloc Num, e leggerlo li'
+# vorrebbe dire scambiare ogni clic per un Ctrl+clic a chi tiene acceso il
+# tastierino numerico.
+STATO_SHIFT = 0x0001
+STATO_CONTROL = 0x0004
+STATO_COMANDO = 0x0008
+
+
+def con_modificatore(stato, comando=False):
+    """True se il clic porta un tasto che significa "piu' righe insieme"."""
+    maschera = STATO_SHIFT | STATO_CONTROL | (STATO_COMANDO if comando else 0)
+    return bool(stato & maschera)
+
+
 CHECK_ON = "\u25c9"      # cerchio pieno: riga selezionata
 CHECK_OFF = "\u25cb"     # cerchio vuoto
 COLUMN_WIDTHS = {CHECK_COLUMN: 46, ACTION_COLUMN: 175, "asset_tag": 120, "tipo": 75, "modello": 185,
@@ -1359,6 +1374,121 @@ class EliminaPlusDialog(_Modal):
         self.destroy()
 
 
+def _per_stanza(items):
+    """I dispositivi raggruppati per stanza, in ordine di nome."""
+    gruppi = {}
+    for item in items:
+        gruppi.setdefault(item.get("stanza") or T("(senza stanza)"), []).append(item)
+    return sorted(gruppi.items())
+
+
+def _riga_dispositivo(item, con_prestito=True):
+    riga = "    %s  %s" % (valore_visibile(item, "asset_tag") or
+                           valore_visibile(item, "imei"),
+                           (item.get("modello") or "")[:34])
+    if con_prestito and item.get("prestato_a"):
+        riga += T("   [in prestito a %s]") % item["prestato_a"]
+    return riga.rstrip()
+
+
+def riepilogo_eliminazione(da_eliminare, bloccati, restano):
+    """Le righe da leggere prima di eliminare.
+
+    Un'operazione che tocca venti dispositivi non si conferma con un si': chi la
+    lancia deve poter vedere quali spariscono, da quale stanza, e che cosa il
+    programma salta e perche'.
+    """
+    righe = []
+    if da_eliminare:
+        righe.append(T("VERRANNO ELIMINATI: %d") % len(da_eliminare))
+        for stanza, elenco in _per_stanza(da_eliminare):
+            righe.append("")
+            righe.append(T("  %s - %d dispositivi") % (stanza, len(elenco)))
+            righe.extend(_riga_dispositivo(i) for i in elenco)
+    else:
+        righe.append(T("Non c'e' niente da eliminare."))
+    if bloccati:
+        righe.append("")
+        righe.append(T("SALTATI perche' non si possono eliminare: %d") % len(bloccati))
+        for item, motivo in bloccati:
+            righe.append("    %s  -  %s" % (valore_visibile(item, "asset_tag") or
+                                            valore_visibile(item, "imei"), T(motivo)))
+    righe.append("")
+    righe.append(T("In inventario resteranno %d dispositivi.") % restano)
+    return righe
+
+
+def riepilogo_spostamento(spostabili, telefoni, destinazione, stanza_iphone, conteggi):
+    """Le righe da leggere prima di spostare fra stanze."""
+    righe = []
+    restano_dove_sono = [i for i in spostabili if i.get("stanza") == destinazione]
+    da_spostare = [i for i in spostabili if i.get("stanza") != destinazione]
+    if da_spostare:
+        righe.append(T("SPOSTATI IN %s: %d") % (destinazione, len(da_spostare)))
+        for stanza, elenco in _per_stanza(da_spostare):
+            righe.append("")
+            righe.append(T("  da %s - %d dispositivi") % (stanza, len(elenco)))
+            righe.extend(_riga_dispositivo(i) for i in elenco)
+    else:
+        righe.append(T("Nessun cambiamento: sono gia' tutti in %s.") % destinazione)
+    if restano_dove_sono and da_spostare:
+        righe.append("")
+        righe.append(T("Gia' in %s, restano dove sono: %d")
+                     % (destinazione, len(restano_dove_sono)))
+    if telefoni:
+        righe.append("")
+        righe.append(T("RESTANO FERMI perche' sono iPhone: %d") % len(telefoni))
+        righe.append(T("Gli iPhone sono sempre registrati in %s.") % stanza_iphone)
+    if conteggi and da_spostare:
+        righe.append("")
+        righe.append(T("Come restano le stanze:"))
+        for stanza, (prima, dopo) in conteggi:
+            if prima != dopo:
+                righe.append("  %-28s %d  ->  %d" % (stanza, prima, dopo))
+    return righe
+
+
+class ConfermaOperazioneDialog(_Modal):
+    """Che cosa sta per succedere, riga per riga, prima di farlo succedere."""
+
+    def __init__(self, parent, titolo, intestazione, righe, testo_ok,
+                 stile_ok="Primary.TButton", avvertenza=None):
+        _Modal.__init__(self, parent, titolo)
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, text=intestazione, style="Section.TLabel",
+                  wraplength=430, justify="left").pack(anchor="w", pady=(0, 10))
+
+        cornice = tk.Frame(body, bg=theme.CARD, highlightthickness=1,
+                           highlightbackground=theme.BORDER)
+        cornice.pack(fill="both", expand=True)
+        testo = tk.Text(cornice, width=52, height=min(16, max(4, len(righe))),
+                        wrap="none", relief="flat", highlightthickness=0,
+                        bg=theme.CARD, fg=theme.TEXT, font=self.master.fonts["base"])
+        testo.insert("1.0", "\n".join(righe))
+        testo.configure(state="disabled")
+        barra = ttk.Scrollbar(cornice, orient="vertical", command=testo.yview)
+        testo.configure(yscrollcommand=barra.set)
+        testo.pack(side="left", fill="both", expand=True, padx=(8, 0), pady=8)
+        barra.pack(side="right", fill="y")
+
+        if avvertenza:
+            tk.Label(body, text=avvertenza, justify="left", anchor="w",
+                     bg=theme.LOAN_BG, fg=theme.LOAN_FG, padx=10, pady=8,
+                     wraplength=430).pack(fill="x", pady=(10, 0))
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(14, 0))
+        ttk.Button(buttons, text=T("Annulla"),
+                   command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=testo_ok, style=stile_ok,
+                   command=self._ok).pack(side="right")
+
+    def _ok(self):
+        self.result = True
+        self.destroy()
+
+
 class RoomCard(tk.Frame):
     """Riquadro cliccabile con il conteggio dei dispositivi di una stanza."""
 
@@ -1418,6 +1548,9 @@ class App(tk.Tk):
         lang.imposta(config.load_language())
         self.fonts = theme.apply(self)
         installa_copia_incolla(self)
+        # Command esiste solo su macOS: dove non c'e', quel bit di stato
+        # significa altro e non va letto.
+        self._ha_comando = self.tk.call("tk", "windowingsystem") == "aqua"
         self.cfg = config.load_shared_config(data_path)
         self.store = InventoryStore(data_path,
                                     iphone_room=self.cfg.get("iphone_room"),
@@ -1742,13 +1875,24 @@ class App(tk.Tk):
             return          # tabella in ricostruzione
         self._sync_righelli()
 
+    def _control_e_della_selezione(self):
+        """True se qui Control+clic serve gia' alla selezione multipla."""
+        try:
+            gesti = str(self.tk.call("event", "info", "<<ToggleSelection>>"))
+        except tk.TclError:
+            return False
+        return "Control" in gesti
+
     def _make_table(self, parent):
         wrap = tk.Frame(parent, bg=theme.CARD, highlightthickness=1,
                         highlightbackground=theme.BORDER)
         wrap.pack(fill="both", expand=True)
         columns = self._columns()
+        # "extended" e' la selezione multipla di ttk: Ctrl per righe sparse,
+        # Shift per un intervallo. La fa Tk, quindi non c'e' nostro codice sugli
+        # eventi del mouse e non c'e' niente che possa rallentare l'elenco.
         tree = ttk.Treeview(wrap, columns=columns, show="headings",
-                            selectmode="browse", style="Inv.Treeview")
+                            selectmode="extended", style="Inv.Treeview")
         for field in columns:
             if field == CHECK_COLUMN:
                 tree.heading(field, text=T(""))
@@ -1838,7 +1982,13 @@ class App(tk.Tk):
                 tree.bind(combinazione, self._copia_selezione)
             except tk.TclError:
                 pass
-        for tasto_destro in ("<Button-3>", "<Button-2>", "<Control-Button-1>"):
+        # Su Windows Control+clic aggiunge una riga alla selezione; su macOS
+        # quel gesto e' il tasto destro. Invece di dedurlo dal sistema operativo
+        # lo si chiede a Tk, che lo sa gia'.
+        tasti_destri = ["<Button-3>", "<Button-2>"]
+        if not self._control_e_della_selezione():
+            tasti_destri.append("<Control-Button-1>")
+        for tasto_destro in tasti_destri:
             tree.bind(tasto_destro, self._menu_riga)
         tree.bind("<Configure>", lambda e: (self._sync_row_buttons(),
                                             self._sync_righelli()))
@@ -1878,8 +2028,11 @@ class App(tk.Tk):
         if self.tree is None:
             return "break"
         riga = self.tree.identify_row(evento.y)
-        if riga:
+        if riga and riga not in self.tree.selection():
+            # su una riga gia' scelta il menu agisce su tutte: azzerare la
+            # selezione per aprirlo vorrebbe dire perdere venti spunte
             self.tree.selection_set(riga)
+            self.tree.focus(riga)
         item = self._item_by_tag(riga) if riga else None
         etichetta = (T("Copia l'IMEI") if item is not None and is_iphone(item.get("tipo"))
                      else T("Copia l'asset tag"))
@@ -2060,16 +2213,21 @@ class App(tk.Tk):
             atteso = CHECK_ON if tag in scelti else CHECK_OFF
             if self.tree.set(tag, CHECK_COLUMN) != atteso:
                 self.tree.set(tag, CHECK_COLUMN, atteso)
+        self._update_status()
 
     def _on_click(self, event):
         tag, column = self._cell_at(event)
         if not tag:
             return None
+        if con_modificatore(event.state, self._ha_comando):
+            return None          # comanda ttk: aggiunge, toglie o estende
         if column == CHECK_COLUMN:
-            if tag in self.tree.selection():
-                self.tree.selection_remove(tag)
+            if self.tree.selection() == (tag,):
+                self.tree.selection_remove(tag)   # era l'unica: si toglie
             else:
-                self.tree.selection_set([tag])
+                self.tree.selection_set([tag])    # senza tasti si riparte da qui
+            # la riga diventa l'ancora da cui Shift estendera'
+            self.tree.focus(tag)
             self._on_select()
             return "break"
         if column == ACTION_COLUMN:
@@ -2077,6 +2235,8 @@ class App(tk.Tk):
         return None
 
     def _on_double_click(self, event):
+        if con_modificatore(event.state, self._ha_comando):
+            return "break"       # un doppio Ctrl+clic non apre la scheda
         tag, column = self._cell_at(event)
         if column in (ACTION_COLUMN, CHECK_COLUMN):
             return "break"
@@ -2437,7 +2597,8 @@ class App(tk.Tk):
         if self.tree is None:
             self._update_status()
             return
-        selected = set(self.selected_tags()) if keep_selection else set()
+        selected = self.selected_tags() if keep_selection else []
+        ancora = self.tree.focus() if keep_selection else ""
         self.tree.delete(*self.tree.get_children())
         columns = self._columns()
         scelti = set(selected)
@@ -2457,7 +2618,9 @@ class App(tk.Tk):
                              tags=(tag,) if tag else ())
         restore = [t for t in selected if self.tree.exists(t)]
         if restore:
-            self.tree.selection_set(restore[:1])
+            self.tree.selection_set(restore)
+            if ancora in restore:
+                self.tree.focus(ancora)
             self.tree.see(restore[0])
         self._update_status()
         self._applica_larghezze()
@@ -2477,6 +2640,9 @@ class App(tk.Tk):
             label = T("%d dispositivi") % len(self.visible)
             if len(self.visible) != total:
                 label += T(" di %d") % total
+            scelti = len(self.tree.selection()) if self.tree is not None else 0
+            if scelti > 1:
+                label += T("  -  %d selezionati") % scelti
             self.var_section_count.set(label)
         shown = "" if len(self.visible) == total else T("  |  visualizzati: %d") % len(self.visible)
         self.var_status.set(
@@ -2510,11 +2676,32 @@ class App(tk.Tk):
         self.refresh_table()
 
     def selected_tags(self):
-        return list(self.tree.selection()) if self.tree is not None else []
+        """Gli asset tag selezionati, nell'ordine in cui si vedono nell'elenco.
+
+        Tk li restituisce nell'ordine in cui la selezione e' stata costruita:
+        chi sceglie dal basso verso l'alto se li ritroverebbe capovolti nel
+        riepilogo e negli appunti, dove ci si aspetta l'ordine dell'elenco.
+        """
+        if self.tree is None:
+            return []
+        scelti = set(self.tree.selection())
+        return [t for t in self.tree.get_children() if t in scelti]
 
     def selected_items(self):
         tags = set(self.selected_tags())
         return [i for i in self.store.items if i["asset_tag"] in tags]
+
+    def _items_by_tag(self, tags):
+        """I dispositivi corrispondenti ai codici, in un giro solo.
+
+        Cercarli uno per uno con _item_by_tag costerebbe un giro dell'inventario
+        per ogni riga selezionata: con venti righe su trecento dispositivi si
+        sente.
+        """
+        voluti = set(tags)
+        trovati = dict((i["asset_tag"], i) for i in self.store.items
+                       if i["asset_tag"] in voluti)
+        return [trovati[t] for t in tags if t in trovati]
 
     def _reload(self, message=None):
         try:
@@ -2526,7 +2713,16 @@ class App(tk.Tk):
         self.store.iphone_room = self.cfg.get("iphone_room")
         self.store.stati = list(self.cfg.get("states") or [])
         self._sync_filter_values()
+        scelti, ancora = self.selected_tags(), (self.tree.focus() if self.tree else "")
         self._render()
+        if scelti and self.tree is not None:
+            # l'elenco si ricarica da solo ogni quindici secondi: senza questo,
+            # una selezione costruita riga per riga sparirebbe da sola
+            restano = [t for t in scelti if self.tree.exists(t)]
+            if restano:
+                self.tree.selection_set(restano)
+                if ancora in restano:
+                    self.tree.focus(ancora)
         if message:
             self.var_status.set(message + "     " + self.var_status.get())
 
@@ -2686,13 +2882,24 @@ class App(tk.Tk):
                       T("Salvato %s.") % edited["asset_tag"])
 
     def on_delete(self):
+        """Elimina i dispositivi selezionati, dopo averli mostrati uno per uno."""
         tags = self.selected_tags()
         if not tags:
+            messagebox.showinfo(T("Elimina"),
+                                T("Spunta i dispositivi da eliminare."), parent=self)
             return
-        item = self._item_by_tag(tags[0])
-        if item is not None:
+
+        da_eliminare, _non_trovati, bloccati = self.store.anteprima_eliminazione(tags)
+        # l'anteprima ha riletto il file: la tabella va riallineata a quello che
+        # il riepilogo sta per raccontare
+        self.refresh_table()
+
+        # Un solo dispositivo bloccato: si dice perche' e cosa fare per
+        # sbloccarlo, che e' piu' utile di un elenco con dentro una riga sola.
+        if not da_eliminare and len(bloccati) == 1:
+            item = bloccati[0][0]
             libero, sblocco = puo_essere_eliminato(item)
-            if not libero and sblocco is None:
+            if sblocco is None:
                 messagebox.showwarning(
                     T("Eliminazione non consentita"),
                     T("%s - %s\n\n"
@@ -2701,26 +2908,58 @@ class App(tk.Tk):
                     "Registra prima la spedizione con il pulsante Conferma\n"
                     "spedizione, nel contenitore Iphone. Da quel momento restera'\n"
                     "consultabile per %d mesi, e poi potra' essere eliminato.")
-                    % (tags[0], item.get("modello", ""), MESI_CONSERVAZIONE),
+                    % (valore_visibile(item, "asset_tag") or valore_visibile(item, "imei"),
+                       item.get("modello", ""), MESI_CONSERVAZIONE),
                     parent=self)
-                return
-            if not libero:
+            else:
                 messagebox.showwarning(
                     T("Eliminazione non consentita"),
                     T("%s - %s\n\n"
                     "Il dispositivo e' stato rispedito al servizio telefonia il %s e\n"
                     "va conservato in inventario per consultazione.\n\n"
                     "Potrai eliminarlo a partire dal %s.")
-                    % (tags[0], item.get("modello", ""), item["spedito_il"],
+                    % (valore_visibile(item, "asset_tag") or valore_visibile(item, "imei"),
+                       item.get("modello", ""), item["spedito_il"],
                        sblocco.strftime("%d/%m/%Y")),
                     parent=self)
-                return
-        question = T("Eliminare %s dall'inventario?") % tags[0]
-        if item and item.get("modello"):
-            question = T("Eliminare %s - %s dall'inventario?") % (tags[0], item["modello"])
-        if not messagebox.askyesno(T("Conferma eliminazione"), question, parent=self):
             return
-        self._run(lambda: self.store.delete(tags), T("Eliminato %s.") % tags[0])
+
+        restano = len(self.store.items) - len(da_eliminare)
+        righe = riepilogo_eliminazione(da_eliminare, bloccati, restano)
+        if not da_eliminare:
+            messagebox.showwarning(T("Elimina"), "\n".join(righe), parent=self)
+            return
+
+        avvertenza = T("Stai per eliminare %d dispositivi dall'inventario di tutti.\n"
+                       "Una copia del file dati viene salvata prima di procedere.")
+        if len(da_eliminare) == 1:
+            avvertenza = T("Il dispositivo sparisce dall'inventario di tutti.\n"
+                           "Una copia del file dati viene salvata prima di procedere.")
+        if not ConfermaOperazioneDialog(
+            self, T("Conferma eliminazione"),
+            T("Eliminare %d dispositivi?") % len(da_eliminare) if len(da_eliminare) > 1
+            else T("Eliminare questo dispositivo?"),
+            righe, T("Elimina"), "Rosso.TButton", avvertenza
+        ).show():
+            return
+
+        try:
+            copia = self.store.copia_di_sicurezza()
+        except InventoryError as exc:
+            messagebox.showerror(T("Eliminazione annullata"), str(exc), parent=self)
+            return
+
+        # solo quelli davvero eliminabili: store.delete e' tutto-o-niente, e un
+        # iPhone protetto in mezzo bloccherebbe anche gli altri
+        eliminabili = [i["asset_tag"] for i in da_eliminare]
+        fatto = self._run(lambda: self.store.delete(eliminabili))
+        if fatto is None:
+            return
+        messagebox.showinfo(
+            T("Eliminazione completata"),
+            T("Eliminati %d dispositivi.\n\nIn inventario ne restano %d.\n\n"
+              "Copia di sicurezza del file precedente:\n%s")
+            % (len(eliminabili), len(self.store.items), copia), parent=self)
 
     def on_delete_many(self):
         """Eliminazione in blocco, incollando i codici da un foglio."""
@@ -2745,20 +2984,49 @@ class App(tk.Tk):
             % (len(tags), len(self.store.items), copia), parent=self)
 
     def on_move(self):
+        """Sposta in un'altra stanza i dispositivi selezionati."""
         tags = self.selected_tags()
         if not tags:
-            messagebox.showinfo(T("Sposta"), T("Spunta il dispositivo da spostare."), parent=self)
+            messagebox.showinfo(T("Sposta"),
+                                T("Spunta i dispositivi da spostare."), parent=self)
             return
-        telefoni = [t for t in tags if is_iphone((self._item_by_tag(t) or {}).get("tipo"))]
-        if telefoni and len(telefoni) == len(tags):
+        items = self._items_by_tag(tags)
+        telefoni = [i for i in items if is_iphone(i.get("tipo"))]
+        spostabili = [i for i in items if not is_iphone(i.get("tipo"))]
+        if telefoni and not spostabili:
             messagebox.showinfo(
                 T("Sposta"),
                 T("Gli iPhone restano sempre in %s e non possono essere spostati.")
                 % self.iphone_room(), parent=self)
             return
-        room = self._ask_room(T("Sposta %s in:") % tags[0])
+
+        domanda = (T("Sposta %s in:") % tags[0] if len(spostabili) == 1
+                   else T("Sposta %d dispositivi in:") % len(spostabili))
+        room = self._ask_room(domanda)
         if not room:
             return
+
+        in_partenza = sum(1 for i in spostabili if i.get("stanza") != room)
+        conteggi = []
+        for stanza in self.cfg["rooms"]:
+            prima = sum(1 for i in self.store.items if i.get("stanza") == stanza)
+            escono = sum(1 for i in spostabili
+                         if i.get("stanza") == stanza and stanza != room)
+            dopo = prima - escono + (in_partenza if stanza == room else 0)
+            conteggi.append((stanza, (prima, dopo)))
+        righe = riepilogo_spostamento(spostabili, telefoni, room,
+                                      self.iphone_room(), conteggi)
+        if not in_partenza:
+            messagebox.showinfo(T("Sposta"), "\n".join(righe), parent=self)
+            return
+        if not ConfermaOperazioneDialog(
+            self, T("Conferma spostamento"),
+            T("Spostare %d dispositivi in %s?") % (in_partenza, room)
+            if in_partenza > 1 else T("Spostare questo dispositivo in %s?") % room,
+            righe, T("Sposta")
+        ).show():
+            return
+
         esito = self._run(lambda: self.store.move_to_room(tags, room))
         if esito:
             spostati, bloccati = esito

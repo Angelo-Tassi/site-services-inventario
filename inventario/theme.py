@@ -13,7 +13,11 @@ MUTED = "#6B7A8C"
 BORDER = "#D7E0EA"
 HEAD_BG = "#E7EEF6"
 ROW_ALT = "#F6F9FC"
-SELECT = "#CFE4F6"
+# Ambra: e' l'unica tinta che nessuna categoria di riga usa. Con l'azzurro di
+# prima una riga selezionata era quasi identica a un tablet Dell, e con venti
+# righe accese insieme non si capiva piu' che cosa fosse una spunta e che cosa
+# una categoria.
+SELECT = "#F6DFAC"
 DANGER = "#B03A2E"
 LOAN_BG = "#FDEEEC"     # riga di un dispositivo in prestito
 LOAN_BG_ALT = "#FAE6E3"
@@ -141,8 +145,10 @@ def apply(root):
     style.configure("Inv.Treeview.Heading", background=HEAD_BG, foreground=PRIMARY,
                     font=fonts["bold"], relief="flat", padding=(8, 7))
     style.map("Inv.Treeview.Heading", background=[("active", "#DAE5F0")])
-    style.map("Inv.Treeview", background=[("selected", SELECT)],
-              foreground=[("selected", TEXT)])
+    # Solo lo sfondo: senza mappare il colore del testo, una riga in prestito
+    # selezionata conserva il suo rosso e una spedita il suo viola, cosi' le due
+    # informazioni piu' urgenti attraversano la selezione.
+    style.map("Inv.Treeview", background=[("selected", SELECT)])
     # Pulsanti veri disegnati sopra le righe dell'elenco.
     style.configure("Row.TButton", background=LINK, foreground="#FFFFFF",
                     font=(family, 9, "bold"), borderwidth=0, relief="flat",

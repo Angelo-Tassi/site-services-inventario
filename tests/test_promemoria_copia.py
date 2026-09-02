@@ -35,18 +35,27 @@ assert store.modifiche == 2
 app._run(lambda: store.set_campo("IT-9001", "note", "provata"))
 assert store.modifiche == 2, "una modifica a vuoto non conta"
 
+# ---- servono abbastanza dispositivi da poterne togliere quanti ne chiede la
+# soglia: la fixture da sola non ci arriva
+for numero in range(MODIFICHE_PER_PROMEMORIA):
+    store.add(new_item("IT-92%02d" % numero, "Laptop", "T14", "PF92%02d" % numero,
+                       fixture.DR, ""))
+store.load()
+app._modifiche_alla_copia = store.modifiche      # si riparte da qui
+chieste[:] = []
+
 # ---- fino alla soglia non chiede niente
-mancanti = MODIFICHE_PER_PROMEMORIA - store.modifiche
+mancanti = MODIFICHE_PER_PROMEMORIA
 da_togliere = [i["asset_tag"] for i in store.items
-               if i["asset_tag"] not in ("IT-9001",)
-               and not i["asset_tag"].startswith("35")][:mancanti - 1]
+               if i["asset_tag"].startswith("IT-92")][:mancanti - 1]
 app._run(lambda: store.delete(da_togliere))
-assert store.modifiche == MODIFICHE_PER_PROMEMORIA - 1, store.modifiche
+fatte = store.modifiche - app._modifiche_alla_copia
+assert fatte == MODIFICHE_PER_PROMEMORIA - 1, fatte
 assert not chieste, "un record prima della soglia non si chiede ancora"
 
 # ---- al record numero MODIFICHE_PER_PROMEMORIA lo chiede
 app._run(lambda: store.delete(["IT-9001"]))
-assert store.modifiche == MODIFICHE_PER_PROMEMORIA, store.modifiche
+assert store.modifiche - app._modifiche_alla_copia == 0, "il conto riparte"
 assert len(chieste) == 1, chieste
 assert "%d dispositivi" % MODIFICHE_PER_PROMEMORIA in chieste[0], chieste[0]
 

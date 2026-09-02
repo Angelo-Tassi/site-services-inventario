@@ -25,7 +25,7 @@ assert [c.note.cget("text") for c in schede()[:3]] == ["", "2 in prestito", ""]
 assert app._columns()[0] == CHECK_COLUMN
 assert ACTION_COLUMN not in app._columns(), "in home niente colonna azione"
 assert app.tree.heading(CHECK_COLUMN)["text"] == ""
-assert str(app.tree.cget("selectmode")) == "browse"
+assert str(app.tree.cget("selectmode")) == "extended"
 for stanza in (BAU, DR):
     app.show_room(stanza)
     assert ACTION_COLUMN not in app._columns(), stanza
@@ -54,17 +54,28 @@ assert app.action_label(app._item_by_tag("IT-0106")) == "Registra rientro"
 app._run(lambda: app.store.give_back("IT-0106"), "ok")
 assert app.action_label(app._item_by_tag("IT-0106")) == "Presta"
 
-# ---- selezione a casella, una alla volta
+# ---- selezione a casella
 app.show_home()
 assert set(app.tree.set(t, CHECK_COLUMN) for t in app.tree.get_children()) == {CHECK_OFF}
 app.tree.selection_set(["IT-0103"]); app._on_select()
 assert app.tree.set("IT-0103", CHECK_COLUMN) == CHECK_ON
 assert app.tree.set("IT-0104", CHECK_COLUMN) == CHECK_OFF
+# scegliendone un'altra senza tasti premuti, la prima si spegne
 app.tree.selection_set(["IT-0104"]); app._on_select()
 assert app.selected_tags() == ["IT-0104"]
 assert app.tree.set("IT-0103", CHECK_COLUMN) == CHECK_OFF
 app.refresh_table()
 assert app.selected_tags() == ["IT-0104"] and app.tree.set("IT-0104", CHECK_COLUMN) == CHECK_ON
+
+# ---- e piu' righe insieme sopravvivono a un ricarico dell'elenco
+app.tree.selection_set(["IT-0104", "IT-0101", "IT-0103"]); app._on_select()
+assert app.selected_tags() == ["IT-0101", "IT-0103", "IT-0104"], \
+    "i selezionati si leggono nell'ordine dell'elenco, non dei clic"
+assert all(app.tree.set(t, CHECK_COLUMN) == CHECK_ON
+           for t in ("IT-0101", "IT-0103", "IT-0104"))
+app.refresh_table()
+assert app.selected_tags() == ["IT-0101", "IT-0103", "IT-0104"], app.selected_tags()
+app.tree.selection_set(["IT-0104"]); app._on_select()
 
 # ---- colori per tipo
 app._run(lambda: app.store.add(new_item(tipo=TIPO, modello="Apple iPhone 14",

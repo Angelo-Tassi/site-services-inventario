@@ -184,6 +184,7 @@ table{min-width:520px}
     <li><a href="#colonne">Le colonne di ogni stanza</a></li>
     <li><a href="#aggiungere">Aggiungere un dispositivo</a></li>
     <li><a href="#modificare">Modificare al volo</a></li>
+    <li><a href="#selezione">Selezionare piu' dispositivi</a></li>
     <li><a href="#appunti">Copia e incolla</a></li>
     <li><a href="#prestiti">Prestiti</a></li>
     <li><a href="#iphone">iPhone</a></li>
@@ -257,8 +258,9 @@ table{min-width:520px}
       <p>Si apre cliccando una scheda. Mostra solo i dispositivi di quella stanza, e
         aggiunge i due pulsanti per importare ed esportare soltanto lei.</p></div>
     <div class="card"><h3>Selezione</h3>
-      <p>La colonna con la casella a sinistra: si seleziona <b>un dispositivo alla
-        volta</b>. Serve per Modifica, Elimina e Sposta.</p></div>
+      <p>La casella a sinistra. Un clic sceglie una riga, <b>Ctrl+clic</b> ne aggiunge
+        altre anche lontane, <b>Maiusc+clic</b> prende l'intervallo. Vedi
+        <a href="#selezione">Selezionare piu' dispositivi</a>.</p></div>
     <div class="card"><h3>Filtri e ricerca</h3>
       <p>Sopra l'elenco: stanza, tipo e una casella di ricerca che guarda dentro tutti
         i campi, asset tag, seriale, note e nome di chi ha in prestito.</p></div>
@@ -281,9 +283,9 @@ table{min-width:520px}
     <tr><td><span class="k grigio">‹ Home</span></td><td class="d">Torna alla schermata iniziale da qualsiasi stanza.</td></tr>
     <tr><td><span class="k blu">Aggiungi</span></td><td class="d">Chiede prima <b>che tipo</b> di dispositivo, poi se inserirlo a mano o con il lettore di codici a barre.</td></tr>
     <tr><td><span class="k grigio">Modifica</span></td><td class="d">Apre il dispositivo selezionato per cambiarne i campi.</td></tr>
-    <tr><td><span class="k grigio">Elimina</span></td><td class="d">Toglie il dispositivo selezionato, con conferma. Gli iPhone hanno protezioni in piu': vedi <a href="#iphone">iPhone</a>.</td></tr>
+    <tr><td><span class="k grigio">Elimina</span></td><td class="d">Toglie <b>tutti i dispositivi selezionati</b>, dopo un riepilogo che li elenca uno per uno e una copia di sicurezza. Gli iPhone hanno protezioni in piu': vedi <a href="#iphone">iPhone</a>.</td></tr>
     <tr><td><span class="k rosso">Elimina +</span></td><td class="d"><b>Eliminazione in blocco.</b> Si incollano i codici presi da Excel, uno per riga; il programma dice quali esistono, da quale stanza spariranno e che cosa salta e perche'. Per procedere si scrive <span class="mono">ACCETTO</span>. Una copia di sicurezza viene salvata comunque prima.</td></tr>
-    <tr><td><span class="k grigio">Sposta in stanza…</span></td><td class="d">Cambia la stanza del dispositivo selezionato. Gli iPhone non si spostano.</td></tr>
+    <tr><td><span class="k grigio">Sposta in stanza…</span></td><td class="d">Cambia la stanza di <b>tutti i dispositivi selezionati</b>, dopo un riepilogo che dice da dove partono e come restano le stanze. Gli iPhone non si spostano.</td></tr>
     <tr><td><span class="k arancio">Importa xls…</span></td><td class="d">Carica dispositivi da un foglio Excel. Prima chiede <b>che cosa</b> importare e <b>come</b>. Vedi <a href="#importare">Importare</a>.</td></tr>
     <tr><td><span class="k verde">Esporta xls…</span></td><td class="d">Produce un file Excel dell'inventario. Prima chiede ambito e forma. Vedi <a href="#esportare">Esportare</a>.</td></tr>
     <tr><td><span class="k verde">Salva copia in locale…</span></td><td class="d"><b>La copia di sicurezza che decidi tu.</b> Vedi <a href="#sicurezza">Sicurezza dei dati</a>.</td></tr>
@@ -414,6 +416,41 @@ table{min-width:520px}
       <p>Con <span class="k grigio">Sposta in stanza…</span>, oppure dalla scheda del
         dispositivo.</p></div>
   </div>
+</section>
+
+<section id="selezione">
+  <h2>Selezionare piu' dispositivi</h2>
+  <p class="sub">Un clic sceglie una riga. <b>Ctrl+clic</b> ne aggiunge altre, anche
+    lontane fra loro; <b>Maiusc+clic</b> prende tutto l'intervallo fino a quella riga.
+    I tasti vanno tenuti premuti: appena si clicca senza, la selezione riparte da una
+    riga sola, come su Windows.</p>
+  <div class="tw"><table class="man">
+    <tr><th>Come si riconosce</th><th>Che cosa vuol dire</th></tr>
+    <tr><td class="d">Cerchio pieno nella prima colonna</td><td class="d">la riga e' scelta. E' il segno autorevole, indipendente dal colore.</td></tr>
+    <tr><td class="d">Sfondo ambra</td><td class="d">e' l'unica tinta che nessuna categoria usa: una riga selezionata non si confonde mai con un tablet o un iPhone. Il colore del testo resta quello della categoria, cosi' il rosso di un prestito attraversa la selezione.</td></tr>
+    <tr><td class="d">Il conteggio accanto al titolo</td><td class="d">quante righe sono scelte in questo momento.</td></tr>
+  </table></div>
+  <p class="note">La selezione tiene <b>solo le righe visibili</b>: filtrando o cercando
+    si assottiglia, e cancellando il filtro non torna. E' voluto: impedisce di eliminare
+    dispositivi che non si stanno guardando.</p>
+
+  <h3>Chi agisce su piu' righe</h3>
+  <p class="sub"><span class="k grigio">Elimina</span> e
+    <span class="k grigio">Sposta in stanza…</span>. <i>Modifica</i> resta a un
+    dispositivo per volta, perche' una scheda si apre da sola;
+    <span class="k rosso">Elimina +</span> e' un'altra cosa, serve a incollare codici
+    presi da Excel.</p>
+
+  <h3>Il riepilogo prima di agire</h3>
+  <p class="sub">Nessuna delle due operazioni parte senza mostrare prima che cosa fara'.</p>
+  <div class="tw"><table class="man">
+    <tr><th>Operazione</th><th>Che cosa dice prima</th></tr>
+    <tr><td class="d"><b>Elimina</b></td><td class="d">i dispositivi che spariscono, raggruppati per stanza, con il modello e la segnalazione di quelli <b>in prestito</b>; quelli <b>saltati perche' non si possono eliminare</b>, con il motivo; quanti dispositivi resteranno. Una copia di sicurezza viene salvata prima, e alla fine si legge dove sta.</td></tr>
+    <tr><td class="d"><b>Sposta in stanza…</b></td><td class="d">i dispositivi divisi per stanza di provenienza, quanti iPhone restano fermi e perche', e come restano le stanze prima e dopo. Se sono gia' tutti nella stanza scelta lo dice subito.</td></tr>
+  </table></div>
+  <div class="avviso">Se nella selezione c'e' un iPhone protetto, <b>spariscono solo gli
+    altri</b>: il telefono resta dov'e' e il riepilogo dice perche'. Prima l'operazione
+    si sarebbe fermata del tutto, senza eliminare niente.</div>
 </section>
 
 <section id="appunti">
@@ -565,7 +602,7 @@ table{min-width:520px}
       <p><span class="k verde">Salva copia in locale…</span> mette una copia
         dell'inventario dove vuoi: sul tuo PC, su una chiavetta, fuori dalla rete.</p></div>
     <div class="card"><h3>4 · Il promemoria</h3>
-      <p>Ogni dieci dispositivi aggiunti, modificati o eliminati, il programma chiede se
+      <p>Ogni venti dispositivi aggiunti, modificati o eliminati, il programma chiede se
         vuoi salvare una copia locale. Si puo' dire di no: torna a chiedere dopo altri
         cinque.</p></div>
     <div class="card"><h3>5 · Ripristino</h3>
@@ -700,6 +737,7 @@ table{min-width:520px}
     <li><a href="#colonne-en">The columns of each room</a></li>
     <li><a href="#aggiungere-en">Adding a device</a></li>
     <li><a href="#modificare-en">Editing on the spot</a></li>
+    <li><a href="#selezione-en">Selecting several devices</a></li>
     <li><a href="#appunti-en">Copy and paste</a></li>
     <li><a href="#prestiti-en">Loans</a></li>
     <li><a href="#iphone-en">iPhones</a></li>
@@ -773,8 +811,9 @@ table{min-width:520px}
       <p>Opens by clicking a card. Shows only that room's devices, and adds the two buttons
         to import and export just that room.</p></div>
     <div class="card"><h3>Selection</h3>
-      <p>The checkbox column on the left: <b>one device at a time</b>. It is what Edit,
-        Delete and Move act on.</p></div>
+      <p>The checkbox on the left. A click picks one row, <b>Ctrl+click</b> adds others
+        however far apart, <b>Shift+click</b> takes the range. See
+        <a href="#selezione-en">Selecting several devices</a>.</p></div>
     <div class="card"><h3>Filters and search</h3>
       <p>Above the list: room, type, and a search box that looks inside every field — asset
         tag, serial, notes and the name of whoever has it on loan.</p></div>
@@ -797,9 +836,9 @@ table{min-width:520px}
     <tr><td><span class="k grigio">‹ Home</span></td><td class="d">Back to the first screen from any room.</td></tr>
     <tr><td><span class="k blu">Add</span></td><td class="d">Asks first <b>which type</b> of device, then whether to enter it by hand or with the barcode reader.</td></tr>
     <tr><td><span class="k grigio">Edit</span></td><td class="d">Opens the selected device to change its fields.</td></tr>
-    <tr><td><span class="k grigio">Delete</span></td><td class="d">Removes the selected device, with confirmation. iPhones have extra protection: see <a href="#iphone-en">iPhones</a>.</td></tr>
+    <tr><td><span class="k grigio">Delete</span></td><td class="d">Removes <b>every selected device</b>, after a summary listing them one by one and a backup copy. iPhones have extra protection: see <a href="#iphone-en">iPhones</a>.</td></tr>
     <tr><td><span class="k rosso">Delete +</span></td><td class="d"><b>Bulk deletion.</b> You paste the codes from Excel, one per line; the program says which exist, which room they will disappear from, and what it skips and why. To go ahead you type <span class="mono">ACCETTO</span>. A backup copy is saved first anyway.</td></tr>
-    <tr><td><span class="k grigio">Move to room…</span></td><td class="d">Changes the selected device's room. iPhones do not move.</td></tr>
+    <tr><td><span class="k grigio">Move to room…</span></td><td class="d">Changes the room of <b>every selected device</b>, after a summary saying where they come from and how the rooms end up. iPhones do not move.</td></tr>
     <tr><td><span class="k arancio">Import xls…</span></td><td class="d">Loads devices from an Excel sheet. It asks first <b>what</b> to import and <b>how</b>. See <a href="#importare-en">Importing</a>.</td></tr>
     <tr><td><span class="k verde">Export xls…</span></td><td class="d">Produces an Excel file of the inventory. It asks first for scope and shape. See <a href="#esportare-en">Exporting</a>.</td></tr>
     <tr><td><span class="k verde">Save a local copy…</span></td><td class="d"><b>The backup you decide on.</b> See <a href="#sicurezza-en">Keeping the data safe</a>.</td></tr>
@@ -928,6 +967,40 @@ table{min-width:520px}
       <p>With <span class="k grigio">Move to room…</span>, or from the device's own
         card.</p></div>
   </div>
+</section>
+
+<section id="selezione-en">
+  <h2>Selecting several devices</h2>
+  <p class="sub">A click picks one row. <b>Ctrl+click</b> adds others, however far
+    apart; <b>Shift+click</b> takes the whole range up to that row. The keys must be
+    held down: as soon as you click without them the selection starts again from a
+    single row, as on Windows.</p>
+  <div class="tw"><table class="man">
+    <tr><th>How you can tell</th><th>What it means</th></tr>
+    <tr><td class="d">Filled circle in the first column</td><td class="d">the row is picked. It is the authoritative sign, independent of colour.</td></tr>
+    <tr><td class="d">Amber background</td><td class="d">the one tint no category uses: a selected row is never mistaken for a tablet or an iPhone. The text colour stays the category's, so the red of a loan survives the selection.</td></tr>
+    <tr><td class="d">The count next to the title</td><td class="d">how many rows are picked right now.</td></tr>
+  </table></div>
+  <p class="note">The selection holds <b>only the visible rows</b>: filtering or
+    searching thins it out, and clearing the filter does not bring it back. That is
+    deliberate: it stops you deleting devices you are not looking at.</p>
+
+  <h3>What acts on several rows</h3>
+  <p class="sub"><span class="k grigio">Delete</span> and
+    <span class="k grigio">Move to room…</span>. <i>Edit</i> stays one device at a time,
+    because a record opens on its own; <span class="k rosso">Delete +</span> is a
+    different thing, for pasting codes taken from Excel.</p>
+
+  <h3>The summary before acting</h3>
+  <p class="sub">Neither operation starts without showing what it will do.</p>
+  <div class="tw"><table class="man">
+    <tr><th>Operation</th><th>What it says first</th></tr>
+    <tr><td class="d"><b>Delete</b></td><td class="d">the devices that will disappear, grouped by room, with the model and a flag on the ones <b>on loan</b>; those <b>skipped because they cannot be deleted</b>, with the reason; how many devices will be left. A backup copy is saved first, and at the end you read where it is.</td></tr>
+    <tr><td class="d"><b>Move to room…</b></td><td class="d">the devices split by room of origin, how many iPhones stay put and why, and how the rooms stand before and after. If they are already all in the chosen room it says so at once.</td></tr>
+  </table></div>
+  <div class="avviso">If the selection contains a protected iPhone, <b>only the others
+    disappear</b>: the phone stays where it is and the summary says why. Before, the
+    operation would have stopped altogether, deleting nothing.</div>
 </section>
 
 <section id="appunti-en">
@@ -1079,7 +1152,7 @@ table{min-width:520px}
       <p><span class="k verde">Save a local copy…</span> puts a copy of the inventory
         wherever you want: your PC, a USB stick, off the network.</p></div>
     <div class="card"><h3>4 · The reminder</h3>
-      <p>Every ten devices added, changed or deleted, the program asks whether you want
+      <p>Every twenty devices added, changed or deleted, the program asks whether you want
         to save a local copy. You can say no: it comes back after another five.</p></div>
     <div class="card"><h3>5 · Restore</h3>
       <p>You go back from the interface, without hunting for files by hand. See

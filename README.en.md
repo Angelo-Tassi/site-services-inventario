@@ -297,8 +297,14 @@ use *Export xls...*.
 - **Coloured rows**, always: light green for iPhones, blue for Dell tablets,
   purple for devices already shipped back, red for those on loan. When they
   overlap the most urgent wins: loan, then shipment, then type.
-- **Tick to select**: the first column is a checkbox, and you work on **one
-  device at a time**.
+- **Selection**: the first column is a checkbox. A click picks one row;
+  **Ctrl+click** adds others, however far apart, and **Shift+click** takes the
+  whole range up to that row. The keys must be held down: a click without them
+  starts again from a single row, as on Windows. How many are picked is written
+  next to the list title.
+- **Delete** and **Move to room...** act on all the selected rows, and show a
+  summary of what they are about to do before proceeding. *Edit* stays one
+  device at a time: a record opens on its own.
 - **Loans**: the *Loan* column, with a real button on every row, appears **only
   inside a room that handles loans**.
 - **Add** asks first *what* you are adding, from a dropdown of the configured
@@ -489,11 +495,11 @@ IMEI - already present, the program **inserts nothing** and says where the one
 holding it is, with its model and room: you see at once whether it is a typo or
 a device already recorded.
 
-**Every ten devices touched, it reminds you of the local copy.** Additions,
+**Every twenty devices touched, it reminds you of the local copy.** Additions,
 edits and deletions are counted together - and it counts *records*, so a bulk
-deletion of thirty counts all thirty. On the tenth the program asks whether you
-want to save a copy on your own computer, and you can say no: it comes back
-after another ten. Saving a copy resets the count.
+deletion of thirty counts all thirty. On the twentieth the program asks whether
+you want to save a copy on your own computer, and you can say no: it comes back
+after another twenty. Saving a copy resets the count.
 
 It is there because the automatic copies live on the network folder next to the
 data: they cover human error, not the folder disappearing.
@@ -517,6 +523,43 @@ them one by one - and without giving up knowing what disappears.
 
 Duplicates count once, empty lines are ignored, and iPhones keep every one of
 their protections.
+
+## Selecting several devices
+
+A click picks one row. **Ctrl+click** adds others, however far apart;
+**Shift+click** takes the whole range up to that row. The keys must be held
+down: as soon as you click without them the selection starts again from a single
+row - the Windows behaviour.
+
+The chosen rows are recognised by the filled circle in the first column and by
+the amber background, the one tint no category uses: a selected row is never
+mistaken for a tablet or an iPhone. How many there are is written next to the
+list title.
+
+The selection holds **only the visible rows**: filtering or searching thins it
+out, and clearing the filter does not bring it back. That is deliberate - it
+stops you deleting devices you are not looking at.
+
+**Delete** and **Move to room...** act on several rows. *Edit* stays one device
+at a time, and *Delete +* is a different thing: that one is for pasting codes
+taken from Excel.
+
+### The summary before acting
+
+Neither operation starts without showing what it will do.
+
+**Delete** lists the devices that will disappear, grouped by room, with the
+model and a flag on the ones **on loan**; then those **skipped because they
+cannot be deleted** - an iPhone not yet shipped back, one still in retention -
+with the reason; and how many devices will be left. A **backup copy** is saved
+before proceeding, and at the end the program says where it is.
+
+If the selection contains a protected iPhone, **only the others disappear**: the
+phone stays, and the summary says why.
+
+**Move to room...** lists the devices split by room of origin, how many iPhones
+stay put, and how the rooms stand before and after. If they are already all in
+the chosen room it says so, instead of letting you find out at the end.
 
 ## Duplicates
 
@@ -1032,8 +1075,10 @@ safely, use *Export xls...*.
 | `Ctrl+F` | jump to the search box |
 | `Ctrl+P` | print the current view |
 | `Esc` | back to the home page |
-| `Del` | delete the ticked device |
+| `Del` | delete the ticked devices |
 | click on the checkbox | tick or untick the row |
+| `Ctrl`+click | add a row to the selection, however far apart |
+| `Shift`+click | select the whole range up to that row |
 | double-click on notes | edit the note in the list |
 | double-click on model/description | edit the description in the list |
 | double-click on status | dropdown to change the status in the list |
