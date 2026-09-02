@@ -494,6 +494,25 @@ table{min-width:520px}
     Vanno bene anche le abbreviazioni <span class="mono">BAU</span>,
     <span class="mono">KIOSK</span>, <span class="mono">DISASTER</span>.</p>
 
+  <h3>I doppioni</h3>
+  <p class="sub">Il programma non ne crea: l'inserimento singolo <b>rifiuta</b> un
+    identificativo gia' presente, e dicendo dove sta quello che c'e' gia'; l'importazione
+    aggiorna la scheda invece di duplicarla. Se un foglio contiene due volte lo stesso
+    identificativo, vale l'ultima riga e il riepilogo lo dichiara.</p>
+  <p class="sub">I doppioni entrano da un'altra strada: il file dati e' un
+    <code>.xlsx</code> che si puo' aprire e correggere a mano. Per quello c'e'
+    <span class="k rosso">Controllo generale duplicati</span>, accanto al pulsante del
+    modello, in home.</p>
+  <div class="tw"><table class="man">
+    <tr><th>Che cosa fa</th><th>Come</th></tr>
+    <tr><td class="d">Cerca in <b>tutto l'inventario</b></td><td class="d">dispositivi registrati piu' volte con lo stesso identificativo.</td></tr>
+    <tr><td class="d">Mostra <b>ogni gruppo</b></td><td class="d">quale registrazione tiene e quali elimina, con stanza, modello e data dell'ultima modifica.</td></tr>
+    <tr><td class="d">Tiene la <b>piu' recente</b></td><td class="d">e' quella su cui qualcuno ha lavorato per ultimo.</td></tr>
+    <tr><td class="d">Chiede conferma</td><td class="d">e salva una copia di sicurezza prima di eliminare.</td></tr>
+    <tr><td class="d">Segnala i <b>numeri di serie ripetuti</b></td><td class="d">su dispositivi diversi: non li tocca, perche' duplicati non sono - ma quasi sempre sono un errore di battitura.</td></tr>
+    <tr><td class="d">Non tocca gli <b>iPhone protetti</b></td><td class="d">li elenca a parte, con il motivo.</td></tr>
+  </table></div>
+
   <h3>Il riepilogo prima di importare</h3>
   <p class="sub">Niente viene scritto finche' non confermi, e prima di confermare vedi:</p>
   <div class="tw"><table class="man">
@@ -503,6 +522,9 @@ table{min-width:520px}
     <tr><td class="d"><b>Quanti dispositivi ci sono adesso e quanti dopo</b></td><td class="d">e' il numero che dice se sta per succedere quello che pensi. Con la sostituzione dice anche quanti ne spariscono prima.</td></tr>
     <tr><td class="d">Le stanze riconosciute dal foglio</td><td class="d">se non ne trova nessuna te lo dice li', prima di toccare qualsiasi cosa: altrimenti i dispositivi finirebbero senza stanza.</td></tr>
   </table></div>
+  <p class="note">A operazione avvenuta il riepilogo finale ripete tutto: che cosa e'
+    stato fatto e dove, quante righe non sono state caricate e perche' una per una, come
+    si trova adesso l'inventario stanza per stanza, e dove sta la copia di sicurezza.</p>
 
   <p class="note">Un foglio da importare non e' un inventario e non va mai aperto come
     tale: si carica da qui.</p>
@@ -987,6 +1009,24 @@ table{min-width:520px}
     <span class="mono">BAU</span>, <span class="mono">KIOSK</span> and
     <span class="mono">DISASTER</span> work too.</p>
 
+  <h3>Duplicates</h3>
+  <p class="sub">The program does not create them: adding a device <b>refuses</b> an
+    identifier already present, and says where the existing one is; an import updates the
+    record instead of duplicating it. If a sheet contains the same identifier twice, the
+    last row wins and the summary says so.</p>
+  <p class="sub">Duplicates get in another way: the data file is an <code>.xlsx</code>
+    anyone can open and correct by hand. That is what <span class="k rosso">General
+    duplicate check</span> is for, next to the template button on the home screen.</p>
+  <div class="tw"><table class="man">
+    <tr><th>What it does</th><th>How</th></tr>
+    <tr><td class="d">Searches <b>the whole inventory</b></td><td class="d">for devices recorded more than once under the same identifier.</td></tr>
+    <tr><td class="d">Shows <b>every group</b></td><td class="d">which record it keeps and which it deletes, with room, model and the date of the last change.</td></tr>
+    <tr><td class="d">Keeps the <b>most recent</b></td><td class="d">it is the one somebody worked on last.</td></tr>
+    <tr><td class="d">Asks for confirmation</td><td class="d">and saves a backup copy before deleting.</td></tr>
+    <tr><td class="d">Flags <b>repeated serial numbers</b></td><td class="d">on different devices: it does not touch them, because they are not duplicates - but they are almost always a typo.</td></tr>
+    <tr><td class="d">Leaves <b>protected iPhones</b> alone</td><td class="d">they are listed separately, with the reason.</td></tr>
+  </table></div>
+
   <h3>The summary before importing</h3>
   <p class="sub">Nothing is written until you confirm, and before confirming you see:</p>
   <div class="tw"><table class="man">
@@ -996,6 +1036,9 @@ table{min-width:520px}
     <tr><td class="d"><b>How many devices there are now and how many after</b></td><td class="d">that is the number that tells you whether what you think is about to happen. With Replace it also says how many disappear first.</td></tr>
     <tr><td class="d">The rooms recognised in the sheet</td><td class="d">if it finds none it tells you right there, before touching anything: otherwise the devices would end up with no room.</td></tr>
   </table></div>
+  <p class="note">Once it is done the final summary repeats everything: what was done and
+    where, how many rows were not loaded and why, one by one, how the inventory stands now
+    room by room, and where the backup copy is.</p>
 
   <p class="note">A sheet to import is not an inventory and must never be opened as one: it
     is loaded from here.</p>

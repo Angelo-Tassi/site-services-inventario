@@ -598,6 +598,66 @@ EN = {
         'Copied to the clipboard: %s.',
     "Il tipo non puo' restare vuoto.":
         'The type cannot be left empty.',
+    'Controllo generale duplicati':
+        'General duplicate check',
+    'Nessun duplicato':
+        'No duplicates',
+    "Ho controllato %d dispositivi: ognuno compare una volta sola.\n\nNessun numero di serie e' ripetuto su due dispositivi diversi.":
+        'I checked %d devices: each appears only once.\n\nNo serial number is repeated on two different devices.',
+    'Controllati %d dispositivi.':
+        '%d devices checked.',
+    "DOPPIONI TROVATI: %d identificativi, %d righe in piu'.":
+        'DUPLICATES FOUND: %d identifiers, %d extra rows.',
+    'TIENE':
+        'KEEPS',
+    'elimina':
+        'deletes',
+    '  ... e altri %d identificativi':
+        '  ... and %d more identifiers',
+    "Si tiene la registrazione modificata piu' di recente.":
+        'The most recently changed record is the one kept.',
+    'NUMERI DI SERIE RIPETUTI su dispositivi diversi: %d':
+        'SERIAL NUMBERS REPEATED on different devices: %d',
+    'Questi non vengono toccati: vanno guardati a mano.':
+        'These are not touched: they need a look by hand.',
+    'Controllo duplicati':
+        'Duplicate check',
+    "\n\nProcedo a eliminare le righe in piu'?\nUna copia di sicurezza viene salvata prima.":
+        '\n\nShall I delete the extra rows?\nA backup copy is saved first.',
+    'Duplicati rimossi.':
+        'Duplicates removed.',
+    'Duplicati rimossi':
+        'Duplicates removed',
+    "Eliminate %d righe in piu'.":
+        '%d extra rows deleted.',
+    '    ... e altre %d':
+        '    ... and %d more',
+    'NON eliminate, protette: %d':
+        'NOT deleted, protected: %d',
+    'Dispositivi prima: %d':
+        'Devices before: %d',
+    'Dispositivi adesso: %d':
+        'Devices now: %d',
+    "%d identificativi compaiono piu' volte nel foglio (%s): vale l'ultima riga.":
+        '%d identifiers appear more than once in the sheet (%s): the last row wins.',
+    ' e altri':
+        ' and others',
+    '%s in %s.':
+        '%s into %s.',
+    'Righe non caricate, o caricate con riserva:':
+        'Rows not loaded, or loaded with a reservation:',
+    '  %d iPhone: si inseriscono solo a mano':
+        '  %d iPhones: entered by hand only',
+    '  %d di altre stanze':
+        '  %d from other rooms',
+    "  %d doppioni nel foglio: tenuta l'ultima riga":
+        '  %d duplicates in the sheet: the last row was kept',
+    '  %d senza modello: caricate lo stesso':
+        '  %d with no model: loaded anyway',
+    'Colonne del foglio non riconosciute: %s':
+        'Sheet columns not recognised: %s',
+    'In inventario adesso: %d dispositivi.':
+        'In the inventory now: %d devices.',
 }
 
 # ------------------------------------------------- colonne dei file prodotti

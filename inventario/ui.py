@@ -1085,6 +1085,12 @@ class ImportDialog(_Modal):
                          % esito["da_tag"])
         if esito.get("iphone"):
             righe.append("%d iPhone ignorati: si inseriscono solo a mano." % esito["iphone"])
+        doppioni = esito.get("doppioni") or []
+        if doppioni:
+            righe.append(T("%d identificativi compaiono piu' volte nel foglio (%s): "
+                           "vale l'ultima riga.")
+                         % (len(doppioni), ", ".join(doppioni[:3])
+                            + (T(" e altri") if len(doppioni) > 3 else "")))
         if esito.get("altre_stanze"):
             righe.append("%d righe di altre stanze scartate." % esito["altre_stanze"])
         if esito.get("regola") == "tutte" and opzioni.get("stanza"):
@@ -2265,6 +2271,9 @@ class App(tk.Tk):
                       style="Muted.TLabel").pack(side="left", padx=(10, 0))
             ttk.Button(header, text=T("Scarica il modello di importazione"),
                        command=self.on_template).pack(side="right")
+            ttk.Button(header, text=T("Controllo generale duplicati"),
+                       style="Rosso.TButton",
+                       command=self.on_duplicati).pack(side="right", padx=(0, 6))
         else:
             header = ttk.Frame(self.body)
             header.pack(fill="x", pady=(10, 8))
@@ -2887,6 +2896,90 @@ class App(tk.Tk):
                    command=ok).pack(side="right")
         return dialog.show()
 
+    def on_duplicati(self):
+        """Cerca in tutto l'inventario i dispositivi registrati due volte.
+
+        Il file dati e' un .xlsx che si puo' aprire e correggere a mano: e' da
+        li' che i doppioni entrano. Il programma non ne crea, ma deve saperli
+        togliere.
+        """
+        gruppi, seriali = self.store.trova_duplicati()
+        if not gruppi and not seriali:
+            messagebox.showinfo(
+                T("Nessun duplicato"),
+                T("Ho controllato %d dispositivi: ognuno compare una volta sola.\n\n"
+                  "Nessun numero di serie e' ripetuto su due dispositivi diversi.")
+                % len(self.store.items), parent=self)
+            return
+
+        righe = [T("Controllati %d dispositivi.") % len(self.store.items), ""]
+        if gruppi:
+            quanti = sum(len(e) - 1 for _t, e in gruppi)
+            righe.append(T("DOPPIONI TROVATI: %d identificativi, %d righe in piu'.")
+                         % (len(gruppi), quanti))
+            for tag, elenco in gruppi[:12]:
+                tenuto = self.store._piu_recente(elenco)
+                righe.append("")
+                righe.append("  %s  -  %d registrazioni" % (tag, len(elenco)))
+                for item in elenco:
+                    segno = T("TIENE") if item is tenuto else T("elimina")
+                    righe.append("    [%s] %s  %s  %s"
+                                 % (segno, item.get("stanza") or "-",
+                                    (item.get("modello") or "")[:28],
+                                    item.get("modificato_il") or ""))
+            if len(gruppi) > 12:
+                righe.append("")
+                righe.append(T("  ... e altri %d identificativi") % (len(gruppi) - 12))
+            righe.append("")
+            righe.append(T("Si tiene la registrazione modificata piu' di recente."))
+        if seriali:
+            righe.append("")
+            righe.append(T("NUMERI DI SERIE RIPETUTI su dispositivi diversi: %d")
+                         % len(seriali))
+            for seriale, elenco in seriali[:8]:
+                righe.append("    %s  ->  %s" % (seriale, ", ".join(
+                    valore_visibile(i, "asset_tag") for i in elenco)))
+            righe.append(T("Questi non vengono toccati: vanno guardati a mano."))
+
+        if not gruppi:
+            messagebox.showwarning(T("Controllo duplicati"), "\n".join(righe),
+                                   parent=self)
+            return
+        if not messagebox.askyesno(
+            T("Controllo duplicati"),
+            "\n".join(righe) + T("\n\nProcedo a eliminare le righe in piu'?\n"
+                                 "Una copia di sicurezza viene salvata prima."),
+            parent=self
+        ):
+            return
+
+        rapporto = self._run(lambda: self.store.rimuovi_duplicati(),
+                             T("Duplicati rimossi."))
+        if not rapporto:
+            return
+        self._render()
+        fine = [T("Eliminate %d righe in piu'.") % len(rapporto["eliminati"]), ""]
+        for item in rapporto["eliminati"][:15]:
+            fine.append("    %s  %s  %s" % (valore_visibile(item, "asset_tag"),
+                                            item.get("stanza") or "-",
+                                            (item.get("modello") or "")[:24]))
+        if len(rapporto["eliminati"]) > 15:
+            fine.append(T("    ... e altre %d") % (len(rapporto["eliminati"]) - 15))
+        if rapporto["protetti"]:
+            fine.append("")
+            fine.append(T("NON eliminate, protette: %d") % len(rapporto["protetti"]))
+            for item, motivo in rapporto["protetti"]:
+                fine.append("    %s  -  %s"
+                            % (valore_visibile(item, "asset_tag"), motivo))
+        fine.append("")
+        fine.append(T("Dispositivi prima: %d") % rapporto["prima"])
+        fine.append(T("Dispositivi adesso: %d") % rapporto["dopo"])
+        if rapporto["copia"]:
+            fine.append("")
+            fine.append(T("Copia di sicurezza del file precedente:"))
+            fine.append(rapporto["copia"])
+        messagebox.showinfo(T("Duplicati rimossi"), "\n".join(fine), parent=self)
+
     def on_template(self):
         """Genera il modello vuoto da compilare e reimportare."""
         percorso = filedialog.asksaveasfilename(
@@ -2955,17 +3048,62 @@ class App(tk.Tk):
             items, opzioni["mode"], stanza))
         if not risultato:
             return
-        righe = [T("Aggiunti: %d") % risultato["aggiunti"],
-                 T("Aggiornati: %d") % risultato["aggiornati"]]
+        messagebox.showinfo(T("Importazione completata"),
+                            "\n".join(self._resoconto_importazione(
+                                risultato, esito, opzioni, scartati)),
+                            parent=self)
+
+    def _resoconto_importazione(self, risultato, esito, opzioni, scartati=0):
+        """Che cosa e' stato fatto davvero, riga per riga.
+
+        A operazione avvenuta i numeri non bastano: chi ha appena riscritto
+        l'inventario di tutti deve poter controllare che sia successo quello che
+        si aspettava, e ritrovare la copia di sicurezza se non lo e'.
+        """
+        esito = esito or {}
+        righe = [T("%s in %s.")
+                 % (T("Sostituzione") if opzioni["mode"] == "replace" else T("Unione"),
+                    opzioni["stanza"] or T("tutto l'inventario")), ""]
+        if risultato.get("eliminati"):
+            righe.append(T("Eliminati prima del caricamento: %d")
+                         % risultato["eliminati"])
+        righe.append(T("Aggiunti: %d") % risultato["aggiunti"])
+        righe.append(T("Aggiornati: %d") % risultato["aggiornati"])
+
+        saltate = []
+        if esito.get("scartate"):
+            saltate.append(T("  %d senza identificativo") % esito["scartate"])
+        if esito.get("iphone"):
+            saltate.append(T("  %d iPhone: si inseriscono solo a mano") % esito["iphone"])
         if scartati:
-            righe.append(T("Scartate %d righe di altre stanze.") % scartati)
-        if risultato["eliminati"]:
-            righe.append(T("Eliminati prima del caricamento: %d") % risultato["eliminati"])
-        if risultato["copia"]:
+            saltate.append(T("  %d di altre stanze") % scartati)
+        if esito.get("doppioni"):
+            saltate.append(T("  %d doppioni nel foglio: tenuta l'ultima riga")
+                           % len(esito["doppioni"]))
+        if esito.get("senza_modello"):
+            saltate.append(T("  %d senza modello: caricate lo stesso")
+                           % esito["senza_modello"])
+        if saltate:
+            righe.append("")
+            righe.append(T("Righe non caricate, o caricate con riserva:"))
+            righe.extend(saltate)
+        if esito.get("colonne_ignorate"):
+            righe.append("")
+            righe.append(T("Colonne del foglio non riconosciute: %s")
+                         % ", ".join(esito["colonne_ignorate"][:6]))
+
+        righe.append("")
+        righe.append(T("In inventario adesso: %d dispositivi.") % len(self.store.items))
+        per_stanza = []
+        for stanza in self.cfg["rooms"]:
+            quanti = sum(1 for i in self.store.items if i.get("stanza") == stanza)
+            per_stanza.append("  %-28s %d" % (stanza, quanti))
+        righe.extend(per_stanza)
+        if risultato.get("copia"):
             righe.append("")
             righe.append(T("Copia di sicurezza del file precedente:"))
             righe.append(risultato["copia"])
-        messagebox.showinfo(T("Importazione completata"), "\n".join(righe), parent=self)
+        return righe
 
     def on_import_room(self):
         """Carica dal file solo la sezione che riguarda la stanza aperta."""
@@ -3008,17 +3146,10 @@ class App(tk.Tk):
             miei, opzioni["mode"], stanza))
         if not risultato:
             return
-        righe = [T("In %s - aggiunti: %d, aggiornati: %d")
-                 % (stanza, risultato["aggiunti"], risultato["aggiornati"])]
-        if scartati:
-            righe.append(T("Scartate %d righe di altre stanze.") % scartati)
-        if risultato["eliminati"]:
-            righe.append(T("Eliminati prima del caricamento: %d") % risultato["eliminati"])
-        if risultato["copia"]:
-            righe.append("")
-            righe.append(T("Copia di sicurezza del file precedente:"))
-            righe.append(risultato["copia"])
-        messagebox.showinfo(T("Importazione completata"), "\n".join(righe), parent=self)
+        messagebox.showinfo(T("Importazione completata"),
+                            "\n".join(self._resoconto_importazione(
+                                risultato, esito_stanza, opzioni, scartati)),
+                            parent=self)
 
     def _avviso_stanza_mancante(self, stanza, esito):
         trovate = esito.get("stanze_trovate") or []

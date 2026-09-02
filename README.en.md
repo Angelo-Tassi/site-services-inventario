@@ -518,6 +518,29 @@ them one by one - and without giving up knowing what disappears.
 Duplicates count once, empty lines are ignored, and iPhones keep every one of
 their protections.
 
+## Duplicates
+
+The program does not create them. **Adding a device refuses** an identifier
+already present, saying where the existing one is and what it is, and without
+inserting anything; an **import updates** the record instead of duplicating it.
+If a sheet contains the same identifier twice the last row wins, and the summary
+says so before importing.
+
+They get in another way: the data file is an `.xlsx` anyone can open and correct
+by hand. That is what **`General duplicate check`** is for, next to the template
+button on the home screen:
+
+- it searches **the whole inventory** for devices recorded more than once under
+  the same identifier;
+- it shows **every group**: which record it keeps and which it deletes, with
+  room, model and the date of the last change. It keeps the most recent one;
+- it asks for confirmation and **saves a backup copy** before deleting;
+- at the end it says what it deleted, what it could not touch - protected
+  iPhones - how many devices there were and how many there are now;
+- it separately flags **serial numbers repeated** on different devices: those it
+  does not touch, because they are not duplicates, but they are almost always a
+  typo.
+
 ## The columns of each room
 
 Each view shows **only** the columns that can hold a value there. A column empty

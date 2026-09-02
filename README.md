@@ -445,6 +445,29 @@ cercarli uno per uno - e senza rinunciare a sapere che cosa sparisce.
 I doppioni contano una volta sola, le righe vuote si ignorano, e gli iPhone
 mantengono tutte le loro protezioni.
 
+## I doppioni
+
+Il programma non ne crea. L'**inserimento singolo rifiuta** un identificativo
+gia' presente, dicendo dove sta e che cos'e' quello che c'e' gia', e senza
+inserire niente; l'**importazione aggiorna** la scheda invece di duplicarla. Se
+un foglio contiene due volte lo stesso identificativo vale l'ultima riga, e il
+riepilogo lo dichiara prima di importare.
+
+Entrano da un'altra strada: il file dati e' un `.xlsx` che si puo' aprire e
+correggere a mano. Per quello c'e' **`Controllo generale duplicati`**, accanto
+al pulsante del modello in home:
+
+- cerca in **tutto l'inventario** i dispositivi registrati piu' volte con lo
+  stesso identificativo;
+- mostra **ogni gruppo**: quale registrazione tiene e quali elimina, con stanza,
+  modello e data dell'ultima modifica. Tiene la piu' recente;
+- chiede conferma e **salva una copia di sicurezza** prima di eliminare;
+- alla fine dice che cosa ha eliminato, che cosa non ha potuto toccare - gli
+  iPhone protetti - quanti dispositivi c'erano e quanti ce ne sono adesso;
+- segnala a parte i **numeri di serie ripetuti** su dispositivi diversi: quelli
+  non li tocca, perche' duplicati non sono, ma quasi sempre sono un errore di
+  battitura.
+
 ## Le colonne di ogni stanza
 
 Ogni vista mostra **solo** le colonne che li' possono avere un valore. Una

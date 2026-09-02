@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.36.0 · alfa</div>
+  <div class="alpha">versione 0.37.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,20 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.37.0</h3>
+      <p class="quando">2 settembre 2026</p>
+      <ul>
+        <li><b>Controllo generale duplicati</b>, accanto al pulsante del modello: cerca
+          in tutto l'inventario i dispositivi registrati piu' volte, mostra per ogni
+          gruppo quale tiene e quali elimina, e salva una copia prima di procedere.</li>
+        <li><b>I doppioni dentro un foglio importato vengono dichiarati</b> prima di
+          importare: vale l'ultima riga, e si sa quali sono.</li>
+        <li><b>Il riepilogo dopo l'importazione racconta tutto</b>: che cosa e' stato
+          fatto e dove, quante righe non sono state caricate e perche' una per una, come
+          si trova l'inventario stanza per stanza, e dove sta la copia di sicurezza.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.36.0</h3>
       <p class="quando">2 settembre 2026</p>
@@ -236,18 +250,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           di no: torna a chiedere dopo altri cinque.</li>
         <li><b>Note prima di Stato</b> nell'elenco e nei modelli, e
           <b>l'esportazione porta quattro campi</b>: asset tag, tipo, stanza, note.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.33.0</h3>
-      <p class="quando">1 settembre 2026</p>
-      <ul>
-        <li><b>Elimina +</b>: si incollano i codici da Excel, uno per riga, e il
-          programma mostra che cosa sparisce e da quale stanza, che cosa salta e
-          perche'. Per procedere si scrive <code>ACCETTO</code>.</li>
-        <li><b>Il riepilogo dell'importazione dice dove finiscono i dispositivi</b>:
-          nuovi e aggiornati stanza per stanza, le righe saltate con il motivo, e
-          quanti dispositivi ci saranno alla fine.</li>
       </ul>
     </div>
   </div>
@@ -431,7 +433,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.36.0 · alpha</div>
+  <div class="alpha">version 0.37.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -457,6 +459,20 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.37.0</h3>
+      <p class="quando">2 September 2026</p>
+      <ul>
+        <li><b>General duplicate check</b>, next to the template button: it searches the
+          whole inventory for devices recorded more than once, shows for each group which
+          one it keeps and which it deletes, and saves a copy before proceeding.</li>
+        <li><b>Duplicates inside an imported sheet are declared</b> before importing: the
+          last row wins, and you know which ones they are.</li>
+        <li><b>The summary after an import tells the whole story</b>: what was done and
+          where, how many rows were not loaded and why, one by one, how the inventory
+          stands room by room, and where the backup copy is.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.36.0</h3>
       <p class="quando">2 September 2026</p>
@@ -498,18 +514,6 @@ python Inventario.py</pre>
           say no: it comes back after another five.</li>
         <li><b>Notes before Status</b> in the list and in the templates, and
           <b>exports carry four fields</b>: asset tag, type, room, notes.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.33.0</h3>
-      <p class="quando">1 September 2026</p>
-      <ul>
-        <li><b>Delete +</b>: you paste the codes from Excel, one per line, and the
-          program shows what disappears and from which room, what it skips and why. To
-          go ahead you type <code>ACCETTO</code>.</li>
-        <li><b>The import summary says where the devices go</b>: new and updated room by
-          room, the skipped rows with the reason, and how many devices there will be at
-          the end.</li>
       </ul>
     </div>
   </div>
