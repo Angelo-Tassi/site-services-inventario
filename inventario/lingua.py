@@ -578,6 +578,26 @@ EN = {
         'Time for a copy',
     "Hai modificato %d dispositivi dall'ultima copia locale.\n\nLe copie automatiche stanno sulla cartella di rete, accanto\nai dati: se sparisce quella, spariscono anche loro.\n\nVuoi salvare adesso una copia dell'inventario sul tuo\ncomputer? Ci vogliono cinque secondi.":
         'You have changed %d devices since the last local copy.\n\nThe automatic copies live on the network folder, next to\nthe data: if that goes, they go with it.\n\nDo you want to save a copy of the inventory on your own\ncomputer now? It takes five seconds.',
+    'Copia':
+        'Copy',
+    'Taglia':
+        'Cut',
+    'Incolla':
+        'Paste',
+    'Seleziona tutto':
+        'Select all',
+    "Copia l'identificativo":
+        'Copy the identifier',
+    'Copia la riga':
+        'Copy the row',
+    'Modifica...':
+        'Edit...',
+    "Non c'e' nessuna riga selezionata.":
+        'No row is selected.',
+    'Copiato negli appunti: %s.':
+        'Copied to the clipboard: %s.',
+    "Il tipo non puo' restare vuoto.":
+        'The type cannot be left empty.',
 }
 
 # ------------------------------------------------- colonne dei file prodotti

@@ -123,6 +123,157 @@ REFRESH_MS = 15000
 # --------------------------------------------------------------- dialoghi
 
 
+def installa_copia_incolla(root):
+    """Copia, taglia e incolla in tutti i campi dell'applicazione.
+
+    Tk ha le sue scorciatoie predefinite, ma non sono le stesse su tutti i
+    sistemi ne' con tutte le disposizioni di tastiera, e in qualche caso non
+    funzionano affatto: chi incolla un codice preso da Excel non deve chiedersi
+    se in quel campo si puo' fare. Qui si collegano a mano - Control e Command -
+    e si aggiunge il menu del tasto destro.
+
+    Si collega alle classi di widget, non ai singoli campi, cosi' vale anche per
+    le finestre costruite piu' tardi.
+
+    Vale anche per i campi in sola lettura: da li' non si scrive, ma copiare
+    quello che c'e' scritto e' sempre lecito.
+    """
+
+    def scrivibile(widget):
+        try:
+            return str(widget.cget("state")) not in ("readonly", "disabled")
+        except tk.TclError:
+            return True
+
+    def testo_selezionato(widget):
+        try:
+            if widget.selection_present():
+                return widget.selection_get()
+        except (tk.TclError, AttributeError):
+            pass
+        try:
+            return widget.get("sel.first", "sel.last")          # Text
+        except (tk.TclError, TypeError):
+            return None
+
+    def tutto_il_testo(widget):
+        try:
+            return widget.get()
+        except (TypeError, tk.TclError):
+            try:
+                return widget.get("1.0", "end").rstrip("\n")    # Text
+            except tk.TclError:
+                return ""
+
+    def copia(evento):
+        widget = evento.widget
+        testo = testo_selezionato(widget)
+        if testo is None:
+            testo = tutto_il_testo(widget)      # niente selezionato: tutto
+        if testo:
+            widget.clipboard_clear()
+            widget.clipboard_append(testo)
+        return "break"
+
+    def taglia(evento):
+        copia(evento)
+        widget = evento.widget
+        if not scrivibile(widget):
+            return "break"
+        try:
+            if widget.selection_present():
+                widget.delete("sel.first", "sel.last")
+            else:
+                widget.delete(0, "end")
+        except (tk.TclError, AttributeError):
+            try:
+                widget.delete("sel.first", "sel.last")
+            except tk.TclError:
+                pass
+        return "break"
+
+    def incolla(evento):
+        widget = evento.widget
+        if not scrivibile(widget):
+            return "break"
+        try:
+            arrivato = widget.clipboard_get()
+        except tk.TclError:
+            return "break"
+        try:
+            if widget.selection_present():
+                widget.delete("sel.first", "sel.last")
+        except (tk.TclError, AttributeError):
+            try:
+                widget.delete("sel.first", "sel.last")
+            except tk.TclError:
+                pass
+        try:
+            widget.insert("insert", arrivato)
+        except tk.TclError:
+            pass
+        return "break"
+
+    def seleziona_tutto(evento):
+        widget = evento.widget
+        try:
+            widget.select_range(0, "end")
+            widget.icursor("end")
+        except (tk.TclError, AttributeError):
+            try:
+                widget.tag_add("sel", "1.0", "end")
+            except tk.TclError:
+                pass
+        return "break"
+
+    menu = tk.Menu(root, tearoff=0)
+
+    def apri_menu(evento):
+        widget = evento.widget
+        finto = type("Evento", (), {"widget": widget})()
+        menu.delete(0, "end")
+        menu.add_command(label=T("Copia"), command=lambda: copia(finto))
+        menu.add_command(label=T("Taglia"), command=lambda: taglia(finto),
+                         state="normal" if scrivibile(widget) else "disabled")
+        menu.add_command(label=T("Incolla"), command=lambda: incolla(finto),
+                         state="normal" if scrivibile(widget) else "disabled")
+        menu.add_separator()
+        menu.add_command(label=T("Seleziona tutto"),
+                         command=lambda: seleziona_tutto(finto))
+        try:
+            widget.focus_set()
+            menu.tk_popup(evento.x_root, evento.y_root)
+        finally:
+            menu.grab_release()
+        return "break"
+
+    scorciatoie = (("c", copia), ("x", taglia), ("v", incolla), ("a", seleziona_tutto))
+    root._appunti = {"copia": copia, "taglia": taglia, "incolla": incolla,
+                     "seleziona_tutto": seleziona_tutto, "menu": apri_menu}
+    # Si sostituiscono i collegamenti predefiniti invece di aggiungersi: due
+    # gestori sulla stessa combinazione incollerebbero due volte.
+    virtuali = {"c": "<<Copy>>", "x": "<<Cut>>", "v": "<<Paste>>",
+                "a": "<<SelectAll>>"}
+    for classe in ("Entry", "TEntry", "TCombobox", "Text"):
+        for tasto, azione in scorciatoie:
+            for modificatore in ("Control", "Command"):
+                for lettera in (tasto, tasto.upper()):
+                    try:
+                        root.bind_class(classe, "<%s-%s>" % (modificatore, lettera),
+                                        azione)
+                    except tk.TclError:
+                        pass      # combinazione non disponibile su questo sistema
+            try:
+                root.bind_class(classe, virtuali[tasto], azione)
+            except tk.TclError:
+                pass
+        for tasto_destro in ("<Button-3>", "<Button-2>", "<Control-Button-1>"):
+            try:
+                root.bind_class(classe, tasto_destro, apri_menu, add="+")
+            except tk.TclError:
+                pass
+
+
 class _Modal(tk.Toplevel):
     def __init__(self, parent, title):
         tk.Toplevel.__init__(self, parent)
@@ -648,11 +799,23 @@ class EsportazioneFattaDialog(_Modal):
         ttk.Label(body, text=descrizione, style="Section.TLabel",
                   wraplength=420, justify="left").pack(anchor="w")
 
-        elenco = "\n".join(os.path.basename(p) for p in self.percorsi[:6])
-        if len(self.percorsi) > 6:
-            elenco += T("\n... e altri %d") % (len(self.percorsi) - 6)
-        ttk.Label(body, text=elenco, style="Muted.TLabel",
-                  justify="left").pack(anchor="w", pady=(6, 14))
+        # Percorsi interi in un campo di testo, non in un'etichetta: da qui si
+        # copiano - con Ctrl+C o con il tasto destro - e si incollano dove
+        # servono, che e' la prima cosa che si vuole fare con un file appena
+        # prodotto.
+        elenco = "\n".join(self.percorsi)
+        cornice = tk.Frame(body, bg=theme.CARD, highlightthickness=1,
+                           highlightbackground=theme.BORDER)
+        cornice.pack(fill="both", expand=True, pady=(6, 14))
+        percorsi = tk.Text(cornice, width=52, height=min(6, max(1, len(self.percorsi))),
+                           wrap="none", relief="flat", highlightthickness=0,
+                           bg=theme.CARD, fg=theme.TEXT, font=self.master.fonts["base"])
+        percorsi.insert("1.0", elenco)
+        percorsi.configure(state="disabled")
+        barra = ttk.Scrollbar(cornice, orient="horizontal", command=percorsi.xview)
+        percorsi.configure(xscrollcommand=barra.set)
+        percorsi.pack(side="top", fill="both", expand=True, padx=8, pady=(8, 0))
+        barra.pack(side="bottom", fill="x")
 
         ttk.Button(body, text=T("Invia per e-mail con Outlook"),
                    style="Primary.TButton",
@@ -1248,6 +1411,7 @@ class App(tk.Tk):
 
         lang.imposta(config.load_language())
         self.fonts = theme.apply(self)
+        installa_copia_incolla(self)
         self.cfg = config.load_shared_config(data_path)
         self.store = InventoryStore(data_path,
                                     iphone_room=self.cfg.get("iphone_room"),
@@ -1662,9 +1826,66 @@ class App(tk.Tk):
         tree.bind("<Button-1>", self._on_click)
         tree.bind("<Double-1>", self._on_double_click)
         tree.bind("<<TreeviewSelect>>", self._on_select)
+        for combinazione in ("<Control-c>", "<Control-C>", "<Command-c>",
+                             "<Command-C>", "<<Copy>>"):
+            try:
+                tree.bind(combinazione, self._copia_selezione)
+            except tk.TclError:
+                pass
+        for tasto_destro in ("<Button-3>", "<Button-2>", "<Control-Button-1>"):
+            tree.bind(tasto_destro, self._menu_riga)
         tree.bind("<Configure>", lambda e: (self._sync_row_buttons(),
                                             self._sync_righelli()))
         return tree
+
+    def _copia_selezione(self, _evento=None, solo_identificativo=False):
+        """Copia negli appunti la riga selezionata, pronta per Excel.
+
+        Serve soprattutto all'incontrario: si copiano gli asset tag da qui e si
+        incollano in Elimina +, o in un foglio.
+        """
+        tags = self.selected_tags() or list(self.tree.selection())
+        if not tags:
+            self._segnala(T("Non c'e' nessuna riga selezionata."))
+            return "break"
+        colonne = [c for c in self._columns()
+                   if c not in (CHECK_COLUMN, ACTION_COLUMN)]
+        righe = []
+        for tag in tags:
+            item = self._item_by_tag(tag)
+            if item is None:
+                continue
+            if solo_identificativo:
+                righe.append(valore_visibile(item, "asset_tag")
+                             or valore_visibile(item, "imei"))
+            else:
+                righe.append("\t".join(valore_visibile(item, c) for c in colonne))
+        if not righe:
+            return "break"
+        self.clipboard_clear()
+        self.clipboard_append("\n".join(righe))
+        self._segnala(T("Copiato negli appunti: %s.") % ", ".join(tags[:3]))
+        return "break"
+
+    def _menu_riga(self, evento):
+        """Menu del tasto destro sull'elenco."""
+        if self.tree is None:
+            return "break"
+        riga = self.tree.identify_row(evento.y)
+        if riga:
+            self.tree.selection_set(riga)
+        menu = tk.Menu(self, tearoff=0)
+        menu.add_command(label=T("Copia l'identificativo"),
+                         command=lambda: self._copia_selezione(solo_identificativo=True))
+        menu.add_command(label=T("Copia la riga"), command=self._copia_selezione)
+        menu.add_separator()
+        menu.add_command(label=T("Modifica..."), command=self.on_edit)
+        menu.add_command(label=T("Elimina"), command=self.on_delete)
+        try:
+            menu.tk_popup(evento.x_root, evento.y_root)
+        finally:
+            menu.grab_release()
+        return "break"
 
     # --------------------------------------------- colori delle colonne
 

@@ -282,6 +282,32 @@ resterebbero dentro insieme ai tuoi.
 Ci sono due modi. Fanno la stessa cosa; cambia solo quando avviene lo
 svuotamento.
 
+## 9. Copia e incolla
+
+Serve a verificare che i campi accettino quello che arriva da Excel, e che
+dall'elenco si possa portare via un identificativo.
+
+1. apri `Collaudo\Inventario_di_prova.xlsx` in Excel e **copia una colonna** di
+   asset tag, per esempio da `IT-BAU-101` a `IT-BAU-105`;
+2. nel programma premi **`Elimina +`** e incolla con **Ctrl+V** nel riquadro:
+   devono comparire le cinque righe. Premi *Controlla* e poi **Annulla**: non si
+   sta eliminando niente, si sta solo provando l'incollaggio;
+3. nell'elenco, **doppio clic sulla cella Note** di un dispositivo e incolla un
+   testo qualsiasi con Ctrl+V: deve entrare. `Esc` per annullare;
+4. **doppio clic sulla cella Tipo**: la tendina propone i tipi, ma si puo' anche
+   scrivere o incollare un valore diverso;
+5. **tasto destro** in un qualsiasi campo di testo: deve aprirsi il menu con
+   *Copia*, *Taglia*, *Incolla*, *Seleziona tutto*;
+6. seleziona una riga dell'elenco e premi **Ctrl+C**: la riga finisce negli
+   appunti, pronta da incollare in Excel. Con il **tasto destro sulla riga** si
+   sceglie *Copia l'identificativo*, che copia il solo asset tag;
+7. fai un'esportazione qualsiasi: nella finestra finale i percorsi dei file si
+   possono **selezionare e copiare**.
+
+**Cosa deve succedere:** tutti i campi accettano Ctrl+C e Ctrl+V, il tasto
+destro apre sempre il menu, e quello che si copia dall'elenco si incolla in
+Excel senza ritocchi.
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

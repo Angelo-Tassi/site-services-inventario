@@ -34,9 +34,18 @@ for n in range(9):
     excel_io.export(app.store.items[:2], p)
     molti.append(p)
 dlg = EsportazioneFattaDialog(app, "9 file", molti)
-etichette = [w.cget("text") for w in dlg.winfo_children()[0].winfo_children()
-             if w.winfo_class() == "TLabel"]
-assert any("e altri 3" in t for t in etichette), etichette
+# i percorsi stanno in un campo di testo, non in un'etichetta: da li' si copiano
+def aree(widget, trovate=None):
+    trovate = [] if trovate is None else trovate
+    if widget.winfo_class() == "Text":
+        trovate.append(widget.get("1.0", "end"))
+    for figlio in widget.winfo_children():
+        aree(figlio, trovate)
+    return trovate
+
+testo = "\n".join(aree(dlg))
+assert all(p in testo for p in molti), "devono esserci tutti i percorsi, per intero"
+assert testo.count("Stanza_") == 9, testo
 dlg._cancel()
 
 # ---- senza Outlook il file resta comunque prodotto, e lo si dice

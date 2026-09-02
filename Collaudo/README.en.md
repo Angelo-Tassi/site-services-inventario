@@ -281,6 +281,32 @@ in alongside yours.
 There are two ways. They do the same thing; only the moment of the emptying
 differs.
 
+## 9. Copy and paste
+
+This checks that the fields accept what comes from Excel, and that an identifier
+can be taken out of the list.
+
+1. open `Collaudo\Inventario_di_prova.xlsx` in Excel and **copy a column** of
+   asset tags, for example from `IT-BAU-101` to `IT-BAU-105`;
+2. in the program press **`Delete +`** and paste with **Ctrl+V** into the box:
+   the five rows must appear. Press *Check* and then **Cancel**: nothing is being
+   deleted, this is only testing the paste;
+3. in the list, **double-click the Notes cell** of a device and paste any text
+   with Ctrl+V: it must go in. `Esc` to cancel;
+4. **double-click the Type cell**: the dropdown offers the types, but you can
+   also type or paste a different value;
+5. **right-click** in any text field: the menu must open with *Copy*, *Cut*,
+   *Paste*, *Select all*;
+6. select a row in the list and press **Ctrl+C**: the row goes to the clipboard,
+   ready to paste into Excel. **Right-clicking the row** offers *Copy the
+   identifier*, which copies the asset tag alone;
+7. run any export: in the final window the file paths can be **selected and
+   copied**.
+
+**What must happen:** every field accepts Ctrl+C and Ctrl+V, the right button
+always opens the menu, and what you copy from the list pastes into Excel with no
+touch-ups.
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.

@@ -574,6 +574,24 @@ made for whoever is working.
 in the file. To put the whole inventory back you use *Save a local copy...*,
 which copies the real file and carries everything with it.
 
+## Copy and paste
+
+It works **everywhere**, in every field, with the keyboard or the right mouse
+button: the codes come from an Excel sheet and go back to one, and that is the
+round trip you make every day.
+
+| Where | What you can do |
+| --- | --- |
+| in **any text field** | `Ctrl+C` copies, `Ctrl+V` pastes, `Ctrl+X` cuts, `Ctrl+A` selects all; the **right button** opens the same menu |
+| in the **cells edited in place** | double-click and paste as in any other program; `Enter` saves, `Esc` cancels |
+| in **read-only fields** | no writing, but **always copying**: the quickest way to grab the path of a file you have just exported |
+| from the **device list** | `Ctrl+C` copies the selected row, in columns and ready for Excel; the right button also offers *Copy the identifier* |
+| in **`Delete +`** | it is made for pasting: a column of asset tags taken from Excel, one per line |
+
+The shortcuts are bound explicitly by the program rather than left to Tk's
+defaults, which differ between systems and keyboard layouts: `Ctrl` and `Cmd`
+both work, everywhere.
+
 ## Loans
 
 Opening a room listed among the *rooms with loans* (the Digital Kiosk by
@@ -953,6 +971,9 @@ safely, use *Export xls...*.
 | double-click on status | dropdown to change the status in the list |
 | double-click on type | dropdown to change the type, or type/paste one |
 | double-click anywhere else | open the device record |
+| `Ctrl+C` on the list | copy the selected row, ready for Excel |
+| right-click on the list | copy the identifier or the whole row |
+| `Ctrl+C` / `Ctrl+V` in a field | copy and paste; the right button opens the menu |
 
 ## Where to keep the real inventory
 

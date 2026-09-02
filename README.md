@@ -501,6 +501,24 @@ fatta per chi lavora.
 file non ci sono. Per rimettere in piedi l'inventario per intero si usa *Salva
 copia in locale...*, che copia il file vero e si porta dietro tutto.
 
+## Copia e incolla
+
+Funziona **ovunque**, in ogni campo, con la tastiera o con il tasto destro: i
+codici arrivano da un foglio Excel e ci tornano, e questo e' il giro che si fa
+tutti i giorni.
+
+| Dove | Che cosa si puo' fare |
+| --- | --- |
+| in **qualsiasi campo di testo** | `Ctrl+C` copia, `Ctrl+V` incolla, `Ctrl+X` taglia, `Ctrl+A` seleziona tutto; il **tasto destro** apre lo stesso menu |
+| nelle **celle modificabili al volo** | doppio clic e si incolla come in un qualsiasi programma; `Invio` salva, `Esc` annulla |
+| nei **campi in sola lettura** | scrivere no, ma **copiare sempre**: e' il modo piu' rapido per prendere il percorso di un file appena esportato |
+| dall'**elenco dei dispositivi** | `Ctrl+C` copia la riga selezionata, incolonnata e pronta per Excel; il tasto destro offre anche *Copia l'identificativo* |
+| in **`Elimina +`** | e' fatto apposta per incollare: una colonna di asset tag presa da Excel, una per riga |
+
+Le scorciatoie sono collegate esplicitamente dal programma e non lasciate ai
+comportamenti predefiniti di Tk, che cambiano fra sistemi e disposizioni di
+tastiera: `Ctrl` e `Cmd` funzionano tutti e due, ovunque.
+
 ## Prestiti
 
 Aprendo una stanza elencata fra le *stanze con prestito* (di serie il Digital
@@ -851,6 +869,9 @@ consultare i dati in Excel senza rischi, usa *Esporta xls...*.
 | doppio clic sullo stato | tendina per cambiare stato nell'elenco |
 | doppio clic sul tipo | tendina per cambiare tipo, o si scrive/incolla |
 | doppio clic altrove | apre la scheda del dispositivo |
+| `Ctrl+C` sull'elenco | copia la riga selezionata, pronta per Excel |
+| tasto destro sull'elenco | copia l'identificativo o la riga intera |
+| `Ctrl+C` / `Ctrl+V` in un campo | copia e incolla; il tasto destro apre il menu |
 
 ## Aggiungere con il lettore di codici a barre
 

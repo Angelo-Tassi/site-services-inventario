@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.35.1 · alfa</div>
+  <div class="alpha">versione 0.36.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,20 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.36.0</h3>
+      <p class="quando">2 settembre 2026</p>
+      <ul>
+        <li><b>Copia e incolla ovunque</b>: in ogni campo, con Ctrl+C e Ctrl+V o con il
+          tasto destro. Le scorciatoie le collega il programma, invece di lasciarle ai
+          comportamenti predefiniti che cambiano fra sistemi e tastiere.</li>
+        <li><b>Dall'elenco si copia la riga selezionata</b> con Ctrl+C, incolonnata e
+          pronta per Excel; il tasto destro offre anche il solo identificativo, che e'
+          quello che serve a incollare in Elimina +.</li>
+        <li><b>I percorsi dei file esportati si copiano</b>: erano un'etichetta, ora sono
+          un campo da cui si prende il percorso intero.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.35.1</h3>
       <p class="quando">2 settembre 2026</p>
@@ -234,26 +248,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
         <li><b>Il riepilogo dell'importazione dice dove finiscono i dispositivi</b>:
           nuovi e aggiornati stanza per stanza, le righe saltate con il motivo, e
           quanti dispositivi ci saranno alla fine.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.32.2</h3>
-      <p class="quando">1 settembre 2026</p>
-      <ul>
-        <li><b>Il modello di importazione segue l'elenco</b>: stesse colonne, stesso
-          ordine, stesse larghezze, con le tendine su Tipo e Stato.</li>
-        <li><b>Le colonne dei file Excel si adattano al contenuto</b>: niente piu' testo
-          tagliato o sbordato, e nessuna colonna da allargare a mano. Vale per le
-          esportazioni, per la stampa e per il file dell'inventario.</li>
-        <li><b>Il tipo si cambia dall'elenco</b>, con la tendina, come lo stato e le
-          note. Un iPhone non si trasforma in un laptop: si perderebbe
-          l'identificativo, e il programma lo rifiuta spiegando perche'.</li>
-        <li><b>Colonne in ordine di lettura</b>: asset tag, tipo, stanza, stato, note,
-          e per ultimi modello/descrizione e numero di serie, che si leggono solo
-          quando servono. Il contenitore Iphone mantiene il suo ordine.</li>
-        <li><b>L'esportazione porta quattro campi</b>: asset tag, tipo, stanza e stato.
-          Un file esportato risponde a "che cosa abbiamo, dove sta, come sta", non a
-          tutto il resto. Per ricostruire un inventario si usa la copia locale.</li>
       </ul>
     </div>
   </div>
@@ -437,7 +431,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.35.1 · alpha</div>
+  <div class="alpha">version 0.36.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -463,6 +457,20 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.36.0</h3>
+      <p class="quando">2 September 2026</p>
+      <ul>
+        <li><b>Copy and paste everywhere</b>: in every field, with Ctrl+C and Ctrl+V or
+          with the right mouse button. The shortcuts are bound by the program instead of
+          being left to defaults that differ between systems and keyboards.</li>
+        <li><b>The selected row is copied from the list</b> with Ctrl+C, in columns and
+          ready for Excel; the right button also offers the identifier alone, which is
+          what you paste into Delete +.</li>
+        <li><b>Exported file paths can be copied</b>: they used to be a label, now they
+          are a field you can take the whole path from.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.35.1</h3>
       <p class="quando">2 September 2026</p>
@@ -502,26 +510,6 @@ python Inventario.py</pre>
         <li><b>The import summary says where the devices go</b>: new and updated room by
           room, the skipped rows with the reason, and how many devices there will be at
           the end.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.32.2</h3>
-      <p class="quando">1 September 2026</p>
-      <ul>
-        <li><b>The import template follows the list</b>: same columns, same order, same
-          widths, with the dropdowns on Type and Status.</li>
-        <li><b>Excel columns size themselves to their content</b>: no more truncated or
-          overflowing text, and no columns to widen by hand. It applies to exports, to
-          printing and to the inventory file itself.</li>
-        <li><b>The type is changed from the list</b>, with a dropdown, like the status
-          and the notes. An iPhone does not turn into a laptop: the identifier would be
-          lost, and the program refuses, explaining why.</li>
-        <li><b>Columns in reading order</b>: asset tag, type, room, status, notes, and
-          last model/description and serial number, which are read only when needed. The
-          Iphone container keeps its own order.</li>
-        <li><b>Exports carry four fields</b>: asset tag, type, room and status. An
-          exported file answers "what do we have, where is it, how is it", not
-          everything else. To rebuild an inventory you use the local copy.</li>
       </ul>
     </div>
   </div>

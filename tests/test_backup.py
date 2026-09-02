@@ -91,6 +91,8 @@ from tkinter import messagebox
 avvisi = []
 messagebox.showinfo = lambda t, m, **k: avvisi.append((t, m))
 messagebox.showwarning = lambda t, m, **k: avvisi.append((t, m))
+# il promemoria della copia locale non deve fermare una suite automatica
+messagebox.askyesno = lambda t, m, **k: avvisi.append((t, m)) or False
 
 config.backup_dir = lambda: cartella          # ripristina la vera funzione
 app = App(fixture.build()); app._initial_load()
