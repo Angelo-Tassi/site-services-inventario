@@ -8,7 +8,7 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fixture
-from inventario.store import InventoryStore, new_item
+from inventario.store import InventoryError, InventoryStore, new_item
 from inventario.ui import PAROLA_ELIMINA, App, EliminaPlusDialog
 
 percorso = fixture.build()
@@ -24,16 +24,18 @@ app._run(lambda: store.add(new_item(tipo=fixture.TIPO_IPHONE, modello="Apple iPh
 # quello che non si puo' toccare
 codici = ["IT-0101",                       # esiste
           "IT-0107\tLaptop\tThinkPad",     # riga intera incollata da Excel
+          "IT-0106",                       # kiosk, libero
           "IT-0101",                       # doppione: conta una volta sola
           "IT-9999",                       # non esiste
           "356938035643809",               # iPhone mai spedito
           "   ",                           # riga vuota: ignorata
           ]
 da_eliminare, non_trovati, bloccati = store.anteprima_eliminazione(codici)
-assert [i["asset_tag"] for i in da_eliminare] == ["IT-0101", "IT-0107"], da_eliminare
+assert [i["asset_tag"] for i in da_eliminare] == ["IT-0101", "IT-0106"], da_eliminare
 assert non_trovati == ["IT-9999"], non_trovati
-assert [i["asset_tag"] for i, _m in bloccati] == ["356938035643809"], bloccati
-assert "non ancora rispedito" in bloccati[0][1], bloccati[0][1]
+assert [i["asset_tag"] for i, _m in bloccati] == ["IT-0107", "356938035643809"], bloccati
+assert "in prestito a Marco Bianchi" in bloccati[0][1], bloccati[0][1]
+assert "non ancora rispedito" in bloccati[1][1], bloccati[1][1]
 
 # ---- il riepilogo mostrato dice le stanze, i prestiti e i motivi
 dlg = EliminaPlusDialog(app, store)
@@ -42,7 +44,7 @@ dlg._controlla()
 testo = dlg.riepilogo.get("1.0", "end")
 assert "VERRANNO ELIMINATI: 2" in testo, testo
 assert fixture.BAU in testo and fixture.KIOSK in testo, testo
-assert "IT-0101" in testo and "IT-0107" in testo
+assert "IT-0101" in testo and "IT-0106" in testo
 assert "in prestito a Marco Bianchi" in testo, "un prestito in corso va segnalato"
 assert "non ancora rispedito" in testo
 assert "IT-9999" in testo
@@ -53,7 +55,7 @@ dlg._ok()
 assert dlg.result is None and dlg.winfo_exists()
 dlg.var_conferma.set(PAROLA_ELIMINA.lower())     # anche minuscolo va bene
 dlg._ok()
-assert dlg.result == ["IT-0101", "IT-0107"], dlg.result
+assert dlg.result == ["IT-0101", "IT-0106"], dlg.result
 
 # ---- e se non c'e' niente da eliminare non si puo' nemmeno provare
 vuoto = EliminaPlusDialog(app, store)
@@ -65,12 +67,19 @@ vuoto._ok()
 assert vuoto.result is None
 vuoto.destroy()
 
+# ---- un dispositivo in prestito non si elimina, nemmeno chiamando l'archivio
+try:
+    store.delete(["IT-0107"])
+    raise SystemExit("un prestito aperto e' stato eliminato")
+except InventoryError as exc:
+    assert "in prestito a Marco Bianchi" in str(exc), str(exc)
+
 # ---- l'eliminazione vera toglie solo quelli scelti
 prima = len(store.items)
-store.delete(["IT-0101", "IT-0107"])
+store.delete(["IT-0101", "IT-0106"])
 store.load()
 assert len(store.items) == prima - 2
-assert not [i for i in store.items if i["asset_tag"] in ("IT-0101", "IT-0107")]
+assert not [i for i in store.items if i["asset_tag"] in ("IT-0101", "IT-0106")]
 assert [i for i in store.items if i["asset_tag"] == "356938035643809"], \
     "l'iPhone non si tocca"
 

@@ -86,14 +86,15 @@ app._run(lambda: app.store.add(new_item(tipo=fixture.TIPO_IPHONE,
                                         imei="356938035643809",
                                         restituito_da="M. B.")), "ok")
 app.show_home()
-misti = ["IT-0101", "IT-0107", "356938035643809"]
+misti = ["IT-0101", "IT-0106", "IT-0107", "356938035643809"]
 app.tree.selection_set(misti); app._on_select()
 
 da_eliminare, non_trovati, bloccati = app.store.anteprima_eliminazione(app.selected_tags())
 # l'ordine e' quello dell'elenco a video, che e' ordinato per ultima modifica
-assert sorted(i["asset_tag"] for i in da_eliminare) == ["IT-0101", "IT-0107"], \
+assert sorted(i["asset_tag"] for i in da_eliminare) == ["IT-0101", "IT-0106"], \
     da_eliminare
-assert [i["asset_tag"] for i, _m in bloccati] == ["356938035643809"], bloccati
+assert sorted(i["asset_tag"] for i, _m in bloccati) == ["356938035643809",
+                                                       "IT-0107"], bloccati
 
 testo = "\n".join(riepilogo_eliminazione(da_eliminare, bloccati,
                                          len(app.store.items) - len(da_eliminare)))
@@ -105,18 +106,23 @@ assert "In inventario resteranno 12 dispositivi." in testo, testo
 
 items = app._items_by_tag(app.selected_tags())
 telefoni = [i for i in items if ui.is_iphone(i.get("tipo"))]
-spostabili = [i for i in items if not ui.is_iphone(i.get("tipo"))]
+prestati = [i for i in items
+            if not ui.is_iphone(i.get("tipo")) and ui.is_on_loan(i)]
+spostabili = [i for i in items
+              if not ui.is_iphone(i.get("tipo")) and not ui.is_on_loan(i)]
 conteggi = [(BAU, (6, 5)), (KIOSK, (5, 4)), (DR, (3, 5))]
-testo = "\n".join(riepilogo_spostamento(spostabili, telefoni, DR,
+testo = "\n".join(riepilogo_spostamento(spostabili, telefoni, prestati, DR,
                                         app.iphone_room(), conteggi))
 assert ("SPOSTATI IN %s: 2" % DR) in testo, testo
 assert ("da %s" % BAU) in testo and ("da %s" % KIOSK) in testo, "da dove partono"
 assert "RESTANO FERMI perche' sono iPhone: 1" in testo, testo
+assert "RESTANO FERMI perche' sono in prestito: 1" in testo, testo
+assert "IT-0107" in testo, "il prestito bloccato si legge per nome"
 assert "3  ->  5" in testo, "il prima e dopo di ogni stanza"
 
 # ---- spostare dove sono gia' non e' un cambiamento
 fermi = [i for i in app.store.items if i.get("stanza") == KIOSK][:2]
-testo = "\n".join(riepilogo_spostamento(fermi, [], KIOSK, app.iphone_room(), []))
+testo = "\n".join(riepilogo_spostamento(fermi, [], [], KIOSK, app.iphone_room(), []))
 assert ("Nessun cambiamento: sono gia' tutti in %s." % KIOSK) in testo, testo
 
 # ============================ l'operazione vera ============================
@@ -131,7 +137,9 @@ app.store.load()
 assert len(app.store.items) == prima - 2, len(app.store.items)
 assert [i for i in app.store.items if i["asset_tag"] == "356938035643809"], \
     "l'iPhone protetto resta"
-assert not [i for i in app.store.items if i["asset_tag"] in ("IT-0101", "IT-0107")]
+assert not [i for i in app.store.items if i["asset_tag"] in ("IT-0101", "IT-0106")]
+assert [i for i in app.store.items if i["asset_tag"] == "IT-0107"], \
+    "il laptop in prestito resta: prima si registra il rientro"
 titolo, corpo = avvisi[-1]
 assert titolo == "Eliminazione completata", avvisi[-1]
 assert "Eliminati 2 dispositivi." in corpo and "Copia di sicurezza" in corpo, corpo

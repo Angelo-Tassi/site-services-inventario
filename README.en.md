@@ -513,10 +513,10 @@ them one by one - and without giving up knowing what disappears.
    tags is fine, or whole rows: the first code matching a device in the inventory
    is the one used;
 2. press **Check**. The program touches nothing and shows:
-   - the devices that **will be deleted**, grouped by room, with the model and a
-     flag on the ones **on loan**;
-   - those **skipped because they cannot be deleted** - an iPhone not yet shipped
-     back, one still in retention - with the reason and the date;
+   - the devices that **will be deleted**, grouped by room, with the model;
+   - those **skipped because they cannot be deleted** - a device on loan, an
+     iPhone not yet shipped back, one still in retention - with the reason and
+     the date;
    - those **skipped because they are not in the inventory**, listed;
 3. to go ahead you type **`ACCETTO`**. A backup copy is saved before deleting,
    and at the end the program says how many devices are left.
@@ -549,17 +549,33 @@ taken from Excel.
 Neither operation starts without showing what it will do.
 
 **Delete** lists the devices that will disappear, grouped by room, with the
-model and a flag on the ones **on loan**; then those **skipped because they
-cannot be deleted** - an iPhone not yet shipped back, one still in retention -
-with the reason; and how many devices will be left. A **backup copy** is saved
-before proceeding, and at the end the program says where it is.
+model; then those **skipped because they cannot be deleted** - a device on loan,
+an iPhone not yet shipped back, one still in retention - with the reason; and how
+many devices will be left. A **backup copy** is saved before proceeding, and at
+the end the program says where it is.
 
-If the selection contains a protected iPhone, **only the others disappear**: the
-phone stays, and the summary says why.
+If the selection contains a protected device, **only the others disappear**: that
+one stays, and the summary says why.
 
-**Move to room...** lists the devices split by room of origin, how many iPhones
-stay put, and how the rooms stand before and after. If they are already all in
-the chosen room it says so, instead of letting you find out at the end.
+**Move to room...** lists the devices split by room of origin, how many stay put
+and for what reason, and how the rooms stand before and after. If they are
+already all in the chosen room it says so, instead of letting you find out at
+the end.
+
+### Devices on loan are untouchable
+
+**A device out on loan is neither moved nor deleted.** It holds everywhere:
+Delete, Delete +, Move to room... and the *Room* field inside the record too,
+which would otherwise be the back door for moving it anyway.
+
+The reason is that while it is in someone's hands the inventory is the only
+trace of who has it and where it is booked: moving or deleting it would wipe
+that trace out. Loans are opened and closed in the **Digital Kiosk**, the room
+where loans are active; to free the device press **Register return** on its row,
+and from that moment it moves and deletes like any other.
+
+Every other change stays possible: notes, model and type can be corrected while
+the device is out.
 
 ## Duplicates
 
@@ -668,6 +684,10 @@ exist.
 *Lend* asks for the person's name and records date and time. While the device is
 out, the row is red and the status is *On loan*. *Register return* closes
 the loan and puts it back among the available ones.
+
+While it is on loan the device **is neither moved nor deleted**: it is already
+booked where it needs to be, and whoever looks for it must find it there. The
+program skips it and says who has it; to free it press *Register return*.
 
 ## Shipping iPhones
 

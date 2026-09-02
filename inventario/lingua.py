@@ -820,6 +820,40 @@ EN = {
         'iPhone not yet sent back to the phone service',
     'in conservazione fino al %s':
         'kept until %s',
+'in prestito a %s: registra prima il rientro':
+        'on loan to %s: register the return first',
+    "%s e' in prestito a %s dal %s.\n\n"
+    "Un dispositivo in prestito non si sposta e non si elimina:\n"
+    "registra prima il rientro con il pulsante Registra rientro,\n"
+    "nella stanza dove e' stato prestato.":
+        '%s is on loan to %s since %s.\n\n'
+        'A device on loan is neither moved nor deleted:\n'
+        'register the return first with the Register return button,\n'
+        'in the room where it was lent.',
+    "RESTANO FERMI perche' sono in prestito: %d":
+        'STAY WHERE THEY ARE because they are on loan: %d',
+    'Registra prima il rientro, poi si potranno spostare.':
+        'Register the return first, then they can be moved.',
+    '%d dispositivi sono in prestito e non si spostano.\n\n'
+    'Registra prima il rientro, poi si potranno spostare.':
+        '%d devices are on loan and do not move.\n\n'
+        'Register the return first, then they can be moved.',
+    "%s e' in prestito a %s: registra prima il rientro,\n"
+    "poi si potra' spostare.":
+        '%s is on loan to %s: register the return first,\n'
+        'then it can be moved.',
+    '  %d in prestito lasciati dove sono.':
+        '  %d on loan left where they are.',
+    '%s - %s\n\n'
+    "Il dispositivo e' in prestito a %s dal %s.\n\n"
+    "Un dispositivo in prestito non si elimina: l'inventario e'\n"
+    "l'unica traccia di chi ce l'ha. Registra prima il rientro\n"
+    'con il pulsante Registra rientro, poi potrai eliminarlo.':
+        '%s - %s\n\n'
+        'The device is on loan to %s since %s.\n\n'
+        'A device on loan is not deleted: the inventory is the only\n'
+        'trace of who has it. Register the return first with the\n'
+        'Register return button, then you will be able to delete it.',
 }
 
 # ------------------------------------------------- colonne dei file prodotti

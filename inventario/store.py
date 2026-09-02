@@ -258,6 +258,26 @@ class BloccoConservazione(InventoryError):
             % (item["asset_tag"], item["spedito_il"], sblocco.strftime("%d/%m/%Y")))
 
 
+class BloccoPrestito(InventoryError):
+    """Un dispositivo in prestito non si sposta e non si elimina.
+
+    Finche' e' nelle mani di una persona, l'inventario deve continuare a dire
+    dov'e' e chi ce l'ha: spostarlo o cancellarlo perderebbe l'unica traccia
+    che permette di andarlo a riprendere. Prima si registra il rientro.
+    """
+
+    def __init__(self, item):
+        self.item = item
+        InventoryError.__init__(
+            self,
+            T("%s e' in prestito a %s dal %s.\n\n"
+              "Un dispositivo in prestito non si sposta e non si elimina:\n"
+              "registra prima il rientro con il pulsante Registra rientro,\n"
+              "nella stanza dove e' stato prestato.")
+            % (item["asset_tag"], item.get("prestato_a", ""),
+               item.get("prestato_il", "")))
+
+
 def current_user():
     try:
         user = getpass.getuser()
@@ -656,6 +676,10 @@ class InventoryStore(object):
                 raise InventoryError(
                     T("L'asset tag %s e' gia' presente nell'inventario.") % item["asset_tag"]
                 )
+            precedente = items[index]
+            if is_on_loan(precedente) and clean(item.get("stanza")) != clean(
+                    precedente.get("stanza")):
+                raise BloccoPrestito(precedente)
             self._enforce_iphone_room(item)
             normalize_state(item, self.stati)
             _stamp_item(item)
@@ -671,6 +695,8 @@ class InventoryStore(object):
             for it in items:
                 if it["asset_tag"] not in wanted:
                     continue
+                if is_on_loan(it):
+                    raise BloccoPrestito(it)
                 libero, sblocco = puo_essere_eliminato(it)
                 if libero:
                     continue
@@ -855,13 +881,15 @@ class InventoryStore(object):
     def move_to_room(self, tags, room):
         """Sposta i dispositivi selezionati.
 
-        Ritorna (spostati, iphone_lasciati_fermi): gli iPhone non si spostano.
+        Ritorna (spostati, iphone_fermi, prestiti_fermi): gli iPhone stanno
+        sempre nella loro stanza, e un dispositivo in prestito non si muove
+        finche' non e' registrato il rientro.
         """
         wanted = set(norm_tag(t) for t in tags)
         room = clean(room)
 
         def op(items):
-            moved = bloccati = 0
+            moved = telefoni = prestati = 0
             for it in items:
                 if it["asset_tag"] not in wanted:
                     continue
@@ -869,13 +897,16 @@ class InventoryStore(object):
                     if it.get("stanza") != self.iphone_room:
                         it["stanza"] = self.iphone_room     # rimette a posto
                         _stamp_item(it)
-                    bloccati += 1
+                    telefoni += 1
+                    continue
+                if is_on_loan(it):
+                    prestati += 1
                     continue
                 if it.get("stanza") != room:
                     it["stanza"] = room
                     _stamp_item(it)
                     moved += 1
-            return moved, bloccati
+            return moved, telefoni, prestati
 
         return self._apply(op)
 
@@ -1145,12 +1176,16 @@ class InventoryStore(object):
             if tag in gia_visti:
                 continue                  # la stessa riga incollata due volte
             gia_visti.add(tag)
+            if is_on_loan(trovato):
+                bloccati.append((trovato, T("in prestito a %s: registra prima il rientro")
+                                 % trovato.get("prestato_a", "")))
+                continue
             libero, sblocco = puo_essere_eliminato(trovato)
             if not libero:
                 if sblocco is None:
-                    motivo = "iPhone non ancora rispedito al servizio telefonia"
+                    motivo = T("iPhone non ancora rispedito al servizio telefonia")
                 else:
-                    motivo = "in conservazione fino al %s" % sblocco.strftime("%d/%m/%Y")
+                    motivo = T("in conservazione fino al %s") % sblocco.strftime("%d/%m/%Y")
                 bloccati.append((trovato, motivo))
                 continue
             da_eliminare.append(trovato)

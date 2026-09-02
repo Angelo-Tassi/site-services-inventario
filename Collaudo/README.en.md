@@ -302,11 +302,24 @@ so you read exactly what will happen.
 7. check that **only the two laptops** are gone and that the iPhone is still in
    its container;
 8. the last message must say how many devices are left and where the backup copy
-   is: open it and check they are all still there.
+   is: open it and check they are all still there;
+9. go into the **Digital Kiosk**, press **Lend** on a laptop and give a name.
+   Then, with that laptop selected, try:
+   - **Move to room...** - if it is the only one chosen the program says it is on
+     loan and does not even ask for the room; together with others, the summary
+     lists it among those that *stay where they are because they are on loan*,
+     and after confirming the others move and it does not;
+   - **Delete** - it says you cannot, and that the return must be registered
+     first;
+   - **Edit**, changing the **room** - refused with the same reason, while
+     correcting the **note** works;
+10. press **Register return** on that laptop and repeat the move: now it travels
+    like any other.
 
 **What must happen:** the selection is not lost on its own - not even when the
-list reloads - both operations always show the summary before acting, and a
-protected iPhone does not stop the others being deleted.
+list reloads - both operations always show the summary before acting, a
+protected iPhone does not stop the others being deleted, and **a device on loan
+is neither moved nor deleted by any route** until the return is registered.
 
 ## 10. Copy and paste
 

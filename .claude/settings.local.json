@@ -4,7 +4,11 @@
       "Bash(git add *)",
       "Bash(git commit -q -m ' *)",
       "Bash(git push *)",
-      "Bash(git tag *)"
+      "Bash(git tag *)",
+      "Bash(curl -s \"https://api.github.com/repos/Angelo-Tassi/site-services-inventario/actions/runs?per_page=3\")",
+      "Bash(.venv/bin/python -c ' *)",
+      "Bash(curl -s \"https://api.github.com/repos/Angelo-Tassi/site-services-inventario/releases/latest\")",
+      "Bash(curl -s \"https://api.github.com/repos/Angelo-Tassi/site-services-inventario/actions/runs/33676876959/jobs\")"
     ]
   }
 }

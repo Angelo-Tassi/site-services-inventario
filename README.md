@@ -439,9 +439,10 @@ cercarli uno per uno - e senza rinunciare a sapere che cosa sparisce.
    corrisponde a un dispositivo in inventario;
 2. si preme **Controlla**. Il programma non tocca niente e mostra:
    - i dispositivi che **verranno eliminati**, raggruppati per stanza, con il
-     modello e la segnalazione di quelli **in prestito**;
-   - quelli **saltati perche' non si possono eliminare** - un iPhone non ancora
-     rispedito, uno in conservazione - con il motivo e la data;
+     modello;
+   - quelli **saltati perche' non si possono eliminare** - un dispositivo in
+     prestito, un iPhone non ancora rispedito, uno in conservazione - con il
+     motivo e la data;
    - quelli **saltati perche' non sono in inventario**, elencati;
 3. per procedere si scrive **`ACCETTO`**. Prima di eliminare viene salvata una
    copia di sicurezza, e alla fine il programma dice quanti dispositivi
@@ -475,18 +476,35 @@ codici presi da Excel.
 Nessuna delle due operazioni parte senza mostrare prima che cosa fara'.
 
 **Elimina** elenca i dispositivi che spariscono, raggruppati per stanza, con il
-modello e la segnalazione di quelli **in prestito**; poi quelli **saltati perche'
-non si possono eliminare** - un iPhone non ancora rispedito, uno in
-conservazione - con il motivo; e quanti dispositivi resteranno. Una **copia di
-sicurezza** viene salvata prima di procedere, e alla fine il programma dice dove
-sta.
+modello; poi quelli **saltati perche' non si possono eliminare** - un dispositivo
+in prestito, un iPhone non ancora rispedito, uno in conservazione - con il
+motivo; e quanti dispositivi resteranno. Una **copia di sicurezza** viene salvata
+prima di procedere, e alla fine il programma dice dove sta.
 
-Se nella selezione c'e' un iPhone protetto, **spariscono solo gli altri**: il
-telefono resta, e il riepilogo dice perche'.
+Se nella selezione c'e' un dispositivo protetto, **spariscono solo gli altri**:
+quello resta, e il riepilogo dice perche'.
 
 **Sposta in stanza...** elenca i dispositivi divisi per stanza di provenienza,
-quanti iPhone restano fermi, e come restano le stanze prima e dopo. Se sono
-gia' tutti nella stanza scelta lo dice, invece di lasciarlo scoprire alla fine.
+quanti restano fermi e per quale ragione, e come restano le stanze prima e dopo.
+Se sono gia' tutti nella stanza scelta lo dice, invece di lasciarlo scoprire
+alla fine.
+
+### I dispositivi in prestito non si toccano
+
+**Un dispositivo dato in prestito non si sposta e non si elimina.** Vale in
+tutto il programma: Elimina, Elimina +, Sposta in stanza... e anche il campo
+*Stanza* dentro la scheda, che altrimenti sarebbe la porta di servizio per
+spostarlo lo stesso.
+
+La ragione e' che finche' e' nelle mani di una persona l'inventario e' l'unica
+traccia di chi ce l'ha e di dove risulta: spostarlo o cancellarlo la
+cancellerebbe. Il prestito si apre e si chiude nel **Digital Kiosk**, che e' la
+stanza dove i prestiti sono attivi; per liberare il dispositivo si preme
+**Registra rientro** sulla sua riga, e da quel momento si sposta e si elimina
+come qualsiasi altro.
+
+Le altre modifiche restano possibili: nota, modello e tipo si correggono anche
+mentre il dispositivo e' fuori.
 
 ## I doppioni
 
@@ -596,6 +614,10 @@ esiste:
 | --- | --- | --- |
 | Disponibile | **Presta** | chiede il nome della persona e registra nome, data e ora accanto al dispositivo |
 | In prestito | **Registra rientro** | chiude il prestito e riporta il dispositivo fra i disponibili |
+
+Finche' e' in prestito, il dispositivo **non si sposta e non si elimina**: e'
+gia' registrato dove serve, e chi lo cerca deve trovarlo li'. Il programma lo
+salta e dice a chi e' stato dato; per liberarlo si preme *Registra rientro*.
 
 Finche' il dispositivo e' fuori, la sua riga e' **evidenziata in rosso** e lo
 stato risulta **In prestito**; l'evidenziazione si ritrova anche nei file

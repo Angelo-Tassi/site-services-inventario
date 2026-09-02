@@ -304,11 +304,24 @@ prima di farlo si legga esattamente che cosa succedera'.
 7. controlla che siano spariti **solo i due laptop** e che l'iPhone sia ancora
    nel suo contenitore;
 8. l'ultimo messaggio deve dire quanti dispositivi restano e dove si trova la
-   copia di sicurezza: aprila e verifica che ci siano ancora tutti.
+   copia di sicurezza: aprila e verifica che ci siano ancora tutti;
+9. entra nel **Digital Kiosk**, premi **Presta** su un laptop e indica un nome.
+   Poi provaci con quel laptop selezionato:
+   - **Sposta in stanza...** - se e' l'unico scelto il programma dice che e' in
+     prestito e non chiede nemmeno la stanza; insieme ad altri, il riepilogo lo
+     elenca fra quelli che *restano fermi perche' sono in prestito*, e dopo la
+     conferma gli altri si spostano e lui no;
+   - **Elimina** - dice che non si puo' e che va registrato prima il rientro;
+   - **Modifica**, cambiando la **stanza** - viene rifiutato con lo stesso
+     motivo, mentre correggere la **nota** funziona;
+10. premi **Registra rientro** su quel laptop e ripeti lo spostamento: adesso si
+    muove come qualsiasi altro.
 
 **Cosa deve succedere:** la selezione non si perde da sola - nemmeno quando
 l'elenco si ricarica - le due operazioni mostrano sempre il riepilogo prima di
-agire, e un iPhone protetto non impedisce di eliminare gli altri.
+agire, un iPhone protetto non impedisce di eliminare gli altri, e **un
+dispositivo in prestito non si sposta e non si elimina da nessuna strada**
+finche' non e' registrato il rientro.
 
 ## 10. Copia e incolla
 

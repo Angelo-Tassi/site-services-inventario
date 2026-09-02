@@ -98,7 +98,7 @@ app._run(lambda: app.store.add(new_item(tipo=TIPO, modello="Apple iPhone 13",
                                         imei="351234567890123", restituito_da="E. R.",
                                         stanza=KIOSK)), "ok")
 assert app._item_by_tag("351234567890123")["stanza"] == BAU
-assert app.store.move_to_room(["356938035643809", "IT-0101"], DR) == (1, 1)
+assert app.store.move_to_room(["356938035643809", "IT-0101"], DR) == (1, 1, 0)
 assert app._item_by_tag("356938035643809")["stanza"] == BAU
 assert app._item_by_tag("IT-0101")["stanza"] == DR
 avvisi.clear()

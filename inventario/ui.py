@@ -1412,13 +1412,14 @@ def riepilogo_eliminazione(da_eliminare, bloccati, restano):
         righe.append(T("SALTATI perche' non si possono eliminare: %d") % len(bloccati))
         for item, motivo in bloccati:
             righe.append("    %s  -  %s" % (valore_visibile(item, "asset_tag") or
-                                            valore_visibile(item, "imei"), T(motivo)))
+                                            valore_visibile(item, "imei"), motivo))
     righe.append("")
     righe.append(T("In inventario resteranno %d dispositivi.") % restano)
     return righe
 
 
-def riepilogo_spostamento(spostabili, telefoni, destinazione, stanza_iphone, conteggi):
+def riepilogo_spostamento(spostabili, telefoni, prestati, destinazione,
+                          stanza_iphone, conteggi):
     """Le righe da leggere prima di spostare fra stanze."""
     righe = []
     restano_dove_sono = [i for i in spostabili if i.get("stanza") == destinazione]
@@ -1439,6 +1440,11 @@ def riepilogo_spostamento(spostabili, telefoni, destinazione, stanza_iphone, con
         righe.append("")
         righe.append(T("RESTANO FERMI perche' sono iPhone: %d") % len(telefoni))
         righe.append(T("Gli iPhone sono sempre registrati in %s.") % stanza_iphone)
+    if prestati:
+        righe.append("")
+        righe.append(T("RESTANO FERMI perche' sono in prestito: %d") % len(prestati))
+        righe.append(T("Registra prima il rientro, poi si potranno spostare."))
+        righe.extend(_riga_dispositivo(i) for i in prestati)
     if conteggi and da_spostare:
         righe.append("")
         righe.append(T("Come restano le stanze:"))
@@ -2899,7 +2905,19 @@ class App(tk.Tk):
         if not da_eliminare and len(bloccati) == 1:
             item = bloccati[0][0]
             libero, sblocco = puo_essere_eliminato(item)
-            if sblocco is None:
+            if is_on_loan(item):
+                messagebox.showwarning(
+                    T("Eliminazione non consentita"),
+                    T("%s - %s\n\n"
+                    "Il dispositivo e' in prestito a %s dal %s.\n\n"
+                    "Un dispositivo in prestito non si elimina: l'inventario e'\n"
+                    "l'unica traccia di chi ce l'ha. Registra prima il rientro\n"
+                    "con il pulsante Registra rientro, poi potrai eliminarlo.")
+                    % (valore_visibile(item, "asset_tag") or valore_visibile(item, "imei"),
+                       item.get("modello", ""), item.get("prestato_a", ""),
+                       item.get("prestato_il", "")),
+                    parent=self)
+            elif sblocco is None:
                 messagebox.showwarning(
                     T("Eliminazione non consentita"),
                     T("%s - %s\n\n"
@@ -2992,8 +3010,22 @@ class App(tk.Tk):
             return
         items = self._items_by_tag(tags)
         telefoni = [i for i in items if is_iphone(i.get("tipo"))]
-        spostabili = [i for i in items if not is_iphone(i.get("tipo"))]
-        if telefoni and not spostabili:
+        prestati = [i for i in items
+                    if not is_iphone(i.get("tipo")) and is_on_loan(i)]
+        spostabili = [i for i in items
+                      if not is_iphone(i.get("tipo")) and not is_on_loan(i)]
+        if not spostabili:
+            if prestati:
+                messagebox.showinfo(
+                    T("Sposta"),
+                    T("%d dispositivi sono in prestito e non si spostano.\n\n"
+                      "Registra prima il rientro, poi si potranno spostare.")
+                    % len(prestati) if len(prestati) > 1 else
+                    T("%s e' in prestito a %s: registra prima il rientro,\n"
+                      "poi si potra' spostare.")
+                    % (valore_visibile(prestati[0], "asset_tag"),
+                       prestati[0].get("prestato_a", "")), parent=self)
+                return
             messagebox.showinfo(
                 T("Sposta"),
                 T("Gli iPhone restano sempre in %s e non possono essere spostati.")
@@ -3014,7 +3046,7 @@ class App(tk.Tk):
                          if i.get("stanza") == stanza and stanza != room)
             dopo = prima - escono + (in_partenza if stanza == room else 0)
             conteggi.append((stanza, (prima, dopo)))
-        righe = riepilogo_spostamento(spostabili, telefoni, room,
+        righe = riepilogo_spostamento(spostabili, telefoni, prestati, room,
                                       self.iphone_room(), conteggi)
         if not in_partenza:
             messagebox.showinfo(T("Sposta"), "\n".join(righe), parent=self)
@@ -3029,11 +3061,14 @@ class App(tk.Tk):
 
         esito = self._run(lambda: self.store.move_to_room(tags, room))
         if esito:
-            spostati, bloccati = esito
+            spostati, fermi_telefoni, fermi_prestiti = esito
             messaggio = T("Spostati %d dispositivi in %s.") % (spostati, room) if spostati \
                 else T("Nessuno spostamento.")
-            if bloccati:
-                messaggio += T("  %d iPhone lasciati in %s.") % (bloccati, self.iphone_room())
+            if fermi_telefoni:
+                messaggio += T("  %d iPhone lasciati in %s.") % (fermi_telefoni,
+                                                                 self.iphone_room())
+            if fermi_prestiti:
+                messaggio += T("  %d in prestito lasciati dove sono.") % fermi_prestiti
             self.var_status.set(messaggio + "     " + self.var_status.get())
 
     def on_lend(self, tag=None):
