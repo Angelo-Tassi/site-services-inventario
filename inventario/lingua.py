@@ -658,6 +658,102 @@ EN = {
         'Sheet columns not recognised: %s',
     'In inventario adesso: %d dispositivi.':
         'In the inventory now: %d devices.',
+    '%d righe valide trovate.':
+        '%d valid rows found.',
+    '%d righe hanno preso la stanza dai separatori nel foglio.':
+        '%d rows took their room from the separators in the sheet.',
+    '%d iPhone ignorati: si inseriscono solo a mano.':
+        '%d iPhones ignored: they are entered by hand only.',
+    '%d righe di altre stanze scartate.':
+        '%d rows from other rooms discarded.',
+    '%d righe non hanno il modello del dispositivo: verranno importate\ncon quel campo vuoto, da completare a mano.':
+        '%d rows have no device model: they will be imported with that\nfield empty, to be completed by hand.',
+    'Un unico elenco, in un solo foglio':
+        'A single list, in one sheet',
+    'Un foglio per ogni stanza, nello stesso file':
+        'One sheet per room, in the same file',
+    'Un file separato per ogni stanza':
+        'A separate file for each room',
+    '%s  →  %s':
+        '%s  →  %s',
+    '%s - %s':
+        '%s - %s',
+    '%s aggiornato su %s.':
+        '%s updated on %s.',
+    'Asset Tag':
+        'Asset Tag',
+    'Modello':
+        'Model',
+    'Restituito da':
+        'Returned by',
+    "Non c'e' un altro tipo in cui trasformarlo.":
+        'There is no other type to turn it into.',
+    "Questo non e' un inventario":
+        'This is not an inventory',
+    "Questo file non e' un inventario":
+        'This file is not an inventory',
+    "%s\n\n%s\n\nUn foglio del genere si CARICA in un inventario con\nImporta xls..., non si apre come inventario: aprendolo, le\nrighe separatore diventerebbero dispositivi e nessun\ndispositivo avrebbe una stanza.\n\nScegli Annulla, lascia creare l'inventario vuoto, e importa\nquesto file da dentro il programma.":
+        '%s\n\n%s\n\nA sheet like this is LOADED into an inventory with\nImport xls..., it is not opened as one: opening it would turn\nthe separator rows into devices and leave every device\nwithout a room.\n\nChoose Cancel, let the empty inventory be created, and import\nthis file from inside the program.',
+    "Il file aperto e' un foglio da IMPORTARE, non un inventario:\n%s\n\nContiene le righe che dividono i dispositivi per stanza (%s),\nche qui compaiono in elenco come se fossero dispositivi. Per\nquesto le stanze restano vuote.\n\nCome sistemare:\n1. chiudi il programma;\n2. cancella il file inventario_percorso.json accanto al programma,\n   se c'e': e' li' che resta memorizzata la scelta sbagliata;\n3. riapri: l'inventario vuoto viene creato da solo in Produzione;\n4. carica questo foglio con  Importa xls...  da dentro il programma.":
+        'The file you opened is a sheet to IMPORT, not an inventory:\n%s\n\nIt contains the rows that split devices by room (%s), which\nappear here in the list as if they were devices. That is why\nthe rooms stay empty.\n\nHow to fix it:\n1. close the program;\n2. delete inventario_percorso.json next to the program, if it is\n   there: that is where the wrong choice is remembered;\n3. reopen: the empty inventory is created by itself in Produzione;\n4. load this sheet with  Import xls...  from inside the program.',
+    "Nel foglio non c'e' nessuna riga che dichiari una stanza.\nI %d dispositivi verranno importati SENZA STANZA: le schede\ndelle stanze resteranno vuote.\n\nUna riga separatore e' una riga con scritto solo il nome della\nstanza, per esempio  Site Services BAU  (vanno bene anche BAU,\nKIOSK, DISASTER). Vale per tutte le righe che la seguono.":
+        'The sheet contains no row declaring a room.\nThe %d devices will be imported WITH NO ROOM: the room cards\nwill stay empty.\n\nA separator row is a row carrying only the room name, for\nexample  Site Services BAU  (BAU, KIOSK, DISASTER work too).\nIt applies to every row that follows it.',
+    "%s e' gia' in inventario%s.\n\nNon e' stato inserito niente: due dispositivi non possono avere lo stesso identificativo.\n\nSe e' un dispositivo diverso, controlla il codice; se e' lo stesso, modificalo invece di reinserirlo.":
+        '%s is already in the inventory%s.\n\nNothing was added: two devices cannot share the same identifier.\n\nIf it is a different device, check the code; if it is the same one, edit it instead of adding it again.',
+    "%s non e' un inventario leggibile:\n%s\n\nNon e' stato ripristinato niente.":
+        '%s is not a readable inventory:\n%s\n\nNothing was restored.',
+    '%s non risulta in prestito.':
+        '%s is not recorded as being on loan.',
+    "%s risulta gia' in prestito a %s dal %s.":
+        '%s is already on loan to %s since %s.',
+    'Gli iPhone non vengono dati in prestito.':
+        'iPhones are not lent out.',
+    "Il campo %s non si modifica dall'elenco.":
+        'The %s field is not edited from the list.',
+    "Il dispositivo %s non esiste piu' nell'inventario.":
+        'Device %s is no longer in the inventory.',
+    'Impossibile accedere alla cartella di rete:\n%s':
+        'Cannot reach the network folder:\n%s',
+    'Impossibile leggere %s:\n%s':
+        'Cannot read %s:\n%s',
+    'Impossibile leggere il file:\n%s':
+        'Cannot read the file:\n%s',
+    'Impossibile salvare %s:\n%s':
+        'Cannot save %s:\n%s',
+    'Indica il nome della persona a cui presti il dispositivo.':
+        'Give the name of the person you are lending the device to.',
+    "L'articolo %s non esiste piu': e' stato eliminato da un altro utente.":
+        'Item %s no longer exists: another user deleted it.',
+    "L'asset tag %s e' gia' presente nell'inventario.":
+        'Asset tag %s is already in the inventory.',
+    "L'asset tag e' obbligatorio.":
+        'The asset tag is required.',
+    'La cartella %s non esiste.':
+        'The folder %s does not exist.',
+    "La copia %s non esiste piu'.":
+        'Copy %s no longer exists.',
+    'Lo stato degli iPhone e\' sempre "%s" e non si cambia.':
+        'The status of an iPhone is always "%s" and cannot be changed.',
+    'Nel file non e\' stata trovata la colonna "Asset Tag" (o "IMEI").\nCi deve essere una riga con le intestazioni delle colonne.':
+        'The "Asset Tag" (or "IMEI") column was not found in the file.\nThere must be a row with the column headings.',
+    "Non riesco a creare la cartella delle copie di sicurezza.\n\nL'operazione e' stata annullata: nessun dato e' stato toccato.":
+        'I cannot create the backup folder.\n\nThe operation was cancelled: no data was touched.',
+    "Non riesco a creare la copia di sicurezza:\n%s\n\nL'operazione e' stata annullata: nessun dato e' stato toccato.":
+        'I cannot create the backup copy:\n%s\n\nThe operation was cancelled: no data was touched.',
+    "Non riesco a ripristinare la copia:\n%s\n\nL'inventario e' rimasto com'era.":
+        'I cannot restore the copy:\n%s\n\nThe inventory was left as it was.',
+    "Non si passa da iPhone a un altro tipo, ne' viceversa.\n\nUn iPhone e' identificato dall'IMEI, gli altri dispositivi dall'asset tag\ne dal numero di serie: il passaggio cancellerebbe l'identificativo.\n\nElimina il dispositivo e reinseriscilo con il tipo giusto.":
+        'You cannot switch from iPhone to another type, or the other way round.\n\nAn iPhone is identified by its IMEI, the other devices by asset tag\nand serial number: the switch would erase the identifier.\n\nDelete the device and enter it again with the right type.',
+    'Stato non previsto: %s.':
+        'Unexpected status: %s.',
+    "La cartella condivisa non si raggiunge:\n  %s\n\nAprila prima da Esplora risorse: se non si apre da li', non si\napre nemmeno da qui. Controlla il percorso e la connessione.":
+        'The shared folder cannot be reached:\n  %s\n\nOpen it in File Explorer first: if it does not open there, it will\nnot open from here either. Check the path and the connection.',
+    "Non si e' potuto salvare la configurazione ne' accanto al\nprogramma ne' nel profilo utente.":
+        'The configuration could not be saved, neither next to the program\nnor in the user profile.',
+    "Sulla cartella condivisa non si puo' scrivere:\n  %s\n\n%s\n\nServe il permesso di Modifica su quella cartella: chiedilo a\nchi amministra la share.":
+        'The shared folder cannot be written to:\n  %s\n\n%s\n\nModify permission on that folder is needed: ask whoever\nadministers the share.',
+    "Sulla share non c'e' nessun inventario:\n  %s":
+        'There is no inventory on the share:\n  %s',
 }
 
 # ------------------------------------------------- colonne dei file prodotti

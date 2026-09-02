@@ -13,6 +13,8 @@ import re
 import sys
 
 from . import config
+
+from .lingua import T
 from .store import InventoryStore, InventoryError
 
 
@@ -99,13 +101,13 @@ def collega(cartella, creare=True):
     padre = os.path.dirname(dentro)
     if not os.path.isdir(padre):
         raise InventoryError(
-            "La cartella condivisa non si raggiunge:\n  %s\n\n"
+            T("La cartella condivisa non si raggiunge:\n  %s\n\n"
             "Aprila prima da Esplora risorse: se non si apre da li', non si\n"
-            "apre nemmeno da qui. Controlla il percorso e la connessione." % padre)
+            "apre nemmeno da qui. Controlla il percorso e la connessione.") % padre)
     gia_esisteva = os.path.exists(percorso)
     if not gia_esisteva:
         if not creare:
-            raise InventoryError("Sulla share non c'e' nessun inventario:\n  %s"
+            raise InventoryError(T("Sulla share non c'e' nessun inventario:\n  %s")
                                  % percorso)
         try:
             if not os.path.isdir(dentro):
@@ -113,14 +115,14 @@ def collega(cartella, creare=True):
             InventoryStore(percorso).create_if_missing()
         except OSError as exc:
             raise InventoryError(
-                "Sulla cartella condivisa non si puo' scrivere:\n  %s\n\n%s\n\n"
+                T("Sulla cartella condivisa non si puo' scrivere:\n  %s\n\n%s\n\n"
                 "Serve il permesso di Modifica su quella cartella: chiedilo a\n"
-                "chi amministra la share." % (dentro, exc))
+                "chi amministra la share.") % (dentro, exc))
     scritto = config.save_configured_data_path(percorso)
     if not scritto:
         raise InventoryError(
-            "Non si e' potuto salvare la configurazione ne' accanto al\n"
-            "programma ne' nel profilo utente.")
+            T("Non si e' potuto salvare la configurazione ne' accanto al\n"
+            "programma ne' nel profilo utente."))
     return percorso, gia_esisteva
 
 

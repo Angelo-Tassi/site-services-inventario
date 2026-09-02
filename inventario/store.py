@@ -26,6 +26,8 @@ from datetime import datetime
 
 from openpyxl import Workbook, load_workbook
 
+from .lingua import T
+
 SHEET_NAME = "Inventario"
 
 FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
@@ -469,7 +471,7 @@ class _Lock(object):
                 time.sleep(0.4)
             except OSError as exc:
                 raise InventoryError(
-                    "Impossibile accedere alla cartella di rete:\n%s" % exc
+                    T("Impossibile accedere alla cartella di rete:\n%s") % exc
                 )
 
     def __exit__(self, *exc):
@@ -514,7 +516,7 @@ class InventoryStore(object):
             return False
         folder = os.path.dirname(self.path)
         if folder and not os.path.isdir(folder):
-            raise InventoryError("La cartella %s non esiste." % folder)
+            raise InventoryError(T("La cartella %s non esiste.") % folder)
         self._write([])
         from . import config
         if not os.path.exists(config.shared_config_path(self.path)):
@@ -546,7 +548,7 @@ class InventoryStore(object):
         try:
             wb = load_workbook(self.path, read_only=True, data_only=True)
         except Exception as exc:
-            raise InventoryError("Impossibile leggere %s:\n%s" % (self.path, exc))
+            raise InventoryError(T("Impossibile leggere %s:\n%s") % (self.path, exc))
         try:
             ws = wb[SHEET_NAME] if SHEET_NAME in wb.sheetnames else wb.worksheets[0]
             rows = ws.iter_rows(values_only=True)
@@ -583,7 +585,7 @@ class InventoryStore(object):
                 os.remove(tmp)
             except OSError:
                 pass
-            raise InventoryError("Impossibile salvare %s:\n%s" % (self.path, exc))
+            raise InventoryError(T("Impossibile salvare %s:\n%s") % (self.path, exc))
         finally:
             wb.close()
 
@@ -610,7 +612,7 @@ class InventoryStore(object):
         item = dict(item)
         item["asset_tag"] = norm_tag(item.get("asset_tag"))
         if not item["asset_tag"]:
-            raise InventoryError("L'asset tag e' obbligatorio.")
+            raise InventoryError(T("L'asset tag e' obbligatorio."))
 
         def op(items):
             gia_presente = next((it for it in items
@@ -622,11 +624,11 @@ class InventoryStore(object):
                 dettagli = [d for d in (gia_presente.get("modello"),
                                         gia_presente.get("stanza")) if d]
                 raise InventoryError(
-                    "%s e' gia' in inventario%s.\n\n"
+                    T("%s e' gia' in inventario%s.\n\n"
                     "Non e' stato inserito niente: due dispositivi non possono "
                     "avere lo stesso identificativo.\n\n"
                     "Se e' un dispositivo diverso, controlla il codice; se e' "
-                    "lo stesso, modificalo invece di reinserirlo."
+                    "lo stesso, modificalo invece di reinserirlo.")
                     % (item["asset_tag"],
                        "  -  " + ", ".join(dettagli) if dettagli else ""))
             self._enforce_iphone_room(item)
@@ -641,18 +643,18 @@ class InventoryStore(object):
         item = dict(item)
         item["asset_tag"] = norm_tag(item.get("asset_tag"))
         if not item["asset_tag"]:
-            raise InventoryError("L'asset tag e' obbligatorio.")
+            raise InventoryError(T("L'asset tag e' obbligatorio."))
 
         def op(items):
             index = _index_of(items, old_tag)
             if index is None:
                 raise InventoryError(
-                    "L'articolo %s non esiste piu': e' stato eliminato da un altro utente."
+                    T("L'articolo %s non esiste piu': e' stato eliminato da un altro utente.")
                     % old_tag
                 )
             if item["asset_tag"] != old_tag and _index_of(items, item["asset_tag"]) is not None:
                 raise InventoryError(
-                    "L'asset tag %s e' gia' presente nell'inventario." % item["asset_tag"]
+                    T("L'asset tag %s e' gia' presente nell'inventario.") % item["asset_tag"]
                 )
             self._enforce_iphone_room(item)
             normalize_state(item, self.stati)
@@ -693,8 +695,8 @@ class InventoryStore(object):
         cartella = config.backup_dir()
         if cartella is None:
             raise InventoryError(
-                "Non riesco a creare la cartella delle copie di sicurezza.\n\n"
-                "L'operazione e' stata annullata: nessun dato e' stato toccato.")
+                T("Non riesco a creare la cartella delle copie di sicurezza.\n\n"
+                "L'operazione e' stata annullata: nessun dato e' stato toccato."))
         try:
             quando = datetime.fromtimestamp(os.path.getmtime(self.path))
         except OSError:
@@ -710,8 +712,8 @@ class InventoryStore(object):
             shutil.copy2(self.path, destinazione)
         except OSError as exc:
             raise InventoryError(
-                "Non riesco a creare la copia di sicurezza:\n%s\n\n"
-                "L'operazione e' stata annullata: nessun dato e' stato toccato." % exc)
+                T("Non riesco a creare la copia di sicurezza:\n%s\n\n"
+                "L'operazione e' stata annullata: nessun dato e' stato toccato.") % exc)
         return destinazione
 
     def copia_in(self, destinazione):
@@ -732,14 +734,14 @@ class InventoryStore(object):
 
         cartella = os.path.dirname(os.path.abspath(destinazione))
         if not os.path.isdir(cartella):
-            raise InventoryError("La cartella non esiste:\n%s" % cartella)
+            raise InventoryError(T("La cartella non esiste:\n%s") % cartella)
         with _Lock(self.path):
             if not os.path.exists(self.path):
-                raise InventoryError("L'inventario non c'e' piu':\n%s" % self.path)
+                raise InventoryError(T("L'inventario non c'e' piu':\n%s") % self.path)
             try:
                 shutil.copy2(self.path, destinazione)
             except OSError as exc:
-                raise InventoryError("Non riesco a salvare la copia:\n%s" % exc)
+                raise InventoryError(T("Non riesco a salvare la copia:\n%s") % exc)
             quanti = len(self._read())
             impostazioni = None
             sorgente = config.shared_config_path(self.path)
@@ -788,13 +790,13 @@ class InventoryStore(object):
         Ritorna (dispositivi ripristinati, copia dello stato precedente).
         """
         if not os.path.exists(percorso):
-            raise InventoryError("La copia %s non esiste piu'." % os.path.basename(percorso))
+            raise InventoryError(T("La copia %s non esiste piu'.") % os.path.basename(percorso))
         try:
             recuperati = InventoryStore(percorso)._read()
         except InventoryError as exc:
             raise InventoryError(
-                "%s non e' un inventario leggibile:\n%s\n\n"
-                "Non e' stato ripristinato niente." % (os.path.basename(percorso), exc))
+                T("%s non e' un inventario leggibile:\n%s\n\n"
+                "Non e' stato ripristinato niente.") % (os.path.basename(percorso), exc))
 
         with _Lock(self.path):
             precedente = self.copia_di_sicurezza()
@@ -802,8 +804,8 @@ class InventoryStore(object):
                 shutil.copy2(percorso, self.path)
             except OSError as exc:
                 raise InventoryError(
-                    "Non riesco a ripristinare la copia:\n%s\n\n"
-                    "L'inventario e' rimasto com'era." % exc)
+                    T("Non riesco a ripristinare la copia:\n%s\n\n"
+                    "L'inventario e' rimasto com'era.") % exc)
         self.load()
         return len(recuperati), precedente
 
@@ -835,14 +837,14 @@ class InventoryStore(object):
         def op(items):
             index = _index_of(items, tag)
             if index is None:
-                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+                raise InventoryError(T("Il dispositivo %s non esiste piu' nell'inventario.") % tag)
             item = items[index]
             if not is_iphone(item.get("tipo")):
                 raise InventoryError(
-                    "La spedizione al servizio telefonia riguarda solo gli iPhone.")
+                    T("La spedizione al servizio telefonia riguarda solo gli iPhone."))
             if is_shipped(item):
                 raise InventoryError(
-                    "%s risulta gia' spedito il %s." % (tag, item["spedito_il"]))
+                    T("%s risulta gia' spedito il %s.") % (tag, item["spedito_il"]))
             item["spedito_il"] = datetime.now().strftime("%d/%m/%Y %H:%M")
             normalize_state(item, self.stati)
             _stamp_item(item)
@@ -882,18 +884,18 @@ class InventoryStore(object):
         tag = norm_tag(tag)
         person = clean(person)
         if not person:
-            raise InventoryError("Indica il nome della persona a cui presti il dispositivo.")
+            raise InventoryError(T("Indica il nome della persona a cui presti il dispositivo."))
 
         def op(items):
             index = _index_of(items, tag)
             if index is None:
-                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+                raise InventoryError(T("Il dispositivo %s non esiste piu' nell'inventario.") % tag)
             item = items[index]
             if is_iphone(item.get("tipo")):
-                raise InventoryError("Gli iPhone non vengono dati in prestito.")
+                raise InventoryError(T("Gli iPhone non vengono dati in prestito."))
             if is_on_loan(item):
                 raise InventoryError(
-                    "%s risulta gia' in prestito a %s dal %s."
+                    T("%s risulta gia' in prestito a %s dal %s.")
                     % (tag, item["prestato_a"], item["prestato_il"]))
             item["prestato_a"] = person
             item["prestato_il"] = datetime.now().strftime("%d/%m/%Y %H:%M")
@@ -910,10 +912,10 @@ class InventoryStore(object):
         def op(items):
             index = _index_of(items, tag)
             if index is None:
-                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+                raise InventoryError(T("Il dispositivo %s non esiste piu' nell'inventario.") % tag)
             item = items[index]
             if not is_on_loan(item):
-                raise InventoryError("%s non risulta in prestito." % tag)
+                raise InventoryError(T("%s non risulta in prestito.") % tag)
             person = item["prestato_a"]
             item["prestato_a"] = ""
             item["prestato_il"] = ""
@@ -929,20 +931,20 @@ class InventoryStore(object):
         tag = norm_tag(tag)
         stato = clean(stato)
         if stato not in self.stati:
-            raise InventoryError("Stato non previsto: %s." % stato)
+            raise InventoryError(T("Stato non previsto: %s.") % stato)
 
         def op(items):
             index = _index_of(items, tag)
             if index is None:
-                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+                raise InventoryError(T("Il dispositivo %s non esiste piu' nell'inventario.") % tag)
             item = items[index]
             if is_iphone(item.get("tipo")):
                 atteso = SPEDITO if is_shipped(item) else DA_RISPEDIRE
                 raise InventoryError(
-                    "Lo stato degli iPhone e' sempre \"%s\" e non si cambia." % atteso)
+                    T("Lo stato degli iPhone e' sempre \"%s\" e non si cambia.") % atteso)
             if is_on_loan(item):
                 raise InventoryError(
-                    "%s e' in prestito a %s: registra prima il rientro."
+                    T("%s e' in prestito a %s: registra prima il rientro.")
                     % (tag, item["prestato_a"]))
             if item.get("stato") == stato:
                 return False
@@ -960,14 +962,14 @@ class InventoryStore(object):
     def set_campo(self, tag, campo, valore):
         """Aggiorna un solo campo di testo (modifica al volo dall'elenco)."""
         if campo not in self.CAMPI_AL_VOLO:
-            raise InventoryError("Il campo %s non si modifica dall'elenco." % campo)
+            raise InventoryError(T("Il campo %s non si modifica dall'elenco.") % campo)
         tag = norm_tag(tag)
         valore = clean(valore)
 
         def op(items):
             index = _index_of(items, tag)
             if index is None:
-                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+                raise InventoryError(T("Il dispositivo %s non esiste piu' nell'inventario.") % tag)
             if items[index].get(campo, "") == valore:
                 return False
             items[index][campo] = valore
@@ -990,19 +992,19 @@ class InventoryStore(object):
         def op(items):
             index = _index_of(items, tag)
             if index is None:
-                raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
+                raise InventoryError(T("Il dispositivo %s non esiste piu' nell'inventario.") % tag)
             attuale = items[index]
             if not tipo:
-                raise InventoryError("Il tipo non puo' restare vuoto.")
+                raise InventoryError(T("Il tipo non puo' restare vuoto."))
             if clean(attuale.get("tipo")) == tipo:
                 return False
             if is_iphone(attuale.get("tipo")) != is_iphone(tipo):
                 raise InventoryError(
-                    "Non si passa da iPhone a un altro tipo, ne' viceversa.\n\n"
+                    T("Non si passa da iPhone a un altro tipo, ne' viceversa.\n\n"
                     "Un iPhone e' identificato dall'IMEI, gli altri dispositivi "
                     "dall'asset tag\ne dal numero di serie: il passaggio "
                     "cancellerebbe l'identificativo.\n\n"
-                    "Elimina il dispositivo e reinseriscilo con il tipo giusto.")
+                    "Elimina il dispositivo e reinseriscilo con il tipo giusto."))
             attuale["tipo"] = tipo
             normalize_state(attuale, self.stati)
             _stamp_item(attuale)
@@ -1355,7 +1357,7 @@ def rows_from_workbook(path, rooms=None):
     try:
         wb = load_workbook(path, read_only=True, data_only=True)
     except Exception as exc:
-        raise InventoryError("Impossibile leggere il file:\n%s" % exc)
+        raise InventoryError(T("Impossibile leggere il file:\n%s") % exc)
     try:
         tags = tag_stanze(rooms or [])
         items = []
@@ -1414,8 +1416,8 @@ def rows_from_workbook(path, rooms=None):
 
         if not letto:
             raise InventoryError(
-                "Nel file non e' stata trovata la colonna \"Asset Tag\" (o \"IMEI\").\n"
-                "Ci deve essere una riga con le intestazioni delle colonne."
+                T("Nel file non e' stata trovata la colonna \"Asset Tag\" (o \"IMEI\").\n"
+                "Ci deve essere una riga con le intestazioni delle colonne.")
             )
         return items, esito
     finally:

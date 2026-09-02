@@ -1077,14 +1077,14 @@ class ImportDialog(_Modal):
         ttk.Label(body, text=os.path.basename(path),
                   style="Section.TLabel").pack(anchor="w")
         esito = esito or {}
-        righe = ["%d righe valide trovate." % count]
+        righe = [T("%d righe valide trovate.") % count]
         if esito.get("scartate"):
-            righe.append("%d righe ignorate: manca l'identificativo." % esito["scartate"])
+            righe.append(T("%d righe ignorate: manca l'identificativo.") % esito["scartate"])
         if esito.get("da_tag"):
-            righe.append("%d righe hanno preso la stanza dai separatori nel foglio."
+            righe.append(T("%d righe hanno preso la stanza dai separatori nel foglio.")
                          % esito["da_tag"])
         if esito.get("iphone"):
-            righe.append("%d iPhone ignorati: si inseriscono solo a mano." % esito["iphone"])
+            righe.append(T("%d iPhone ignorati: si inseriscono solo a mano.") % esito["iphone"])
         doppioni = esito.get("doppioni") or []
         if doppioni:
             righe.append(T("%d identificativi compaiono piu' volte nel foglio (%s): "
@@ -1092,7 +1092,7 @@ class ImportDialog(_Modal):
                          % (len(doppioni), ", ".join(doppioni[:3])
                             + (T(" e altri") if len(doppioni) > 3 else "")))
         if esito.get("altre_stanze"):
-            righe.append("%d righe di altre stanze scartate." % esito["altre_stanze"])
+            righe.append(T("%d righe di altre stanze scartate.") % esito["altre_stanze"])
         if esito.get("regola") == "tutte" and opzioni.get("stanza"):
             righe.append(T("Il foglio non dichiara stanze: tutte le righe finiranno "
                          "in %s.") % opzioni["stanza"])
@@ -1206,8 +1206,8 @@ class ImportDialog(_Modal):
         senza = esito.get("senza_modello")
         if senza:
             messaggi.append(
-                "%d righe non hanno il modello del dispositivo: verranno importate\n"
-                "con quel campo vuoto, da completare a mano." % senza)
+                T("%d righe non hanno il modello del dispositivo: verranno importate\n"
+                  "con quel campo vuoto, da completare a mano.") % senza)
         return messaggi
 
     def _ok(self):

@@ -793,6 +793,51 @@ configured at that moment.
 
 ---
 
+## If the file has different columns from ours
+
+The import is tolerant and does not stop over a "dirty" file. Here is exactly
+what happens.
+
+| In the file | What the program does |
+| --- | --- |
+| Extra columns (cost, supplier, cost centre...) | ignores them and **lists them for you** before importing |
+| Names with different case or spacing | recognises them anyway: `  ASSET TAG `, `tipo`, `MoDeLLo`, `s/n` all work |
+| Two columns for the same field | uses the first and reports the second among the ignored ones |
+| The **model** is missing | imports anyway and tells you how many rows are left without |
+| The **asset tag** (or IMEI) is missing | stops with an error and imports nothing |
+| A title before the table | skips it and looks for the headings in the first 12 rows |
+| Several sheets | reads them all; a sheet titled like a room counts as a separator |
+| A sheet with no table (instructions, notes) | ignores it |
+| Empty rows | skips them without counting them |
+| Rows with no identifier | counts them as discarded and carries on |
+
+The delicate point is the **unrecognised columns**: if your file calls a field
+something the program does not know, that data is not imported - and the summary
+before importing says so, so you can rename the column and try again.
+
+## Creating the inventory from an existing Excel file
+
+There is no need to enter the devices by hand: *Import xls...* accepts any Excel
+file whose **first row holds the headings**. The only required column is the
+asset tag - or, for iPhones, the IMEI, which takes its place; the others are
+recognised by name, in Italian or in English, for example:
+
+| Column | Headings recognised |
+| --- | --- |
+| Asset Tag | Asset Tag, Asset, Tag, Etichetta, Inventario |
+| Type | Tipo, Tipologia, Categoria, Type |
+| Model/Description | Model, Model/Description, Modello, Descrizione, Dispositivo |
+| Serial number | Numero di serie, Seriale, Serial Number, S/N, Matricola, Service Tag |
+| IMEI | IMEI, IMEI/MEID, MEID, Codice IMEI |
+| Returned by | Restituito da, Proprietario, Consegnato da, Owner |
+| Room | Stanza, Room, Locale, Ubicazione, Posizione |
+| On loan to | In prestito a, Prestato a, Assegnato a, Borrower |
+| Status | Stato, Status, Disponibilita' |
+| Notes | Note, Nota, Commenti, Notes |
+
+Everything else is ignored, and the summary before importing lists the columns
+it did not understand.
+
 ## How exporting works
 
 As with importing, *Export xls...* opens a window with two questions first.
