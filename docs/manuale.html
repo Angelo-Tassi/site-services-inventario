@@ -321,10 +321,10 @@ table{min-width:520px}
     telefonia</i>.</p>
   <div class="tw"><table class="man">
     <tr><th>Dove sei</th><th>Che cosa vedi</th><th>Che cosa sparisce</th></tr>
-    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, tipo, modello, seriale, stanza, stato, note. Sette colonne per dire che cos'e', dov'e' e come sta.</td><td class="d">Tutto il resto: IMEI, chi ha il prestito e da quando, chi ha restituito, quando e' stato spedito, ultima modifica.</td></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, tipo, stanza, note, stato, modello, seriale. Sette colonne per dire che cos'e', dov'e' e come sta.</td><td class="d">Tutto il resto: IMEI, chi ha il prestito e da quando, chi ha restituito, quando e' stato spedito, ultima modifica.</td></tr>
     <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Restituito da e Spedito il, perche' li' stanno i telefoni.</td><td class="d">Stanza, In prestito a, Prestato il.</td></tr>
     <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">In prestito a, Prestato il e la colonna <b>Prestito</b> con i pulsanti.</td><td class="d">Stanza, IMEI, Restituito da, Spedito il.</td></tr>
-    <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Solo l'essenziale: asset tag, tipo, modello, seriale, stato, note.</td><td class="d">Stanza, tutto il prestito, tutto quello degli iPhone.</td></tr>
+    <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Solo l'essenziale: asset tag, tipo, note, stato, modello, seriale.</td><td class="d">Stanza, tutto il prestito, tutto quello degli iPhone.</td></tr>
     <tr><td class="d"><b>Contenitore Iphone</b></td><td class="d">Modello/Descrizione, IMEI, Restituito da, stato, Spedito il, note, piu' la colonna <b>Spedizione</b>.</td><td class="d">Asset tag e seriale (un iPhone non ne ha), prestiti, stanza e tipo.</td></tr>
   </table></div>
   <p class="note">La colonna <b>Stanza</b> sparisce sempre dentro una stanza: sarebbe
@@ -355,11 +355,10 @@ table{min-width:520px}
     prestiti in un'altra stanza, le due colonne compaiono li'.</div>
 
   <h3>La stessa regola nei file che escono</h3>
-  <p class="sub">Un file esportato risponde a una domanda sola: <b>che cosa abbiamo, di
-    che tipo, dove sta e in che condizioni</b>. Quattro colonne: asset tag, tipo, stanza,
-    stato.</p>
-  <p class="sub">Modello, numero di serie, note, prestiti, IMEI, spedizioni e ultima
-    modifica restano fuori: servono a chi lavora davanti all'elenco, dentro la stanza che
+  <p class="sub">Un file esportato risponde a una domanda sola: <b>che cosa abbiamo e
+    dove sta</b>. Tre colonne: asset tag, tipo, stanza.</p>
+  <p class="sub">Stato, modello, numero di serie, note, prestiti, IMEI, spedizioni e
+    ultima modifica restano fuori: servono a chi lavora davanti all'elenco, dentro la stanza che
     li riguarda, non a chi riceve il file. La <b>stampa</b> invece li porta, perche' e'
     fatta per chi lavora.</p>
   <div class="avviso"><b>Da un'esportazione non si ricostruisce un inventario</b>, perche'
@@ -383,6 +382,10 @@ table{min-width:520px}
       solo far rimandare l'inserimento, cioe' perdere la riga. La stanza non blocca
       niente: se non la scegli parte dalla prima.</li>
   </ol>
+  <p class="note"><b>Un identificativo non si ripete.</b> Se l'asset tag - o l'IMEI - e'
+    gia' in inventario, il programma non inserisce niente e dice dove sta il dispositivo
+    che ce l'ha gia', con il modello e la stanza: si capisce subito se e' un errore di
+    battitura o un dispositivo gia' registrato.</p>
   <p class="note">Il dispositivo appena inserito compare in cima all'elenco: e' ordinato
     per ultima modifica, cosi' si vede subito che e' arrivato.</p>
 </section>
@@ -503,7 +506,7 @@ table{min-width:520px}
 
 <section id="sicurezza">
   <h2>Sicurezza dei dati</h2>
-  <p class="sub">Quattro protezioni diverse, che coprono guasti diversi.</p>
+  <p class="sub">Cinque protezioni diverse, che coprono guasti diversi.</p>
 
   <div class="grid">
     <div class="card"><h3>1 · Salvataggi che non si pestano</h3>
@@ -517,7 +520,11 @@ table{min-width:520px}
     <div class="card"><h3>3 · La copia che decidi tu</h3>
       <p><span class="k verde">Salva copia in locale…</span> mette una copia
         dell'inventario dove vuoi: sul tuo PC, su una chiavetta, fuori dalla rete.</p></div>
-    <div class="card"><h3>4 · Ripristino</h3>
+    <div class="card"><h3>4 · Il promemoria</h3>
+      <p>Ogni cinque dispositivi aggiunti, modificati o eliminati, il programma chiede se
+        vuoi salvare una copia locale. Si puo' dire di no: torna a chiedere dopo altri
+        cinque.</p></div>
+    <div class="card"><h3>5 · Ripristino</h3>
       <p>Si torna indietro dall'interfaccia, senza cercare file a mano. Vedi
         <a href="#ripristino">qui sotto</a>.</p></div>
   </div>
@@ -766,10 +773,10 @@ table{min-width:520px}
     status sums them up: <i>On loan</i>, <i>Shipped to the phone service</i>.</p>
   <div class="tw"><table class="man">
     <tr><th>Where you are</th><th>What you see</th><th>What goes away</th></tr>
-    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, type, model, serial, room, status, notes. Seven columns to say what a device is, where it is and how it is.</td><td class="d">Everything else: IMEI, who has it on loan and since when, who returned it, when it was shipped, last change.</td></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, type, room, notes, status, model, serial. Seven columns to say what a device is, where it is and how it is.</td><td class="d">Everything else: IMEI, who has it on loan and since when, who returned it, when it was shipped, last change.</td></tr>
     <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Returned by and Shipped on, because the phones live there.</td><td class="d">Room, On loan to, Lent on.</td></tr>
     <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">On loan to, Lent on, and the <b>Loan</b> column with its buttons.</td><td class="d">Room, IMEI, Returned by, Shipped on.</td></tr>
-    <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Only the essentials: asset tag, type, model, serial, status, notes.</td><td class="d">Room, everything about loans, everything about iPhones.</td></tr>
+    <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Only the essentials: asset tag, type, notes, status, model, serial.</td><td class="d">Room, everything about loans, everything about iPhones.</td></tr>
     <tr><td class="d"><b>Iphone container</b></td><td class="d">Model/Description, IMEI, Returned by, status, Shipped on, notes, plus the <b>Shipment</b> column.</td><td class="d">Asset tag and serial (an iPhone has neither), loans, room and type.</td></tr>
   </table></div>
   <p class="note">The <b>Room</b> column always disappears inside a room: it would be the
@@ -799,11 +806,10 @@ table{min-width:520px}
     the settings and the two columns appear there.</div>
 
   <h3>The same rule in the files that come out</h3>
-  <p class="sub">An exported file answers a single question: <b>what do we have, of what
-    type, where is it and in what condition</b>. Four columns: asset tag, type, room,
-    status.</p>
-  <p class="sub">Model, serial number, notes, loans, IMEI, shipments and last change stay
-    out: they serve whoever is working in front of the list, inside the room they belong
+  <p class="sub">An exported file answers a single question: <b>what do we have and where
+    is it</b>. Three columns: asset tag, type, room.</p>
+  <p class="sub">Status, model, serial number, notes, loans, IMEI, shipments and last
+    change stay out: they serve whoever is working in front of the list, inside the room they belong
     to, not whoever receives the file. <b>Printing</b> does carry them, because it is made
     for whoever is working.</p>
   <div class="avviso"><b>An inventory cannot be rebuilt from an export</b>, because those
@@ -826,6 +832,10 @@ table{min-width:520px}
       entry, which means losing the row. The room blocks nothing: if you do not pick one it
       starts from the first.</li>
   </ol>
+  <p class="note"><b>An identifier is never repeated.</b> If the asset tag - or the IMEI -
+    is already in the inventory, the program inserts nothing and says where the device
+    holding it is, with its model and room: you see at once whether it is a typo or a
+    device already recorded.</p>
   <p class="note">A device just entered appears at the top of the list: it is sorted by
     last change, so you can see it arrived.</p>
 </section>
@@ -947,7 +957,7 @@ table{min-width:520px}
 
 <section id="sicurezza-en">
   <h2>Keeping the data safe</h2>
-  <p class="sub">Four different protections, covering four different failures.</p>
+  <p class="sub">Five different protections, covering different failures.</p>
 
   <div class="grid">
     <div class="card"><h3>1 · Saves that do not clash</h3>
@@ -961,7 +971,10 @@ table{min-width:520px}
     <div class="card"><h3>3 · The copy you decide on</h3>
       <p><span class="k verde">Save a local copy…</span> puts a copy of the inventory
         wherever you want: your PC, a USB stick, off the network.</p></div>
-    <div class="card"><h3>4 · Restore</h3>
+    <div class="card"><h3>4 · The reminder</h3>
+      <p>Every five devices added, changed or deleted, the program asks whether you want
+        to save a local copy. You can say no: it comes back after another five.</p></div>
+    <div class="card"><h3>5 · Restore</h3>
       <p>You go back from the interface, without hunting for files by hand. See
         <a href="#ripristino-en">below</a>.</p></div>
   </div>

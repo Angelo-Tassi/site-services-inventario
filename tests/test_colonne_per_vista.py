@@ -28,7 +28,7 @@ def campi():
 app.show_home()
 # l'ordine conta: prima quello che si cerca a colpo d'occhio, per ultimi i
 # campi lunghi che si leggono solo quando servono
-assert campi() == ["asset_tag", "tipo", "stanza", "stato", "note",
+assert campi() == ["asset_tag", "tipo", "stanza", "note", "stato",
                    "modello", "seriale"], campi()
 # l'IMEI e' l'identificativo dei soli telefoni: si guarda dove stanno loro
 assert "imei" not in campi()
@@ -63,7 +63,7 @@ assert app._columns()[:2] == [CHECK_COLUMN, ACTION_COLUMN]
 # ---- Magazzino Disaster Recovery: ne' prestiti ne' telefoni, la piu' pulita
 app.show_room(DR)
 assert not any(c in campi() for c in IPHONE + PRESTITO), campi()
-assert campi() == ["asset_tag", "tipo", "stato", "note", "modello", "seriale",
+assert campi() == ["asset_tag", "tipo", "note", "stato", "modello", "seriale",
                    "modificato_il", "modificato_da"], campi()
 
 # ---- contenitore iPhone: niente asset tag, niente seriale, niente prestiti,

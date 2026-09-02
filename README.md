@@ -394,6 +394,22 @@ dice: non crea mai un inventario locale al posto di quello condiviso.
 Le stanze predefinite sono **Site Services BAU**, **Digital Kiosk** e
 **Magazzino Disaster Recovery**; i prestiti sono attivi sul Digital Kiosk.
 
+## Due cose che il programma fa da solo
+
+**Un identificativo non si ripete.** Inserendo un dispositivo con un asset tag -
+o un IMEI - gia' presente, il programma **non inserisce niente** e dice dove sta
+quello che ce l'ha gia', con il modello e la stanza: si capisce subito se e' un
+errore di battitura o un dispositivo gia' registrato.
+
+**Ogni cinque dispositivi toccati, ricorda la copia locale.** Aggiunte,
+modifiche ed eliminazioni si contano insieme - e contano i *record*, quindi
+un'eliminazione in blocco di trenta li conta tutti e trenta. Al quinto il
+programma chiede se vuoi salvare una copia sul tuo computer, e si puo' dire di
+no: torna a chiedere dopo altri cinque. Salvando una copia il conto riparte.
+
+Serve perche' le copie automatiche stanno sulla cartella di rete accanto ai
+dati: coprono l'errore umano, non la cartella che sparisce.
+
 ## Eliminare piu' dispositivi in una volta
 
 **`Elimina +`**, accanto a *Elimina*, serve a togliere trenta dispositivi senza
@@ -422,8 +438,8 @@ colonna vuota per costruzione non porta informazione: toglie spazio a quello che
 si deve leggere.
 
 L'**inventario completo in home** e' una panoramica: dice che cos'e' un
-dispositivo, dov'e' e come sta - asset tag, tipo, modello, seriale, stanza,
-stato, note - in una riga che si legge senza scorrere di lato. Le domande piu'
+dispositivo, dov'e' e come sta - asset tag, tipo, stanza, note, stato,
+modello, seriale - in una riga che si legge senza scorrere di lato. Le domande piu'
 precise si fanno dentro la stanza che le riguarda, e in panoramica ci pensa lo
 stato a riassumerle: *In prestito*, *Spedito al servizio telefonia*.
 
@@ -458,11 +474,11 @@ un'altra stanza dalle impostazioni, le due colonne compaiono li'.
 
 ### La stessa regola nei file che escono
 
-Un file esportato risponde a una domanda sola: **che cosa abbiamo, di che tipo,
-dove sta e in che condizioni**. Quattro colonne: asset tag, tipo, stanza, stato.
+Un file esportato risponde a una domanda sola: **che cosa abbiamo e dove sta**.
+Tre colonne: asset tag, tipo, stanza.
 
-Modello, numero di serie, note, prestiti, IMEI, spedizioni e ultima modifica
-restano fuori: servono a chi lavora davanti all'elenco, dentro la stanza che li
+Stato, modello, numero di serie, note, prestiti, IMEI, spedizioni e ultima
+modifica restano fuori: servono a chi lavora davanti all'elenco, dentro la stanza che li
 riguarda, non a chi riceve il file. La **stampa** invece li porta, perche' e'
 fatta per chi lavora.
 

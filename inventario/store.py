@@ -486,6 +486,9 @@ class InventoryStore(object):
         # Stanza in cui gli iPhone stanno per forza; None disattiva il vincolo.
         self.iphone_room = iphone_room
         self.stati = list(stati or STATI)
+        # Record toccati da quando il programma e' aperto: serve a ricordare di
+        # tenersi una copia locale, non a fare statistiche.
+        self.modifiche = 0
         self.items = []
         self._stamp = None
 
@@ -592,11 +595,13 @@ class InventoryStore(object):
         """
         with _Lock(self.path):
             items = self._read()
+            prima = dict((it["asset_tag"], dict(it)) for it in items)
             result = operation(items)
             items.sort(key=lambda it: (it.get("stanza", ""), it.get("asset_tag", "")))
             self._write(items)
             self.items = items
             self._stamp = self._disk_stamp()
+            self.modifiche += _quanti_cambiati(prima, items)
         return result
 
     # ---------------------------------------------------------- operazioni
@@ -608,10 +613,22 @@ class InventoryStore(object):
             raise InventoryError("L'asset tag e' obbligatorio.")
 
         def op(items):
-            if any(it["asset_tag"] == item["asset_tag"] for it in items):
+            gia_presente = next((it for it in items
+                                 if it["asset_tag"] == item["asset_tag"]), None)
+            if gia_presente is not None:
+                # dire solo "esiste gia'" costringe a cercarlo a mano: si dice
+                # dov'e' e che cos'e', cosi' si capisce subito se e' un errore
+                # di battitura o il dispositivo che si aveva gia' registrato
+                dettagli = [d for d in (gia_presente.get("modello"),
+                                        gia_presente.get("stanza")) if d]
                 raise InventoryError(
-                    "L'asset tag %s e' gia' presente nell'inventario." % item["asset_tag"]
-                )
+                    "%s e' gia' in inventario%s.\n\n"
+                    "Non e' stato inserito niente: due dispositivi non possono "
+                    "avere lo stesso identificativo.\n\n"
+                    "Se e' un dispositivo diverso, controlla il codice; se e' "
+                    "lo stesso, modificalo invece di reinserirlo."
+                    % (item["asset_tag"],
+                       "  -  " + ", ".join(dettagli) if dettagli else ""))
             self._enforce_iphone_room(item)
             normalize_state(item, self.stati)
             _stamp_item(item)
@@ -1145,6 +1162,21 @@ def _pezzi_di_riga(riga):
     for separatore in ("\t", ";", ","):
         testo = testo.replace(separatore, "\x00")
     return [p.strip() for p in testo.split("\x00") if p.strip()]
+
+
+def _quanti_cambiati(prima, dopo):
+    """Quanti record sono stati aggiunti, tolti o modificati da un'operazione.
+
+    Si contano i record, non le operazioni: eliminarne trenta in un colpo solo
+    e' un cambiamento grosso quanto trenta eliminazioni una per una, e chi
+    tiene una copia locale vuole saperlo.
+    """
+    adesso = dict((it["asset_tag"], it) for it in dopo)
+    cambiati = len(set(prima) ^ set(adesso))
+    for tag in set(prima) & set(adesso):
+        if prima[tag] != adesso[tag]:
+            cambiati += 1
+    return cambiati
 
 
 def _index_of(items, tag):

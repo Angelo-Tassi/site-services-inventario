@@ -574,6 +574,10 @@ EN = {
         'In the inventory now: %d',
     "Dopo l'importazione: %d":
         'After the import: %d',
+    'Conviene una copia':
+        'Time for a copy',
+    "Hai modificato %d dispositivi dall'ultima copia locale.\n\nLe copie automatiche stanno sulla cartella di rete, accanto\nai dati: se sparisce quella, spariscono anche loro.\n\nVuoi salvare adesso una copia dell'inventario sul tuo\ncomputer? Ci vogliono cinque secondi.":
+        'You have changed %d devices since the last local copy.\n\nThe automatic copies live on the network folder, next to\nthe data: if that goes, they go with it.\n\nDo you want to save a copy of the inventory on your own\ncomputer now? It takes five seconds.',
 }
 
 # ------------------------------------------------- colonne dei file prodotti

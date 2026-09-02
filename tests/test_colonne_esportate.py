@@ -33,9 +33,9 @@ def intestazioni(file_prodotto):
     finally:
         wb.close()
 
-# ---- un file esportato risponde a una domanda sola: che cosa abbiamo, di che
-# tipo, dove sta e in che condizioni. Stesse quattro colonne ovunque.
-ATTESE = ["Asset Tag", "Tipo", "Stanza", "Stato"]
+# ---- un file esportato risponde a una domanda sola: che cosa abbiamo e dove
+# sta. Stesse tre colonne ovunque.
+ATTESE = ["Asset Tag", "Tipo", "Stanza"]
 colonne = intestazioni(excel_io.export(items, os.path.join(fuori, "tutto.xlsx"),
                                        rooms=[BAU, KIOSK, DR]))
 assert colonne == ATTESE, colonne
@@ -63,7 +63,7 @@ modello = os.path.join(fuori, "modello.xlsx")
 excel_io.build_template(modello, [BAU, KIOSK, DR])
 colonne = intestazioni(modello)
 # il modello segue lo stesso ordine dell'elenco nel programma
-assert colonne == ["Asset Tag", "Tipo", "Stato", "Note",
+assert colonne == ["Asset Tag", "Tipo", "Note", "Stato",
                    "Modello/Descrizione", "Numero di serie"], colonne
 # il modello da compilare resta piu' ricco dell'esportazione: serve a caricare
 # dispositivi nuovi, non a documentare quelli che ci sono gia'

@@ -21,6 +21,7 @@ from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
                     sembra_un_foglio_da_importare, testo_spedizione,
                     valore_visibile)
 
+MODIFICHE_PER_PROMEMORIA = 5   # record toccati prima di ricordare la copia
 ALTEZZA_MINIMA_TABELLA = 160   # pixel: circa cinque righe
 SPAZIO_CELLA = 22              # margini della cella, perche' il testo non tocchi i bordi
 SPAZIO_INTESTAZIONE = 34       # margini piu' la barretta colorata e la freccia
@@ -31,7 +32,7 @@ LARGHEZZA_MINIMA = 46
 # per ultimi i campi lunghi, che si leggono solo quando servono davvero. Il
 # contenitore Iphone non segue questo ordine: li' l'IMEI e' l'identificativo e
 # viene per primo.
-ORDINE_COLONNE = ["asset_tag", "tipo", "stanza", "stato", "note",
+ORDINE_COLONNE = ["asset_tag", "tipo", "stanza", "note", "stato",
                   "modello", "seriale",
                   "imei", "restituito_da", "prestato_a", "prestato_il",
                   "spedito_il", "modificato_il", "modificato_da"]
@@ -2311,7 +2312,36 @@ class App(tk.Tk):
             self.refresh_table()
         if success:
             self.var_status.set(success + "     " + self.var_status.get())
+        self._forse_ricorda_copia()
         return result
+
+    def _forse_ricorda_copia(self):
+        """Ogni tanto ricorda di portarsi via una copia dell'inventario.
+
+        Le copie automatiche stanno sulla share, accanto ai dati: coprono
+        l'errore umano ma non la cartella di rete che sparisce. Quella copia la
+        deve volere qualcuno, e chi sta lavorando non ci pensa: glielo si
+        ricorda dopo un po' di modifiche, non a ogni singola riga.
+        """
+        if getattr(self, "_copia_chiesta", False):
+            return                      # gia' in corso: non si annida
+        fatte = self.store.modifiche - getattr(self, "_modifiche_alla_copia", 0)
+        if fatte < MODIFICHE_PER_PROMEMORIA:
+            return
+        self._copia_chiesta = True
+        try:
+            salva = messagebox.askyesno(
+                T("Conviene una copia"),
+                T("Hai modificato %d dispositivi dall'ultima copia locale.\n\n"
+                  "Le copie automatiche stanno sulla cartella di rete, accanto\n"
+                  "ai dati: se sparisce quella, spariscono anche loro.\n\n"
+                  "Vuoi salvare adesso una copia dell'inventario sul tuo\n"
+                  "computer? Ci vogliono cinque secondi.") % fatte, parent=self)
+            self._modifiche_alla_copia = self.store.modifiche
+            if salva:
+                self.on_copia_locale()
+        finally:
+            self._copia_chiesta = False
 
     # ------------------------------------------------------------ azioni
 
@@ -3016,6 +3046,7 @@ class App(tk.Tk):
         righe.append(T("E' un inventario completo: si apre in Excel, e in caso di\n"
                        "guaio si ricarica con Ripristina o con Importa xls...\n"
                        "in modalita' Sostituisci."))
+        self._modifiche_alla_copia = self.store.modifiche
         messagebox.showinfo(T("Copia salvata"), "\n".join(righe), parent=self)
 
     def on_collega(self):

@@ -48,8 +48,8 @@ per block.
 | --- | --- |
 | Asset Tag | `IT-BAU-101` ... `IT-KSK-210` ... `IT-DRC-310`, one series per room |
 | Type | seven Laptops and three Tablets per room |
-| Status | a mix of the five statuses, to see how they behave |
 | Notes | some filled in, some empty |
+| Status | a mix of the five statuses, to see how they behave |
 | Model/Description | Lenovo ThinkPad T14 Gen 4 and Gen 5, Dell Latitude 7320 Detachable and 7230 Rugged Extreme |
 | Serial number | plausible serials, all different |
 

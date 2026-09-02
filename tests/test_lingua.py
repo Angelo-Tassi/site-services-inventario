@@ -8,6 +8,7 @@ from inventario import config, excel_io
 from inventario import lingua as lang
 from inventario.lingua import EN, INTESTAZIONI_EN, STATI_EN, T, intestazione
 from inventario.store import (ALL_FIELDS, DISPONIBILE, HEADERS, InventoryStore,
+                              SPEDITO,
                               STATI, new_item, rows_from_workbook)
 from inventario.ui import App, ExportOptionsDialog, RoomsDialog, stato_canonico
 
@@ -79,10 +80,20 @@ wb = load_workbook(uscita); ws = wb.active
 teste = [c.value for c in ws[1]]
 from inventario.excel_io import CAMPI_ESPORTAZIONE
 assert teste == [INTESTAZIONI_EN[HEADERS[f]] for f in CAMPI_ESPORTAZIONE], teste
-colonna = teste.index("Status")
-valori = {r[colonna] for r in ws.iter_rows(min_row=2, values_only=True) if r[0]}
-assert valori <= set(STATI_EN.values()), valori
-assert "Available" in valori
+assert "Status" not in teste, "lo stato non esce piu' nei file esportati"
+wb.close()
+
+# gli stati tradotti si vedono nella stampa, che invece li porta
+stampa = excel_io.build_print_file(app.store.items, rooms=STANZE)
+wb = load_workbook(stampa)
+ws = wb.active
+riga_testa = next(n for n, r in enumerate(ws.iter_rows(values_only=True), start=1)
+                  if r and r[0] and str(r[0]).strip() == "Asset Tag")
+teste_stampa = [c.value for c in ws[riga_testa]]
+colonna = teste_stampa.index("Stato")
+valori = {r[colonna] for r in ws.iter_rows(min_row=riga_testa + 1, values_only=True)
+          if r[0]}
+assert valori <= set(STATI + ["In prestito", "Da Rispedire", SPEDITO]), valori
 wb.close()
 
 righe, esito = rows_from_workbook(uscita, STANZE)
@@ -90,7 +101,7 @@ assert len(righe) == 13, len(righe)
 assert {i["stato"] for i in righe} <= set(STATI + ["In prestito"]), \
     "rileggendo, gli stati tornano in italiano"
 assert any(i["stato"] == DISPONIBILE for i in righe)
-# l'esportazione porta quattro campi: il seriale non c'e' piu', e va bene cosi'
+# l'esportazione porta tre campi: seriale e stato non ci sono, e va bene cosi'
 assert all(not i["seriale"] for i in righe), "l'export non porta il seriale"
 assert all(i["asset_tag"] and i["stanza"] for i in righe)
 

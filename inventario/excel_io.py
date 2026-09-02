@@ -121,14 +121,15 @@ def _sottotitolo(stamp, quanti, lingua):
 # danno al file la forma che chi lo apre - o chi lo reimporta - si aspetta.
 CAMPI_PORTANTI = ["asset_tag", "tipo", "modello", "seriale", "stanza", "stato", "note"]
 
-# Un file esportato risponde a una domanda sola: che cosa abbiamo, di che tipo,
-# dove sta e in che condizioni. Tutto il resto - modello, numero di serie, note,
-# prestiti, IMEI, chi ha toccato la riga per ultimo - serve a chi lavora davanti
-# all'elenco, dentro la stanza che lo riguarda, e non a chi riceve il file.
+# Un file esportato risponde a una domanda sola: che cosa abbiamo e dove sta.
+# Tutto il resto - lo stato, il modello, il numero di serie, le note, i
+# prestiti, l'IMEI, chi ha toccato la riga per ultimo - serve a chi lavora
+# davanti all'elenco, dentro la stanza che lo riguarda, e non a chi riceve il
+# file.
 #
 # Attenzione: da un'esportazione non si ricostruisce un inventario, perche' quei
 # campi non ci sono. Per quello c'e' la copia locale, che copia il file vero.
-CAMPI_ESPORTAZIONE = ["asset_tag", "tipo", "stanza", "stato"]
+CAMPI_ESPORTAZIONE = ["asset_tag", "tipo", "stanza"]
 
 
 def campi_con_valore(items, fields):
@@ -255,7 +256,7 @@ def build_print_file(items, group_by_room=False, rooms=None):
 # Le stesse colonne dell'elenco, nello stesso ordine: chi compila il modello
 # ritrova quello che vede nel programma. La stanza non c'e' perche' la dicono le
 # righe separatore.
-TEMPLATE_FIELDS = ["asset_tag", "tipo", "stato", "note", "modello", "seriale"]
+TEMPLATE_FIELDS = ["asset_tag", "tipo", "note", "stato", "modello", "seriale"]
 
 # Un valore d'esempio per ogni colonna, che serve solo a darle una larghezza
 # sensata: il modello e' vuoto, quindi non c'e' contenuto da misurare, ma chi

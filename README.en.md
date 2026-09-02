@@ -469,6 +469,22 @@ opening a window.
 The status is never written by hand into the file: if an import brings an
 unexpected status, it is reset to *Available*.
 
+## Two things the program does by itself
+
+**An identifier is never repeated.** Adding a device with an asset tag - or an
+IMEI - already present, the program **inserts nothing** and says where the one
+holding it is, with its model and room: you see at once whether it is a typo or
+a device already recorded.
+
+**Every five devices touched, it reminds you of the local copy.** Additions,
+edits and deletions are counted together - and it counts *records*, so a bulk
+deletion of thirty counts all thirty. On the fifth the program asks whether you
+want to save a copy on your own computer, and you can say no: it comes back
+after another five. Saving a copy resets the count.
+
+It is there because the automatic copies live on the network folder next to the
+data: they cover human error, not the folder disappearing.
+
 ## Deleting several devices at once
 
 **`Delete +`**, next to *Delete*, is for removing thirty devices without hunting
@@ -496,8 +512,8 @@ by construction carries no information: it takes space away from what you have
 to read.
 
 The **complete inventory on the home screen** is an overview: it says what a
-device is, where it is and how it is - asset tag, type, model, serial, room,
-status, notes - in a row you can read without scrolling sideways. The finer
+device is, where it is and how it is - asset tag, type, room, notes, status,
+model, serial - in a row you can read without scrolling sideways. The finer
 questions are asked inside the room they belong to, and in the overview the
 status sums them up: *On loan*, *Shipped to the phone service*.
 
@@ -532,10 +548,11 @@ the settings and the two columns appear there.
 
 ### The same rule in the files that come out
 
-An exported file answers a single question: **what do we have, of what type,
-where is it and in what condition**. Four columns: asset tag, type, room, status.
+An exported file answers a single question: **what do we have and where is
+it**. Three columns: asset tag, type, room.
 
-Model, serial number, notes, loans, IMEI, shipments and last change stay out:
+Status, model, serial number, notes, loans, IMEI, shipments and last change stay
+out:
 they serve whoever is working in front of the list, inside the room they belong
 to, not whoever receives the file. **Printing** does carry them, because it is
 made for whoever is working.
