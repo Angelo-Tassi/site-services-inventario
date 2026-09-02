@@ -370,7 +370,9 @@ dice: non crea mai un inventario locale al posto di quello condiviso.
   cosa.
 - **Modifica al volo**, senza aprire nessuna finestra: doppio clic sulla cella
   *Note* o *Modello/Descrizione* per scriverci (`Invio` salva, `Esc` annulla),
-  su *Stato* o *Tipo* per la tendina. Doppio clic su una qualsiasi altra colonna
+  su *Stato* per la tendina. Sul *Tipo* la tendina propone i tipi configurati ma
+  si puo' anche scrivere o incollare un valore diverso, che compare poi anche fra
+  i filtri. Doppio clic su una qualsiasi altra colonna
   apre la scheda completa.
 - **Elimina +** toglie molti dispositivi in una volta: si incollano i codici da
   Excel, si legge che cosa sparisce e da quale stanza, e si conferma scrivendo
@@ -847,7 +849,7 @@ consultare i dati in Excel senza rischi, usa *Esporta xls...*.
 | doppio clic sulle note | modifica la nota nell'elenco |
 | doppio clic su modello/descrizione | modifica la descrizione nell'elenco |
 | doppio clic sullo stato | tendina per cambiare stato nell'elenco |
-| doppio clic sul tipo | tendina per cambiare tipo nell'elenco |
+| doppio clic sul tipo | tendina per cambiare tipo, o si scrive/incolla |
 | doppio clic altrove | apre la scheda del dispositivo |
 
 ## Aggiungere con il lettore di codici a barre

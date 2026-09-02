@@ -1927,8 +1927,11 @@ class App(tk.Tk):
         if not box:
             return
         var = tk.StringVar(value=item.get("tipo") or tipi[0])
+        # scrivibile, non solo a scelta: un tipo si incolla da un foglio o si
+        # scrive per esteso quando quelli configurati non bastano
         combo = ttk.Combobox(self.tree, textvariable=var, values=tipi,
-                             state="readonly", font=self.fonts["base"])
+                             state="normal", font=self.fonts["base"])
+        combo.select_range(0, "end")
         combo.place(x=box[0], y=box[1], width=box[2], height=box[3])
         combo.focus_set()
         fatto = {"chiuso": False}
@@ -1944,9 +1947,9 @@ class App(tk.Tk):
                           T("%s: %s.") % (tag, scelto))
 
         combo.bind("<<ComboboxSelected>>", lambda e: chiudi(True))
+        combo.bind("<Return>", lambda e: chiudi(True))
         combo.bind("<Escape>", lambda e: chiudi(False))
-        combo.bind("<FocusOut>", lambda e: chiudi(False))
-        combo.event_generate("<Button-1>")
+        combo.bind("<FocusOut>", lambda e: chiudi(True))
 
     def _segnala(self, messaggio):
         """Avviso discreto nella barra di stato, senza aprire finestre."""
@@ -2145,7 +2148,12 @@ class App(tk.Tk):
         self.combo_room["values"] = [TUTTE()] + rooms + [NO_ROOM()]
         if self.var_room.get() not in self.combo_room["values"]:
             self.var_room.set(TUTTE())
-        self.combo_type["values"] = [TUTTI()] + list(self.cfg["types"])
+        tipi = list(self.cfg["types"])
+        for item in self.store.items:
+            tipo = clean(item.get("tipo"))
+            if tipo and tipo not in tipi:
+                tipi.append(tipo)      # scritto a mano: si filtra lo stesso
+        self.combo_type["values"] = [TUTTI()] + tipi
         if self.var_type.get() not in self.combo_type["values"]:
             self.var_type.set(TUTTI())
 

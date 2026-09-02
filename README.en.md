@@ -304,8 +304,10 @@ use *Export xls...*.
 - **Add** asks first *what* you are adding, from a dropdown of the configured
   types, and only then *how*: by hand or with the barcode reader.
 - **Editing in place**, with no window to open: double-click the *Notes* or
-  *Model/Description* cell to type (`Enter` saves, `Esc` cancels), *Status* or
-  *Type* for the dropdown. Double-clicking any other column opens the full
+  *Model/Description* cell to type (`Enter` saves, `Esc` cancels), *Status* for
+  the dropdown. On *Type* the dropdown offers the configured types but you can
+  also type or paste a different value, which then appears among the filters
+  too. Double-clicking any other column opens the full
   record.
 - **Delete +** removes many devices at once: you paste the codes from Excel,
   read what disappears and from which room, and confirm by typing `ACCETTO`.
@@ -949,7 +951,7 @@ safely, use *Export xls...*.
 | double-click on notes | edit the note in the list |
 | double-click on model/description | edit the description in the list |
 | double-click on status | dropdown to change the status in the list |
-| double-click on type | dropdown to change the type in the list |
+| double-click on type | dropdown to change the type, or type/paste one |
 | double-click anywhere else | open the device record |
 
 ## Where to keep the real inventory

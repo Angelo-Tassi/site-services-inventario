@@ -992,6 +992,8 @@ class InventoryStore(object):
             if index is None:
                 raise InventoryError("Il dispositivo %s non esiste piu' nell'inventario." % tag)
             attuale = items[index]
+            if not tipo:
+                raise InventoryError("Il tipo non puo' restare vuoto.")
             if clean(attuale.get("tipo")) == tipo:
                 return False
             if is_iphone(attuale.get("tipo")) != is_iphone(tipo):

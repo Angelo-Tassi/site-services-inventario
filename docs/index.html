@@ -143,6 +143,12 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
 .rilascio ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--ink-soft)}
 .rilascio li{margin:0 0 6px}
 .rilascio b{color:var(--ink)}
+
+/* pulsanti della barra, con i colori del programma */
+.tb.rosso{background:#FBEAE7;border-color:#F6D8D2;color:#96291D;font-weight:600}
+.tb.verde{background:#E7F4EA;border-color:#D6EBDC;color:#1E6B3A;font-weight:600}
+.tb.arancio{background:#FDF0E0;border-color:#F8E2C8;color:#8A5316;font-weight:600}
+.tools .sp{flex:1}
 </style>
 </head>
 <body>
@@ -162,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.35.0 · alfa</div>
+  <div class="alpha">versione 0.35.1 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -189,9 +195,13 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
     <div class="rilascio">
-      <h3>v0.35.0</h3>
+      <h3>v0.35.1</h3>
       <p class="quando">2 settembre 2026</p>
       <ul>
+        <li><b>Il tipo si puo' anche scrivere</b>, non solo scegliere dalla tendina: si
+          incolla un valore da un foglio e compare poi anche fra i filtri.</li>
+        <li><b>L'anteprima dell'interfaccia qui sotto e' quella vera</b>: gli stessi
+          pulsanti, con gli stessi colori, e le colonne nell'ordine giusto.</li>
         <li><b>Il modello di importazione ha le stesse colonne di un file
           esportato</b>: asset tag, tipo, stanza, note. Si esporta, si corregge in
           Excel, si reimporta - senza cambiare formato. Le altre colonne restano
@@ -292,8 +302,13 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
     </div>
     <div class="tools">
       <span class="tb">‹ Home</span><span class="tb p">Aggiungi</span><span class="tb">Modifica</span>
-      <span class="tb">Elimina</span><span class="tb">Sposta in stanza…</span>
-      <span class="tb">Importa xls…</span><span class="tb">Esporta xls…</span><span class="tb">Stampa</span>
+      <span class="tb">Elimina</span><span class="tb rosso">Elimina +</span>
+      <span class="tb">Sposta in stanza…</span>
+      <span class="tb arancio">Importa xls…</span><span class="tb verde">Esporta xls…</span>
+      <span class="tb verde">Salva copia in locale…</span><span class="tb">Stampa</span>
+      <span class="sp"></span>
+      <span class="tb rosso">Ripristina</span><span class="tb rosso">Reset inventario</span>
+      <span class="tb">Impostazioni</span>
     </div>
     <div class="stage">
       <div class="cards">
@@ -316,14 +331,14 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
       <div class="tw">
         <table>
           <thead><tr><th></th><th>Asset Tag</th><th>Tipo</th><th>Stanza</th>
-            <th>Stato</th><th>Note</th><th>Modello/Descrizione</th><th>Numero di serie</th></tr></thead>
+            <th>Note</th><th>Stato</th><th>Modello/Descrizione</th><th>Numero di serie</th></tr></thead>
           <tbody>
-            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Disponibile</td><td>Postazione reception</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
-            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Da Rispedire</td><td>Restituito da M. Bianchi</td><td>Apple iPhone 14</td><td class="mono">—</td></tr>
-            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>Controllare</td><td>Con tastiera e pennino</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
-            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>In prestito</td><td>—</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td></tr>
-            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Spedito al servizio telefonia</td><td>Rispedito il 28/08/2026</td><td>Apple iPhone 13</td><td class="mono">—</td></tr>
-            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>Da rebuildare</td><td>Scorta sigillata</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Postazione reception</td><td>Disponibile</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
+            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Restituito da M. Bianchi</td><td>Da Rispedire</td><td>Apple iPhone 14</td><td class="mono">—</td></tr>
+            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>Con tastiera e pennino</td><td>Controllare</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
+            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>—</td><td>In prestito</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td></tr>
+            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Rispedito il 28/08/2026</td><td>Spedito al servizio telefonia</td><td>Apple iPhone 13</td><td class="mono">—</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>Scorta sigillata</td><td>Da rebuildare</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td></tr>
           </tbody>
         </table>
       </div>
@@ -422,7 +437,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.35.0 · alpha</div>
+  <div class="alpha">version 0.35.1 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -449,9 +464,13 @@ python Inventario.py</pre>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
     <div class="rilascio">
-      <h3>v0.35.0</h3>
+      <h3>v0.35.1</h3>
       <p class="quando">2 September 2026</p>
       <ul>
+        <li><b>The type can also be typed</b>, not just picked from the dropdown: you
+          paste a value from a sheet and it then appears among the filters too.</li>
+        <li><b>The interface preview below is the real one</b>: the same buttons, with
+          the same colours, and the columns in the right order.</li>
         <li><b>The import template has the same columns as an exported file</b>: asset
           tag, type, room, notes. You export, fix things in Excel and import back -
           without changing format. The other columns stay importable: if your sheet has
@@ -550,8 +569,13 @@ python Inventario.py</pre>
     </div>
     <div class="tools">
       <span class="tb">‹ Home</span><span class="tb p">Add</span><span class="tb">Edit</span>
-      <span class="tb">Delete</span><span class="tb">Move to room…</span>
-      <span class="tb">Import xls…</span><span class="tb">Export xls…</span><span class="tb">Print</span>
+      <span class="tb">Delete</span><span class="tb rosso">Delete +</span>
+      <span class="tb">Move to room…</span>
+      <span class="tb arancio">Import xls…</span><span class="tb verde">Export xls…</span>
+      <span class="tb verde">Save a local copy…</span><span class="tb">Print</span>
+      <span class="sp"></span>
+      <span class="tb rosso">Restore</span><span class="tb rosso">Reset inventory</span>
+      <span class="tb">Settings</span>
     </div>
     <div class="stage">
       <div class="cards">
@@ -574,14 +598,14 @@ python Inventario.py</pre>
       <div class="tw">
         <table>
           <thead><tr><th></th><th>Asset Tag</th><th>Type</th><th>Room</th>
-            <th>Status</th><th>Notes</th><th>Model/Description</th><th>Serial number</th></tr></thead>
+            <th>Notes</th><th>Status</th><th>Model/Description</th><th>Serial number</th></tr></thead>
           <tbody>
-            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Available</td><td>Reception desk</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
-            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>To be shipped back</td><td>Returned by M. Bianchi</td><td>Apple iPhone 14</td><td class="mono">—</td></tr>
-            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>To be checked</td><td>With keyboard and stylus</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
-            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>On loan</td><td>—</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td></tr>
-            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Shipped to the phone service</td><td>Shipped on 28/08/2026</td><td>Apple iPhone 13</td><td class="mono">—</td></tr>
-            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>To be rebuilt</td><td>Sealed spare</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Reception desk</td><td>Available</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
+            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Returned by M. Bianchi</td><td>To be shipped back</td><td>Apple iPhone 14</td><td class="mono">—</td></tr>
+            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>With keyboard and stylus</td><td>To be checked</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
+            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>—</td><td>On loan</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td></tr>
+            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Shipped on 28/08/2026</td><td>Shipped to the phone service</td><td>Apple iPhone 13</td><td class="mono">—</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>Sealed spare</td><td>To be rebuilt</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td></tr>
           </tbody>
         </table>
       </div>

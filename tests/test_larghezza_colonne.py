@@ -75,6 +75,19 @@ assert prima == "Laptop", prima
 app._run(lambda: app.store.set_tipo("IT-8000", "Tablet"), "ok")
 assert app._item_by_tag("IT-8000")["tipo"] == "Tablet"
 
+# ---- il tipo si puo' anche scrivere: la tendina propone, non obbliga
+app._run(lambda: app.store.set_tipo("IT-8000", "Workstation mobile"), "ok")
+assert app._item_by_tag("IT-8000")["tipo"] == "Workstation mobile"
+app.show_home(); app.update()
+assert "Workstation mobile" in list(app.combo_type["values"]), \
+    "un tipo scritto a mano deve comparire fra i filtri"
+try:
+    app.store.set_tipo("IT-8000", "   ")
+    raise AssertionError("doveva rifiutare un tipo vuoto")
+except Exception as exc:
+    assert "vuoto" in str(exc), exc
+app._run(lambda: app.store.set_tipo("IT-8000", "Tablet"), "ok")
+
 # ---- ma un iPhone non diventa un laptop: si perderebbe l'identificativo
 telefono = new_item(tipo=fixture.TIPO_IPHONE, modello="Apple iPhone 14",
                     imei="356938035643809", restituito_da="M. B.")
