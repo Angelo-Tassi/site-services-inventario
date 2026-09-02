@@ -548,11 +548,11 @@ the settings and the two columns appear there.
 
 ### The same rule in the files that come out
 
-An exported file answers a single question: **what do we have and where is
-it**. Three columns: asset tag, type, room.
+An exported file says **what we have, where it is and what there is to know**.
+Four columns: asset tag, type, room, notes - the notes travel with the device,
+because they are what a row has that is particular to it.
 
-Status, model, serial number, notes, loans, IMEI, shipments and last change stay
-out:
+Status, model, serial number, loans, IMEI, shipments and last change stay out:
 they serve whoever is working in front of the list, inside the room they belong
 to, not whoever receives the file. **Printing** does carry them, because it is
 made for whoever is working.

@@ -33,9 +33,9 @@ def intestazioni(file_prodotto):
     finally:
         wb.close()
 
-# ---- un file esportato risponde a una domanda sola: che cosa abbiamo e dove
-# sta. Stesse tre colonne ovunque.
-ATTESE = ["Asset Tag", "Tipo", "Stanza"]
+# ---- un file esportato dice che cosa abbiamo, dove sta e che cosa c'e' da
+# sapere. Stesse quattro colonne ovunque.
+ATTESE = ["Asset Tag", "Tipo", "Stanza", "Note"]
 colonne = intestazioni(excel_io.export(items, os.path.join(fuori, "tutto.xlsx"),
                                        rooms=[BAU, KIOSK, DR]))
 assert colonne == ATTESE, colonne
@@ -81,8 +81,10 @@ for f in scritti:
 from inventario.store import rows_from_workbook
 riletti, _ = rows_from_workbook(scritti[0], [BAU, KIOSK, DR])
 assert riletti, scritti[0]
-assert all(not i["modello"] and not i["seriale"] and not i["note"] for i in riletti)
+assert all(not i["modello"] and not i["seriale"] for i in riletti)
 assert all(i["asset_tag"] and i["stanza"] for i in riletti)
+# le note invece viaggiano: sono quello che una riga ha di particolare
+assert any(i["note"] for i in riletti), "le note devono sopravvivere all'export"
 
 # ---- le colonne portanti restano anche quando non c'e' niente da scrivere
 assert campi_con_valore([], list(ALL_FIELDS)) == CAMPI_PORTANTI

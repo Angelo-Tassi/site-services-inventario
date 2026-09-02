@@ -121,15 +121,15 @@ def _sottotitolo(stamp, quanti, lingua):
 # danno al file la forma che chi lo apre - o chi lo reimporta - si aspetta.
 CAMPI_PORTANTI = ["asset_tag", "tipo", "modello", "seriale", "stanza", "stato", "note"]
 
-# Un file esportato risponde a una domanda sola: che cosa abbiamo e dove sta.
-# Tutto il resto - lo stato, il modello, il numero di serie, le note, i
-# prestiti, l'IMEI, chi ha toccato la riga per ultimo - serve a chi lavora
-# davanti all'elenco, dentro la stanza che lo riguarda, e non a chi riceve il
-# file.
+# Un file esportato dice che cosa abbiamo, dove sta e che cosa c'e' da sapere:
+# le note viaggiano con il dispositivo, perche' sono quello che una riga ha di
+# particolare. Il resto - lo stato, il modello, il numero di serie, i prestiti,
+# l'IMEI, chi ha toccato la riga per ultimo - serve a chi lavora davanti
+# all'elenco, dentro la stanza che lo riguarda, e non a chi riceve il file.
 #
 # Attenzione: da un'esportazione non si ricostruisce un inventario, perche' quei
 # campi non ci sono. Per quello c'e' la copia locale, che copia il file vero.
-CAMPI_ESPORTAZIONE = ["asset_tag", "tipo", "stanza"]
+CAMPI_ESPORTAZIONE = ["asset_tag", "tipo", "stanza", "note"]
 
 
 def campi_con_valore(items, fields):

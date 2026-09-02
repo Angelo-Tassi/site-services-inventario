@@ -474,11 +474,12 @@ un'altra stanza dalle impostazioni, le due colonne compaiono li'.
 
 ### La stessa regola nei file che escono
 
-Un file esportato risponde a una domanda sola: **che cosa abbiamo e dove sta**.
-Tre colonne: asset tag, tipo, stanza.
+Un file esportato dice **che cosa abbiamo, dove sta e che cosa c'e' da sapere**.
+Quattro colonne: asset tag, tipo, stanza, note - le note viaggiano con il
+dispositivo, perche' sono quello che una riga ha di particolare.
 
-Stato, modello, numero di serie, note, prestiti, IMEI, spedizioni e ultima
-modifica restano fuori: servono a chi lavora davanti all'elenco, dentro la stanza che li
+Stato, modello, numero di serie, prestiti, IMEI, spedizioni e ultima modifica
+restano fuori: servono a chi lavora davanti all'elenco, dentro la stanza che li
 riguarda, non a chi riceve il file. La **stampa** invece li porta, perche' e'
 fatta per chi lavora.
 
