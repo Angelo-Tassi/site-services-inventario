@@ -21,15 +21,19 @@ ws = wb["Inventario"]
 assert [c.value for c in ws[1]] == [HEADERS[f] for f in excel_io.TEMPLATE_FIELDS]
 # le tendine devono stare sulle colonne di tipo e stato, comunque siano ordinate
 from openpyxl.utils import get_column_letter
-attese = {get_column_letter(excel_io.TEMPLATE_FIELDS.index(c) + 1) for c in ("tipo", "stato")}
+# le tendine stanno sui campi a scelta fissa che il modello contiene
+con_tendina = [c for c in ("tipo", "stato", "stanza") if c in excel_io.TEMPLATE_FIELDS]
+attese = {get_column_letter(excel_io.TEMPLATE_FIELDS.index(c) + 1) for c in con_tendina}
 trovate = {str(dv.sqref).split("2:")[0] for dv in ws.data_validations.dataValidation}
 assert trovate == attese, (trovate, attese)
 # e nessuna colonna piu' stretta della propria intestazione
 for i, campo in enumerate(excel_io.TEMPLATE_FIELDS, start=1):
     larghezza = ws.column_dimensions[get_column_letter(i)].width
     assert larghezza >= len(HEADERS[campo]), (campo, larghezza)
-assert "IMEI" not in [c.value for c in ws[1]]
-assert "Stanza" not in [c.value for c in ws[1]], "la stanza arriva dai separatori"
+assert "IMEI" not in [c.value for c in ws[1]], "gli iPhone non si importano"
+# la stanza c'e' come colonna perche' un file esportato ce l'ha, ma si puo'
+# lasciare vuota: la dicono le righe separatore
+assert "Stanza" in [c.value for c in ws[1]]
 
 # ---- un separatore per stanza, con righe libere sotto
 separatori = [ws.cell(row=r, column=1).value for r in range(2, ws.max_row + 1)
@@ -37,10 +41,10 @@ separatori = [ws.cell(row=r, column=1).value for r in range(2, ws.max_row + 1)
 assert separatori == [s.upper() for s in STANZE], separatori
 assert ws.max_row == 1 + len(STANZE) * (1 + excel_io.RIGHE_PER_STANZA)
 
-# ---- tendine su Tipo e Stato
+# ---- tendine sui campi a scelta fissa presenti nel modello
 valori = [v.formula1 for v in ws.data_validations.dataValidation]
 assert any("Laptop" in v and "Tablet" in v and "Iphone" not in v for v in valori), valori
-assert any("Disponibile" in v for v in valori), valori
+assert any(STANZE[0] in v for v in valori), valori
 wb.close()
 
 # ---- il modello si importa senza errori, e a vuoto non porta niente

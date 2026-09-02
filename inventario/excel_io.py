@@ -253,10 +253,10 @@ def build_print_file(items, group_by_room=False, rooms=None):
                   for_print=True, con_iphone=True)
 
 
-# Le stesse colonne dell'elenco, nello stesso ordine: chi compila il modello
-# ritrova quello che vede nel programma. La stanza non c'e' perche' la dicono le
-# righe separatore.
-TEMPLATE_FIELDS = ["asset_tag", "tipo", "note", "stato", "modello", "seriale"]
+# Il modello ha esattamente le colonne di un file esportato: si esporta, si
+# corregge in Excel, si reimporta. Due formati diversi per la stessa cosa
+# obbligano a ricordarsi quale sia quale, e prima o poi si sbaglia.
+TEMPLATE_FIELDS = list(CAMPI_ESPORTAZIONE)
 
 # Un valore d'esempio per ogni colonna, che serve solo a darle una larghezza
 # sensata: il modello e' vuoto, quindi non c'e' contenuto da misurare, ma chi
@@ -264,8 +264,9 @@ TEMPLATE_FIELDS = ["asset_tag", "tipo", "note", "stato", "modello", "seriale"]
 TEMPLATE_ESEMPI = {
     "asset_tag": "IT-0000",
     "tipo": "Laptop",
+    "stanza": "Magazzino Disaster Recovery",
+    "note": "Batteria da sostituire, rientro dal reparto",
     "stato": "Guasto in attesa tecnico",
-    "note": "Batteria da sostituire, rientro",
     "modello": "Lenovo ThinkPad T14 Gen 5",
     "seriale": "PF4A1B2C",
 }
@@ -282,11 +283,16 @@ ISTRUZIONI_IT = [
     ("quella stanza, fino al separatore successivo.", False),
     ("", False),
     ("Regole", True),
-    ("- Asset Tag e Modello sono indispensabili; il numero di serie e'", False),
-    ("  vivamente consigliato.", False),
+    ("- L'Asset Tag e' l'unico dato indispensabile: senza, la riga viene", False),
+    ("  scartata. Tipo, stanza e note si possono lasciare vuoti.", False),
+    ("- Il modello ha le stesse colonne di un file esportato: puoi", False),
+    ("  esportare, correggere in Excel e reimportare.", False),
+    ("- Servono altre colonne? Aggiungile: modello, numero di serie e", False),
+    ("  stato vengono riconosciuti dal nome e importati lo stesso.", False),
     ("- L'asset tag identifica il dispositivo: importando due volte lo", False),
     ("  stesso asset tag, la scheda viene aggiornata invece che duplicata.", False),
-    ("- Tipo e Stato hanno la tendina: usa i valori proposti.", False),
+    ("- Tipo e Stanza hanno la tendina: usa i valori proposti.", False),
+    ("- La stanza si puo' anche non scriverla: la dicono i separatori.", False),
     ("- Puoi aggiungere righe sotto un separatore, o spostare i separatori.", False),
     ("- Non cambiare i nomi delle colonne nella prima riga.", False),
     ("- Le righe lasciate vuote vengono semplicemente ignorate.", False),
@@ -312,11 +318,16 @@ ISTRUZIONI_EN = [
     ("the next separator.", False),
     ("", False),
     ("Rules", True),
-    ("- Asset Tag and Model are required; the serial number is strongly", False),
-    ("  recommended.", False),
+    ("- The Asset Tag is the only thing required: without it the row is", False),
+    ("  discarded. Type, room and notes can be left empty.", False),
+    ("- The template has the same columns as an exported file: you can", False),
+    ("  export, fix things in Excel and import back.", False),
+    ("- Need other columns? Add them: model, serial number and status are", False),
+    ("  recognised by name and imported all the same.", False),
     ("- The asset tag identifies the device: importing the same asset tag", False),
     ("  twice updates the record instead of duplicating it.", False),
-    ("- Type and Status have dropdowns: use the values offered.", False),
+    ("- Type and Room have dropdowns: use the values offered.", False),
+    ("- You can leave the room empty: the separators declare it.", False),
     ("- You can add rows under a separator, or move the separators.", False),
     ("- Do not change the column names in the first row.", False),
     ("- Rows left empty are simply ignored.", False),
@@ -336,9 +347,13 @@ ISTRUZIONI_EN = [
 def build_template(path, rooms, stati=None, lingua=None):
     """Genera il modello vuoto da compilare e reimportare.
 
-    Contiene solo le colonne che servono a laptop e tablet, gia' divise per
-    stanza con le righe-separatore, e le tendine sui campi a scelta fissa.
-    Gli iPhone non compaiono: si inseriscono a mano dal programma.
+    Ha le stesse colonne di un file esportato, con le righe gia' divise per
+    stanza dai separatori e le tendine sui campi a scelta fissa. Gli iPhone non
+    compaiono: si inseriscono a mano dal programma.
+
+    Le colonne che qui non ci sono - modello, numero di serie, stato - restano
+    comunque importabili: chi ha un foglio suo che le contiene lo carica lo
+    stesso, perche' l'importazione riconosce le colonne dal nome.
 
     lingua: "en" per intestazioni, tendine e istruzioni in inglese.
     """
@@ -392,9 +407,27 @@ def build_template(path, rooms, stati=None, lingua=None):
         scelte.error, scelte.errorTitle = "Choose one of the listed statuses.", "Invalid status"
     else:
         scelte.error, scelte.errorTitle = "Scegli uno degli stati previsti.", "Stato non valido"
-    ws.add_data_validation(scelte)
-    colonna_stato = get_column_letter(TEMPLATE_FIELDS.index("stato") + 1)
-    scelte.add("%s2:%s%d" % (colonna_stato, colonna_stato, ultima))
+    if "stato" in TEMPLATE_FIELDS:
+        ws.add_data_validation(scelte)
+        colonna_stato = get_column_letter(TEMPLATE_FIELDS.index("stato") + 1)
+        scelte.add("%s2:%s%d" % (colonna_stato, colonna_stato, ultima))
+
+    # La stanza la dicono le righe separatore, ma la colonna c'e' comunque
+    # perche' un file esportato ce l'ha: chi preferisce scriverla riga per riga
+    # trova la tendina, chi si affida ai separatori la lascia vuota.
+    if "stanza" in TEMPLATE_FIELDS and rooms:
+        stanze = DataValidation(type="list",
+                                formula1='"%s"' % ",".join(str(r) for r in rooms),
+                                allow_blank=True, showDropDown=False)
+        if lingua == "en":
+            stanze.error = "Choose one of the configured rooms."
+            stanze.errorTitle = "Invalid room"
+        else:
+            stanze.error = "Scegli una delle stanze configurate."
+            stanze.errorTitle = "Stanza non valida"
+        ws.add_data_validation(stanze)
+        colonna_stanza = get_column_letter(TEMPLATE_FIELDS.index("stanza") + 1)
+        stanze.add("%s2:%s%d" % (colonna_stanza, colonna_stanza, ultima))
 
     for i, campo in enumerate(TEMPLATE_FIELDS, start=1):
         ws.column_dimensions[get_column_letter(i)].width = larghezza_colonna(

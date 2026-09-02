@@ -18,11 +18,13 @@ from inventario.store import HEADERS, larghezza_colonna
 RADICE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CARTELLA = os.path.join(RADICE, "Collaudo")
 
-# I file di prova devono somigliare a quelli veri: stesse colonne e stesso
-# ordine del modello da compilare, che e' anche l'ordine dell'elenco nel
-# programma. Derivandoli invece di riscriverli, un prossimo riordino li porta
-# dietro da solo.
-CAMPI = list(TEMPLATE_FIELDS)
+# I file di prova sono piu' ricchi del modello da compilare, e devono esserlo:
+# il modello contiene il minimo per caricare dei dispositivi, questi servono a
+# provare che l'importazione riconosca tutte le colonne che puo' incontrare in
+# un foglio vero. L'ordine e' quello dell'elenco nel programma.
+CAMPI = ["asset_tag", "tipo", "note", "stato", "modello", "seriale"]
+assert set(TEMPLATE_FIELDS) - {"stanza"} <= set(CAMPI), \
+    "il file di prova deve contenere almeno le colonne del modello"
 INTESTAZIONI = [HEADERS[c] for c in CAMPI]
 
 LAPTOP = ["Lenovo ThinkPad T14 Gen 4", "Lenovo ThinkPad T14 Gen 5"]

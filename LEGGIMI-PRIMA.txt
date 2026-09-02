@@ -69,6 +69,13 @@ L'IDEA IN UNA RIGA
    "Crea collegamento sul desktop.bat": mette l'icona sulla
    scrivania dell'utente.
 
+   SE SUL DESKTOP NON COMPARE NIENTE: su alcune postazioni la
+   creazione automatica e' bloccata. Fallo a mano, funziona sempre:
+   tasto destro su "Avvia Inventario.bat" > Mostra altre opzioni >
+   Invia a > Desktop (crea collegamento). Oppure trascina sul
+   desktop la copia "Inventario dispositivi.lnk" rimasta nella
+   cartella.
+
    Da li' in poi si apre con doppio clic sull'icona.
 
    In qualsiasi momento si puo' cambiare inventario dal programma:
@@ -169,6 +176,12 @@ THE IDEA IN ONE LINE
    On each workstation, double-click
    "Crea collegamento sul desktop.bat": it puts the icon on the
    user's desktop.
+
+   IF NOTHING APPEARS ON THE DESKTOP: on some workstations the
+   automatic creation is blocked. Do it by hand, it always works:
+   right-click "Avvia Inventario.bat" > Show more options > Send to
+   > Desktop (create shortcut). Or drag onto the desktop the copy
+   "Inventario dispositivi.lnk" left in the folder.
 
    From then on it opens with a double-click on the icon.
 

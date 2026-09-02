@@ -192,6 +192,7 @@ table{min-width:520px}
     <li><a href="#ripristino">Tornare indietro</a></li>
     <li><a href="#impostazioni">Impostazioni</a></li>
     <li><a href="#lingua">Lingua</a></li>
+    <li><a href="#collegamento">Se il collegamento non compare</a></li>
     <li><a href="#diagnostica">Se qualcosa non va</a></li>
     <li><a href="#regole">Cinque regole</a></li>
   </ul>
@@ -591,6 +592,25 @@ table{min-width:520px}
     esca in inglese: l'opzione compare nella finestra di esportazione.</p>
 </section>
 
+<section id="collegamento">
+  <h2>Se il collegamento sul desktop non compare</h2>
+  <p class="sub">Su alcune postazioni la creazione automatica viene bloccata dai criteri
+    di sicurezza. Il collegamento fatto a mano invece non fallisce mai:</p>
+  <ol class="steps">
+    <li>apri la cartella del programma sulla postazione;</li>
+    <li>tasto destro su <code>Avvia Inventario.bat</code> &rsaquo;
+      <i>Mostra altre opzioni</i> &rsaquo; <i>Invia a</i> &rsaquo;
+      <i>Desktop (crea collegamento)</i>;</li>
+    <li>in alternativa, trascina sul desktop la copia
+      <code>Inventario dispositivi.lnk</code> rimasta nella cartella: si puo' dare anche
+      a un altro utente senza eseguire niente.</li>
+  </ol>
+  <p class="note">Il collegamento creato dal programma punta ad
+    <code>Avvia Inventario.bat</code> e non direttamente a <code>pythonw.exe</code>,
+    proprio perche' un collegamento a un eseguibile con argomenti su certe postazioni
+    viene rifiutato.</p>
+</section>
+
 <section id="diagnostica">
   <h2>Se qualcosa non va</h2>
   <p class="sub">Doppio clic su <span class="mono">Diagnostica.bat</span>, nella cartella
@@ -646,6 +666,7 @@ table{min-width:520px}
     <li><a href="#ripristino-en">Going back</a></li>
     <li><a href="#impostazioni-en">Settings</a></li>
     <li><a href="#lingua-en">Language</a></li>
+    <li><a href="#collegamento-en">If the shortcut does not appear</a></li>
     <li><a href="#diagnostica-en">If something is off</a></li>
     <li><a href="#regole-en">Five rules</a></li>
   </ul>
@@ -1042,6 +1063,24 @@ table{min-width:520px}
     change — because it is the same for everybody.</p>
   <p class="note">Working in Italian you can ask for a single exported file to come out in
     English: the option appears in the export window.</p>
+</section>
+
+<section id="collegamento-en">
+  <h2>If the desktop shortcut does not appear</h2>
+  <p class="sub">On some workstations automatic creation is blocked by security policy.
+    Creating the shortcut by hand never fails:</p>
+  <ol class="steps">
+    <li>open the program folder on the workstation;</li>
+    <li>right-click <code>Avvia Inventario.bat</code> &rsaquo; <i>Show more options</i>
+      &rsaquo; <i>Send to</i> &rsaquo; <i>Desktop (create shortcut)</i>;</li>
+    <li>alternatively, drag onto the desktop the
+      <code>Inventario dispositivi.lnk</code> copy left in the folder: it can be handed
+      to another user without running anything.</li>
+  </ol>
+  <p class="note">The shortcut the program creates points at
+    <code>Avvia Inventario.bat</code> and not straight at <code>pythonw.exe</code>,
+    precisely because a shortcut to an executable with arguments is refused on some
+    workstations.</p>
 </section>
 
 <section id="diagnostica-en">

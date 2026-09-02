@@ -62,12 +62,16 @@ assert "IMEI" in colonne and "Restituito da" in colonne, colonne
 modello = os.path.join(fuori, "modello.xlsx")
 excel_io.build_template(modello, [BAU, KIOSK, DR])
 colonne = intestazioni(modello)
-# il modello segue lo stesso ordine dell'elenco nel programma
-assert colonne == ["Asset Tag", "Tipo", "Note", "Stato",
-                   "Modello/Descrizione", "Numero di serie"], colonne
-# il modello da compilare resta piu' ricco dell'esportazione: serve a caricare
-# dispositivi nuovi, non a documentare quelli che ci sono gia'
-assert set(excel_io.CAMPI_ESPORTAZIONE) - set(TEMPLATE_FIELDS) == {"stanza"}
+# il modello ha esattamente le colonne di un file esportato: si esporta, si
+# corregge in Excel, si reimporta
+assert colonne == ATTESE, colonne
+assert excel_io.TEMPLATE_FIELDS == excel_io.CAMPI_ESPORTAZIONE
+# le colonne che il modello non ha restano importabili: chi ha un foglio suo
+# che le contiene lo carica lo stesso
+from inventario.store import map_headers
+riconosciute = map_headers(["Asset Tag", "Modello/Descrizione", "Numero di serie",
+                            "Stato"])
+assert sorted(riconosciute.values()) == ["asset_tag", "modello", "seriale", "stato"]
 
 # ---- un file per stanza: tutti con la stessa forma
 cartella = tempfile.mkdtemp()

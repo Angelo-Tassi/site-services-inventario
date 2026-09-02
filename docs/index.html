@@ -162,7 +162,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.34.1 · alfa</div>
+  <div class="alpha">versione 0.35.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -188,6 +188,19 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.35.0</h3>
+      <p class="quando">2 settembre 2026</p>
+      <ul>
+        <li><b>Il modello di importazione ha le stesse colonne di un file
+          esportato</b>: asset tag, tipo, stanza, note. Si esporta, si corregge in
+          Excel, si reimporta - senza cambiare formato. Le altre colonne restano
+          importabili: se il tuo foglio le ha, vengono riconosciute dal nome.</li>
+        <li><b>Il collegamento sul desktop punta al file di avvio</b> e non
+          all'eseguibile con argomenti, che su alcune postazioni veniva rifiutato. Se
+          non compare lo stesso, il programma spiega come farlo a mano.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.34.1</h3>
       <p class="quando">1 settembre 2026</p>
@@ -231,21 +244,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
         <li><b>L'esportazione porta quattro campi</b>: asset tag, tipo, stanza e stato.
           Un file esportato risponde a "che cosa abbiamo, dove sta, come sta", non a
           tutto il resto. Per ricostruire un inventario si usa la copia locale.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.31.0</h3>
-      <p class="quando">1 settembre 2026</p>
-      <ul>
-        <li><b>Nessuna colonna taglia piu' il testo</b>: ognuna si misura sul contenuto
-          e non scende mai sotto la larghezza della propria intestazione, cosi' anche
-          una colonna vuota dice che cosa conterrebbe.</li>
-        <li><b>Modello diventa Modello/Descrizione</b> e si modifica dall'elenco con un
-          doppio clic. L'importazione accetta ancora la vecchia intestazione.</li>
-        <li><b>Ogni colonna ha il suo colore</b> nella riga di divisione e
-          nell'intestazione, per non perderla scorrendo un elenco largo.</li>
-        <li><b>Obbligatorio solo l'identificativo</b> quando si aggiunge un
-          dispositivo: asset tag, o IMEI per gli iPhone. Il resto si completa dopo.</li>
       </ul>
     </div>
   </div>
@@ -424,7 +422,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.34.1 · alpha</div>
+  <div class="alpha">version 0.35.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -450,6 +448,19 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.35.0</h3>
+      <p class="quando">2 September 2026</p>
+      <ul>
+        <li><b>The import template has the same columns as an exported file</b>: asset
+          tag, type, room, notes. You export, fix things in Excel and import back -
+          without changing format. The other columns stay importable: if your sheet has
+          them, they are recognised by name.</li>
+        <li><b>The desktop shortcut points at the launch file</b> and not at the
+          executable with arguments, which some workstations refused. If it still does
+          not appear, the program explains how to do it by hand.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.34.1</h3>
       <p class="quando">1 September 2026</p>
@@ -492,21 +503,6 @@ python Inventario.py</pre>
         <li><b>Exports carry four fields</b>: asset tag, type, room and status. An
           exported file answers "what do we have, where is it, how is it", not
           everything else. To rebuild an inventory you use the local copy.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.31.0</h3>
-      <p class="quando">1 September 2026</p>
-      <ul>
-        <li><b>No column truncates its text any more</b>: each one sizes itself to its
-          content and never goes below the width of its own heading, so even an empty
-          column says what it would hold.</li>
-        <li><b>Model becomes Model/Description</b> and is edited from the list with a
-          double-click. Importing still accepts the old heading.</li>
-        <li><b>Every column has its own colour</b> in the dividing line and the heading,
-          so you do not lose it while scrolling a wide list.</li>
-        <li><b>Only the identifier is required</b> when adding a device: asset tag, or
-          IMEI for iPhones. The rest is filled in later.</li>
       </ul>
     </div>
   </div>

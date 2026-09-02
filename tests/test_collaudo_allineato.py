@@ -10,12 +10,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fixture
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
-from inventario.excel_io import TEMPLATE_FIELDS
-from inventario.store import HEADERS, rows_from_workbook
+from inventario.excel_io import CAMPI_ESPORTAZIONE, TEMPLATE_FIELDS
+from inventario.store import HEADERS, map_headers, rows_from_workbook
 
 RADICE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CARTELLA = os.path.join(RADICE, "Collaudo")
-ATTESE = [HEADERS[c] for c in TEMPLATE_FIELDS]
+# Il file di prova e' piu' ricco del modello: serve a provare che l'importazione
+# riconosca tutte le colonne che puo' incontrare in un foglio vero.
+ATTESE = ["Asset Tag", "Tipo", "Note", "Stato", "Modello/Descrizione",
+          "Numero di serie"]
 STANZE = [fixture.BAU, fixture.KIOSK, fixture.DR]
 
 def foglio(nome):
@@ -29,9 +32,20 @@ def foglio(nome):
     finally:
         wb.close()
 
-# ---- il file regolare ha esattamente le colonne del modello, nello stesso ordine
+# ---- il file regolare ha le colonne attese, nell'ordine dell'elenco
 testa, larghezze = foglio("Inventario_di_prova.xlsx")
 assert testa == ATTESE, testa
+
+# ---- e ogni sua colonna e' riconosciuta dall'importazione: se un giorno un
+# nome cambia senza che l'alias lo segua, il collaudo se ne accorge qui
+riconosciute = map_headers(testa)
+assert len(riconosciute) == len(testa), (riconosciute, testa)
+
+# ---- contiene tutto quello che il modello propone, tranne la stanza, che nel
+# file di prova la dicono le righe separatore
+mancanti = (set(TEMPLATE_FIELDS) - {"stanza"}) - set(riconosciute.values())
+assert not mancanti, mancanti
+assert "stanza" in CAMPI_ESPORTAZIONE, "l'esportazione la stanza ce l'ha"
 
 # ---- e nessuna colonna piu' stretta della propria intestazione
 for nome, larghezza in zip(testa, larghezze):

@@ -136,6 +136,18 @@ percorso locale.
 Su ogni postazione, poi, doppio clic su **`Crea collegamento sul desktop.bat`**:
 mette l'icona sulla scrivania dell'utente e ne lascia una copia nella cartella.
 
+Il collegamento punta ad **`Avvia Inventario.bat`**, non direttamente a
+`pythonw.exe`: su alcune postazioni un collegamento a un eseguibile con
+argomenti viene rifiutato dai criteri di sicurezza, mentre quello a un file
+`.bat` funziona sempre.
+
+**Se sul desktop non compare niente** - capita, dove la creazione automatica e'
+bloccata - si fa a mano e non fallisce: tasto destro su
+`Avvia Inventario.bat` > *Mostra altre opzioni* > *Invia a* >
+*Desktop (crea collegamento)*. In alternativa si trascina sul desktop la copia
+`Inventario dispositivi.lnk` rimasta nella cartella, che si puo' dare anche
+agli altri utenti senza eseguire niente.
+
 Da quel momento il tecnico fa doppio clic sull'icona e lavora sull'inventario di
 tutti, senza sapere niente di percorsi di rete.
 
@@ -1046,10 +1058,14 @@ ottiene in due modi:
   [`docs/Modello_inventario.xlsx`](docs/Modello_inventario.xlsx) (italiano) e
   [`docs/Import_template.xlsx`](docs/Import_template.xlsx) (inglese).
 
-Contiene solo le colonne che servono a laptop e tablet - *Asset Tag*, *Tipo*,
-*Stato*, *Note*, *Modello/Descrizione*, *Numero di serie* - nello stesso ordine
-in cui compaiono nel programma, gia' divise per stanza dalle righe-separatore,
-con le tendine su *Tipo* e *Stato* e un foglio *Istruzioni*.
+Ha **le stesse colonne di un file esportato** - *Asset Tag*, *Tipo*, *Stanza*,
+*Note* - con le tendine su *Tipo* e *Stanza*, le righe-separatore gia' pronte e
+un foglio *Istruzioni*. Cosi' si esporta, si corregge in Excel e si reimporta
+senza cambiare formato.
+
+Le colonne che il modello non ha - *Modello/Descrizione*, *Numero di serie*,
+*Stato* - **restano importabili**: se il tuo foglio le contiene vengono
+riconosciute dal nome e caricate lo stesso.
 Il modello generato dal programma rispecchia le stanze e gli stati configurati
 in quel momento.
 
