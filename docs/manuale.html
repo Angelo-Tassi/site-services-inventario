@@ -325,15 +325,15 @@ table{min-width:520px}
     valore. Una colonna vuota per costruzione non porta informazione: toglie spazio a
     quello che si deve leggere davvero.</p>
   <p class="sub">L'<b>inventario completo in home</b> e' una panoramica: dice che cos'e'
-    un dispositivo, dov'e' e come sta, in una riga che si legge senza scorrere di lato.
-    Le domande piu' precise - chi ha il prestito e da quando, chi ha restituito un
-    telefono, quando e' stato spedito, qual e' l'IMEI - si fanno dentro la stanza che le
-    riguarda, il <b>Digital Kiosk</b> e il contenitore <b>Iphone</b>. In panoramica ci
-    pensa lo stato a riassumerle: <i>In prestito</i>, <i>Spedito al servizio
-    telefonia</i>.</p>
+    un dispositivo, dov'e', come sta e da quando, in una riga che si legge senza scorrere
+    di lato. Le domande piu' precise - il modello e il numero di serie, chi ha il
+    prestito e da quando, chi ha restituito un telefono, quando e' stato spedito, qual
+    e' l'IMEI - si fanno dentro la stanza che le riguarda, il <b>Digital Kiosk</b> e il
+    contenitore <b>Iphone</b>. In panoramica ci pensa lo stato a riassumerle:
+    <i>In prestito</i>, <i>Spedito al servizio telefonia</i>.</p>
   <div class="tw"><table class="man">
     <tr><th>Dove sei</th><th>Che cosa vedi</th><th>Che cosa sparisce</th></tr>
-    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, tipo, stanza, note, stato, modello, seriale. Sette colonne per dire che cos'e', dov'e' e come sta.</td><td class="d">Tutto il resto: IMEI, chi ha il prestito e da quando, chi ha restituito, quando e' stato spedito, ultima modifica.</td></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, tipo, stanza, note, stato, ultima modifica, modificato da. Sette colonne per dire che cos'e', dov'e', come sta e da quando.</td><td class="d">Tutto il resto: Modello/Descrizione e numero di serie, che si leggono davanti all'oggetto; IMEI, chi ha il prestito e da quando, chi ha restituito, quando e' stato spedito.</td></tr>
     <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Restituito da e Spedito il, perche' li' stanno i telefoni.</td><td class="d">Stanza, In prestito a, Prestato il.</td></tr>
     <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">In prestito a, Prestato il e la colonna <b>Prestito</b> con i pulsanti.</td><td class="d">Stanza, IMEI, Restituito da, Spedito il.</td></tr>
     <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Solo l'essenziale: asset tag, tipo, note, stato, modello, seriale.</td><td class="d">Stanza, tutto il prestito, tutto quello degli iPhone.</td></tr>
@@ -894,14 +894,15 @@ table{min-width:520px}
     column empty by construction carries no information: it takes space away from what you
     actually have to read.</p>
   <p class="sub">The <b>complete inventory on the home screen</b> is an overview: it says
-    what a device is, where it is and how it is, in a row you can read without scrolling
-    sideways. The finer questions - who has it on loan and since when, who returned a
-    phone, when it was shipped, what the IMEI is - are asked inside the room they belong
-    to, the <b>Digital Kiosk</b> and the <b>Iphone</b> container. In the overview the
-    status sums them up: <i>On loan</i>, <i>Shipped to the phone service</i>.</p>
+    what a device is, where it is, how it is and since when, in a row you can read
+    without scrolling sideways. The finer questions - the model and the serial number,
+    who has it on loan and since when, who returned a phone, when it was shipped, what
+    the IMEI is - are asked inside the room they belong to, the <b>Digital Kiosk</b> and
+    the <b>Iphone</b> container. In the overview the status sums them up: <i>On
+    loan</i>, <i>Shipped to the phone service</i>.</p>
   <div class="tw"><table class="man">
     <tr><th>Where you are</th><th>What you see</th><th>What goes away</th></tr>
-    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, type, room, notes, status, model, serial. Seven columns to say what a device is, where it is and how it is.</td><td class="d">Everything else: IMEI, who has it on loan and since when, who returned it, when it was shipped, last change.</td></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, type, room, notes, status, last change, changed by. Seven columns to say what a device is, where it is, how it is and since when.</td><td class="d">Everything else: Model/Description and serial number, which you read in front of the device; IMEI, who has it on loan and since when, who returned it, when it was shipped.</td></tr>
     <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Returned by and Shipped on, because the phones live there.</td><td class="d">Room, On loan to, Lent on.</td></tr>
     <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">On loan to, Lent on, and the <b>Loan</b> column with its buttons.</td><td class="d">Room, IMEI, Returned by, Shipped on.</td></tr>
     <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Only the essentials: asset tag, type, notes, status, model, serial.</td><td class="d">Room, everything about loans, everything about iPhones.</td></tr>

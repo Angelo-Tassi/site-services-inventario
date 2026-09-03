@@ -24,12 +24,13 @@ def campi():
     return app._campi_visibili()
 
 # ---- home: una panoramica, non una scheda. Dice che cos'e' un dispositivo,
-# dov'e' e come sta; il resto si guarda dentro la stanza che lo riguarda
+# dov'e', come sta e da quando; il resto si guarda dentro la stanza
 app.show_home()
-# l'ordine conta: prima quello che si cerca a colpo d'occhio, per ultimi i
-# campi lunghi che si leggono solo quando servono
+# l'ordine conta: dopo lo stato si legge chi ha toccato la riga per ultimo
 assert campi() == ["asset_tag", "tipo", "stanza", "note", "stato",
-                   "modello", "seriale"], campi()
+                   "modificato_il", "modificato_da"], campi()
+# modello e numero di serie servono davanti all'oggetto, cioe' dentro la stanza
+assert "modello" not in campi() and "seriale" not in campi(), campi()
 # l'IMEI e' l'identificativo dei soli telefoni: si guarda dove stanno loro
 assert "imei" not in campi()
 assert app._columns() == [CHECK_COLUMN] + campi()
@@ -37,7 +38,7 @@ assert app._columns() == [CHECK_COLUMN] + campi()
 prestati = [i for i in app.store.items if i.get("prestato_a")]
 assert prestati and all(i["stato"] == "In prestito" for i in prestati), prestati
 # e l'ordinamento continua a funzionare anche su una colonna che non si vede
-assert app.sort_field == "modificato_il" and "modificato_il" not in campi()
+assert app.sort_field == "modificato_il" and "modificato_il" in campi()
 app.sort_by("modello")
 assert app.visible[0]["modello"] <= app.visible[-1]["modello"]
 app.sort_by("modificato_il")

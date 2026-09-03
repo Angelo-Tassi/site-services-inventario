@@ -49,7 +49,10 @@ def confini(app):
     colonne = app._columns()
     larghezze = [int(app.tree.column(c, "width")) for c in colonne]
     disponibile = app.tree.winfo_width()
-    fuori, x = [], 0
+    # le coordinate di Tk partono dal bordo esterno della tabella, il conto
+    # delle larghezze da zero: senza il rientro il confine atteso cade due
+    # pixel a sinistra di quello vero
+    fuori, x = [], app._rientro_tabella()
     for indice in range(len(colonne) - 1):
         x += larghezze[indice]
         if 0 < x < disponibile:

@@ -620,14 +620,16 @@ by construction carries no information: it takes space away from what you have
 to read.
 
 The **complete inventory on the home screen** is an overview: it says what a
-device is, where it is and how it is - asset tag, type, room, notes, status,
-model, serial - in a row you can read without scrolling sideways. The finer
-questions are asked inside the room they belong to, and in the overview the
-status sums them up: *On loan*, *Shipped to the phone service*.
+device is, where it is, how it is and since when - asset tag, type, room, notes,
+status, last change, changed by - in a row you can read without scrolling
+sideways. **Model/Description and serial number are not there**: you read those
+in front of the device you are holding, which means inside the room. The other
+questions the status sums up in the overview: *On loan*, *Shipped to the phone
+service*.
 
 | Where you are | What goes away |
 | --- | --- |
-| **Home** | IMEI, loans, returned by, shipped on, last change |
+| **Home** | Model/Description, serial number, IMEI, loans, returned by, shipped on |
 | **Site Services BAU** | Room, On loan to, Lent on |
 | **Digital Kiosk** | Room, IMEI, Returned by, Shipped on |
 | **Magazzino Disaster Recovery** | Room, loans and the iPhone fields |

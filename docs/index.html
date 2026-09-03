@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.39.0 · alfa</div>
+  <div class="alpha">versione 0.39.1 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,23 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.39.1</h3>
+      <p class="quando">3 settembre 2026</p>
+      <ul>
+        <li><b>Le righe colorate fra le colonne restano sul bordo anche scorrendo
+          a destra.</b> Arrivate in fondo alla barra finivano in mezzo al testo:
+          il conto trattava a parte l'estremo destro e li' azzerava lo
+          spostamento, come se la tabella non fosse stata scorsa.</li>
+        <li><b>In home, dopo lo stato, ci sono Ultima modifica e Modificato
+          da</b>: guardando tutto l'inventario insieme la domanda che ci si fa
+          e' chi ha toccato una riga, e quando.</li>
+        <li><b>Modello/Descrizione e Numero di serie restano nelle stanze</b>:
+          si leggono davanti all'oggetto che si ha in mano, non in panoramica.
+          Il dato non cambia, cambia solo dove si vede: esportazioni, stampa e
+          scheda del dispositivo li portano come prima.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.39.0</h3>
       <p class="quando">3 settembre 2026</p>
@@ -243,29 +260,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           uno nella selezione perche' non si eliminasse niente.</li>
         <li><b>Il promemoria della copia locale arriva ogni venti modifiche</b> invece
           di dieci.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.37.2</h3>
-      <p class="quando">2 settembre 2026</p>
-      <ul>
-        <li><b>I messaggi dicono "asset tag"</b> dove la chiave e' l'asset tag: il
-          controllo duplicati e i riepiloghi di importazione parlavano di
-          "identificativo", e nel controllo si leggeva prima il numero di serie, che
-          invece serve solo per consultazione.</li>
-        <li><b>Il promemoria della copia locale arriva ogni venti modifiche</b> invece di
-          dieci.</li>
-        <li><b>L'inglese e' completo</b>: i messaggi di errore dell'archivio e le righe
-          del riepilogo di importazione restavano in italiano anche cambiando lingua.
-          Ora tutto passa dalla traduzione, e un test lo verifica a ogni modifica.</li>
-        <li><b>Controllo generale duplicati</b>, accanto al pulsante del modello: cerca
-          in tutto l'inventario i dispositivi registrati piu' volte, mostra per ogni
-          gruppo quale tiene e quali elimina, e salva una copia prima di procedere.</li>
-        <li><b>I doppioni dentro un foglio importato vengono dichiarati</b> prima di
-          importare: vale l'ultima riga, e si sa quali sono.</li>
-        <li><b>Il riepilogo dopo l'importazione racconta tutto</b>: che cosa e' stato
-          fatto e dove, quante righe non sono state caricate e perche' una per una, come
-          si trova l'inventario stanza per stanza, e dove sta la copia di sicurezza.</li>
       </ul>
     </div>
   </div>
@@ -342,14 +336,14 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
       <div class="tw">
         <table>
           <thead><tr><th></th><th>Asset Tag</th><th>Tipo</th><th>Stanza</th>
-            <th>Note</th><th>Stato</th><th>Modello/Descrizione</th><th>Numero di serie</th></tr></thead>
+            <th>Note</th><th>Stato</th><th>Ultima modifica</th><th>Modificato da</th></tr></thead>
           <tbody>
-            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Postazione reception</td><td>Disponibile</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
-            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Restituito da M. Bianchi</td><td>Da Rispedire</td><td>Apple iPhone 14</td><td class="mono">—</td></tr>
-            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>Con tastiera e pennino</td><td>Controllare</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
-            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>—</td><td>In prestito</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td></tr>
-            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Rispedito il 28/08/2026</td><td>Spedito al servizio telefonia</td><td>Apple iPhone 13</td><td class="mono">—</td></tr>
-            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>Scorta sigillata</td><td>Da rebuildare</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Postazione reception</td><td>Disponibile</td><td>02/09/2026 18:12</td><td class="mono">a.tassi</td></tr>
+            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Restituito da M. Bianchi</td><td>Da Rispedire</td><td>02/09/2026 17:40</td><td class="mono">a.tassi</td></tr>
+            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>Con tastiera e pennino</td><td>Controllare</td><td>01/09/2026 09:05</td><td class="mono">m.rossi</td></tr>
+            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>—</td><td>In prestito</td><td>02/09/2026 11:23</td><td class="mono">a.tassi</td></tr>
+            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Rispedito il 28/08/2026</td><td>Spedito al servizio telefonia</td><td>28/08/2026 16:02</td><td class="mono">m.rossi</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>Scorta sigillata</td><td>Da rebuildare</td><td>30/08/2026 08:47</td><td class="mono">a.tassi</td></tr>
           </tbody>
         </table>
       </div>
@@ -448,7 +442,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.39.0 · alpha</div>
+  <div class="alpha">version 0.39.1 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -474,6 +468,23 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.39.1</h3>
+      <p class="quando">3 September 2026</p>
+      <ul>
+        <li><b>The coloured lines between columns stay on the edge when you scroll
+          right.</b> At the end of the bar they landed in the middle of the text:
+          the calculation treated the right end as a special case and zeroed the
+          offset there, as if the table had not been scrolled.</li>
+        <li><b>On the home screen, after the status, come Last change and
+          Changed by</b>: looking at the whole inventory at once, the question
+          you ask is who touched a row, and when.</li>
+        <li><b>Model/Description and Serial number stay inside the rooms</b>:
+          you read those in front of the device you are holding, not in the
+          overview. The data does not change, only where it shows: exports,
+          print and the device record carry them as before.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.39.0</h3>
       <p class="quando">3 September 2026</p>
@@ -521,27 +532,6 @@ python Inventario.py</pre>
           selection was enough for nothing to be deleted.</li>
         <li><b>The local-copy reminder comes every twenty changes</b> instead of
           ten.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.37.2</h3>
-      <p class="quando">2 September 2026</p>
-      <ul>
-        <li><b>The messages say "asset tag"</b> where the asset tag is the key: the
-          duplicate check and the import summaries talked about an "identifier", and the
-          check led with the serial number, which is only there for reference.</li>
-        <li><b>The local-copy reminder comes every twenty changes</b> instead of ten.</li>
-        <li><b>English is complete</b>: the store's error messages and the import summary
-          lines stayed in Italian even after switching language. Everything now goes
-          through the translation, and a test checks it on every change.</li>
-        <li><b>General duplicate check</b>, next to the template button: it searches the
-          whole inventory for devices recorded more than once, shows for each group which
-          one it keeps and which it deletes, and saves a copy before proceeding.</li>
-        <li><b>Duplicates inside an imported sheet are declared</b> before importing: the
-          last row wins, and you know which ones they are.</li>
-        <li><b>The summary after an import tells the whole story</b>: what was done and
-          where, how many rows were not loaded and why, one by one, how the inventory
-          stands room by room, and where the backup copy is.</li>
       </ul>
     </div>
   </div>
@@ -617,14 +607,14 @@ python Inventario.py</pre>
       <div class="tw">
         <table>
           <thead><tr><th></th><th>Asset Tag</th><th>Type</th><th>Room</th>
-            <th>Notes</th><th>Status</th><th>Model/Description</th><th>Serial number</th></tr></thead>
+            <th>Notes</th><th>Status</th><th>Last change</th><th>Changed by</th></tr></thead>
           <tbody>
-            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Reception desk</td><td>Available</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A1B2C</td></tr>
-            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Returned by M. Bianchi</td><td>To be shipped back</td><td>Apple iPhone 14</td><td class="mono">—</td></tr>
-            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>With keyboard and stylus</td><td>To be checked</td><td>Dell Latitude 7320 Detachable</td><td class="mono">8H2KLM3</td></tr>
-            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>—</td><td>On loan</td><td>Lenovo ThinkPad T14 Gen 4</td><td class="mono">PF4A2C1G</td></tr>
-            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Shipped on 28/08/2026</td><td>Shipped to the phone service</td><td>Apple iPhone 13</td><td class="mono">—</td></tr>
-            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>Sealed spare</td><td>To be rebuilt</td><td>Lenovo ThinkPad T14 Gen 5</td><td class="mono">PF4B7T1J</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Reception desk</td><td>Available</td><td>02/09/2026 18:12</td><td class="mono">a.tassi</td></tr>
+            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Returned by M. Bianchi</td><td>To be shipped back</td><td>02/09/2026 17:40</td><td class="mono">a.tassi</td></tr>
+            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>With keyboard and stylus</td><td>To be checked</td><td>01/09/2026 09:05</td><td class="mono">m.rossi</td></tr>
+            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>—</td><td>On loan</td><td>02/09/2026 11:23</td><td class="mono">a.tassi</td></tr>
+            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Shipped on 28/08/2026</td><td>Shipped to the phone service</td><td>28/08/2026 16:02</td><td class="mono">m.rossi</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>Sealed spare</td><td>To be rebuilt</td><td>30/08/2026 08:47</td><td class="mono">a.tassi</td></tr>
           </tbody>
         </table>
       </div>

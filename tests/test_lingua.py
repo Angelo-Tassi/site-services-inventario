@@ -36,13 +36,21 @@ assert intestazione(HEADERS["seriale"]) == "Serial number"
 lang.imposta("it")
 percorso = fixture.build()
 app = App(percorso); app._initial_load()
-assert app.tree.heading("seriale")["text"].startswith("Numero di serie")
+# in panoramica: il numero di serie si guarda dentro la stanza, non qui
+assert app.tree.heading("modificato_il")["text"].startswith("Ultima modifica")
 assert "Site Services" in app.title()
 lang.imposta("en")
 app.ricostruisci()
+assert app.tree.heading("modificato_il")["text"].startswith("Last change"), \
+    app.tree.heading("modificato_il")["text"]
+assert app.tree.heading("modificato_da")["text"].startswith("Changed by")
+assert app.tree.heading("stato")["text"].startswith("Status")
+# e dentro una stanza le colonne che ci sono solo li' si traducono lo stesso
+app.show_room(fixture.KIOSK)
 assert app.tree.heading("seriale")["text"].startswith("Serial number"), \
     app.tree.heading("seriale")["text"]
-assert app.tree.heading("stato")["text"].startswith("Status")
+assert app.tree.heading("modello")["text"].startswith("Model/Description")
+app.show_home()
 assert app.view == "home" and len(app.visible) == 13
 riga = app.tree.item("IT-0107", "values")
 assert riga[app._columns().index("stato")] == "On loan", riga

@@ -536,14 +536,16 @@ colonna vuota per costruzione non porta informazione: toglie spazio a quello che
 si deve leggere.
 
 L'**inventario completo in home** e' una panoramica: dice che cos'e' un
-dispositivo, dov'e' e come sta - asset tag, tipo, stanza, note, stato,
-modello, seriale - in una riga che si legge senza scorrere di lato. Le domande piu'
-precise si fanno dentro la stanza che le riguarda, e in panoramica ci pensa lo
-stato a riassumerle: *In prestito*, *Spedito al servizio telefonia*.
+dispositivo, dov'e', come sta e da quando - asset tag, tipo, stanza, note,
+stato, ultima modifica, modificato da - in una riga che si legge senza scorrere
+di lato. **Modello/Descrizione e numero di serie non ci sono**: si leggono
+davanti all'oggetto che si ha in mano, cioe' dentro la stanza. Le altre domande
+in panoramica le riassume lo stato: *In prestito*, *Spedito al servizio
+telefonia*.
 
 | Dove sei | Che cosa sparisce |
 | --- | --- |
-| **Home** | IMEI, prestiti, restituito da, spedito il, ultima modifica |
+| **Home** | Modello/Descrizione, numero di serie, IMEI, prestiti, restituito da, spedito il |
 | **Site Services BAU** | Stanza, In prestito a, Prestato il |
 | **Digital Kiosk** | Stanza, IMEI, Restituito da, Spedito il |
 | **Magazzino Disaster Recovery** | Stanza, prestiti e campi degli iPhone |

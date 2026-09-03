@@ -1905,14 +1905,15 @@ class App(tk.Tk):
                        if c in ORDINE_COLONNE else len(ORDINE_COLONNE))
 
         # L'inventario completo e' una panoramica, non una scheda: deve dire in
-        # una riga che cos'e' un dispositivo, dov'e' e come sta. Chi e' l'ha in
-        # prestito, quando e' stato spedito, chi l'ha restituito e chi ha
-        # toccato la riga per ultimo sono domande da fare dentro la stanza che
-        # le riguarda - e lo stato in panoramica le riassume gia': "In
-        # prestito", "Spedito al servizio telefonia".
+        # una riga che cos'e' un dispositivo, dov'e' e come sta, e da quando -
+        # chi ha toccato la riga per ultimo e quando e' la domanda che ci si fa
+        # guardando tutto insieme. Il modello e il numero di serie servono
+        # dentro la stanza, davanti all'oggetto che si ha in mano; il prestito e
+        # la spedizione lo stato in panoramica li riassume gia': "In prestito",
+        # "Spedito al servizio telefonia".
         if self.view == "home":
             togli("imei", "prestato_a", "prestato_il", "restituito_da",
-                  "spedito_il", "modificato_il", "modificato_da")
+                  "spedito_il", "modello", "seriale")
         return campi
 
     def _columns(self):
@@ -2066,6 +2067,7 @@ class App(tk.Tk):
         tree.tag_configure("tablet", background=theme.TABLET_ROW)
         tree.tag_configure("tablet_alt", background=theme.TABLET_ROW_ALT)
         self._righelli = []
+        self._rientro = None            # si rimisura per ogni tabella nuova
         tree.bind("<Button-1>", self._on_click)
         tree.bind("<Double-1>", self._on_double_click)
         tree.bind("<<TreeviewSelect>>", self._on_select)
@@ -2173,19 +2175,41 @@ class App(tk.Tk):
         except tk.TclError:
             pass          # tabella in ricostruzione: al prossimo giro ci sara'
 
+    def _rientro_tabella(self):
+        """Di quanto la prima colonna e' rientrata rispetto al bordo del widget.
+
+        Il conto delle larghezze parte da zero, le coordinate di Tk dal bordo
+        esterno della tabella: senza questo scarto - due pixel di cornice - le
+        righe cadrebbero sempre un po' a sinistra del punto giusto. Si misura
+        una volta, a tabella ferma, e si tiene.
+        """
+        if getattr(self, "_rientro", None) is None:
+            figli = self.tree.get_children()
+            riquadro = (self.tree.bbox(figli[0], self._columns()[0])
+                        if figli else None)
+            if riquadro and self.tree.xview()[0] == 0:
+                self._rientro = riquadro[0]
+            else:
+                return 2                # elenco vuoto o gia' scorso: si riprova
+        return self._rientro
+
     def _disegna_righelli(self):
         if getattr(self, "tree", None) is None or not self.tree.winfo_exists():
             return
         colonne = self._columns()
         larghezze = [int(self.tree.column(c, "width")) for c in colonne]
         totale = sum(larghezze) or 1
-        primo, ultimo = self.tree.xview()
-        scostamento = primo * totale if ultimo < 1.0 else 0
+        # xview() dice a che punto del totale siamo. Il caso "non si scorre" e'
+        # gia' compreso: li' il primo estremo vale zero. Trattare a parte
+        # l'estremo destro - com'era prima - azzerava lo scostamento proprio
+        # quando la tabella era spostata al massimo, e le righe finivano in
+        # mezzo al testo.
+        scostamento = self.tree.xview()[0] * totale
         altezza = self.tree.winfo_height()
         larghezza = self.tree.winfo_width()
         for riga in self._righelli:
             riga.place_forget()
-        x = -scostamento
+        x = self._rientro_tabella() - scostamento
         for indice, campo in enumerate(colonne[:-1]):
             x += larghezze[indice]
             if not (0 < x < larghezza):
