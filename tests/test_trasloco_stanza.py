@@ -54,6 +54,43 @@ assert all(i["stanza"] == DR for i in telefoni), telefoni
 assert store.trasloca_stanza(BAU, DR) == {"totale": 0, "prestiti": 0, "iphone": 0}
 assert store.trasloca_stanza(DR, DR) == {"totale": 0, "prestiti": 0, "iphone": 0}
 
+# ---- la finestra vera: e' lei che deve accorgersi del trasloco
+# Nelle prove qui sotto la finestra viene simulata, quindi qui si controlla che
+# quella vera produca davvero le segnalazioni su cui il resto si appoggia.
+vera = App(fixture.build())
+vera._initial_load()
+vera.update()
+
+def salva_stanze(stanze):
+    """Come farebbe l'utente: riscrive il riquadro delle stanze e preme Salva."""
+    d = ui.RoomsDialog(vera, vera.cfg["rooms"], vera.cfg["types"],
+                       vera.cfg.get("loan_rooms", []), vera.cfg.get("iphone_room", ""))
+    d.text_rooms.delete("1.0", "end")
+    d.text_rooms.insert("1.0", "\n".join(stanze))
+    d._ok()
+    esito = d.result
+    if d.winfo_exists():
+        d.destroy()
+    return esito
+
+# togliendo la stanza con prestito, la finestra lo dichiara invece di rifiutare
+esito = salva_stanze([BAU, DR])
+assert esito is not None, "il salvataggio non deve piu' essere rifiutato"
+assert esito["prestiti_spariti"] == [KIOSK], esito["prestiti_spariti"]
+assert esito["loan_rooms"] == [], esito["loan_rooms"]
+assert esito["iphone_sparita"] == "", esito
+
+# togliendo quella degli iPhone, lo stesso
+esito = salva_stanze([KIOSK, DR])
+assert esito["iphone_sparita"] == BAU, esito
+assert esito["iphone_room"] == "", "la destinazione la chiede on_settings"
+assert esito["prestiti_spariti"] == [], esito
+
+# tolte tutte e due, si segnalano tutte e due
+esito = salva_stanze([DR])
+assert esito["iphone_sparita"] == BAU and esito["prestiti_spariti"] == [KIOSK], esito
+vera.destroy()
+
 # ============================ dalle impostazioni ============================
 app = App(fixture.build())
 app._initial_load()
@@ -120,6 +157,49 @@ assert prestati and all(i["stanza"] == DR for i in prestati), prestati
 assert all(i["prestato_a"] for i in prestati), "i prestiti restano aperti"
 corpo = [m for t, m in avvisi if t == "Stanza traslocata"][-1]
 assert "erano in prestito" in corpo, corpo
+
+# ---- il buco chiuso: togliendo la stanza dai DUE riquadri in un colpo solo,
+# i dispositivi in prestito sarebbero finiti nel cestino, cioe' eliminati.
+# Adesso il programma chiede lo stesso dove spostarli.
+terza = App(fixture.build())
+terza._initial_load()
+terza.update()
+domande_terza = []
+def rispondi_terza(titolo, prompt, stanze):
+    domande_terza.append((titolo, prompt, list(stanze)))
+    return DR
+terza._scegli_stanza = rispondi_terza
+# la stanza sparisce dall'elenco E dalle stanze con prestito insieme
+ui.RoomsDialog.show = lambda self: {
+    "rooms": [BAU, DR], "types": terza.cfg["types"],
+    "loan_rooms": [], "prestiti_spariti": [],
+    "iphone_room": BAU, "iphone_sparita": "",
+    "rinomine": [], "rinomine_tipi": [], "lingua": "it"}
+terza.on_settings()
+terza.store.load()
+assert domande_terza, "un prestito aperto non puo' finire nel cestino in silenzio"
+assert domande_terza[-1][0] == "Dove vanno i dispositivi in prestito?", domande_terza[-1][0]
+prestati = [i for i in terza.store.items if i.get("prestato_a")]
+assert prestati and all(i["stanza"] == DR for i in prestati), prestati
+assert not [v for v in terza.store.eliminati() if v.get("scheda", {}).get("prestato_a")], \
+    "nessun dispositivo in prestito deve essere finito fra gli eliminati"
+
+# ---- e l'archivio si rifiuta comunque, chiunque glielo chieda
+from inventario.store import InventoryError
+quarta = InventoryStore(fixture.build(), iphone_room=BAU)
+quarta.load()
+try:
+    quarta.porta_via_gli_orfani([KIOSK])
+    raise SystemExit("ha eliminato una stanza con un prestito dentro")
+except InventoryError as exc:
+    assert "in prestito" in str(exc), str(exc)
+quarta.load()
+assert len([i for i in quarta.items if i["stanza"] == KIOSK]) == 5, "niente e' stato toccato"
+# senza prestiti aperti, invece, la stanza si svuota come prima
+quarta.give_back("IT-0107"); quarta.give_back("IT-0110")
+portati = quarta.porta_via_gli_orfani([KIOSK])
+assert len(portati) == 5, portati
+terza.destroy()
 
 # ---- annullando la scelta non si salva niente
 avvisi.clear()

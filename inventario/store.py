@@ -1005,6 +1005,13 @@ class InventoryStore(object):
         portati = []
 
         def op(items):
+            # Un dispositivo in prestito non si elimina, e finire nel cestino
+            # sarebbe eliminarlo. L'unica strada per portarlo altrove e' il
+            # trasloco della stanza, che glielo cambia sotto invece di
+            # toglierlo dall'inventario.
+            for it in items:
+                if clean(it.get("stanza")) in volute and is_on_loan(it):
+                    raise BloccoPrestito(it)
             portati[:] = [dict(it) for it in items if clean(it.get("stanza")) in volute]
             items[:] = [it for it in items if clean(it.get("stanza")) not in volute]
             return len(portati)
@@ -1012,6 +1019,21 @@ class InventoryStore(object):
         self._apply(op)
         self.aggiungi_agli_eliminati(portati, orfani=True)
         return portati
+
+    def stanze_con_prestiti_aperti(self, stanze):
+        """Fra quelle indicate, le stanze che tengono ancora un prestito aperto.
+
+        Una stanza cosi' non si puo' svuotare nel cestino: quei dispositivi sono
+        nelle mani di qualcuno. Se sparisce va traslocata, come quella degli
+        iPhone.
+        """
+        aperte = []
+        for stanza in stanze:
+            stanza = clean(stanza)
+            if stanza and any(clean(i.get("stanza")) == stanza and is_on_loan(i)
+                              for i in self.items):
+                aperte.append(stanza)
+        return aperte
 
     def quanti_nelle_stanze(self, stanze):
         """Quanti dispositivi ci sono in ognuna delle stanze indicate."""

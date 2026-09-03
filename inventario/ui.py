@@ -3703,12 +3703,19 @@ class App(tk.Tk):
                        "I telefoni devono stare in una stanza: scegli quale, e ci\n"
                        "andranno tutti, rispediti e non - insieme agli altri %d\n"
                        "dispositivi che ci sono dentro.")
-        else:
+        elif ruolo == "prestiti":
             titolo = T("Dove vanno i prestiti?")
             spiega = T("Stai togliendo %s, che e' una stanza con prestito.\n\n"
                        "Scegli dove spostare i suoi %d dispositivi: la stanza\n"
                        "scelta prendera' il suo posto fra quelle con prestito, e\n"
                        "anche i dispositivi in prestito si sposteranno.")
+        else:
+            titolo = T("Dove vanno i dispositivi in prestito?")
+            spiega = T("Stai togliendo %s, e li' dentro c'e' ancora almeno un\n"
+                       "dispositivo in prestito.\n\n"
+                       "Un dispositivo in prestito non si elimina, quindi non puo'\n"
+                       "finire negli eliminati di recente: scegli dove spostare i\n"
+                       "suoi %d dispositivi. Il prestito resta aperto.")
         return self._scegli_stanza(titolo, spiega % (stanza, quanti), stanze_nuove)
 
     def _scegli_stanza(self, titolo, prompt, stanze):
@@ -4414,16 +4421,29 @@ class App(tk.Tk):
         # i dispositivi in prestito - lasciarli in una stanza che non esiste
         # piu' sarebbe perderne la traccia, che e' proprio cio' che la regola
         # dei prestiti vuole evitare.
+        # Una stanza che tiene ancora un prestito aperto va traslocata anche se
+        # non risulta piu' fra quelle con prestito: togliendola dai due riquadri
+        # in un colpo solo, i suoi dispositivi sarebbero finiti nel cestino - e
+        # un dispositivo in prestito non si elimina.
+        gia_previste = set(prestiti_spariti) | ({iphone_sparita} if iphone_sparita else set())
+        sparite = [r for r in self.cfg.get("rooms", [])
+                   if r not in result.get("rooms", [])
+                   and r not in set(v for v, _n in rinomine)
+                   and r not in gia_previste]
+        con_prestiti = self.store.stanze_con_prestiti_aperti(sparite)
+
         traslochi = []
         for stanza, ruolo in ([(iphone_sparita, "iphone")] if iphone_sparita else []) + \
-                [(r, "prestiti") for r in prestiti_spariti]:
+                [(r, "prestiti") for r in prestiti_spariti] + \
+                [(r, "prestiti_aperti") for r in con_prestiti]:
             dove = self._chiedi_dove_trasloca(stanza, ruolo, result["rooms"])
             if not dove:
                 return                      # annullato: non si salva niente
             traslochi.append((stanza, dove, ruolo))
             if ruolo == "iphone":
                 result["iphone_room"] = dove
-            elif dove not in result["loan_rooms"]:
+            elif ruolo == "prestiti" and dove not in result["loan_rooms"]:
+                # il banco dei prestiti si sposta, non si chiude
                 result["loan_rooms"].append(dove)
         if not result.get("iphone_room"):
             result["iphone_room"] = result["rooms"][0]

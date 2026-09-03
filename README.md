@@ -783,6 +783,18 @@ Togliendo una stanza con prestito, quella che scegli **ne prende il posto** fra
 le stanze con prestito. Annullando la scelta non viene salvato niente, nemmeno le
 altre impostazioni.
 
+La domanda arriva anche se togli la stanza **dai due riquadri insieme** - da
+*Stanze* e da *Stanze con prestito* nello stesso salvataggio - purche' li' dentro
+ci sia ancora un prestito aperto: quel dispositivo e' nelle mani di qualcuno e
+non puo' finire fra gli eliminati.
+
+**Fuori da questo caso un dispositivo in prestito non si sposta e non si
+elimina**, da nessuna strada: ne' con *Elimina*, ne' con *Elimina +*, ne' con
+*Sposta in stanza...*, ne' cambiando la stanza nella sua scheda, ne' togliendo la
+stanza per mandarlo negli eliminati. Il trasloco della stanza e' l'unica
+eccezione, e c'e' perche' il dispositivo **resta in inventario**: cambia la
+stanza sotto di lui invece di toglierlo.
+
 ### Aggiungere o rinominare un tipo di dispositivo
 
 Basta una riga in **Tipi di dispositivo**. Il tipo compare nella tendina di

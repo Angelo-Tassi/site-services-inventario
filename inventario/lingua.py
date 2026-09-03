@@ -1040,6 +1040,17 @@ EN = {
         'inside it.',
     'Dove vanno i prestiti?':
         'Where do the loans go?',
+    'Dove vanno i dispositivi in prestito?':
+        'Where do the devices on loan go?',
+    "Stai togliendo %s, e li' dentro c'e' ancora almeno un\n"
+    'dispositivo in prestito.\n\n'
+    "Un dispositivo in prestito non si elimina, quindi non puo'\n"
+    'finire negli eliminati di recente: scegli dove spostare i\n'
+    'suoi %d dispositivi. Il prestito resta aperto.':
+        'You are removing %s, and there is still at least one device on loan\n'
+        'inside it.\n\n'
+        'A device on loan is not deleted, so it cannot end up in recently\n'
+        'deleted: choose where to move its %d devices. The loan stays open.',
     "Stai togliendo %s, che e' una stanza con prestito.\n\n"
     "Scegli dove spostare i suoi %d dispositivi: la stanza\n"
     "scelta prendera' il suo posto fra quelle con prestito, e\n"

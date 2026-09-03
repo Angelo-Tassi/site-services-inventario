@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.44.0 · alfa</div>
+  <div class="alpha">versione 0.44.1 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,21 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.44.1</h3>
+      <p class="quando">3 settembre 2026</p>
+      <ul>
+        <li><b>Un prestito aperto non finisce mai negli eliminati.</b>
+          Togliendo la stanza dall'elenco <i>e</i> da quelle con prestito nello
+          stesso salvataggio, i dispositivi in prestito ci sarebbero finiti:
+          adesso il programma chiede dove spostarli, come per le altre stanze
+          con un ruolo.</li>
+        <li><b>Il divieto sta nell'archivio</b>, non solo nella finestra: un
+          dispositivo in prestito non si porta via nemmeno chiamando la
+          funzione direttamente. L'unica strada che lo sposta resta il trasloco
+          della stanza, che lo lascia in inventario.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.44.0</h3>
       <p class="quando">3 settembre 2026</p>
@@ -243,23 +258,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           richiesta di conferma: prima restavano in elenco con il nome di una
           stanza che non esisteva piu'. Non avendo una stanza a cui tornare, al
           ripristino il programma chiede in quale rimetterli.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.42.0</h3>
-      <p class="quando">3 settembre 2026</p>
-      <ul>
-        <li><b>Rinominare un tipo di dispositivo aggiorna i dispositivi di quel
-          tipo.</b> Cambia l'etichetta e nient'altro: asset tag, numero di
-          serie, stanza, stato, note, prestito e spedizione restano quelli che
-          erano.</li>
-        <li><b>Il tipo Iphone non si rinomina.</b> E' la parola con cui il
-          programma riconosce i telefoni: da li' vengono l'IMEI al posto
-          dell'asset tag, la stanza obbligata, la spedizione al servizio
-          telefonia e il fatto che non si eliminino. Il salvataggio viene
-          rifiutato dicendo che nome rimettere.</li>
-        <li><b>Due tipi con lo stesso nome</b> vengono rifiutati, come gia'
-          succedeva per le stanze.</li>
       </ul>
     </div>
   </div>
@@ -447,7 +445,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.44.0 · alpha</div>
+  <div class="alpha">version 0.44.1 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -473,6 +471,20 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.44.1</h3>
+      <p class="quando">3 September 2026</p>
+      <ul>
+        <li><b>An open loan never ends up among the deleted.</b> Removing the
+          room from the list <i>and</i> from the rooms with loans in the same
+          save, the devices on loan would have gone there: now the program asks
+          where to move them, as for the other rooms with a role.</li>
+        <li><b>The ban lives in the store</b>, not only in the window: a device
+          on loan is not taken away even by calling the function directly. The
+          only route that moves it is still relocating the room, which leaves it
+          in the inventory.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.44.0</h3>
       <p class="quando">3 September 2026</p>
@@ -519,22 +531,6 @@ python Inventario.py</pre>
           confirmation: before, they stayed in the list with the name of a room
           that no longer existed. Having no room to go back to, on restore the
           program asks which one to put them in.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.42.0</h3>
-      <p class="quando">3 September 2026</p>
-      <ul>
-        <li><b>Renaming a device type updates the devices of that type.</b> The
-          label changes and nothing else: asset tag, serial number, room,
-          status, notes, loan and shipment stay as they were.</li>
-        <li><b>The Iphone type cannot be renamed.</b> It is the word the program
-          recognises phones by: from it come the IMEI instead of the asset tag,
-          the fixed room, the shipment to the phone service and the fact that
-          they cannot be deleted. Saving is refused, telling you which name to
-          put back.</li>
-        <li><b>Two types with the same name</b> are refused, as already happened
-          for rooms.</li>
       </ul>
     </div>
   </div>

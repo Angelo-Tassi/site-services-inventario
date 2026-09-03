@@ -414,6 +414,18 @@ When you remove a room with loans, the one you choose **takes its place** among
 the rooms with loans. Cancel the choice and nothing is saved, not even the other
 settings.
 
+The question comes up even if you remove the room **from both boxes at once** -
+from *Rooms* and from *Rooms with loans* in the same save - as long as there is
+still an open loan inside it: that device is in someone's hands and cannot end up
+among the deleted.
+
+**Outside this case a device on loan is neither moved nor deleted**, by any
+route: not with *Delete*, not with *Delete +*, not with *Move to room...*, not by
+changing the room on its record, and not by removing the room to send it to the
+deleted. Relocating the room is the only exception, and it exists because the
+device **stays in the inventory**: the room changes underneath it instead of
+taking it away.
+
 ### Adding or renaming a device type
 
 One line in **Device types** is enough. A type called **iPhone** - written
