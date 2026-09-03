@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 1.0.0-beta.1 · beta</div>
+  <div class="alpha">versione 1.0.0-beta.3 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,18 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.3</h3>
+      <p class="quando">3 settembre 2026</p>
+      <ul>
+        <li><b>I quattro `.bat` si sbloccano da soli.</b> Un file `.bat` non si
+          puo' firmare in nessun modo: e' un limite del formato, non una firma
+          mancante. Adesso, al primissimo avvio dopo l'estrazione, tolgono da
+          soli il contrassegno "scaricato da Internet" da tutta la cartella -
+          l'avviso di Windows compare una volta sola, invece che su ognuno dei
+          quattro file.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.1</h3>
       <p class="quando">3 settembre 2026</p>
@@ -235,20 +247,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           e il salvataggio rifiutato se si sbagliava.</li>
         <li><b>Con <i>(nessuna)</i> i prestiti si spengono</b> ovunque, senza
           dover svuotare un riquadro di testo.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.45.0</h3>
-      <p class="quando">3 settembre 2026</p>
-      <ul>
-        <li><b>Il ripristino dagli eliminati chiede conferma</b>, come Elimina e
-          Sposta. Un popup solo: sopra il riepilogo - quali dispositivi tornano
-          e <b>in quale stanza</b>, raggruppati per destinazione - e sotto la
-          conferma. Prima ripristinava e basta, dicendo dopo soltanto quanti
-          erano.</li>
-        <li><b>L'esito si legge sotto l'elenco</b>: quanti sono tornati e in
-          quali stanze, senza una seconda finestra da chiudere. Se qualcuno
-          viene saltato, quello si' che viene detto a parte.</li>
       </ul>
     </div>
   </div>
@@ -436,7 +434,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 1.0.0-beta.1 · beta</div>
+  <div class="alpha">version 1.0.0-beta.3 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -462,6 +460,18 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.3</h3>
+      <p class="quando">3 September 2026</p>
+      <ul>
+        <li><b>The four `.bat` files unblock themselves.</b> A `.bat` file
+          cannot be signed by any means: it is a limit of the format, not a
+          missing signature. Now, on the very first run after extracting, they
+          clear the "downloaded from the Internet" mark from the whole folder
+          by themselves - the Windows warning shows up once, instead of on each
+          of the four files.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.1</h3>
       <p class="quando">3 September 2026</p>
@@ -503,20 +513,6 @@ python Inventario.py</pre>
           wrong.</li>
         <li><b>With <i>(none)</i> loans are switched off</b> everywhere, without
           having to empty a text box.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.45.0</h3>
-      <p class="quando">3 September 2026</p>
-      <ul>
-        <li><b>Restoring from the deleted asks for confirmation</b>, like Delete
-          and Move. A single popup: the summary above - which devices come back
-          and <b>into which room</b>, grouped by destination - and the
-          confirmation below. Before, it just restored, saying afterwards only
-          how many there were.</li>
-        <li><b>The outcome is read under the list</b>: how many came back and
-          into which rooms, without a second window to close. If one is skipped,
-          that is told separately.</li>
       </ul>
     </div>
   </div>
