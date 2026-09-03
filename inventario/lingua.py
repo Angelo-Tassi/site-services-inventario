@@ -818,6 +818,12 @@ EN = {
         'Move this device to %s?',
     'iPhone non ancora rispedito al servizio telefonia':
         'iPhone not yet sent back to the phone service',
+    'Copie e ripristino':
+        'Copies and restore',
+    "Delle copie automatiche se ne tengono %d: quando ne arriva\n"
+    "una nuova, la piu' vecchia viene cancellata.":
+        'Of the automatic copies %d are kept: when a new one arrives,\n'
+        'the oldest is deleted.',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':

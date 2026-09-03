@@ -30,12 +30,35 @@ def controlla():
         atteso = {
             "Importa xls...": "Arancio.TButton",
             "Esporta xls...": "Verde.TButton",
-            "Salva copia in locale...": "Verde.TButton",
-            "Ripristina": "Rosso.TButton",
-            "Reset inventario": "Rosso.TButton",
         }
         for testo, stile in atteso.items():
             esiti.append(("%s -> %s" % (testo, stile), trovati.get(testo) == stile))
+        # I comandi che riscrivono l'inventario stanno nella finestra
+        # Impostazioni, non piu' nella barra: nella barra facevano sparire
+        # dallo schermo i comandi di tutti i giorni.
+        dentro = {}
+        finestra = ui.RoomsDialog(app, app.cfg["rooms"], app.cfg["types"],
+                                  app.cfg.get("loan_rooms", []),
+                                  app.cfg.get("iphone_room", ""), lang.corrente())
+        def gira_dialogo(w):
+            if w.winfo_class() == "TButton":
+                try:
+                    dentro[str(w.cget("text"))] = str(w.cget("style"))
+                except Exception:
+                    pass
+            for c in w.winfo_children():
+                gira_dialogo(c)
+        gira_dialogo(finestra)
+        for testo, stile in (("Salva copia in locale...", "Verde.TButton"),
+                             ("Ripristina da una copia...", "Rosso.TButton"),
+                             ("Reset inventario", "Rosso.TButton")):
+            esiti.append(("Impostazioni: %s -> %s" % (testo, stile),
+                          dentro.get(testo) == stile))
+        # e nella barra non ci sono piu'
+        esiti.append(("fuori dalla barra",
+                      not any(t in trovati for t in ("Salva copia in locale...",
+                                                     "Reset inventario"))))
+        finestra.destroy()
         app.show_room(fixture.KIOSK); app.update()
         trovati = {}; gira(app)
         esiti.append(("Esporta questa stanza in xls -> Verde",
@@ -48,9 +71,14 @@ def controlla():
         esiti.append(("arancio definito", st.lookup("Arancio.TButton", "background") == theme.AZIONE_ARANCIO_BG))
         # in inglese il pulsante nuovo esiste con l'etichetta tradotta
         lang.imposta("en"); app.ricostruisci(); app.update()
-        trovati = {}; gira(app)
+        dentro = {}
+        finestra = ui.RoomsDialog(app, app.cfg["rooms"], app.cfg["types"],
+                                  app.cfg.get("loan_rooms", []),
+                                  app.cfg.get("iphone_room", ""), lang.corrente())
+        gira_dialogo(finestra)
         esiti.append(("Save a local copy... in inglese",
-                      trovati.get("Save a local copy...") == "Verde.TButton"))
+                      dentro.get("Save a local copy...") == "Verde.TButton"))
+        finestra.destroy()
         lang.imposta("it")
     except Exception as exc:
         esiti.append(("eccezione", repr(exc)))
@@ -59,7 +87,7 @@ app.after(700, controlla)
 app.mainloop()
 falliti = [n for n, ok in esiti if ok is not True]
 assert not falliti, falliti
-assert len(esiti) == 11, len(esiti)
+assert len(esiti) == 12, len(esiti)
 
 # ---- il testo resta leggibile sul colore: contrasto AA su tutti gli stati
 def luminanza(colore):

@@ -248,16 +248,17 @@ E' la prova che serve davvero in sede: sbagliare un'importazione e rimediare.
 2. adesso combina il pasticcio: importa `Inventario_di_prova.xlsx` scegliendo
    **Una sola stanza** > `Site Services BAU` > **Unisci**. Tutti e 30 i
    dispositivi finiscono in BAU, che ne aveva 10
-3. premi **Ripristina** nella barra in alto
+3. apri **Impostazioni** > **Ripristina da una copia...** e scegli la prima
+   della lista, che e' l'ultima copia salvata
 
-**Cosa deve risultare.** L'avviso dice di quando e' l'ultima copia e quanti
-dispositivi conteneva rispetto a ora. Confermando, le schede stanza tornano
-10, 10 e 10, e il messaggio finale dice dove ha salvato lo stato sbagliato -
-perche' anche quello resta recuperabile.
+**Cosa deve risultare.** L'elenco mostra tutte le copie dalla piu' recente, con
+data, ora e numero di dispositivi rispetto a ora. Confermando, le schede stanza
+tornano 10, 10 e 10, e il messaggio finale dice dove ha salvato lo stato
+sbagliato - perche' anche quello resta recuperabile.
 
-Poi prova **Impostazioni** > **Ripristina da una copia...**: l'elenco mostra
-tutte le copie dalla piu' recente, con data, ora e numero di dispositivi.
-Sceglierne una e confermare deve dare lo stesso risultato.
+**Dove sono finiti i tre pulsanti.** *Salva copia in locale...*, *Ripristina da
+una copia...* e *Reset inventario* stanno dentro **Impostazioni**, nel riquadro
+*Copie e ripristino*: nella barra in alto non ci sono piu'.
 
 ## 8. La lingua
 
@@ -349,11 +350,33 @@ dall'elenco si possa portare via un identificativo.
 destro apre sempre il menu, e quello che si copia dall'elenco si incolla in
 Excel senza ritocchi.
 
+## 11. Le copie automatiche non superano dieci
+
+Serve a verificare che la cartella delle copie non cresca all'infinito.
+
+1. apri `Produzione\Backup\` sulla share e conta i file che si chiamano
+   `Inventario_<data>_<ora>.xlsx`;
+2. fai undici operazioni che salvano una copia - vanno bene undici *Elimina*
+   di un dispositivo qualsiasi, o undici importazioni con **Sostituisci**;
+3. torna nella cartella e conta di nuovo.
+
+**Cosa deve risultare.** I file con la data nel nome sono **dieci**, mai di
+piu', e sono i dieci piu' recenti: la piu' vecchia sparisce quando ne arriva
+una nuova. Un file che avevi messo li' a mano, con un nome qualsiasi, **deve
+essere ancora al suo posto**: la rotazione tocca solo le copie scritte dal
+programma.
+
+Se una copia e' aperta in Excel su un altro PC il programma non riesce a
+cancellarla: l'operazione va avanti lo stesso, e quella copia sparira' al giro
+dopo. Non e' un errore.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.
 
-1. premi **Reset inventario**, in alto a destra
+1. apri **Impostazioni** e premi **Reset inventario**
 2. l'avviso dice quanti dispositivi verranno eliminati, **per tutti gli utenti**
 3. scrivi per esteso `ELIMINA TUTTO` nella casella, e conferma
 4. il programma salva da solo una copia del file dati nella cartella `Backup`,

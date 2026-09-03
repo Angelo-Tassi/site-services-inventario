@@ -676,6 +676,19 @@ tranne la lingua, che e' una preferenza personale del singolo computer.
 | **Stanza degli iPhone** | dove finiscono i telefoni, sempre |
 | **Lingua** | Italiano o English. La stessa tendina e' anche nell'intestazione della finestra |
 
+In fondo alla finestra, nel riquadro **Copie e ripristino**, stanno i tre
+comandi che riscrivono l'inventario di tutti: **Salva copia in locale...**,
+**Ripristina da una copia...** e **Reset inventario**. Prima erano nella barra
+in alto; si usano di rado e li' rubavano spazio ai comandi di tutti i giorni,
+fino a spingerli fuori dallo schermo sui monitor piu' stretti.
+
+### La barra dei comandi va a capo
+
+Quando la finestra e' troppo stretta per tenere tutti i comandi in una riga, la
+barra si dispone **su due righe** invece di lasciare fuori quello che non ci
+sta: prima i pulsanti in eccesso sparivano senza dire niente, Impostazioni
+compresa. Allargando la finestra la barra torna da sola su una riga sola.
+
 ### Creare o rinominare una stanza
 
 Aggiungi una riga nel riquadro **Stanze** e salva: la scheda compare subito in
@@ -1000,14 +1013,11 @@ Se un'importazione va storta - dispositivi duplicati, la stanza sbagliata, un
 file che non era quello - non serve rimediare a mano: si torna alla versione
 buona.
 
-**Dalla barra in alto**, il pulsante **Ripristina** propone l'**ultima copia
-salvata**, dicendo di quando e' e quanti dispositivi conteneva rispetto a quelli
-che ci sono adesso. E' il caso piu' frequente: si annulla l'ultima operazione
-distruttiva con due clic.
-
-**Da *Impostazioni* > *Ripristina da una copia...*** si sceglie invece fra tutte
-le copie disponibili, elencate dalla piu' recente con data, ora e numero di
-dispositivi: serve quando l'errore risale a qualche passaggio prima.
+**Da *Impostazioni* > *Ripristina da una copia...*** si sceglie fra tutte le
+copie disponibili, elencate dalla piu' recente con data, ora e numero di
+dispositivi rispetto a quelli che ci sono adesso. La prima della lista e'
+l'ultima copia salvata: e' il caso piu' frequente, si annulla l'ultima
+operazione distruttiva con due clic.
 
 Il ripristino **salva prima lo stato attuale** in una nuova copia, quindi anche
 un ripristino sbagliato si annulla. Una copia illeggibile o sparita viene
@@ -1023,7 +1033,7 @@ l'errore umano - un reset di troppo, un'importazione sbagliata - ma **non**
 coprono il caso in cui sparisca la cartella di rete, o qualcuno ci cancelli
 dentro: in quel caso spariscono anche loro.
 
-Per quello c'e' **`Salva copia in locale...`** nella barra dei comandi. Salva
+Per quello c'e' **`Salva copia in locale...`**, in *Impostazioni*. Salva
 dove decidi tu - il tuo PC, una chiavetta, fuori dalla rete - una copia
 dell'inventario **com'e' in quel secondo**:
 
@@ -1035,7 +1045,8 @@ dell'inventario **com'e' in quel secondo**:
   nome e il suffisso `_impostazioni.json`: da soli i dati non basterebbero a
   rimettere l'inventario com'era;
 - **e' un inventario completo, non un estratto**: si apre in Excel, e si
-  ricarica con *Ripristina* o con *Importa xls...* in modalita' Sostituisci.
+  ricarica con *Ripristina da una copia...* o con *Importa xls...* in modalita'
+  Sostituisci.
 
 Il nome proposto porta data e ora, `Inventario_2026-08-31_18-30.xlsx`. Vale la
 pena farla prima di ogni operazione grossa, e ogni tanto per abitudine.
@@ -1052,6 +1063,17 @@ inventario non producono due file identici, e cercando una versione si guarda a
 quando risale il contenuto invece che a quando qualcuno ha premuto un pulsante.
 Se una copia con quel nome esiste gia', ne viene aggiunta una numerata.
 
+**Se ne tengono dieci.** Quando ne arriva una nuova e sono gia' dieci, la piu'
+vecchia viene cancellata. Servono a tornare indietro di qualche passo dopo un
+errore, non a fare da archivio: senza un limite la cartella cresceva a ogni
+eliminazione, e la copia utile finiva in fondo a un elenco lunghissimo.
+L'archivio vero e' la copia che ti salvi in locale, che nessuna rotazione tocca.
+
+Vengono contate solo le copie che ha scritto il programma, riconosciute dalla
+data nel nome: un file messo li' a mano non viene mai cancellato. E se una copia
+non si riesce a cancellare - aperta in Excel da un collega, permessi negati -
+l'operazione va avanti lo stesso: la copia nuova c'e' gia'.
+
 **Se la copia non riesce, l'operazione si annulla** e non viene toccato niente.
 Se la cartella del programma e' in sola lettura, il programma ripiega su una
 cartella `Backup` accanto al file dati e poi sul profilo utente: una copia deve
@@ -1061,11 +1083,11 @@ Per recuperare, apri il file di backup con il programma o con Excel: e' un
 inventario completo, non un formato speciale. Le copie **non finiscono mai nel
 repository**: la cartella ha una propria regola che le esclude.
 
-Vanno svuotate a mano ogni tanto: nessuno le cancella al posto tuo.
+Le copie oltre le ultime dieci le cancella il programma da solo.
 
 ## Svuotare l'inventario per ricaricarlo
 
-Il pulsante **Reset inventario**, in alto a destra, serve a ripartire da zero
+Il pulsante **Reset inventario**, in *Impostazioni*, serve a ripartire da zero
 prima di una reimportazione completa.
 
 Non e' un'operazione che si fa per sbaglio: prima di procedere il programma

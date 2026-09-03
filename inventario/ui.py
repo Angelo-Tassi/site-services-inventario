@@ -13,8 +13,8 @@ from tkinter import filedialog, font as tkfont, messagebox, ttk
 from . import __version__, config, excel_io, theme
 from . import lingua as lang
 from .lingua import T, intestazione, stato as traduci_stato
-from .store import (ALL_FIELDS, DA_RISPEDIRE, HEADERS, InventoryError,
-                    MESI_CONSERVAZIONE,
+from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE, HEADERS,
+                    InventoryError, MESI_CONSERVAZIONE,
                     InventoryStore, NON_DISPONIBILE, SPEDITO, clean,
                     is_iphone, is_on_loan, is_shipped, new_item, norm_tag,
                     puo_essere_eliminato, righe_separatore, rows_from_workbook,
@@ -555,13 +555,26 @@ class RoomsDialog(_Modal):
                  "Nelle stanze con prestito ogni riga dell'elenco ha il pulsante Presta / Registra rientro.\n"
                  "Gli iPhone vengono registrati sempre nella stanza indicata qui sopra e non si spostano."),
         ).grid(row=4, column=0, columnspan=3, sticky="w", pady=(10, 0))
+        # I comandi che riscrivono l'inventario di tutti stanno qui, non nella
+        # barra: si usano di rado, e nella barra rubavano lo spazio ai comandi
+        # di tutti i giorni fino a farli sparire dallo schermo.
+        comandi = ttk.LabelFrame(body, text=T("Copie e ripristino"), padding=10)
+        comandi.grid(row=5, column=0, columnspan=3, sticky="we", pady=(14, 0))
+        ttk.Button(comandi, text=T("Salva copia in locale..."), style="Verde.TButton",
+                   command=self._copia_locale).pack(side="left", padx=(0, 8))
+        ttk.Button(comandi, text=T("Ripristina da una copia..."), style="Rosso.TButton",
+                   command=self._ripristina).pack(side="left", padx=(0, 8))
+        ttk.Button(comandi, text=T("Reset inventario"), style="Rosso.TButton",
+                   command=self._reset).pack(side="left")
+        ttk.Label(comandi, style="Muted.TLabel",
+                  text=T("Delle copie automatiche se ne tengono %d: quando ne arriva\n"
+                         "una nuova, la piu' vecchia viene cancellata.")
+                  % COPIE_DA_TENERE).pack(side="left", padx=(14, 0))
+
         buttons = ttk.Frame(body)
-        buttons.grid(row=5, column=0, columnspan=3, sticky="we", pady=(16, 0))
+        buttons.grid(row=6, column=0, columnspan=3, sticky="we", pady=(16, 0))
         ttk.Button(buttons, text=T("Collega inventario condiviso..."),
                    command=self._collega).pack(side="left", padx=(0, 8))
-        ttk.Button(buttons, text=T("Ripristina da una copia..."),
-                   style="Rosso.TButton",
-                   command=self._ripristina).pack(side="left")
         ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
         ttk.Button(buttons, text=T("Salva"), style="Primary.TButton",
                    command=self._ok).pack(side="right")
@@ -572,6 +585,14 @@ class RoomsDialog(_Modal):
 
     def _ripristina(self):
         self.result = {"ripristina": True}
+        self.destroy()
+
+    def _copia_locale(self):
+        self.result = {"copia_locale": True}
+        self.destroy()
+
+    def _reset(self):
+        self.result = {"reset": True}
         self.destroy()
 
     def _ok(self):
@@ -1639,37 +1660,103 @@ class App(tk.Tk):
                   style="HeadSub.TLabel").pack(anchor="e", pady=(6, 0))
 
     def _build_toolbar(self):
-        bar = ttk.Frame(self, padding=(16, 12, 16, 4))
-        bar.pack(fill="x")
-        self.btn_home = ttk.Button(bar, text=T("‹  Home"), style="Ghost.TButton",
-                                   command=self.show_home)
+        """La barra dei comandi, in una riga o in due a seconda dello spazio.
+
+        In una riga sola i pulsanti che non ci stavano non venivano stretti:
+        Tk semplicemente non li disponeva, e sparivano senza dire niente -
+        Impostazioni compresa, che e' la porta di tutto il resto. Qui i comandi
+        stanno in tre gruppi e i gruppi vanno a capo quando serve, cosi' non
+        se ne perde mai nessuno.
+        """
+        self.barra = ttk.Frame(self, padding=(16, 12, 16, 4))
+        self.barra.pack(fill="x")
+        self.barra.columnconfigure(1, weight=1)
+
+        # 1. i comandi di tutti i giorni
+        self.gruppo_lavoro = ttk.Frame(self.barra)
+        self.btn_home = ttk.Button(self.gruppo_lavoro, text=T("‹  Home"),
+                                   style="Ghost.TButton", command=self.show_home)
         self.btn_home.pack(side="left", padx=(0, 10))
-        ttk.Button(bar, text=T("Aggiungi"), style="Primary.TButton",
+        ttk.Button(self.gruppo_lavoro, text=T("Aggiungi"), style="Primary.TButton",
                    command=self.on_add).pack(side="left", padx=(0, 6))
         for text, command in (("Modifica", self.on_edit), ("Elimina", self.on_delete)):
-            ttk.Button(bar, text=T(text), command=command).pack(side="left", padx=(0, 6))
-        ttk.Button(bar, text=T("Elimina +"), style="Rosso.TButton",
+            ttk.Button(self.gruppo_lavoro, text=T(text),
+                       command=command).pack(side="left", padx=(0, 6))
+        ttk.Button(self.gruppo_lavoro, text=T("Elimina +"), style="Rosso.TButton",
                    command=self.on_delete_many).pack(side="left", padx=(0, 6))
-        ttk.Button(bar, text=T("Sposta in stanza..."),
+        ttk.Button(self.gruppo_lavoro, text=T("Sposta in stanza..."),
                    command=self.on_move).pack(side="left", padx=(0, 6))
-        ttk.Separator(bar, orient="vertical").pack(side="left", fill="y", padx=10)
-        # Il colore dice a quale famiglia appartiene il comando: arancione i
-        # dati che entrano, verde quelli che escono, rosso quello che riscrive
-        # l'inventario di tutti.
+
+        # 2. i file che entrano ed escono. Il colore dice a quale famiglia
+        # appartiene il comando: arancione i dati che entrano, verde quelli che
+        # escono, rosso quello che riscrive l'inventario di tutti.
+        self.gruppo_file = ttk.Frame(self.barra)
+        self.sep_barra = ttk.Separator(self.gruppo_file, orient="vertical")
+        self.sep_barra.pack(side="left", fill="y", padx=10)
         for text, command, stile in (
             ("Importa xls...", self.on_import, "Arancio.TButton"),
             ("Esporta xls...", self.on_export, "Verde.TButton"),
-            ("Salva copia in locale...", self.on_copia_locale, "Verde.TButton"),
             ("Stampa", self.on_print, "TButton"),
         ):
-            ttk.Button(bar, text=T(text), style=stile,
+            ttk.Button(self.gruppo_file, text=T(text), style=stile,
                        command=command).pack(side="left", padx=(0, 6))
-        ttk.Button(bar, text=T("Impostazioni"), command=self.on_settings).pack(side="right")
-        ttk.Button(bar, text=T("Reset inventario"), style="Rosso.TButton",
-                   command=self.on_reset).pack(side="right", padx=(0, 6))
-        ttk.Button(bar, text=T("Ripristina"), style="Rosso.TButton",
-                   command=self.on_restore).pack(side="right", padx=(0, 6))
-        ttk.Button(bar, text=T("Aggiorna"), command=self.on_refresh).pack(side="right", padx=6)
+
+        # 3. quello che non riguarda i dispositivi
+        self.gruppo_lato = ttk.Frame(self.barra)
+        ttk.Button(self.gruppo_lato, text=T("Aggiorna"),
+                   command=self.on_refresh).pack(side="left", padx=(0, 6))
+        ttk.Button(self.gruppo_lato, text=T("Impostazioni"),
+                   command=self.on_settings).pack(side="left")
+
+        self._righe_barra = None
+        self.barra.bind("<Configure>", self._sistema_barra)
+        self._sistema_barra()
+
+    def _sistema_barra(self, event=None):
+        """Decide se i comandi stanno in una riga o in due.
+
+        Cambia la disposizione solo quando cambia davvero: <Configure> arriva a
+        ogni pixel di ridimensionamento, e rifare la griglia ogni volta
+        sarebbe lavoro buttato. Andare a capo cambia l'altezza, non la
+        larghezza, quindi la scelta non puo' rimbalzare fra i due stati.
+        """
+        larghezza = event.width if event is not None else self.barra.winfo_width()
+        if larghezza <= 1:
+            return
+        lavoro = self.gruppo_lavoro.winfo_reqwidth()
+        file_ = self.gruppo_file.winfo_reqwidth()
+        lato = self.gruppo_lato.winfo_reqwidth()
+        if lavoro + file_ + lato <= larghezza:
+            stato = "una"
+        elif lavoro + lato <= larghezza:
+            stato = "due"
+        else:
+            stato = "due_basso"
+        if stato == self._righe_barra:
+            return
+        self._righe_barra = stato
+        for gruppo in (self.gruppo_lavoro, self.gruppo_file, self.gruppo_lato):
+            gruppo.grid_forget()
+        self.sep_barra.pack_forget()
+        if stato == "una":
+            self.sep_barra.pack(side="left", fill="y", padx=10, before=self.sep_dopo())
+            self.gruppo_lavoro.grid(row=0, column=0, sticky="w")
+            self.gruppo_file.grid(row=0, column=1, sticky="w")
+            self.gruppo_lato.grid(row=0, column=2, sticky="e")
+        elif stato == "due":
+            self.gruppo_lavoro.grid(row=0, column=0, sticky="w")
+            self.gruppo_lato.grid(row=0, column=2, sticky="e")
+            self.gruppo_file.grid(row=1, column=0, columnspan=3, sticky="w",
+                                  pady=(6, 0))
+        else:
+            self.gruppo_lavoro.grid(row=0, column=0, columnspan=3, sticky="w")
+            self.gruppo_file.grid(row=1, column=0, sticky="w", pady=(6, 0))
+            self.gruppo_lato.grid(row=1, column=2, sticky="e", pady=(6, 0))
+
+    def sep_dopo(self):
+        """Il primo pulsante del gruppo file: il separatore gli sta davanti."""
+        figli = [c for c in self.gruppo_file.winfo_children() if c is not self.sep_barra]
+        return figli[0] if figli else None
 
     def _build_filters(self):
         bar = ttk.Frame(self, padding=(16, 4))
@@ -3770,6 +3857,12 @@ class App(tk.Tk):
             return
         if result.get("ripristina"):
             self.on_restore(scegli=True)
+            return
+        if result.get("copia_locale"):
+            self.on_copia_locale()
+            return
+        if result.get("reset"):
+            self.on_reset()
             return
         nuova_lingua = result.pop("lingua", lang.corrente())
         try:

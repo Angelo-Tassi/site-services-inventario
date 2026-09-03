@@ -358,6 +358,19 @@ which is a personal preference of the single computer.
 | **iPhone room** | where phones always end up |
 | **Language** | Italiano or English. The same dropdown is also in the window header |
 
+At the bottom of the window, in the **Copies and restore** box, sit the three
+commands that rewrite everyone's inventory: **Save a local copy...**, **Restore
+from a copy...** and **Reset inventory**. They used to be in the toolbar; they
+are rarely used and up there they stole room from the everyday commands, to the
+point of pushing them off the screen on narrower monitors.
+
+### The toolbar wraps
+
+When the window is too narrow to hold every command in one row, the toolbar lays
+itself out **on two rows** instead of leaving out what does not fit: before, the
+extra buttons disappeared without a word, Settings included. Widen the window and
+the toolbar goes back to a single row on its own.
+
 ### Creating or renaming a room
 
 Add a line in the **Rooms** box and save: the card shows up on the home page
@@ -952,14 +965,10 @@ If an import goes wrong - duplicated devices, the wrong room, a file that was
 not the right one - there is no need to fix it by hand: you go back to the good
 version.
 
-**From the toolbar**, the **Restore** button offers the **latest saved copy**,
-telling you when it is from and how many devices it held compared to the ones
-there now. That is the frequent case: the last destructive operation is undone
-in two clicks.
-
 **From *Settings* > *Restore from a copy...*** you choose among all the copies
-available instead, listed newest first with date, time and number of devices:
-useful when the mistake goes back a few steps.
+available, listed newest first with date, time and number of devices compared to
+the ones there now. The first in the list is the latest saved copy: that is the
+frequent case, the last destructive operation undone in two clicks.
 
 Restoring **saves the current state first** into a new copy, so even a wrong
 restore can be undone. An unreadable or missing copy is refused without touching
@@ -975,7 +984,7 @@ human error - one reset too many, a botched import - but they do **not** cover
 the network folder disappearing, or somebody deleting inside it: in that case
 they go too.
 
-That is what **`Save a local copy...`** in the toolbar is for. It saves, wherever
+That is what **`Save a local copy...`**, in *Settings*, is for. It saves, wherever
 you decide - your PC, a USB stick, off the network - a copy of the inventory
 **as it is at that second**:
 
@@ -987,7 +996,8 @@ you decide - your PC, a USB stick, off the network - a copy of the inventory
   `_impostazioni.json` suffix: the data alone would not be enough to put the
   inventory back as it was;
 - **it is a complete inventory, not an extract**: it opens in Excel, and it is
-  reloaded with *Restore* or with *Import xls...* in Replace mode.
+  reloaded with *Restore from a copy...* or with *Import xls...* in Replace
+  mode.
 
 The suggested name carries the date and time,
 `Inventario_2026-08-31_18-30.xlsx`. It is worth doing before every big
@@ -1005,6 +1015,17 @@ inventory do not produce two identical files, and looking for a version you go
 by when the contents date from rather than when somebody pressed a button. If a
 copy with that name already exists, a numbered one is added.
 
+**Ten of them are kept.** When a new one arrives and there are already ten, the
+oldest is deleted. They are there to step back after a mistake, not to be an
+archive: without a limit the folder grew with every deletion, and the useful copy
+ended up at the bottom of a very long list. The real archive is the copy you save
+locally, which no rotation touches.
+
+Only the copies the program wrote are counted, recognised by the date in the
+name: a file put there by hand is never deleted. And if a copy cannot be deleted
+- open in Excel on a colleague's machine, permissions denied - the operation goes
+ahead anyway: the new copy is already there.
+
 **If the copy fails, the operation is cancelled** and nothing is touched. If the
 program folder is read-only, the program falls back to a `Backup` folder next to
 the data file, then to the user profile: a copy has to be writable.
@@ -1013,11 +1034,11 @@ To recover, open the backup file with the program or with Excel: it is a
 complete inventory, not a special format. The copies **never end up in the
 repository**: the folder carries its own rule excluding them.
 
-They have to be cleared out by hand now and then: nobody deletes them for you.
+Older copies beyond the last ten are cleared out by the program itself.
 
 ## Emptying the inventory to reload it
 
-The **Reset inventory** button, top right, is there to start over before a full
+The **Reset inventory** button, in *Settings*, is there to start over before a full
 reimport. Before anything happens the program shows a warning with how many
 devices will be deleted **for every user** and asks you to type `DELETE
 EVERYTHING` in full, then **saves a copy** of the data file in the same network

@@ -288,13 +288,21 @@ table{min-width:520px}
     <tr><td><span class="k grigio">Sposta in stanza…</span></td><td class="d">Cambia la stanza di <b>tutti i dispositivi selezionati</b>, dopo un riepilogo che dice da dove partono e come restano le stanze. Gli iPhone non si spostano.</td></tr>
     <tr><td><span class="k arancio">Importa xls…</span></td><td class="d">Carica dispositivi da un foglio Excel. Prima chiede <b>che cosa</b> importare e <b>come</b>. Vedi <a href="#importare">Importare</a>.</td></tr>
     <tr><td><span class="k verde">Esporta xls…</span></td><td class="d">Produce un file Excel dell'inventario. Prima chiede ambito e forma. Vedi <a href="#esportare">Esportare</a>.</td></tr>
-    <tr><td><span class="k verde">Salva copia in locale…</span></td><td class="d"><b>La copia di sicurezza che decidi tu.</b> Vedi <a href="#sicurezza">Sicurezza dei dati</a>.</td></tr>
     <tr><td><span class="k grigio">Stampa</span></td><td class="d">Manda alla stampante l'elenco che stai guardando, impaginato. Puo' fare una pagina per stanza.</td></tr>
     <tr><td><span class="k grigio">Aggiorna</span></td><td class="d">Rilegge subito l'inventario dalla rete. L'elenco si aggiorna comunque da solo ogni quindici secondi.</td></tr>
-    <tr><td><span class="k rosso">Ripristina</span></td><td class="d">Riporta l'inventario all'ultima copia di sicurezza. Vedi <a href="#ripristino">Tornare indietro</a>.</td></tr>
-    <tr><td><span class="k rosso">Reset inventario</span></td><td class="d">Svuota l'inventario. Chiede di scrivere <span class="mono">ELIMINA TUTTO</span> e salva prima una copia. Gli iPhone non si toccano mai.</td></tr>
-    <tr><td><span class="k grigio">Impostazioni</span></td><td class="d">Stanze, tipi, prestiti, lingua, ripristino da una copia scelta, e il collegamento all'inventario condiviso.</td></tr>
+    <tr><td><span class="k grigio">Impostazioni</span></td><td class="d">Stanze, tipi, prestiti, lingua, il collegamento all'inventario condiviso e i tre comandi qui sotto.</td></tr>
   </table></div>
+
+  <h3>Dentro Impostazioni: copie e ripristino</h3>
+  <p class="sub">Riscrivono l'inventario di tutti e si usano di rado: nella barra
+    rubavano spazio ai comandi di tutti i giorni fino a spingerli fuori dallo schermo.</p>
+  <div class="tw"><table class="man">
+    <tr><td><span class="k verde">Salva copia in locale…</span></td><td class="d"><b>La copia di sicurezza che decidi tu.</b> Vedi <a href="#sicurezza">Sicurezza dei dati</a>.</td></tr>
+    <tr><td><span class="k rosso">Ripristina da una copia…</span></td><td class="d">Riporta l'inventario a una delle copie di sicurezza, scelta dall'elenco. Vedi <a href="#ripristino">Tornare indietro</a>.</td></tr>
+    <tr><td><span class="k rosso">Reset inventario</span></td><td class="d">Svuota l'inventario. Chiede di scrivere <span class="mono">ELIMINA TUTTO</span> e salva prima una copia. Gli iPhone non si toccano mai.</td></tr>
+  </table></div>
+  <p class="note">Se la finestra e' stretta, la barra dei comandi va a capo su due righe:
+    nessun pulsante viene lasciato fuori. Allargandola torna su una riga sola.</p>
 
   <h3>Solo dentro una stanza</h3>
   <div class="tw"><table class="man">
@@ -603,7 +611,8 @@ table{min-width:520px}
     <div class="card"><h3>2 · Copie automatiche</h3>
       <p>Prima di <b>ogni</b> operazione che cancella o sostituisce, il programma salva
         da solo una copia in <span class="mono">Produzione\Backup\</span>, con la data
-        nel nome. Non devi ricordartene tu.</p></div>
+        nel nome. Non devi ricordartene tu. Se ne tengono <b>dieci</b>: quando ne arriva
+        una nuova, la piu' vecchia viene cancellata.</p></div>
     <div class="card"><h3>3 · La copia che decidi tu</h3>
       <p><span class="k verde">Salva copia in locale…</span> mette una copia
         dell'inventario dove vuoi: sul tuo PC, su una chiavetta, fuori dalla rete.</p></div>
@@ -644,7 +653,7 @@ table{min-width:520px}
   <h2>Tornare indietro</h2>
   <div class="tw"><table class="man">
     <tr><th>Se…</th><th>Fai cosi'</th></tr>
-    <tr><td class="d">Hai appena sbagliato un'importazione o un reset</td><td class="d"><span class="k rosso">Ripristina</span> nella barra: riporta l'inventario all'<b>ultima</b> copia salvata, dicendoti di quando e' e quanti dispositivi contiene.</td></tr>
+    <tr><td class="d">Hai appena sbagliato un'importazione o un reset</td><td class="d"><span class="k grigio">Impostazioni</span> › <span class="k rosso">Ripristina da una copia…</span>: la prima della lista e' l'<b>ultima</b> copia salvata, con la data e quanti dispositivi contiene.</td></tr>
     <tr><td class="d">Ti serve una copia piu' vecchia</td><td class="d"><span class="k grigio">Impostazioni</span> › <span class="k rosso">Ripristina da una copia…</span>: le mostra tutte, con data e numero di dispositivi, e scegli.</td></tr>
     <tr><td class="d">La cartella di rete e' sparita o i dati sono stati cancellati</td><td class="d">Riparti dalla tua copia locale: rimettila sulla share come <span class="mono">Produzione\Inventario.xlsx</span>, insieme al file delle impostazioni rinominato <span class="mono">inventario_impostazioni.json</span>.</td></tr>
     <tr><td class="d">Vuoi svuotare tutto e ricaricare da zero</td><td class="d"><span class="k rosso">Reset inventario</span>, scrivendo <span class="mono">ELIMINA TUTTO</span>. Una copia viene salvata comunque prima di procedere.</td></tr>
@@ -847,13 +856,22 @@ table{min-width:520px}
     <tr><td><span class="k grigio">Move to room…</span></td><td class="d">Changes the room of <b>every selected device</b>, after a summary saying where they come from and how the rooms end up. iPhones do not move.</td></tr>
     <tr><td><span class="k arancio">Import xls…</span></td><td class="d">Loads devices from an Excel sheet. It asks first <b>what</b> to import and <b>how</b>. See <a href="#importare-en">Importing</a>.</td></tr>
     <tr><td><span class="k verde">Export xls…</span></td><td class="d">Produces an Excel file of the inventory. It asks first for scope and shape. See <a href="#esportare-en">Exporting</a>.</td></tr>
-    <tr><td><span class="k verde">Save a local copy…</span></td><td class="d"><b>The backup you decide on.</b> See <a href="#sicurezza-en">Keeping the data safe</a>.</td></tr>
     <tr><td><span class="k grigio">Print</span></td><td class="d">Sends the list you are looking at to the printer, laid out. It can do one page per room.</td></tr>
     <tr><td><span class="k grigio">Refresh</span></td><td class="d">Rereads the inventory from the network at once. The list refreshes by itself every fifteen seconds anyway.</td></tr>
-    <tr><td><span class="k rosso">Restore</span></td><td class="d">Takes the inventory back to the last backup copy. See <a href="#ripristino-en">Going back</a>.</td></tr>
-    <tr><td><span class="k rosso">Reset inventory</span></td><td class="d">Empties the inventory. It asks you to type <span class="mono">ELIMINA TUTTO</span> and saves a copy first. iPhones are never touched.</td></tr>
-    <tr><td><span class="k grigio">Settings</span></td><td class="d">Rooms, types, loans, language, restoring from a chosen copy, and the link to the shared inventory.</td></tr>
+    <tr><td><span class="k grigio">Settings</span></td><td class="d">Rooms, types, loans, language, the link to the shared inventory and the three commands below.</td></tr>
   </table></div>
+
+  <h3>Inside Settings: copies and restore</h3>
+  <p class="sub">They rewrite everyone's inventory and are rarely used: in the toolbar
+    they stole room from the everyday commands, to the point of pushing them off the
+    screen.</p>
+  <div class="tw"><table class="man">
+    <tr><td><span class="k verde">Save a local copy…</span></td><td class="d"><b>The backup you decide on.</b> See <a href="#sicurezza-en">Keeping the data safe</a>.</td></tr>
+    <tr><td><span class="k rosso">Restore from a copy…</span></td><td class="d">Takes the inventory back to one of the backup copies, chosen from the list. See <a href="#ripristino-en">Going back</a>.</td></tr>
+    <tr><td><span class="k rosso">Reset inventory</span></td><td class="d">Empties the inventory. It asks you to type <span class="mono">ELIMINA TUTTO</span> and saves a copy first. iPhones are never touched.</td></tr>
+  </table></div>
+  <p class="note">If the window is narrow, the toolbar wraps onto two rows: no button is
+    ever left out. Widen it and it goes back to a single row.</p>
 
   <h3>Only inside a room</h3>
   <div class="tw"><table class="man">
@@ -1158,7 +1176,8 @@ table{min-width:520px}
     <div class="card"><h3>2 · Automatic copies</h3>
       <p>Before <b>every</b> operation that deletes or replaces, the program saves a copy by
         itself into <span class="mono">Produzione\Backup\</span>, with the date in the name.
-        You do not have to remember.</p></div>
+        You do not have to remember. <b>Ten</b> are kept: when a new one arrives, the
+        oldest is deleted.</p></div>
     <div class="card"><h3>3 · The copy you decide on</h3>
       <p><span class="k verde">Save a local copy…</span> puts a copy of the inventory
         wherever you want: your PC, a USB stick, off the network.</p></div>
@@ -1199,7 +1218,7 @@ table{min-width:520px}
   <h2>Going back</h2>
   <div class="tw"><table class="man">
     <tr><th>If…</th><th>Do this</th></tr>
-    <tr><td class="d">You have just botched an import or a reset</td><td class="d"><span class="k rosso">Restore</span> in the toolbar: it takes the inventory back to the <b>latest</b> saved copy, telling you when it is from and how many devices it holds.</td></tr>
+    <tr><td class="d">You have just botched an import or a reset</td><td class="d"><span class="k grigio">Settings</span> › <span class="k rosso">Restore from a copy…</span>: the first in the list is the <b>latest</b> saved copy, with its date and how many devices it holds.</td></tr>
     <tr><td class="d">You need an older copy</td><td class="d"><span class="k grigio">Settings</span> › <span class="k rosso">Restore from a copy…</span>: it lists them all, with date and device count, and you choose.</td></tr>
     <tr><td class="d">The network folder is gone or the data was deleted</td><td class="d">Start again from your local copy: put it back on the share as <span class="mono">Produzione\Inventario.xlsx</span>, together with the settings file renamed <span class="mono">inventario_impostazioni.json</span>.</td></tr>
     <tr><td class="d">You want to empty everything and reload from scratch</td><td class="d"><span class="k rosso">Reset inventory</span>, typing <span class="mono">ELIMINA TUTTO</span>. A copy is saved before proceeding anyway.</td></tr>

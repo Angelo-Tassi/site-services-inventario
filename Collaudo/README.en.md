@@ -247,16 +247,17 @@ putting it right.
 2. now make the mess: import `Inventario_di_prova.xlsx` choosing **A single
    room** > `Site Services BAU` > **Merge**. All 30 devices end up in BAU, which
    had 10
-3. press **Restore** in the toolbar
+3. open **Settings** > **Restore from a copy...** and pick the first in the
+   list, which is the latest saved copy
 
-**What you should get.** The warning says when the latest copy is from and how
-many devices it held compared to now. On confirmation the room cards go back to
-10, 10 and 10, and the final message says where it saved the wrong state -
-because that stays recoverable too.
+**What you should get.** The list shows every copy newest first, with date, time
+and device count compared to now. On confirmation the room cards go back to 10,
+10 and 10, and the final message says where it saved the wrong state - because
+that stays recoverable too.
 
-Then try **Settings** > **Restore from a copy...**: the list shows every copy
-newest first, with date, time and device count. Picking one and confirming must
-give the same result.
+**Where the three buttons went.** *Save a local copy...*, *Restore from a
+copy...* and *Reset inventory* live inside **Settings**, in the *Copies and
+restore* box: they are no longer in the toolbar.
 
 ## 8. Language
 
@@ -347,11 +348,32 @@ can be taken out of the list.
 always opens the menu, and what you copy from the list pastes into Excel with no
 touch-ups.
 
+## 11. Automatic copies never go past ten
+
+This checks that the copies folder does not grow forever.
+
+1. open `Produzione\Backup\` on the share and count the files named
+   `Inventario_<date>_<time>.xlsx`;
+2. do eleven operations that save a copy - eleven *Delete* of any device will
+   do, or eleven imports with **Replace**;
+3. go back to the folder and count again.
+
+**What you should get.** The files with the date in the name are **ten**, never
+more, and they are the ten most recent: the oldest goes when a new one arrives.
+A file you had put there by hand, with any name, **must still be in place**: the
+rotation only touches the copies the program wrote.
+
+If a copy is open in Excel on another PC the program cannot delete it: the
+operation goes ahead anyway, and that copy will go on the next round. It is not
+an error.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.
 
-1. press **Reset inventory**, at the top right
+1. open **Settings** and press **Reset inventory**
 2. the warning says how many devices will be deleted, **for every user**
 3. type `DELETE EVERYTHING` in full in the box, and confirm
 4. the program saves a copy of the data file by itself, in the `Backup` folder

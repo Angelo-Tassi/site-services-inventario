@@ -278,6 +278,33 @@ class BloccoPrestito(InventoryError):
                item.get("prestato_il", "")))
 
 
+# Quante copie automatiche si tengono nella cartella Backup. Servono a tornare
+# indietro di qualche passo, non a fare da archivio storico: la copia che si
+# conserva davvero e' quella che il tecnico si salva in locale.
+COPIE_DA_TENERE = 10
+
+
+def e_una_copia_automatica(nome):
+    """True se il nome e' quello che scrive copia_di_sicurezza().
+
+    Si guarda la data nel nome, non l'estensione soltanto: nella cartella
+    Backup puo' finire un file messo li' a mano, e quello non si tocca.
+    """
+    if nome.startswith("~$") or not nome.lower().endswith(".xlsx"):
+        return False
+    base = os.path.splitext(nome)[0]
+    if base.endswith(")") and " (" in base:
+        base = base[:base.rindex(" (")]       # "... (2)": stesso contenuto, ripetuto
+    pezzi = base.rsplit("_", 2)
+    if len(pezzi) < 3:
+        return False
+    try:
+        datetime.strptime("_".join(pezzi[-2:]), "%Y-%m-%d_%H-%M-%S")
+    except ValueError:
+        return False
+    return True
+
+
 def current_user():
     try:
         user = getpass.getuser()
@@ -513,6 +540,9 @@ class InventoryStore(object):
         self.modifiche = 0
         self.items = []
         self._stamp = None
+        # Le copie automatiche buttate via dall'ultima rotazione: chi vuole puo'
+        # dirlo, ma nessuno deve dipenderne.
+        self.copie_scartate = []
 
     def _enforce_iphone_room(self, item):
         """Un iPhone appartiene sempre alla sua stanza, comunque lo si registri."""
@@ -740,7 +770,42 @@ class InventoryStore(object):
             raise InventoryError(
                 T("Non riesco a creare la copia di sicurezza:\n%s\n\n"
                 "L'operazione e' stata annullata: nessun dato e' stato toccato.") % exc)
+        self.copie_scartate = self._tieni_solo_le_ultime(cartella)
         return destinazione
+
+    def _tieni_solo_le_ultime(self, cartella, quante=None):
+        """Cancella le copie automatiche piu' vecchie oltre le ultime `quante`.
+
+        Va chiamata dopo aver scritto la copia nuova, mai prima: se la scrittura
+        fallisse si sarebbe fatto spazio buttando via una copia buona.
+
+        Una copia che non si riesce a cancellare - aperta in Excel da un collega,
+        permessi negati sulla share - non ferma niente: la copia nuova c'e' gia',
+        e l'operazione che l'ha chiesta deve andare avanti.
+        """
+        quante = COPIE_DA_TENERE if quante is None else quante
+        try:
+            nomi = os.listdir(cartella)
+        except OSError:
+            return []
+        copie = []
+        for nome in nomi:
+            if not e_una_copia_automatica(nome):
+                continue
+            percorso = os.path.join(cartella, nome)
+            try:
+                copie.append((os.path.getmtime(percorso), nome, percorso))
+            except OSError:
+                continue
+        copie.sort(reverse=True)          # dalla piu' recente, come Ripristina
+        scartate = []
+        for _quando, _nome, percorso in copie[quante:]:
+            try:
+                os.remove(percorso)
+                scartate.append(percorso)
+            except OSError:
+                pass
+        return scartate
 
     def copia_in(self, destinazione):
         """Copia l'inventario, com'e' in questo istante, nel percorso indicato.
