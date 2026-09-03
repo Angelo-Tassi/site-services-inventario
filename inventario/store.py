@@ -20,8 +20,10 @@ import os
 import platform
 import shutil
 import socket
+import tempfile
 import time
 import uuid
+import zipfile
 from datetime import datetime
 
 from openpyxl import Workbook, load_workbook
@@ -282,6 +284,12 @@ class BloccoPrestito(InventoryError):
 # indietro di qualche passo, non a fare da archivio storico: la copia che si
 # conserva davvero e' quella che il tecnico si salva in locale.
 COPIE_DA_TENERE = 10
+
+# Come si chiamano i due file dentro la copia locale. I nomi sono fissi, non
+# quelli del file di partenza: una copia salvata da una postazione deve poter
+# essere riaperta da un'altra, dove l'inventario si chiama in un altro modo.
+NOME_DATI_NELLO_ZIP = "Inventario.xlsx"
+NOME_IMPOSTAZIONI_NELLO_ZIP = "inventario_impostazioni.json"
 
 
 def e_una_copia_automatica(nome):
@@ -826,6 +834,24 @@ class InventoryStore(object):
         cartella = os.path.dirname(os.path.abspath(destinazione))
         if not os.path.isdir(cartella):
             raise InventoryError(T("La cartella non esiste:\n%s") % cartella)
+        sorgente = config.shared_config_path(self.path)
+        if destinazione.lower().endswith(".zip"):
+            with _Lock(self.path):
+                if not os.path.exists(self.path):
+                    raise InventoryError(T("L'inventario non c'e' piu':\n%s") % self.path)
+                quanti = len(self._read())
+                impostazioni = None
+                try:
+                    with zipfile.ZipFile(destinazione, "w",
+                                         zipfile.ZIP_DEFLATED) as archivio:
+                        archivio.write(self.path, NOME_DATI_NELLO_ZIP)
+                        if os.path.exists(sorgente):
+                            archivio.write(sorgente, NOME_IMPOSTAZIONI_NELLO_ZIP)
+                            impostazioni = NOME_IMPOSTAZIONI_NELLO_ZIP
+                except OSError as exc:
+                    raise InventoryError(T("Non riesco a salvare la copia:\n%s") % exc)
+            return destinazione, impostazioni, quanti
+
         with _Lock(self.path):
             if not os.path.exists(self.path):
                 raise InventoryError(T("L'inventario non c'e' piu':\n%s") % self.path)
@@ -835,7 +861,6 @@ class InventoryStore(object):
                 raise InventoryError(T("Non riesco a salvare la copia:\n%s") % exc)
             quanti = len(self._read())
             impostazioni = None
-            sorgente = config.shared_config_path(self.path)
             if os.path.exists(sorgente):
                 accanto = os.path.splitext(destinazione)[0] + "_impostazioni.json"
                 try:
@@ -844,6 +869,134 @@ class InventoryStore(object):
                 except OSError:
                     impostazioni = None      # i dati sono salvi: basta e avanza
         return destinazione, impostazioni, quanti
+
+    def _estrai_copia_locale(self, percorso, cartella):
+        """Tira fuori dati e impostazioni da una copia locale.
+
+        Accetta sia lo zip - dati piu' impostazioni - sia il vecchio .xlsx da
+        solo, con il suo _impostazioni.json accanto se c'e': le copie salvate
+        prima che lo zip esistesse devono restare ripristinabili.
+
+        Ritorna (file dati, file impostazioni o None).
+        """
+        if not os.path.exists(percorso):
+            raise InventoryError(T("Il file %s non esiste piu'.")
+                                 % os.path.basename(percorso))
+        if not percorso.lower().endswith(".zip"):
+            accanto = os.path.splitext(percorso)[0] + "_impostazioni.json"
+            return percorso, (accanto if os.path.exists(accanto) else None)
+
+        try:
+            with zipfile.ZipFile(percorso) as archivio:
+                dentro = archivio.namelist()
+                dati = next((n for n in dentro
+                             if n.lower().endswith(".xlsx")
+                             and not os.path.basename(n).startswith("~$")), None)
+                if dati is None:
+                    raise InventoryError(
+                        T("Nella copia %s non c'e' nessun inventario.\n\n"
+                          "Non e' stato ripristinato niente.")
+                        % os.path.basename(percorso))
+                impostazioni = next((n for n in dentro
+                                     if n.lower().endswith(".json")), None)
+                archivio.extract(dati, cartella)
+                if impostazioni:
+                    archivio.extract(impostazioni, cartella)
+        except zipfile.BadZipFile:
+            raise InventoryError(
+                T("%s non e' una copia leggibile: il file e' rovinato o non e'\n"
+                  "uno di quelli salvati da questo programma.\n\n"
+                  "Non e' stato ripristinato niente.") % os.path.basename(percorso))
+        except OSError as exc:
+            raise InventoryError(T("Non riesco a leggere la copia:\n%s") % exc)
+        return (os.path.join(cartella, dati),
+                os.path.join(cartella, impostazioni) if impostazioni else None)
+
+    def anteprima_copia_locale(self, percorso):
+        """Che cosa c'e' dentro una copia locale, senza toccare niente.
+
+        Serve al riepilogo: prima di riscrivere l'inventario di tutti bisogna
+        poter leggere quanti dispositivi tornerebbero e con quali stanze.
+        """
+        from . import config
+
+        cartella = tempfile.mkdtemp()
+        try:
+            dati, impostazioni = self._estrai_copia_locale(percorso, cartella)
+            try:
+                dispositivi = InventoryStore(dati)._read()
+            except InventoryError as exc:
+                raise InventoryError(
+                    T("%s non e' un inventario leggibile:\n%s\n\n"
+                      "Non e' stato ripristinato niente.")
+                    % (os.path.basename(percorso), exc))
+            rapporto = {"dispositivi": len(dispositivi), "impostazioni": None,
+                        "per_stanza": {}, "quando": None}
+            for it in dispositivi:
+                stanza = clean(it.get("stanza")) or SENZA_STANZA
+                rapporto["per_stanza"][stanza] = rapporto["per_stanza"].get(stanza, 0) + 1
+            try:
+                rapporto["quando"] = datetime.fromtimestamp(os.path.getmtime(dati))
+            except OSError:
+                pass
+            if impostazioni:
+                try:
+                    with open(impostazioni, "r", encoding="utf-8") as fh:
+                        rapporto["impostazioni"] = json.load(fh)
+                except (OSError, ValueError):
+                    rapporto["impostazioni"] = None
+            return rapporto
+        finally:
+            shutil.rmtree(cartella, ignore_errors=True)
+
+    def ripristina_da_copia_locale(self, percorso):
+        """Rimette inventario e impostazioni come stanno in una copia locale.
+
+        E' il ripristino per il caso peggiore: la cartella di rete sparita, con
+        dentro i backup automatici. Da qui tornano anche le stanze, i tipi e le
+        stanze con prestito, che nel solo file dei dispositivi non ci sono.
+
+        Lo stato attuale viene salvato prima, cosi' anche questo si annulla.
+        Ritorna (dispositivi, copia dello stato precedente, impostazioni si/no).
+        """
+        from . import config
+
+        cartella = tempfile.mkdtemp()
+        try:
+            dati, impostazioni = self._estrai_copia_locale(percorso, cartella)
+            try:
+                recuperati = InventoryStore(dati)._read()
+            except InventoryError as exc:
+                raise InventoryError(
+                    T("%s non e' un inventario leggibile:\n%s\n\n"
+                      "Non e' stato ripristinato niente.")
+                    % (os.path.basename(percorso), exc))
+            letta = None
+            if impostazioni:
+                try:
+                    with open(impostazioni, "r", encoding="utf-8") as fh:
+                        letta = json.load(fh)
+                except (OSError, ValueError):
+                    letta = None      # i dispositivi tornano lo stesso
+            with _Lock(self.path):
+                precedente = self.copia_di_sicurezza()
+                try:
+                    shutil.copy2(dati, self.path)
+                except OSError as exc:
+                    raise InventoryError(
+                        T("Non riesco a ripristinare la copia:\n%s\n\n"
+                          "L'inventario e' rimasto com'era.") % exc)
+            # Le impostazioni vengono dopo i dati: se qui andasse storto
+            # qualcosa, l'inventario e' comunque tornato al suo posto.
+            if letta:
+                try:
+                    config.save_shared_config(self.path, letta)
+                except OSError:
+                    letta = None
+        finally:
+            shutil.rmtree(cartella, ignore_errors=True)
+        self.load()
+        return len(recuperati), precedente, bool(letta)
 
     def copie_disponibili(self, quante=40):
         """Le copie di sicurezza, dalla piu' recente. (percorso, data, dispositivi)."""

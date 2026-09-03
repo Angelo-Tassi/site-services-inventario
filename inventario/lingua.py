@@ -824,6 +824,94 @@ EN = {
     "una nuova, la piu' vecchia viene cancellata.":
         'Of the automatic copies %d are kept: when a new one arrives,\n'
         'the oldest is deleted.',
+    'COME RESTANO LE STANZE:':
+        'HOW THE ROOMS END UP:',
+    'TORNANO ANCHE LE IMPOSTAZIONI:':
+        'THE SETTINGS COME BACK TOO:',
+    "L'inventario di tutti torna com'era nella copia.\n"
+    'Lo stato attuale viene salvato prima, cosi\' puoi tornare indietro.':
+        "Everyone's inventory goes back to how it was in the copy.\n"
+        'The current state is saved first, so you can go back.',
+    'La copia contiene %d dispositivi; adesso in inventario ce ne sono %d.':
+        'The copy holds %d devices; the inventory now has %d.',
+    'La copia non porta le impostazioni: stanze, tipi e stati\n'
+    "restano quelli di adesso.":
+        'The copy does not carry the settings: rooms, types and statuses\n'
+        'stay as they are now.',
+    'Stanze':
+        'Rooms',
+    "Le righe con * cambiano rispetto a com'e' adesso.":
+        'The lines marked * change from how it is now.',
+    'Sono tornate anche le impostazioni: stanze, tipi e stati.':
+        'The settings came back too: rooms, types and statuses.',
+    'La copia non portava le impostazioni: stanze e tipi sono rimasti\n'
+    'quelli di prima.':
+        'The copy did not carry the settings: rooms and types stayed as\n'
+        'they were.',
+    'Risale al %s.':
+        'It dates from %s.',
+    'Scegli la copia da cui ripristinare':
+        'Choose the copy to restore from',
+    'Ripristinati %d dispositivi da %s.\n\n%s\n\n'
+    "Lo stato precedente e' stato salvato in:\n%s":
+        'Restored %d devices from %s.\n\n%s\n\n'
+        'The previous state was saved in:\n%s',
+    "Dentro ci sono l'inventario e le impostazioni: stanze,\n"
+    "tipi e stati per rimetterlo com'era.":
+        'Inside are the inventory and the settings: rooms, types and\n'
+        'statuses to put it back as it was.',
+    'Da qui si riparte anche se la cartella di rete sparisce:\n'
+    'Impostazioni > Ripristina da un file locale...\n\n'
+    'Per guardare i dati in Excel, apri lo zip con un doppio\n'
+    "clic: l'inventario dentro e' un .xlsx normale.":
+        'From here you can start again even if the network folder is gone:\n'
+        'Settings > Restore from a local file...\n\n'
+        'To look at the data in Excel, open the zip with a double click:\n'
+        'the inventory inside is an ordinary .xlsx.',
+    "E' un inventario completo: si apre in Excel, e in caso di\n"
+    'guaio si ricarica con Ripristina da un file locale...\n'
+    "o con Importa xls... in modalita' Sostituisci.":
+        'It is a complete inventory: it opens in Excel, and if something\n'
+        'goes wrong it is reloaded with Restore from a local file...\n'
+        'or with Import xls... in Replace mode.',
+    'Ripristino non riuscito':
+        'Restore failed',
+    'Ripristina da un file locale...':
+        'Restore from a local file...',
+    'Ripristina da un file locale':
+        'Restore from a local file',
+    '(niente)':
+        '(none)',
+    "Copia dell'inventario":
+        'Inventory copy',
+    'Copia completa (zip)':
+        'Complete copy (zip)',
+    'Solo i dispositivi (xlsx)':
+        'Devices only (xlsx)',
+    'Delle copie automatiche se ne tengono %d: quando ne arriva\n'
+    "una nuova, la piu' vecchia viene cancellata.\n"
+    'Stanno sulla rete accanto ai dati: se sparisce quella\n'
+    'cartella, si riparte da un file locale.':
+        'Of the automatic copies %d are kept: when a new one arrives,\n'
+        'the oldest is deleted.\n'
+        'They live on the network next to the data: if that folder goes,\n'
+        'you start again from a local file.',
+    'Ripristinare tutto da %s?':
+        'Restore everything from %s?',
+    "Il file %s non esiste piu'.":
+        'The file %s does not exist any more.',
+    "%s non e' una copia leggibile: il file e' rovinato o non e'\n"
+    'uno di quelli salvati da questo programma.\n\n'
+    "Non e' stato ripristinato niente.":
+        '%s is not a readable copy: the file is damaged, or it is not one\n'
+        'of those saved by this program.\n\n'
+        'Nothing was restored.',
+    'Non riesco a leggere la copia:\n%s':
+        'I cannot read the copy:\n%s',
+    "Nella copia %s non c'e' nessun inventario.\n\n"
+    "Non e' stato ripristinato niente.":
+        'There is no inventory inside the copy %s.\n\n'
+        'Nothing was restored.',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':

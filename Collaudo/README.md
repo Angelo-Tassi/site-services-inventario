@@ -372,6 +372,35 @@ dopo. Non e' un errore.
 
 ---
 
+## 12. Ripartire da una copia locale
+
+Serve a verificare la via d'uscita dal caso peggiore: la cartella di rete
+sparita, e con lei i backup automatici che ci stavano dentro.
+
+1. apri **Impostazioni** > **Salva copia in locale...** e salva lo zip **sul tuo
+   PC**, non sulla share. Il messaggio deve dire quanti dispositivi contiene;
+2. controlla il file: aprendolo con un doppio clic dentro devono esserci
+   `Inventario.xlsx` e `inventario_impostazioni.json`;
+3. adesso fai il disastro: in **Impostazioni** cambia il nome di una stanza e
+   salva, poi elimina due o tre dispositivi;
+4. apri **Impostazioni** > **Ripristina da un file locale...** e scegli lo zip
+   del punto 1;
+5. leggi il riepilogo **prima di confermare**: deve dire quanti dispositivi
+   tornano rispetto a quelli di adesso, di quando e' la copia, come resta ogni
+   stanza (prima e dopo) e quali impostazioni cambiano, con un `*` su quelle
+   diverse. Conferma;
+6. controlla che siano tornati sia i dispositivi sia **il nome della stanza** che
+   avevi cambiato;
+7. prova anche il caso brutto: scegli un file qualsiasi che non sia una copia -
+   un documento, un'immagine. Deve dire che non e' una copia leggibile e **non
+   toccare niente**.
+
+**Cosa deve succedere:** dal solo file che ti sei portato via torna tutto,
+stanze comprese. Dello stato di prima resta comunque una copia di sicurezza, il
+cui percorso e' scritto nel messaggio finale.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

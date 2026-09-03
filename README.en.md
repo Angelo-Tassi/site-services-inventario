@@ -358,9 +358,11 @@ which is a personal preference of the single computer.
 | **iPhone room** | where phones always end up |
 | **Language** | Italiano or English. The same dropdown is also in the window header |
 
-At the bottom of the window, in the **Copies and restore** box, sit the three
+At the bottom of the window, in the **Copies and restore** box, sit the four
 commands that rewrite everyone's inventory: **Save a local copy...**, **Restore
-from a copy...** and **Reset inventory**. They used to be in the toolbar; they
+from a copy...** (the automatic copies, on the network), **Restore from a local
+file...** (a copy you saved yourself, even off the network) and **Reset
+inventory**. The first three used to be in the toolbar; they
 are rarely used and up there they stole room from the everyday commands, to the
 point of pushing them off the screen on narrower monitors.
 
@@ -994,16 +996,40 @@ you decide - your PC, a USB stick, off the network - a copy of the inventory
   the program had read earlier;
 - if another technician is saving right then, the program waits for them to
   finish: you never get a file caught mid-write;
-- the settings file is saved next to the data, with the same name and the
-  `_impostazioni.json` suffix: the data alone would not be enough to put the
-  inventory back as it was;
-- **it is a complete inventory, not an extract**: it opens in Excel, and it is
-  reloaded with *Restore from a copy...* or with *Import xls...* in Replace
-  mode.
+- it is a **zip** holding two files: the inventory (`Inventario.xlsx`) and the
+  settings (`inventario_impostazioni.json`). The devices alone would not be
+  enough: the **rooms** are not inside the data file;
+- **it is a complete inventory, not an extract**. To look at it in Excel, open
+  the zip with a double click: inside is an ordinary `.xlsx`.
 
 The suggested name carries the date and time,
-`Inventario_2026-08-31_18-30.xlsx`. It is worth doing before every big
-operation, and now and then out of habit.
+`Inventario_2026-08-31_18-30.zip`. It is worth doing before every big operation,
+and now and then out of habit.
+
+In the window you can also pick **`Devices only (xlsx)`**: it saves just the
+inventory, with the settings file beside it, the way it used to. It is there for
+whoever wants the sheet directly openable.
+
+### Starting again from a local copy
+
+**`Restore from a local file...`**, in *Settings*, is the way out of the worst
+case: the network folder gone, and with it the automatic backups that lived
+inside it.
+
+You pick the file - the zip, or an old `.xlsx` saved before the zip existed - and
+**before anything is touched** the summary appears: how many devices would come
+back compared to now, what date the copy is from, how every room would end up
+(before and after), and which settings would change, with an asterisk on the ones
+that differ from now.
+
+On confirmation, **the devices and the settings** come back: rooms, types, rooms
+with loans and the iPhone room. The current state is saved into a backup copy
+first, so even a wrong restore can be undone.
+
+If the file is damaged, or holds no inventory at all, the program says so and
+**touches nothing**. If the zip does not carry the settings - or you picked an
+`.xlsx` without its `_impostazioni.json` beside it - only the devices come back,
+and the final message says so.
 
 ## Automatic backup copies
 

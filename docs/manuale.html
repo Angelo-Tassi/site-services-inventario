@@ -614,12 +614,14 @@ table{min-width:520px}
         nel nome. Non devi ricordartene tu. Se ne tengono <b>dieci</b>: quando ne arriva
         una nuova, la piu' vecchia viene cancellata.</p></div>
     <div class="card"><h3>3 · La copia che decidi tu</h3>
-      <p><span class="k verde">Salva copia in locale…</span> mette una copia
-        dell'inventario dove vuoi: sul tuo PC, su una chiavetta, fuori dalla rete.</p></div>
+      <p><span class="k verde">Salva copia in locale…</span> mette uno zip con inventario
+        e impostazioni dove vuoi: sul tuo PC, su una chiavetta, fuori dalla rete. Da li'
+        si riparte con <span class="k rosso">Ripristina da un file locale…</span> anche
+        se la cartella di rete non c'e' piu'.</p></div>
     <div class="card"><h3>4 · Il promemoria</h3>
       <p>Ogni venti dispositivi aggiunti, modificati o eliminati, il programma chiede se
         vuoi salvare una copia locale. Si puo' dire di no: torna a chiedere dopo altri
-        cinque.</p></div>
+        venti.</p></div>
     <div class="card"><h3>5 · Ripristino</h3>
       <p>Si torna indietro dall'interfaccia, senza cercare file a mano. Vedi
         <a href="#ripristino">qui sotto</a>.</p></div>
@@ -655,7 +657,7 @@ table{min-width:520px}
     <tr><th>Se…</th><th>Fai cosi'</th></tr>
     <tr><td class="d">Hai appena sbagliato un'importazione o un reset</td><td class="d"><span class="k grigio">Impostazioni</span> › <span class="k rosso">Ripristina da una copia…</span>: la prima della lista e' l'<b>ultima</b> copia salvata, con la data e quanti dispositivi contiene.</td></tr>
     <tr><td class="d">Ti serve una copia piu' vecchia</td><td class="d"><span class="k grigio">Impostazioni</span> › <span class="k rosso">Ripristina da una copia…</span>: le mostra tutte, con data e numero di dispositivi, e scegli.</td></tr>
-    <tr><td class="d">La cartella di rete e' sparita o i dati sono stati cancellati</td><td class="d">Riparti dalla tua copia locale: rimettila sulla share come <span class="mono">Produzione\Inventario.xlsx</span>, insieme al file delle impostazioni rinominato <span class="mono">inventario_impostazioni.json</span>.</td></tr>
+    <tr><td class="d">La cartella di rete e' sparita o i dati sono stati cancellati</td><td class="d"><span class="k grigio">Impostazioni</span> › <span class="k rosso">Ripristina da un file locale…</span>: scegli lo zip che ti sei salvato e tornano <b>dispositivi e stanze</b>. Prima si legge il riepilogo, che dice come resterebbe ogni stanza.</td></tr>
     <tr><td class="d">Vuoi svuotare tutto e ricaricare da zero</td><td class="d"><span class="k rosso">Reset inventario</span>, scrivendo <span class="mono">ELIMINA TUTTO</span>. Una copia viene salvata comunque prima di procedere.</td></tr>
   </table></div>
   <div class="avviso">Anche il ripristino <b>salva prima una copia</b> dello stato
@@ -671,7 +673,8 @@ table{min-width:520px}
     <tr><td class="d"><b>Stanze con prestito</b></td><td class="d">Dove compare la colonna Prestito. Di solito solo Digital Kiosk.</td></tr>
     <tr><td class="d"><b>Lingua</b></td><td class="d">Italiano o inglese. C'e' anche la tendina in alto a destra nell'intestazione.</td></tr>
     <tr><td class="d"><b>Collega inventario condiviso…</b></td><td class="d">Sceglie la cartella di rete su cui lavorare, sfogliando. Dopo va riaperto il programma.</td></tr>
-    <tr><td class="d"><b>Ripristina da una copia…</b></td><td class="d">L'elenco di tutte le copie di sicurezza disponibili.</td></tr>
+    <tr><td class="d"><b>Ripristina da una copia…</b></td><td class="d">L'elenco di tutte le copie di sicurezza disponibili, quelle sulla rete.</td></tr>
+    <tr><td class="d"><b>Ripristina da un file locale…</b></td><td class="d">Riparte da una copia che ti sei salvato tu, fuori dalla rete: tornano i dispositivi <b>e</b> le impostazioni. E' la via d'uscita se la cartella di rete non c'e' piu'.</td></tr>
   </table></div>
   <p class="note">Stanze, tipi, stati e stanze con prestito sono <b>condivisi</b>: stanno
     sulla rete e valgono per tutti. La lingua no: e' una preferenza tua, resta sul tuo PC.</p>
@@ -1180,11 +1183,13 @@ table{min-width:520px}
         You do not have to remember. <b>Ten</b> are kept: when a new one arrives, the
         oldest is deleted.</p></div>
     <div class="card"><h3>3 · The copy you decide on</h3>
-      <p><span class="k verde">Save a local copy…</span> puts a copy of the inventory
-        wherever you want: your PC, a USB stick, off the network.</p></div>
+      <p><span class="k verde">Save a local copy…</span> puts a zip with the inventory and
+        the settings wherever you want: your PC, a USB stick, off the network. From there
+        you start again with <span class="k rosso">Restore from a local file…</span>, even
+        if the network folder is gone.</p></div>
     <div class="card"><h3>4 · The reminder</h3>
       <p>Every twenty devices added, changed or deleted, the program asks whether you want
-        to save a local copy. You can say no: it comes back after another five.</p></div>
+        to save a local copy. You can say no: it comes back after another twenty.</p></div>
     <div class="card"><h3>5 · Restore</h3>
       <p>You go back from the interface, without hunting for files by hand. See
         <a href="#ripristino-en">below</a>.</p></div>
@@ -1221,7 +1226,7 @@ table{min-width:520px}
     <tr><th>If…</th><th>Do this</th></tr>
     <tr><td class="d">You have just botched an import or a reset</td><td class="d"><span class="k grigio">Settings</span> › <span class="k rosso">Restore from a copy…</span>: the first in the list is the <b>latest</b> saved copy, with its date and how many devices it holds.</td></tr>
     <tr><td class="d">You need an older copy</td><td class="d"><span class="k grigio">Settings</span> › <span class="k rosso">Restore from a copy…</span>: it lists them all, with date and device count, and you choose.</td></tr>
-    <tr><td class="d">The network folder is gone or the data was deleted</td><td class="d">Start again from your local copy: put it back on the share as <span class="mono">Produzione\Inventario.xlsx</span>, together with the settings file renamed <span class="mono">inventario_impostazioni.json</span>.</td></tr>
+    <tr><td class="d">The network folder is gone or the data was deleted</td><td class="d"><span class="k grigio">Settings</span> › <span class="k rosso">Restore from a local file…</span>: pick the zip you saved and <b>devices and rooms</b> come back. You read the summary first, which says how every room would end up.</td></tr>
     <tr><td class="d">You want to empty everything and reload from scratch</td><td class="d"><span class="k rosso">Reset inventory</span>, typing <span class="mono">ELIMINA TUTTO</span>. A copy is saved before proceeding anyway.</td></tr>
   </table></div>
   <div class="avviso">Restoring <b>also saves a copy first</b> of the current state: if you
@@ -1237,7 +1242,8 @@ table{min-width:520px}
     <tr><td class="d"><b>Loan rooms</b></td><td class="d">Where the Loan column appears. Usually Digital Kiosk only.</td></tr>
     <tr><td class="d"><b>Language</b></td><td class="d">Italian or English. There is also the dropdown at the top right of the header.</td></tr>
     <tr><td class="d"><b>Link shared inventory…</b></td><td class="d">Picks the network folder to work on, by browsing. The program has to be reopened afterwards.</td></tr>
-    <tr><td class="d"><b>Restore from a copy…</b></td><td class="d">The list of every backup copy available.</td></tr>
+    <tr><td class="d"><b>Restore from a copy…</b></td><td class="d">The list of every backup copy available, the ones on the network.</td></tr>
+    <tr><td class="d"><b>Restore from a local file…</b></td><td class="d">Starts again from a copy you saved yourself, off the network: the devices <b>and</b> the settings come back. It is the way out if the network folder is no longer there.</td></tr>
   </table></div>
   <p class="note">Rooms, types, statuses and loan rooms are <b>shared</b>: they live on the
     network and apply to everybody. The language does not: it is your own preference and

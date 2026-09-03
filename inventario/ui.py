@@ -564,11 +564,16 @@ class RoomsDialog(_Modal):
                    command=self._copia_locale).pack(side="left", padx=(0, 8))
         ttk.Button(comandi, text=T("Ripristina da una copia..."), style="Rosso.TButton",
                    command=self._ripristina).pack(side="left", padx=(0, 8))
+        ttk.Button(comandi, text=T("Ripristina da un file locale..."),
+                   style="Rosso.TButton",
+                   command=self._ripristina_locale).pack(side="left", padx=(0, 8))
         ttk.Button(comandi, text=T("Reset inventario"), style="Rosso.TButton",
                    command=self._reset).pack(side="left")
         ttk.Label(comandi, style="Muted.TLabel",
                   text=T("Delle copie automatiche se ne tengono %d: quando ne arriva\n"
-                         "una nuova, la piu' vecchia viene cancellata.")
+                         "una nuova, la piu' vecchia viene cancellata.\n"
+                         "Stanno sulla rete accanto ai dati: se sparisce quella\n"
+                         "cartella, si riparte da un file locale.")
                   % COPIE_DA_TENERE).pack(side="left", padx=(14, 0))
 
         buttons = ttk.Frame(body)
@@ -589,6 +594,10 @@ class RoomsDialog(_Modal):
 
     def _copia_locale(self):
         self.result = {"copia_locale": True}
+        self.destroy()
+
+    def _ripristina_locale(self):
+        self.result = {"ripristina_locale": True}
         self.destroy()
 
     def _reset(self):
@@ -1472,6 +1481,49 @@ def riepilogo_spostamento(spostabili, telefoni, prestati, destinazione,
         for stanza, (prima, dopo) in conteggi:
             if prima != dopo:
                 righe.append("  %-28s %d  ->  %d" % (stanza, prima, dopo))
+    return righe
+
+
+def riepilogo_copia_locale(rapporto, adesso, stanze_adesso, cfg_adesso):
+    """Che cosa tornerebbe indietro ripristinando una copia locale.
+
+    Il ripristino piu' pesante che il programma sappia fare: riscrive
+    l'inventario di tutti e anche le stanze. Va letto prima, non dopo.
+    """
+    righe = [T("La copia contiene %d dispositivi; adesso in inventario ce ne sono %d.")
+             % (rapporto["dispositivi"], adesso)]
+    if rapporto.get("quando"):
+        righe.append(T("Risale al %s.")
+                     % rapporto["quando"].strftime("%d/%m/%Y %H:%M"))
+    righe.append("")
+    righe.append(T("COME RESTANO LE STANZE:"))
+    dalla_copia = rapporto.get("per_stanza") or {}
+    for stanza in sorted(set(dalla_copia) | set(stanze_adesso)):
+        righe.append("  %-28s %d  ->  %d"
+                     % (stanza, stanze_adesso.get(stanza, 0), dalla_copia.get(stanza, 0)))
+
+    impostazioni = rapporto.get("impostazioni")
+    righe.append("")
+    if not impostazioni:
+        righe.append(T("La copia non porta le impostazioni: stanze, tipi e stati\n"
+                       "restano quelli di adesso."))
+        return righe
+    righe.append(T("TORNANO ANCHE LE IMPOSTAZIONI:"))
+    for chiave, etichetta in (("rooms", T("Stanze")),
+                              ("types", T("Tipi di dispositivo")),
+                              ("loan_rooms", T("Stanze con prestito")),
+                              ("iphone_room", T("Stanza degli iPhone"))):
+        valore = impostazioni.get(chiave)
+        if isinstance(valore, list):
+            valore = ", ".join(valore)
+        attuale = cfg_adesso.get(chiave)
+        if isinstance(attuale, list):
+            attuale = ", ".join(attuale)
+        segno = "  " if clean(str(valore)) == clean(str(attuale)) else "* "
+        righe.append("%s%s: %s" % (segno, etichetta, valore or T("(niente)")))
+    if any(r.startswith("* ") for r in righe):
+        righe.append("")
+        righe.append(T("Le righe con * cambiano rispetto a com'e' adesso."))
     return righe
 
 
@@ -3793,6 +3845,61 @@ class App(tk.Tk):
             % (ripristinati, quando.strftime("%d/%m/%Y %H:%M:%S"), precedente),
             parent=self)
 
+    def on_ripristino_locale(self):
+        """Rimette tutto - inventario e stanze - da una copia salvata in locale.
+
+        E' la via d'uscita dal caso peggiore: la cartella di rete sparita, e con
+        lei i backup automatici che ci stavano dentro. Per questo legge anche le
+        impostazioni: dal solo elenco dei dispositivi le stanze non tornano.
+        """
+        percorso = filedialog.askopenfilename(
+            parent=self, title=T("Scegli la copia da cui ripristinare"),
+            initialdir=os.path.expanduser("~"),
+            filetypes=[(T("Copia dell'inventario"), "*.zip *.xlsx"),
+                       (T("Copia completa (zip)"), "*.zip"),
+                       (T("File Excel"), "*.xlsx")])
+        if not percorso:
+            return
+        try:
+            rapporto = self.store.anteprima_copia_locale(percorso)
+        except InventoryError as exc:
+            messagebox.showerror(T("Ripristino non riuscito"), str(exc), parent=self)
+            return
+
+        stanze_adesso = {}
+        for item in self.store.items:
+            stanza = clean(item.get("stanza")) or NO_ROOM()
+            stanze_adesso[stanza] = stanze_adesso.get(stanza, 0) + 1
+        righe = riepilogo_copia_locale(rapporto, len(self.store.items),
+                                       stanze_adesso, self.cfg)
+        avvertenza = T("L'inventario di tutti torna com'era nella copia.\n"
+                       "Lo stato attuale viene salvato prima, cosi' puoi tornare indietro.")
+        if not ConfermaOperazioneDialog(
+            self, T("Ripristina da un file locale"),
+            T("Ripristinare tutto da %s?") % os.path.basename(percorso),
+            righe, T("Ripristina"), "Rosso.TButton", avvertenza
+        ).show():
+            return
+
+        esito = self._run(lambda: self.store.ripristina_da_copia_locale(percorso))
+        if not esito:
+            return
+        quanti, precedente, con_impostazioni = esito
+        self.cfg = config.load_shared_config(self.store.path)
+        self.store.iphone_room = self.cfg.get("iphone_room")
+        self.store.stati = list(self.cfg.get("states") or [])
+        self._sync_filter_values()
+        self.show_home()
+        coda = T("Sono tornate anche le impostazioni: stanze, tipi e stati.") \
+            if con_impostazioni else \
+            T("La copia non portava le impostazioni: stanze e tipi sono rimasti\n"
+              "quelli di prima.")
+        messagebox.showinfo(
+            T("Inventario ripristinato"),
+            T("Ripristinati %d dispositivi da %s.\n\n%s\n\n"
+              "Lo stato precedente e' stato salvato in:\n%s")
+            % (quanti, os.path.basename(percorso), coda, precedente), parent=self)
+
     def on_copia_locale(self):
         """Salva una copia dell'inventario dove decide l'utente.
 
@@ -3802,12 +3909,13 @@ class App(tk.Tk):
         a ripartire.
         """
         adesso = datetime.now()
-        proposto = "Inventario_%s.xlsx" % adesso.strftime("%Y-%m-%d_%H-%M")
+        proposto = "Inventario_%s.zip" % adesso.strftime("%Y-%m-%d_%H-%M")
         percorso = filedialog.asksaveasfilename(
             parent=self, title=T("Salva una copia dell'inventario"),
-            defaultextension=".xlsx", initialfile=proposto,
+            defaultextension=".zip", initialfile=proposto,
             initialdir=os.path.expanduser("~"),
-            filetypes=[(T("File Excel"), "*.xlsx")])
+            filetypes=[(T("Copia completa (zip)"), "*.zip"),
+                       (T("Solo i dispositivi (xlsx)"), "*.xlsx")])
         if not percorso:
             return
         try:
@@ -3815,19 +3923,30 @@ class App(tk.Tk):
         except InventoryError as exc:
             messagebox.showerror(T("Copia non riuscita"), str(exc), parent=self)
             return
+        e_uno_zip = salvato.lower().endswith(".zip")
         righe = [T("%d dispositivi, come sono in questo momento.") % quanti,
                  "",
                  salvato]
-        if impostazioni:
+        if impostazioni and e_uno_zip:
+            righe.append("")
+            righe.append(T("Dentro ci sono l'inventario e le impostazioni: stanze,\n"
+                           "tipi e stati per rimetterlo com'era."))
+        elif impostazioni:
             righe.append(os.path.basename(impostazioni))
             righe.append("")
             righe.append(T("Accanto ai dati e' stato salvato anche il file delle\n"
                            "impostazioni: stanze, tipi e stati per rimetterlo\n"
                            "com'era."))
         righe.append("")
-        righe.append(T("E' un inventario completo: si apre in Excel, e in caso di\n"
-                       "guaio si ricarica con Ripristina o con Importa xls...\n"
-                       "in modalita' Sostituisci."))
+        if e_uno_zip:
+            righe.append(T("Da qui si riparte anche se la cartella di rete sparisce:\n"
+                           "Impostazioni > Ripristina da un file locale...\n\n"
+                           "Per guardare i dati in Excel, apri lo zip con un doppio\n"
+                           "clic: l'inventario dentro e' un .xlsx normale."))
+        else:
+            righe.append(T("E' un inventario completo: si apre in Excel, e in caso di\n"
+                           "guaio si ricarica con Ripristina da un file locale...\n"
+                           "o con Importa xls... in modalita' Sostituisci."))
         self._modifiche_alla_copia = self.store.modifiche
         messagebox.showinfo(T("Copia salvata"), "\n".join(righe), parent=self)
 
@@ -3887,6 +4006,9 @@ class App(tk.Tk):
             return
         if result.get("reset"):
             self.on_reset()
+            return
+        if result.get("ripristina_locale"):
+            self.on_ripristino_locale()
             return
         nuova_lingua = result.pop("lingua", lang.corrente())
         try:

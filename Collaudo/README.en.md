@@ -369,6 +369,33 @@ an error.
 
 ---
 
+## 12. Starting again from a local copy
+
+This checks the way out of the worst case: the network folder gone, and with it
+the automatic backups that lived inside it.
+
+1. open **Settings** > **Save a local copy...** and save the zip **on your own
+   PC**, not on the share. The message must say how many devices it holds;
+2. check the file: opening it with a double click, inside there must be
+   `Inventario.xlsx` and `inventario_impostazioni.json`;
+3. now make the mess: in **Settings** rename a room and save, then delete two or
+   three devices;
+4. open **Settings** > **Restore from a local file...** and pick the zip from
+   step 1;
+5. read the summary **before confirming**: it must say how many devices come
+   back compared to now, what date the copy is from, how every room ends up
+   (before and after) and which settings change, with a `*` on the ones that
+   differ. Confirm;
+6. check that both the devices and **the room name** you changed have come back;
+7. try the bad case too: pick any file that is not a copy - a document, an
+   image. It must say it is not a readable copy and **touch nothing**.
+
+**What must happen:** everything comes back from the single file you took away,
+rooms included. A backup copy of the previous state is kept anyway, and its path
+is written in the final message.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.

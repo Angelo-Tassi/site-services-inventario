@@ -678,9 +678,11 @@ tranne la lingua, che e' una preferenza personale del singolo computer.
 | **Stanza degli iPhone** | dove finiscono i telefoni, sempre |
 | **Lingua** | Italiano o English. La stessa tendina e' anche nell'intestazione della finestra |
 
-In fondo alla finestra, nel riquadro **Copie e ripristino**, stanno i tre
+In fondo alla finestra, nel riquadro **Copie e ripristino**, stanno i quattro
 comandi che riscrivono l'inventario di tutti: **Salva copia in locale...**,
-**Ripristina da una copia...** e **Reset inventario**. Prima erano nella barra
+**Ripristina da una copia...** (le copie automatiche, sulla rete), **Ripristina
+da un file locale...** (una copia che ti sei salvato tu, anche fuori dalla rete)
+e **Reset inventario**. I primi tre erano nella barra
 in alto; si usano di rado e li' rubavano spazio ai comandi di tutti i giorni,
 fino a spingerli fuori dallo schermo sui monitor piu' stretti.
 
@@ -1050,15 +1052,39 @@ dell'inventario **com'e' in quel secondo**:
   che il programma aveva letto prima;
 - se in quell'istante un altro tecnico sta salvando, il programma aspetta che
   finisca: non ottieni mai un file colto a meta' scrittura;
-- accanto ai dati viene salvato anche il file delle impostazioni, con lo stesso
-  nome e il suffisso `_impostazioni.json`: da soli i dati non basterebbero a
-  rimettere l'inventario com'era;
-- **e' un inventario completo, non un estratto**: si apre in Excel, e si
-  ricarica con *Ripristina da una copia...* o con *Importa xls...* in modalita'
-  Sostituisci.
+- e' uno **zip** che contiene due file: l'inventario (`Inventario.xlsx`) e le
+  impostazioni (`inventario_impostazioni.json`). Da soli i dispositivi non
+  basterebbero: le **stanze** non stanno dentro il file dei dati;
+- **e' un inventario completo, non un estratto**. Per guardarlo in Excel si apre
+  lo zip con un doppio clic: dentro c'e' un `.xlsx` normale.
 
-Il nome proposto porta data e ora, `Inventario_2026-08-31_18-30.xlsx`. Vale la
+Il nome proposto porta data e ora, `Inventario_2026-08-31_18-30.zip`. Vale la
 pena farla prima di ogni operazione grossa, e ogni tanto per abitudine.
+
+Nella finestra si puo' anche scegliere **`Solo i dispositivi (xlsx)`**: salva il
+solo inventario, con il file delle impostazioni accanto, come faceva prima. Serve
+a chi vuole il foglio direttamente apribile.
+
+### Ripartire da una copia locale
+
+**`Ripristina da un file locale...`**, in *Impostazioni*, e' la via d'uscita dal
+caso peggiore: la cartella di rete sparita, e con lei i backup automatici che ci
+stavano dentro.
+
+Si sceglie il file - lo zip, oppure un vecchio `.xlsx` salvato prima che lo zip
+esistesse - e **prima di toccare qualsiasi cosa** compare il riepilogo: quanti
+dispositivi tornerebbero rispetto a quelli di adesso, di quando e' la copia, come
+resterebbe ogni stanza (prima e dopo), e quali impostazioni cambierebbero, con un
+asterisco su quelle diverse da adesso.
+
+Confermando, tornano **i dispositivi e le impostazioni**: stanze, tipi, stanze
+con prestito e stanza degli iPhone. Lo stato attuale viene salvato in una copia
+di sicurezza prima di procedere, quindi anche un ripristino sbagliato si annulla.
+
+Se il file e' rovinato, o non contiene nessun inventario, il programma lo dice e
+**non tocca niente**. Se lo zip non porta le impostazioni - o si e' scelto un
+`.xlsx` senza il suo `_impostazioni.json` accanto - tornano i soli dispositivi, e
+il messaggio finale lo dichiara.
 
 ## Le copie di sicurezza automatiche
 
