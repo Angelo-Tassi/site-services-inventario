@@ -26,6 +26,7 @@ Produzione/*
 /inventario_eliminati.json
 /Inventario.xlsx
 /Inventario dispositivi.lnk
+/.sbloccato
 .*.xlsx.lock
 *.tmp-*
 

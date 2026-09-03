@@ -214,6 +214,12 @@ it stops the mark reaching anything.
 Windows never applied the mark - which happens when the download goes through a
 corporate proxy - and the extracted files are already clean.
 
+**If the mark stays anyway** - the box does not show up but the warning does -
+there is no need to chase it file by file: the package's four `.bat` files clear
+it themselves. On the first double click on any one of them, right after
+extracting, the warning shows up **once**; from then on none of the others ask
+again, on that copy.
+
 If running unsigned programs is governed by security policy in your company
 (AppLocker, Windows Defender Application Control), you need an allowance from the
 administrators: a binary signed by the Python Software Foundation, installed

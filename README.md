@@ -219,6 +219,12 @@ aprirlo, il marchio non passa a niente.
 dire che Windows non ha messo il marchio - capita quando il download passa da un
 proxy aziendale - e i file estratti sono gia' puliti.
 
+**Se il marchio resta comunque** - la casella non compare ma l'avviso si vede lo
+stesso - non serve rincorrerlo file per file: i quattro `.bat` del pacchetto se lo
+tolgono da soli. Al primo doppio clic su uno qualsiasi di loro, appena estratto,
+l'avviso compare **una volta sola**; da quel momento nessuno degli altri lo chiede
+piu', su quella copia.
+
 Se in azienda l'esecuzione di programmi non firmati e' regolata da criteri di
 sicurezza (AppLocker, Windows Defender Application Control), serve
 un'autorizzazione dagli amministratori: un binario firmato dalla Python Software

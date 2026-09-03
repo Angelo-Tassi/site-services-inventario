@@ -12,6 +12,17 @@ rem  Il desktop viene chiesto a Windows, non costruito a mano: con OneDrive la
 rem  scrivania vera e' dentro OneDrive, e %USERPROFILE%\Desktop e' una cartella
 rem  che l'utente non vede mai.
 rem ---------------------------------------------------------------------------
+rem  Il primo doppio clic su un file di questo pacchetto, appena estratto da
+rem  uno zip scaricato, fa comparire l'avviso "Editore sconosciuto": e' il
+rem  contrassegno che Windows mette su tutto cio' che arriva da Internet, non
+rem  ha a che fare con una firma mancante. Qui lo si toglie da tutta la
+rem  cartella una volta sola, cosi' i prossimi doppi clic - su questo file e
+rem  sugli altri accanto - non lo chiedono piu'.
+if exist "%~dp0.sbloccato" goto :gia_sbloccato
+powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command "Get-ChildItem -LiteralPath '%~dp0' -Recurse -File -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue" >nul 2>&1
+type nul > "%~dp0.sbloccato" 2>nul
+attrib +h "%~dp0.sbloccato" >nul 2>&1
+:gia_sbloccato
 setlocal
 set "INV_DIR=%~dp0"
 set "INV_EXE=%~dp0Avvia Inventario.bat"

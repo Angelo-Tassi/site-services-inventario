@@ -68,6 +68,56 @@ jobs:
           # import di tutto quello che serve, con i percorsi veri del pacchetto
           Pacchetto\python\python.exe -c "import tkinter, openpyxl, inventario.ui; print('avvio possibile')"
 
+      - name: Verifica lo sblocco automatico nei .bat
+        shell: pwsh
+        run: |
+          # Le prime righe di ognuno dei quattro .bat tolgono il contrassegno
+          # "scaricato da Internet" da tutta la cartella al primo avvio, cosi'
+          # l'avviso di Windows compare una volta sola invece che su ogni file.
+          # Qui si prova la stessa sequenza isolata, in una cartella a parte,
+          # perche' non si puo' verificarla aprendo i .bat veri: aspettano un
+          # tasto (pause) o accendono l'interfaccia grafica.
+          $righe = @(
+            '@echo off',
+            'if exist "%~dp0.sbloccato" goto :gia_sbloccato',
+            'powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command "Get-ChildItem -LiteralPath ''%~dp0'' -Recurse -File -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue" >nul 2>&1',
+            'type nul > "%~dp0.sbloccato" 2>nul',
+            'attrib +h "%~dp0.sbloccato" >nul 2>&1',
+            ':gia_sbloccato',
+            'exit /b 0'
+          )
+          New-Item -ItemType Directory -Force -Path prova_sblocco | Out-Null
+          Set-Content -Path "prova_sblocco\prova.bat" -Value $righe
+
+          cmd /c "prova_sblocco\prova.bat"
+          if ($LASTEXITCODE -ne 0) {
+            throw "il file di prova e' uscito con codice $LASTEXITCODE"
+          }
+          if (-not (Test-Path "prova_sblocco\.sbloccato")) {
+            throw "il marcatore .sbloccato non e' stato creato"
+          }
+          $attributi = (Get-Item "prova_sblocco\.sbloccato" -Force).Attributes
+          if ($attributi -notmatch "Hidden") {
+            throw "il marcatore non risulta nascosto: $attributi"
+          }
+          Write-Host "Sblocco automatico: marcatore creato e nascosto, come atteso."
+
+          # la seconda volta deve saltare tutto e uscire subito, senza rifare niente
+          Remove-Item "prova_sblocco\.sbloccato" -Force
+          Set-Content -Path "prova_sblocco\.sbloccato" -Value "gia' fatto"
+          $prima = Get-Content "prova_sblocco\.sbloccato" -Raw
+          cmd /c "prova_sblocco\prova.bat"
+          if ($LASTEXITCODE -ne 0) {
+            throw "il secondo avvio e' uscito con codice $LASTEXITCODE"
+          }
+          $dopo = Get-Content "prova_sblocco\.sbloccato" -Raw
+          if ($prima -ne $dopo) {
+            throw "il secondo avvio ha rifatto lo sblocco invece di saltarlo"
+          }
+          Write-Host "Al secondo avvio salta lo sblocco, come atteso."
+
+          Remove-Item -Recurse -Force prova_sblocco
+
       - name: Prepara la cartella da distribuire
         shell: pwsh
         run: |
