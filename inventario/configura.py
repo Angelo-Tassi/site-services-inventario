@@ -25,6 +25,26 @@ def _chiedi(domanda):
         return ""
 
 
+def _porta_avanti_la_console():
+    """Su Windows, richiama in primo piano la finestra del terminale.
+
+    Dopo la finestra di scelta della cartella, il fuoco non torna sempre da
+    solo al terminale: chi aspetta la domanda successiva ("Va bene?") non la
+    vede, e non essendoci niente sullo schermo crede che lo script si sia
+    bloccato invece che essere in attesa di una risposta gia' visibile.
+    """
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+        console = ctypes.windll.kernel32.GetConsoleWindow()
+        if console:
+            ctypes.windll.user32.ShowWindow(console, 9)  # SW_RESTORE
+            ctypes.windll.user32.SetForegroundWindow(console)
+    except Exception:
+        pass
+
+
 def normalizza(scritto):
     """Accetta il percorso in tutte le forme in cui Windows lo fa copiare.
 
@@ -59,12 +79,21 @@ def normalizza(scritto):
 
 
 def scegli_cartella():
-    """Finestra di scelta della cartella, per non incollare percorsi a mano."""
+    """Finestra di scelta della cartella, per non incollare percorsi a mano.
+
+    Su Windows una finestra "padre" mai mostrata (qui e' subito nascosta con
+    withdraw) puo' far aprire la finestra di scelta dietro le altre, o farla
+    comparire solo come icona nella barra delle applicazioni, invece che in
+    primo piano: chi la esegue non la vede, e crede che lo script si sia
+    bloccato. Il -topmost prima di mostrarla forza il primo piano.
+    """
     try:
         import tkinter as tk
         from tkinter import filedialog
         root = tk.Tk()
         root.withdraw()
+        root.attributes("-topmost", True)
+        root.update()
         scelta = filedialog.askdirectory(
             parent=root, title="Scegli la cartella condivisa dell'inventario")
         root.destroy()
@@ -149,6 +178,7 @@ def main():
     print("Si apre una finestra per scegliere la cartella.")
     print()
     cartella = scegli_cartella()
+    _porta_avanti_la_console()
     if not cartella:
         # niente finestra, o annullata: resta la strada di scriverlo
         print("Nessuna cartella scelta dalla finestra.")

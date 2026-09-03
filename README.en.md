@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.3).** The features are complete and every release
+> **Beta version (1.0.0-beta.4).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
