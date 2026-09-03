@@ -926,6 +926,46 @@ EN = {
     'nella stanza con il nome nuovo.':
         '%s\n\nThe devices that were inside have been moved to the room\n'
         'with the new name.',
+    'Tipo ripetuto':
+        'Type repeated',
+    'Il tipo iPhone non si rinomina':
+        'The iPhone type cannot be renamed',
+    'Rinomina completata':
+        'Renaming done',
+    "Questo tipo compare due volte nell'elenco:\n%s\n\n"
+    'Due tipi non possono chiamarsi allo stesso modo.':
+        'This type appears twice in the list:\n%s\n\n'
+        'Two types cannot have the same name.',
+    'Stai rinominando "%s" in "%s".\n\n'
+    "E' la parola con cui il programma riconosce i telefoni: da li'\n"
+    "vengono l'IMEI al posto dell'asset tag, la stanza obbligata, la\n"
+    'spedizione al servizio telefonia e il fatto che non si eliminino.\n\n'
+    'Rimetti "%s" e salva.':
+        'You are renaming "%s" into "%s".\n\n'
+        'It is the word the program recognises phones by: from it come the\n'
+        'IMEI instead of the asset tag, the fixed room, the shipment to the\n'
+        'phone service and the fact that they cannot be deleted.\n\n'
+        'Put "%s" back and save.',
+    'STANZE:':
+        'ROOMS:',
+    'TIPI DI DISPOSITIVO:':
+        'DEVICE TYPES:',
+    '%s\n\nI dispositivi sono stati aggiornati con il nome nuovo.\n'
+    "Non hanno perso niente: cambia solo l'etichetta.":
+        '%s\n\nThe devices have been updated with the new name.\n'
+        'They lost nothing: only the label changes.',
+    'Il tipo "%s" non si rinomina.\n\n'
+    "E' la parola con cui il programma riconosce i telefoni: da li'\n"
+    "vengono l'IMEI al posto dell'asset tag, la stanza obbligata, la\n"
+    'spedizione al servizio telefonia e il fatto che non si eliminino.\n'
+    'Cambiandola, i telefoni gia\' registrati smetterebbero di essere\n'
+    'telefoni.':
+        'The type "%s" cannot be renamed.\n\n'
+        'It is the word the program recognises phones by: from it come the\n'
+        'IMEI instead of the asset tag, the fixed room, the shipment to the\n'
+        'phone service and the fact that they cannot be deleted.\n'
+        'Change it and the phones already registered would stop being\n'
+        'phones.',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':

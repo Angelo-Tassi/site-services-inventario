@@ -396,9 +396,10 @@ is written in the final message.
 
 ---
 
-## 13. Renaming a room
+## 13. Renaming a room or a type
 
-This checks that the devices follow the room when its name changes.
+This checks that the devices follow the room and the type when their name
+changes.
 
 1. look at the home page and note how many devices are in the **Digital
    Kiosk**;
@@ -416,11 +417,19 @@ This checks that the devices follow the room when its name changes.
    room. After saving, reopen **Settings**: the *iPhone room* field must carry
    the new name. Go into the **Iphone** container: the phones must still be
    there, and adding a new one must put it in the room with the new name;
-8. finally move a line to another position without changing any name and save:
-   it **must move nothing**, reordering is not renaming.
+8. move a line to another position without changing any name and save: it
+   **must move nothing**, reordering is not renaming;
+9. now the types. In **Settings** change `Laptop` into `Notebook` and save: the
+   message must say how many devices it updated, and in the list the *Type*
+   column must read `Notebook` on every former laptop. Open the record of one of
+   them: asset tag, serial number, room, status, notes and loan must be
+   **exactly what they were**;
+10. finally try renaming the `Iphone` type into something else: it **must
+    refuse**, explaining that it is the word the program recognises phones by and
+    telling you which name to put back.
 
-**What must happen:** no device is left behind with the old name, and no card
-appears for a room that no longer exists.
+**What must happen:** no device is left behind with the old name, no card appears
+for a room that no longer exists, and the phones stay phones.
 
 ---
 

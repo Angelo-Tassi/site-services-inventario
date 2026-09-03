@@ -101,7 +101,8 @@ assert app.cfg["loan_rooms"] == ["Kiosk 2"], app.cfg
 assert len([i for i in app.store.items if i.get("stanza") == "Kiosk 2"]) == 5
 assert not [i for i in app.store.items if i.get("stanza") == KIOSK]
 titolo, corpo = avvisi[-1]
-assert titolo == "Stanza rinominata", avvisi[-1]
+assert titolo == "Rinomina completata", avvisi[-1]
+assert "STANZE:" in corpo, corpo
 assert "Digital Kiosk  ->  Kiosk 2   (5 dispositivi)" in corpo, corpo
 
 # ---- e la scheda della stanza vecchia non esiste piu': niente orfani
@@ -142,7 +143,7 @@ assert aggiunto["stanza"] == "BAU rinnovato", aggiunto["stanza"]
 avvisi.clear()
 ui.RoomsDialog.show = lambda self: impostazioni(["BAU rinnovato", "Kiosk 2", DR])
 app.on_settings()
-assert not [t for t, _m in avvisi if t == "Stanza rinominata"], avvisi
+assert not [t for t, _m in avvisi if t == "Rinomina completata"], avvisi
 
 app.destroy()
 print("RINOMINA STANZA OK")

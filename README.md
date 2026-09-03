@@ -721,13 +721,28 @@ con il nome della stanza sparita e compaiono in una scheda a parte, da dove si
 spostano con *Sposta in stanza...*. E' voluto - cancellare una riga non puo'
 voler dire cancellare dove sono trenta dispositivi.
 
-### Aggiungere un tipo di dispositivo
+### Aggiungere o rinominare un tipo di dispositivo
 
 Basta una riga in **Tipi di dispositivo**. Il tipo compare nella tendina di
 *Aggiungi* e nel filtro. Un tipo chiamato **iPhone** - scritto come vuoi,
 maiuscole e minuscole non contano - attiva da solo tutte le regole dei telefoni:
 IMEI al posto di asset tag e seriale, niente prestiti, stanza bloccata,
 contenitore in home, spedizione e conservazione.
+
+**Rinominando un tipo, i dispositivi di quel tipo prendono il nome nuovo.**
+Cambia l'etichetta e nient'altro: asset tag, numero di serie, stanza, stato,
+note, prestito e spedizione restano quelli che erano, e alla fine il programma
+dice quanti dispositivi ha aggiornato. Come per le stanze, riordinare le righe o
+aggiungerne una non e' una rinomina, e due tipi non possono chiamarsi allo stesso
+modo.
+
+**Il tipo iPhone fa eccezione: non si rinomina.** Non e' un'etichetta come le
+altre, e' la parola con cui il programma riconosce i telefoni - da li' vengono
+l'IMEI, la stanza obbligata, la spedizione al servizio telefonia e il fatto che
+non si eliminino. Cambiandola, i telefoni gia' registrati smetterebbero di essere
+telefoni senza che nessuno se ne accorga, quindi il salvataggio viene rifiutato e
+ti viene detto che nome rimettere. Vale in tutte e due le direzioni: nemmeno un
+altro tipo puo' diventare *iPhone* per rinomina.
 
 ### Attivare i prestiti in una stanza
 

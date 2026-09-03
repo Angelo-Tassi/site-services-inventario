@@ -401,9 +401,10 @@ cui percorso e' scritto nel messaggio finale.
 
 ---
 
-## 13. Rinominare una stanza
+## 13. Rinominare una stanza o un tipo
 
-Serve a verificare che i dispositivi seguano la stanza quando le si cambia nome.
+Serve a verificare che i dispositivi seguano stanza e tipo quando si cambia loro
+il nome.
 
 1. guarda in home quanti dispositivi ci sono nel **Digital Kiosk**;
 2. apri **Impostazioni**, cambia il nome della riga `Digital Kiosk` in
@@ -422,11 +423,20 @@ Serve a verificare che i dispositivi seguano la stanza quando le si cambia nome.
    campo *Stanza degli iPhone* deve portare il nome nuovo. Entra nel
    contenitore **Iphone**: i telefoni devono esserci ancora, e inserendone uno
    nuovo deve finire nella stanza con il nome nuovo;
-8. infine sposta una riga di posto senza cambiare nessun nome e salva: **non
-   deve spostare niente**, riordinare non e' rinominare.
+8. sposta una riga di posto senza cambiare nessun nome e salva: **non deve
+   spostare niente**, riordinare non e' rinominare;
+9. adesso i tipi. In **Impostazioni** cambia `Laptop` in `Notebook` e salva: il
+   messaggio deve dire quanti dispositivi ha aggiornato, e nell'elenco la
+   colonna *Tipo* deve dire `Notebook` su tutti quelli che erano laptop. Apri
+   la scheda di uno di loro: asset tag, numero di serie, stanza, stato, note e
+   prestito devono essere **esattamente quelli di prima**;
+10. infine prova a rinominare il tipo `Iphone` in qualcos'altro: **deve
+    rifiutare**, spiegando che e' la parola con cui il programma riconosce i
+    telefoni e dicendoti che nome rimettere.
 
 **Cosa deve succedere:** nessun dispositivo resta indietro con il nome vecchio,
-e non compare nessuna scheda di una stanza che non esiste piu'.
+non compare nessuna scheda di una stanza che non esiste piu', e i telefoni
+restano telefoni.
 
 ---
 

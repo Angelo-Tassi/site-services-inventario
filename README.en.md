@@ -399,12 +399,26 @@ name of the room that is gone and show up in a separate card, from where you mov
 them with *Move to room...*. That is deliberate - deleting a line cannot be
 allowed to mean deleting where thirty devices are.
 
-### Adding a device type
+### Adding or renaming a device type
 
 One line in **Device types** is enough. A type called **iPhone** - written
 however you like, case does not matter - switches on all the phone rules by
 itself: IMEI instead of asset tag and serial number, no loans, locked room, the
 container on the home page, shipment and retention.
+
+**When you rename a type, the devices of that type take the new name.** The label
+changes and nothing else: asset tag, serial number, room, status, notes, loan and
+shipment stay as they were, and at the end the program says how many devices it
+updated. As with rooms, reordering the lines or adding one is not a rename, and
+two types cannot have the same name.
+
+**The iPhone type is the exception: it cannot be renamed.** It is not a label
+like the others, it is the word the program recognises phones by - from it come
+the IMEI, the fixed room, the shipment to the phone service and the fact that
+they cannot be deleted. Change it and the phones already registered would stop
+being phones without anyone noticing, so saving is refused and you are told which
+name to put back. It holds both ways: no other type can become *iPhone* by
+renaming either.
 
 ### Turning loans on in a room
 

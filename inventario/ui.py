@@ -18,7 +18,8 @@ from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE, HEADERS,
                     InventoryStore, NON_DISPONIBILE, SPEDITO, clean,
                     is_iphone, is_on_loan, is_shipped, new_item, norm_tag,
                     puo_essere_eliminato, righe_separatore,
-                    rinomine_stanze, rows_from_workbook,
+                    rinomina_tocca_gli_iphone, rinomine_stanze,
+                    rinomine_tipi, rows_from_workbook,
                     sembra_un_foglio_da_importare, testo_spedizione,
                     valore_visibile)
 
@@ -518,6 +519,7 @@ class RoomsDialog(_Modal):
     def __init__(self, parent, rooms, types, loan_rooms, iphone_room="", lingua=None):
         _Modal.__init__(self, parent, T("Impostazioni inventario"))
         self.stanze_di_partenza = list(rooms)
+        self.tipi_di_partenza = list(types)
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
         ttk.Label(body, text=T("Stanze (una per riga)")).grid(row=0, column=0, sticky="w")
@@ -621,6 +623,30 @@ class RoomsDialog(_Modal):
                   "Due stanze non possono chiamarsi allo stesso modo.")
                 % doppie[0], parent=self)
             return
+        doppi = [t for t in types if types.count(t) > 1]
+        if doppi:
+            messagebox.showwarning(
+                T("Tipo ripetuto"),
+                T("Questo tipo compare due volte nell'elenco:\n%s\n\n"
+                  "Due tipi non possono chiamarsi allo stesso modo.")
+                % doppi[0], parent=self)
+            return
+
+        # Il tipo iPhone e' la parola con cui il programma riconosce i telefoni:
+        # si dice di no qui, prima di salvare, invece di lasciare che i telefoni
+        # smettano di essere telefoni.
+        cambi_tipo = rinomine_tipi(self.tipi_di_partenza, types)
+        tocca = rinomina_tocca_gli_iphone(cambi_tipo)
+        if tocca:
+            messagebox.showwarning(
+                T("Il tipo iPhone non si rinomina"),
+                T("Stai rinominando \"%s\" in \"%s\".\n\n"
+                  "E' la parola con cui il programma riconosce i telefoni: da li'\n"
+                  "vengono l'IMEI al posto dell'asset tag, la stanza obbligata, la\n"
+                  "spedizione al servizio telefonia e il fatto che non si eliminino.\n\n"
+                  "Rimetti \"%s\" e salva.") % (tocca[0], tocca[1], tocca[0]),
+                parent=self)
+            return
 
         # Rinominata una stanza, chi la nominava deve seguirla: le stanze con
         # prestito e la stanza degli iPhone si aggiornano da sole, o il
@@ -648,6 +674,7 @@ class RoomsDialog(_Modal):
         scelta = dict((nome, codice) for nome, codice in lang.LINGUE)
         self.result = {"rooms": rooms, "types": types or ["Laptop", "Tablet"],
                        "rinomine": list(rinomine.items()),
+                       "rinomine_tipi": cambi_tipo,
                        "loan_rooms": loans,
                        "iphone_room": stanza_iphone or rooms[0],
                        "lingua": scelta.get(self.var_lingua.get(), lang.ITALIANO)}
@@ -4033,7 +4060,14 @@ class App(tk.Tk):
             return
         nuova_lingua = result.pop("lingua", lang.corrente())
         rinomine = result.pop("rinomine", [])
+        cambi_tipo = result.pop("rinomine_tipi", [])
         spostati = {}
+        cambiati = {}
+        if cambi_tipo:
+            esito = self._run(lambda: self.store.rinomina_tipi(cambi_tipo))
+            if esito is None:
+                return
+            cambiati = esito
         if rinomine:
             # Prima i dispositivi, poi le impostazioni: se lo spostamento non
             # riesce - la share che non risponde, un altro tecnico che sta
@@ -4059,14 +4093,25 @@ class App(tk.Tk):
         self.store.stati = list(self.cfg.get("states") or [])
         self._sync_filter_values()
         self.show_home()
-        if rinomine:
-            righe = [T("%s  ->  %s   (%d dispositivi)")
-                     % (vecchio, nuovo, spostati.get(nuovo, 0))
-                     for vecchio, nuovo in rinomine]
+        if rinomine or cambi_tipo:
+            righe = []
+            if rinomine:
+                righe.append(T("STANZE:"))
+                righe.extend(T("%s  ->  %s   (%d dispositivi)")
+                             % (vecchio, nuovo, spostati.get(nuovo, 0))
+                             for vecchio, nuovo in rinomine)
+            if cambi_tipo:
+                if righe:
+                    righe.append("")
+                righe.append(T("TIPI DI DISPOSITIVO:"))
+                righe.extend(T("%s  ->  %s   (%d dispositivi)")
+                             % (vecchio, nuovo, cambiati.get(nuovo, 0))
+                             for vecchio, nuovo in cambi_tipo)
             messagebox.showinfo(
-                T("Stanza rinominata"),
-                T("%s\n\nI dispositivi che ci stavano dentro sono stati spostati\n"
-                  "nella stanza con il nome nuovo.") % "\n".join(righe), parent=self)
+                T("Rinomina completata"),
+                T("%s\n\nI dispositivi sono stati aggiornati con il nome nuovo.\n"
+                  "Non hanno perso niente: cambia solo l'etichetta.")
+                % "\n".join(righe), parent=self)
 
 
 # ------------------------------------------------------------ avvio

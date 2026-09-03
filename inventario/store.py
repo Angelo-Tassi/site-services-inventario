@@ -341,14 +341,15 @@ def is_iphone(tipo):
     return clean(tipo).lower() == TIPO_IPHONE
 
 
-def rinomine_stanze(vecchie, nuove):
-    """Le stanze rinominate fra due elenchi: coppie (vecchio, nuovo).
+def rinomine_in_elenco(vecchie, nuove):
+    """Le voci rinominate fra due elenchi: coppie (vecchio, nuovo).
 
-    Le stanze si modificano in un riquadro di testo, una per riga: rinominarne
-    una vuol dire cambiare il testo di una riga, quindi la riga resta al suo
-    posto. Si confrontano per posizione, ed e' una rinomina solo quando il nome
-    di prima non c'e' piu' nel nuovo elenco e quello nuovo non c'era prima:
-    cosi' aggiungere, togliere o riordinare non passa mai per una rinomina.
+    Vale per le stanze e per i tipi di dispositivo: si modificano tutti e due in
+    un riquadro di testo, una voce per riga. Rinominarne una vuol dire cambiare
+    il testo di una riga, quindi la riga resta al suo posto. Si confrontano per
+    posizione, ed e' una rinomina solo quando il nome di prima non c'e' piu' nel
+    nuovo elenco e quello nuovo non c'era prima: cosi' aggiungere, togliere o
+    riordinare non passa mai per una rinomina.
 
     Riordinare merita una parola: `[A, B, C]` che diventa `[C, B, A]` ha due
     posizioni cambiate, ma i nomi sono gli stessi. Se lo si prendesse per una
@@ -366,6 +367,31 @@ def rinomine_stanze(vecchie, nuove):
         if vecchio not in nuove and nuovo not in vecchie:
             coppie.append((vecchio, nuovo))
     return coppie
+
+
+def rinomine_stanze(vecchie, nuove):
+    """Le stanze rinominate. Vedi rinomine_in_elenco."""
+    return rinomine_in_elenco(vecchie, nuove)
+
+
+def rinomine_tipi(vecchi, nuovi):
+    """I tipi di dispositivo rinominati. Vedi rinomine_in_elenco."""
+    return rinomine_in_elenco(vecchi, nuovi)
+
+
+def rinomina_tocca_gli_iphone(coppie):
+    """Il tipo iPhone in una rinomina, da qualsiasi lato: (vecchio, nuovo) o None.
+
+    "iPhone" non e' un'etichetta come le altre: e' la parola con cui il
+    programma riconosce i telefoni. Da li' discendono l'IMEI al posto
+    dell'asset tag, la stanza obbligata, la spedizione al servizio telefonia e
+    il fatto che non si eliminino. Cambiarla vorrebbe dire che da quel momento
+    i telefoni non sono piu' telefoni, senza che nessuno se ne accorga.
+    """
+    for vecchio, nuovo in coppie:
+        if is_iphone(vecchio) or is_iphone(nuovo):
+            return (vecchio, nuovo)
+    return None
 
 
 def new_item(asset_tag="", tipo="", modello="", seriale="", stanza="", note="",
@@ -1148,6 +1174,40 @@ class InventoryStore(object):
                     _stamp_item(it)
                     spostati[nuovo] += 1
             return spostati
+
+        return self._apply(op)
+
+    def rinomina_tipi(self, coppie):
+        """Riscrive il tipo dei dispositivi che avevano quello vecchio.
+
+        Cambia solo il tipo: asset tag, numero di serie, stanza, stato, note,
+        prestito e spedizione restano quelli che erano.
+
+        Ritorna {nuovo nome: quanti dispositivi}.
+        """
+        coppie = [(clean(v), clean(n)) for v, n in coppie if clean(v) and clean(n)]
+        if not coppie:
+            return {}
+        tocca = rinomina_tocca_gli_iphone(coppie)
+        if tocca:
+            raise InventoryError(
+                T("Il tipo \"%s\" non si rinomina.\n\n"
+                  "E' la parola con cui il programma riconosce i telefoni: da li'\n"
+                  "vengono l'IMEI al posto dell'asset tag, la stanza obbligata, la\n"
+                  "spedizione al servizio telefonia e il fatto che non si eliminino.\n"
+                  "Cambiandola, i telefoni gia' registrati smetterebbero di essere\n"
+                  "telefoni.") % tocca[0])
+
+        def op(items):
+            cambiati = dict((nuovo, 0) for _v, nuovo in coppie)
+            for vecchio, nuovo in coppie:
+                for it in items:
+                    if clean(it.get("tipo")) != vecchio:
+                        continue
+                    it["tipo"] = nuovo
+                    _stamp_item(it)
+                    cambiati[nuovo] += 1
+            return cambiati
 
         return self._apply(op)
 
