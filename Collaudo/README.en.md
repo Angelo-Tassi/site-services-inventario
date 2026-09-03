@@ -396,6 +396,34 @@ is written in the final message.
 
 ---
 
+## 13. Renaming a room
+
+This checks that the devices follow the room when its name changes.
+
+1. look at the home page and note how many devices are in the **Digital
+   Kiosk**;
+2. open **Settings**, change the `Digital Kiosk` line to `Digital Kiosk 2` and
+   press **Save**;
+3. read the message: it must say `Digital Kiosk  ->  Digital Kiosk 2` with how
+   many devices it moved;
+4. on the home page there must be a **Digital Kiosk 2** card with the same
+   number as before, and **no card with the old name**;
+5. go into the room: the **Loan** column with the *Lend* / *Register return*
+   buttons must still be there - the room with loans followed the new name;
+6. reopen **Settings** and try typing the same room name twice: it must refuse,
+   naming the repeated one;
+7. now the trickiest case: rename **Site Services BAU**, which is the iPhone
+   room. After saving, reopen **Settings**: the *iPhone room* field must carry
+   the new name. Go into the **Iphone** container: the phones must still be
+   there, and adding a new one must put it in the room with the new name;
+8. finally move a line to another position without changing any name and save:
+   it **must move nothing**, reordering is not renaming.
+
+**What must happen:** no device is left behind with the old name, and no card
+appears for a room that no longer exists.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.

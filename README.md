@@ -698,15 +698,28 @@ compresa. Allargando la finestra la barra torna da sola su una riga sola.
 Aggiungi una riga nel riquadro **Stanze** e salva: la scheda compare subito in
 home, vuota. Per rinominarne una, cambia il testo della riga.
 
-Attenzione: rinominare una stanza **non sposta i dispositivi**, che restano
-etichettati con il vecchio nome e compaiono in una scheda a parte. Per portarli
-nella stanza rinominata, aprili e usa *Sposta in stanza...*, oppure - piu'
-rapido con molti dispositivi - esporta la vecchia stanza, cancella i dispositivi
-e reimporta il file dentro la stanza nuova.
+Rinominando una stanza, **i dispositivi che ci stavano dentro la seguono**:
+vengono riassegnati al nome nuovo appena si salva, e alla fine il programma dice
+quanti ne ha spostati. Prima restavano etichettati con il vecchio nome e
+comparivano in una scheda a parte, da svuotare a mano.
 
-Se rinomini la stanza indicata come *Stanza degli iPhone* senza aggiornare quel
-campo, il programma se ne accorge e ripiega sulla prima stanza dell'elenco, per
-non lasciare i telefoni in una stanza inesistente.
+La seguono anche le impostazioni che la nominavano: se era una **stanza con
+prestito** o la **stanza degli iPhone**, quei campi si aggiornano da soli. La
+stanza degli iPhone rinominata **resta la stanza degli iPhone**: i telefoni si
+spostano con lei, e quelli inseriti dopo vanno nella stanza con il nome nuovo.
+
+Il programma capisce che si tratta di una rinomina perche' la riga resta al suo
+posto nell'elenco e il nome cambia. **Riordinare** le righe, **aggiungere** una
+stanza o **toglierne** una non spostano niente: sono cose diverse, e nessuna
+delle tre e' una rinomina.
+
+Due stanze non possono chiamarsi allo stesso modo: il salvataggio viene rifiutato
+dicendo quale nome e' ripetuto.
+
+Togliere una riga, invece, continua a non spostare niente: i dispositivi restano
+con il nome della stanza sparita e compaiono in una scheda a parte, da dove si
+spostano con *Sposta in stanza...*. E' voluto - cancellare una riga non puo'
+voler dire cancellare dove sono trenta dispositivi.
 
 ### Aggiungere un tipo di dispositivo
 

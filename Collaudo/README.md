@@ -401,6 +401,35 @@ cui percorso e' scritto nel messaggio finale.
 
 ---
 
+## 13. Rinominare una stanza
+
+Serve a verificare che i dispositivi seguano la stanza quando le si cambia nome.
+
+1. guarda in home quanti dispositivi ci sono nel **Digital Kiosk**;
+2. apri **Impostazioni**, cambia il nome della riga `Digital Kiosk` in
+   `Digital Kiosk 2` e premi **Salva**;
+3. leggi il messaggio: deve dire `Digital Kiosk  ->  Digital Kiosk 2` con
+   quanti dispositivi ha spostato;
+4. in home deve esserci la scheda **Digital Kiosk 2** con lo stesso numero di
+   prima, e **nessuna scheda con il vecchio nome**;
+5. entra nella stanza: la colonna **Prestito** con i pulsanti *Presta* /
+   *Registra rientro* deve esserci ancora - la stanza con prestito ha seguito
+   il nome nuovo;
+6. riapri **Impostazioni** e prova a scrivere due volte lo stesso nome di
+   stanza: deve rifiutare dicendo quale e' ripetuto;
+7. adesso il caso piu' delicato: rinomina la stanza **Site Services BAU**, che
+   e' la stanza degli iPhone. Dopo il salvataggio riapri **Impostazioni**: il
+   campo *Stanza degli iPhone* deve portare il nome nuovo. Entra nel
+   contenitore **Iphone**: i telefoni devono esserci ancora, e inserendone uno
+   nuovo deve finire nella stanza con il nome nuovo;
+8. infine sposta una riga di posto senza cambiare nessun nome e salva: **non
+   deve spostare niente**, riordinare non e' rinominare.
+
+**Cosa deve succedere:** nessun dispositivo resta indietro con il nome vecchio,
+e non compare nessuna scheda di una stanza che non esiste piu'.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

@@ -17,7 +17,8 @@ from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE, HEADERS,
                     InventoryError, MESI_CONSERVAZIONE,
                     InventoryStore, NON_DISPONIBILE, SPEDITO, clean,
                     is_iphone, is_on_loan, is_shipped, new_item, norm_tag,
-                    puo_essere_eliminato, righe_separatore, rows_from_workbook,
+                    puo_essere_eliminato, righe_separatore,
+                    rinomine_stanze, rows_from_workbook,
                     sembra_un_foglio_da_importare, testo_spedizione,
                     valore_visibile)
 
@@ -516,6 +517,7 @@ class RoomsDialog(_Modal):
 
     def __init__(self, parent, rooms, types, loan_rooms, iphone_room="", lingua=None):
         _Modal.__init__(self, parent, T("Impostazioni inventario"))
+        self.stanze_di_partenza = list(rooms)
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
         ttk.Label(body, text=T("Stanze (una per riga)")).grid(row=0, column=0, sticky="w")
@@ -611,6 +613,24 @@ class RoomsDialog(_Modal):
         if not rooms:
             messagebox.showwarning(T("Dato mancante"), T("Indica almeno una stanza."), parent=self)
             return
+        doppie = [r for r in rooms if rooms.count(r) > 1]
+        if doppie:
+            messagebox.showwarning(
+                T("Stanza ripetuta"),
+                T("Questa stanza compare due volte nell'elenco:\n%s\n\n"
+                  "Due stanze non possono chiamarsi allo stesso modo.")
+                % doppie[0], parent=self)
+            return
+
+        # Rinominata una stanza, chi la nominava deve seguirla: le stanze con
+        # prestito e la stanza degli iPhone si aggiornano da sole, o il
+        # controllo qui sotto fermerebbe il salvataggio per un nome che
+        # l'utente ha appena cambiato di proposito.
+        rinomine = dict(rinomine_stanze(self.stanze_di_partenza, rooms))
+        loans = [rinomine.get(r, r) for r in loans]
+        stanza_iphone_scelta = rinomine.get(self.var_iphone_room.get().strip(),
+                                            self.var_iphone_room.get().strip())
+
         unknown = [r for r in loans if r not in rooms]
         if unknown:
             messagebox.showwarning(
@@ -618,7 +638,7 @@ class RoomsDialog(_Modal):
                 T("Queste stanze con prestito non sono nell'elenco delle stanze:\n%s")
                 % ", ".join(unknown), parent=self)
             return
-        stanza_iphone = self.var_iphone_room.get().strip()
+        stanza_iphone = stanza_iphone_scelta
         if stanza_iphone and stanza_iphone not in rooms:
             messagebox.showwarning(
                 T("Stanza sconosciuta"),
@@ -627,6 +647,7 @@ class RoomsDialog(_Modal):
             return
         scelta = dict((nome, codice) for nome, codice in lang.LINGUE)
         self.result = {"rooms": rooms, "types": types or ["Laptop", "Tablet"],
+                       "rinomine": list(rinomine.items()),
                        "loan_rooms": loans,
                        "iphone_room": stanza_iphone or rooms[0],
                        "lingua": scelta.get(self.var_lingua.get(), lang.ITALIANO)}
@@ -4011,6 +4032,17 @@ class App(tk.Tk):
             self.on_ripristino_locale()
             return
         nuova_lingua = result.pop("lingua", lang.corrente())
+        rinomine = result.pop("rinomine", [])
+        spostati = {}
+        if rinomine:
+            # Prima i dispositivi, poi le impostazioni: se lo spostamento non
+            # riesce - la share che non risponde, un altro tecnico che sta
+            # salvando - non si e' ancora scritto niente, e l'inventario resta
+            # coerente con l'elenco delle stanze.
+            esito = self._run(lambda: self.store.rinomina_stanze(rinomine))
+            if esito is None:
+                return
+            spostati = esito
         try:
             config.save_shared_config(self.store.path, result)
         except OSError as exc:
@@ -4027,6 +4059,14 @@ class App(tk.Tk):
         self.store.stati = list(self.cfg.get("states") or [])
         self._sync_filter_values()
         self.show_home()
+        if rinomine:
+            righe = [T("%s  ->  %s   (%d dispositivi)")
+                     % (vecchio, nuovo, spostati.get(nuovo, 0))
+                     for vecchio, nuovo in rinomine]
+            messagebox.showinfo(
+                T("Stanza rinominata"),
+                T("%s\n\nI dispositivi che ci stavano dentro sono stati spostati\n"
+                  "nella stanza con il nome nuovo.") % "\n".join(righe), parent=self)
 
 
 # ------------------------------------------------------------ avvio

@@ -378,14 +378,26 @@ the toolbar goes back to a single row on its own.
 Add a line in the **Rooms** box and save: the card shows up on the home page
 right away, empty. To rename one, change the text of its line.
 
-Careful: renaming a room **does not move the devices**, which keep the old name
-and appear in a separate card. To bring them across, open them and use *Move to
-room...*, or - faster with many devices - export the old room, delete the
-devices and import the file into the new room.
+When you rename a room, **the devices inside follow it**: they are reassigned to
+the new name as soon as you save, and at the end the program says how many it
+moved. Before, they kept the old name and showed up in a separate card, to be
+emptied by hand.
 
-If you rename the room named as the *iPhone room* without updating that field,
-the program notices and falls back to the first room in the list, so the phones
-are never left in a room that does not exist.
+The settings that named it follow too: if it was a **room with loans** or the
+**iPhone room**, those fields update by themselves. A renamed iPhone room
+**stays the iPhone room**: the phones move with it, and the ones added afterwards
+go into the room with the new name.
+
+The program knows it is a rename because the line stays in its place in the list
+and the name changes. **Reordering** the lines, **adding** a room or **removing**
+one move nothing: they are different things, and none of the three is a rename.
+
+Two rooms cannot have the same name: saving is refused, naming the repeated one.
+
+Removing a line, on the other hand, still moves nothing: the devices keep the
+name of the room that is gone and show up in a separate card, from where you move
+them with *Move to room...*. That is deliberate - deleting a line cannot be
+allowed to mean deleting where thirty devices are.
 
 ### Adding a device type
 

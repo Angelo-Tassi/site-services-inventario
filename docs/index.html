@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.40.0 · alfa</div>
+  <div class="alpha">versione 0.41.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,21 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.41.0</h3>
+      <p class="quando">3 settembre 2026</p>
+      <ul>
+        <li><b>Rinominare una stanza porta con se' i dispositivi.</b> Prima
+          restavano etichettati con il nome vecchio e finivano in una scheda a
+          parte, da svuotare a mano: la stanza su cui lavoravano non esisteva
+          piu'.</li>
+        <li><b>La seguono anche le impostazioni che la nominavano</b>: stanza
+          con prestito e stanza degli iPhone si aggiornano da sole.</li>
+        <li><b>Riordinare, aggiungere o togliere una riga non spostano
+          niente.</b> E' una rinomina solo quando la riga resta al suo posto e
+          cambia il nome; due stanze con lo stesso nome vengono rifiutate.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.40.0</h3>
       <p class="quando">3 settembre 2026</p>
@@ -245,21 +260,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           una nuova, la piu' vecchia viene cancellata. Solo quelle scritte dal
           programma, riconosciute dalla data nel nome: un file messo li' a mano
           non si tocca.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.38.1</h3>
-      <p class="quando">2 settembre 2026</p>
-      <ul>
-        <li><b>Un dispositivo in prestito non si sposta e non si elimina</b>, da
-          nessuna strada: Elimina, Elimina +, Sposta in stanza… e anche il campo
-          Stanza dentro la scheda. Finche' e' nelle mani di una persona,
-          l'inventario e' l'unica traccia di chi ce l'ha.</li>
-        <li><b>Il riepilogo lo dice per nome</b>: chi resta fermo, a chi e' stato
-          prestato e che serve registrare il rientro. In una selezione mista
-          partono gli altri e lui no.</li>
-        <li><b>Il motivo del blocco si legge anche in inglese</b>: veniva
-          composto prima di essere tradotto, quindi restava in italiano.</li>
       </ul>
     </div>
   </div>
@@ -447,7 +447,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.40.0 · alpha</div>
+  <div class="alpha">version 0.41.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -473,6 +473,20 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.41.0</h3>
+      <p class="quando">3 September 2026</p>
+      <ul>
+        <li><b>Renaming a room takes the devices with it.</b> Before, they kept
+          the old name and ended up in a separate card to be emptied by hand:
+          the room they worked in no longer existed.</li>
+        <li><b>The settings that named it follow too</b>: room with loans and
+          iPhone room update by themselves.</li>
+        <li><b>Reordering, adding or removing a line move nothing.</b> It is a
+          rename only when the line stays in place and the name changes; two
+          rooms with the same name are refused.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.40.0</h3>
       <p class="quando">3 September 2026</p>
@@ -523,21 +537,6 @@ python Inventario.py</pre>
         <li><b>Ten automatic copies are kept</b>: when a new one arrives, the
           oldest is deleted. Only the ones the program wrote, recognised by the
           date in the name: a file put there by hand is left alone.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.38.1</h3>
-      <p class="quando">2 September 2026</p>
-      <ul>
-        <li><b>A device on loan is neither moved nor deleted</b>, by any route:
-          Delete, Delete +, Move to room… and the Room field inside the record
-          too. While it is in someone's hands, the inventory is the only trace of
-          who has it.</li>
-        <li><b>The summary names it</b>: what stays put, who it was lent to, and
-          that the return must be registered. In a mixed selection the others go
-          and it stays.</li>
-        <li><b>The block reason reads in English too</b>: it was built before
-          being translated, so it stayed in Italian.</li>
       </ul>
     </div>
   </div>

@@ -912,6 +912,20 @@ EN = {
     "Non e' stato ripristinato niente.":
         'There is no inventory inside the copy %s.\n\n'
         'Nothing was restored.',
+    'Stanza ripetuta':
+        'Room repeated',
+    'Stanza rinominata':
+        'Room renamed',
+    "Questa stanza compare due volte nell'elenco:\n%s\n\n"
+    'Due stanze non possono chiamarsi allo stesso modo.':
+        'This room appears twice in the list:\n%s\n\n'
+        'Two rooms cannot have the same name.',
+    '%s  ->  %s   (%d dispositivi)':
+        '%s  ->  %s   (%d devices)',
+    '%s\n\nI dispositivi che ci stavano dentro sono stati spostati\n'
+    'nella stanza con il nome nuovo.':
+        '%s\n\nThe devices that were inside have been moved to the room\n'
+        'with the new name.',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':

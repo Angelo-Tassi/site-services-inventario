@@ -341,6 +341,33 @@ def is_iphone(tipo):
     return clean(tipo).lower() == TIPO_IPHONE
 
 
+def rinomine_stanze(vecchie, nuove):
+    """Le stanze rinominate fra due elenchi: coppie (vecchio, nuovo).
+
+    Le stanze si modificano in un riquadro di testo, una per riga: rinominarne
+    una vuol dire cambiare il testo di una riga, quindi la riga resta al suo
+    posto. Si confrontano per posizione, ed e' una rinomina solo quando il nome
+    di prima non c'e' piu' nel nuovo elenco e quello nuovo non c'era prima:
+    cosi' aggiungere, togliere o riordinare non passa mai per una rinomina.
+
+    Riordinare merita una parola: `[A, B, C]` che diventa `[C, B, A]` ha due
+    posizioni cambiate, ma i nomi sono gli stessi. Se lo si prendesse per una
+    rinomina si sposterebbero i dispositivi di due stanze intere, e nessuno
+    l'aveva chiesto.
+    """
+    vecchie = [clean(v) for v in vecchie or []]
+    nuove = [clean(n) for n in nuove or []]
+    if set(vecchie) == set(nuove):
+        return []                     # riordinate, non rinominate
+    coppie = []
+    for vecchio, nuovo in zip(vecchie, nuove):
+        if vecchio == nuovo or not vecchio or not nuovo:
+            continue
+        if vecchio not in nuove and nuovo not in vecchie:
+            coppie.append((vecchio, nuovo))
+    return coppie
+
+
 def new_item(asset_tag="", tipo="", modello="", seriale="", stanza="", note="",
              prestato_a="", prestato_il="", imei="", restituito_da="", stato="",
              spedito_il=""):
@@ -1093,6 +1120,34 @@ class InventoryStore(object):
             normalize_state(item, self.stati)
             _stamp_item(item)
             return testo_spedizione(item)
+
+        return self._apply(op)
+
+    def rinomina_stanze(self, coppie):
+        """Riscrive la stanza dei dispositivi che stavano in quelle rinominate.
+
+        Senza questo, rinominare una stanza lasciava i dispositivi etichettati
+        con un nome che non esiste piu': comparivano in una scheda a parte e
+        bisognava spostarli a mano, uno per uno.
+
+        Ritorna {nuovo nome: quanti dispositivi}, anche per le stanze che non
+        ne avevano: chi legge il riepilogo vuole sapere che sono zero, non che
+        non se ne e' parlato.
+        """
+        coppie = [(clean(v), clean(n)) for v, n in coppie if clean(v) and clean(n)]
+        if not coppie:
+            return {}
+
+        def op(items):
+            spostati = dict((nuovo, 0) for _v, nuovo in coppie)
+            for vecchio, nuovo in coppie:
+                for it in items:
+                    if clean(it.get("stanza")) != vecchio:
+                        continue
+                    it["stanza"] = nuovo
+                    _stamp_item(it)
+                    spostati[nuovo] += 1
+            return spostati
 
         return self._apply(op)
 
