@@ -620,8 +620,10 @@ the device is out.
 
 ## Recently deleted
 
-The **`Recently deleted`** button, on the home page next to *General duplicate
-check*, opens the bin: the devices deleted most recently, from which you fish
+The **`RECENTLY DELETED (n)`** button, on the home page next to *General
+duplicate check*, opens the bin. It is black, in capitals, and carries **how many
+records it holds** in brackets: it is the only place you come back from a
+deletion, and it has to be found without looking for it: the devices deleted most recently, from which you fish
 back the one removed by mistake.
 
 What sits in there **is no longer inventory**: it appears in no export, no

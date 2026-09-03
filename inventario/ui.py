@@ -1587,7 +1587,7 @@ class CestinoDialog(_Modal):
         self.elenco.column(ACTION_COLUMN, width=140, anchor="w", stretch=False)
         self.elenco.pack(fill="both", expand=True)
         self.elenco.bind("<<TreeviewSelect>>", lambda e: self._mostra_dettaglio())
-        self.elenco.bind("<Configure>", lambda e: self._disegna_pulsanti())
+        self.elenco.bind("<Configure>", self._disegna_pulsanti)
         # Copia e incolla come nell'elenco principale: la scorciatoia e il
         # menu del tasto destro. installa_copia_incolla() copre i campi di
         # testo, ma una tabella non e' un campo di testo.
@@ -1644,13 +1644,37 @@ class CestinoDialog(_Modal):
         self._mostra_dettaglio()
         self.after_idle(self._disegna_pulsanti)
 
-    def _disegna_pulsanti(self):
+    def _tabella_disposta(self, righe):
+        """Vero quando ogni riga ha davvero il suo posto sullo schermo.
+
+        Appena costruita, la tabella non e' ancora stata disposta: bbox()
+        risponde per la prima riga con le coordinate della riga delle
+        intestazioni - y a zero - e per le altre non risponde affatto. Un
+        pulsante messo li' finisce accanto ai titoli delle colonne invece che
+        accanto al suo dispositivo, e le altre righe restano senza. Si aspetta
+        che le coordinate siano vere.
+        """
+        for tag in righe:
+            try:
+                box = self.elenco.bbox(tag, 2)
+            except tk.TclError:
+                return False
+            if not box:
+                return False
+        return self.elenco.bbox(righe[0], 2)[1] > 0
+
+    def _disegna_pulsanti(self, _evento=None, tentativi=0):
         """Un pulsante Ripristina vero, sopra la cella di ogni riga."""
         if not self.elenco.winfo_exists():
             return
+        righe = self.elenco.get_children()
+        if righe and not self._tabella_disposta(righe):
+            if tentativi < 25:      # ~mezzo secondo, poi si disegna comunque
+                self.after(20, lambda: self._disegna_pulsanti(tentativi=tentativi + 1))
+                return
         indice = 2
         vivi = set()
-        for tag in self.elenco.get_children():
+        for tag in righe:
             try:
                 box = self.elenco.bbox(tag, indice)
             except tk.TclError:
@@ -2910,8 +2934,10 @@ class App(tk.Tk):
             ttk.Button(header, text=T("Controllo generale duplicati"),
                        style="Rosso.TButton",
                        command=self.on_duplicati).pack(side="right", padx=(0, 6))
-            ttk.Button(header, text=T("Eliminati di recente"),
-                       command=self.on_cestino).pack(side="right", padx=(0, 6))
+            self.btn_cestino = ttk.Button(header, style="Cestino.TButton",
+                                          text=self._etichetta_cestino(),
+                                          command=self.on_cestino)
+            self.btn_cestino.pack(side="right", padx=(0, 10))
         else:
             header = ttk.Frame(self.body)
             header.pack(fill="x", pady=(10, 8))
@@ -3222,6 +3248,7 @@ class App(tk.Tk):
             self._render()          # i conteggi delle schede cambiano
         else:
             self.refresh_table()
+        self._aggiorna_cestino()
         if success:
             self.var_status.set(success + "     " + self.var_status.get())
         self._forse_ricorda_copia()
@@ -3671,9 +3698,23 @@ class App(tk.Tk):
                    command=ok).pack(side="right")
         return dialog.show()
 
+    def _etichetta_cestino(self):
+        """ELIMINATI DI RECENTE (n): il numero e' la ragione per aprirlo."""
+        try:
+            quanti = len(self.store.eliminati())
+        except Exception:
+            quanti = 0
+        return T("ELIMINATI DI RECENTE (%d)") % quanti
+
+    def _aggiorna_cestino(self):
+        pulsante = getattr(self, "btn_cestino", None)
+        if pulsante is not None and pulsante.winfo_exists():
+            pulsante.configure(text=self._etichetta_cestino())
+
     def on_cestino(self):
         """Gli eliminati di recente, da cui si ripesca quello tolto per sbaglio."""
         ripristinati = CestinoDialog(self, self.store, self.cfg["rooms"]).show()
+        self._aggiorna_cestino()
         if ripristinati:
             self.store.load()
             self._sync_filter_values()

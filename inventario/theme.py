@@ -34,6 +34,14 @@ SHIP_FG = "#6C3483"
 # Pulsanti della barra, colorati per famiglia: chi sta per premere sa a che
 # categoria appartiene il comando prima di leggerlo. Sfondi pastello e testo
 # scuro dello stesso tono - il contrasto resta alto, il colore non urla.
+# Il cestino: nero pieno, l'unico bottone che non appartiene a nessuna delle tre
+# famiglie di colore. Deve staccare, perche' e' l'unico posto da cui si torna
+# indietro da un'eliminazione e va trovato senza cercarlo. Bianco su nero: 18:1
+# di contrasto, il massimo che il tema puo' dare.
+CESTINO_BG = "#1C1C1C"
+CESTINO_BG_ON = "#3A3A3A"
+CESTINO_FG = "#FFFFFF"
+
 AZIONE_ROSSA_BG = "#FBEAE7"      # ripristino e reset: si tocca l'inventario
 AZIONE_ROSSA_BG_ON = "#F6D8D2"
 AZIONE_ROSSA_FG = "#96291D"
@@ -135,6 +143,15 @@ def apply(root):
                   background=[("active", acceso), ("pressed", acceso)],
                   foreground=[("active", testo), ("pressed", testo)],
                   bordercolor=[("!disabled", acceso)])
+
+    # Piu' grande e in stampatello: e' un pulsante che si cerca con lo sguardo
+    # quando ci si accorge di aver eliminato la riga sbagliata.
+    style.configure("Cestino.TButton", background=CESTINO_BG, foreground=CESTINO_FG,
+                    font=(family, 11, "bold"), borderwidth=0, relief="flat",
+                    padding=(12, 6))
+    style.map("Cestino.TButton",
+              background=[("active", CESTINO_BG_ON), ("pressed", CESTINO_BG_ON)],
+              foreground=[("active", CESTINO_FG), ("pressed", CESTINO_FG)])
 
     style.configure("Ghost.TButton", background=BG, foreground=PRIMARY,
                     font=fonts["bold"], borderwidth=0, padding=(6, 4))

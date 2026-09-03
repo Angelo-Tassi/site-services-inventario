@@ -508,8 +508,10 @@ mentre il dispositivo e' fuori.
 
 ## Eliminati di recente
 
-Il pulsante **`Eliminati di recente`**, in home accanto a *Controllo generale
-duplicati*, apre il cestino: gli ultimi dispositivi eliminati, da cui si ripesca
+Il pulsante **`ELIMINATI DI RECENTE (n)`**, in home accanto a *Controllo generale
+duplicati*, apre il cestino. E' nero, in stampatello e porta fra parentesi
+**quanti record contiene**: e' l'unico posto da cui si torna indietro da
+un'eliminazione, e va trovato senza cercarlo: gli ultimi dispositivi eliminati, da cui si ripesca
 quello tolto per sbaglio.
 
 Quello che ci sta dentro **non e' piu' inventario**: non compare nelle

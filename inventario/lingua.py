@@ -1026,6 +1026,8 @@ EN = {
         'Copy the rows (%d)',
     '%d selezionati':
         '%d selected',
+    'ELIMINATI DI RECENTE (%d)':
+        'RECENTLY DELETED (%d)',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':

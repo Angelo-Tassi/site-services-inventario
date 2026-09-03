@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.43.0 · alfa</div>
+  <div class="alpha">versione 0.43.1 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,21 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.43.1</h3>
+      <p class="quando">3 settembre 2026</p>
+      <ul>
+        <li><b>Il pulsante degli eliminati si vede</b>: nero, in stampatello e
+          con dentro quanti record contiene. E' l'unico posto da cui si torna
+          indietro da un'eliminazione.</li>
+        <li><b>Il primo pulsante Ripristina non finisce piu' accanto ai titoli
+          delle colonne.</b> Appena aperta la finestra la tabella non era
+          ancora disposta: la prima riga rispondeva con le coordinate delle
+          intestazioni e le altre non rispondevano affatto, cosi' il primo
+          pulsante era fuori posto e gli altri mancavano finche' non si
+          cliccava.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.43.0</h3>
       <p class="quando">3 settembre 2026</p>
@@ -242,24 +257,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
         <li><b>Riordinare, aggiungere o togliere una riga non spostano
           niente.</b> E' una rinomina solo quando la riga resta al suo posto e
           cambia il nome; due stanze con lo stesso nome vengono rifiutate.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.40.0</h3>
-      <p class="quando">3 settembre 2026</p>
-      <ul>
-        <li><b>Ripristina da un file locale…</b>, in Impostazioni: rimette
-          inventario <i>e</i> stanze da una copia salvata fuori dalla rete. E'
-          la via d'uscita se la cartella di rete sparisce, con dentro i backup
-          automatici.</li>
-        <li><b>La copia in locale e' uno zip</b> con l'inventario e le
-          impostazioni: dai soli dispositivi le stanze non si recuperano. Chi
-          vuole il foglio direttamente apribile sceglie <i>Solo i dispositivi
-          (xlsx)</i>, come prima.</li>
-        <li><b>Prima si legge il riepilogo</b>: quanti dispositivi tornano, di
-          quando e' la copia, come resta ogni stanza e quali impostazioni
-          cambiano. Un file rovinato viene rifiutato senza toccare niente, e
-          dello stato attuale resta comunque una copia.</li>
       </ul>
     </div>
   </div>
@@ -447,7 +444,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.43.0 · alpha</div>
+  <div class="alpha">version 0.43.1 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -473,6 +470,20 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.43.1</h3>
+      <p class="quando">3 September 2026</p>
+      <ul>
+        <li><b>The recently-deleted button is visible</b>: black, in capitals,
+          carrying how many records it holds. It is the only place you come back
+          from a deletion.</li>
+        <li><b>The first Restore button no longer lands next to the column
+          headings.</b> Right after the window opened the table had not been
+          laid out yet: the first row answered with the header coordinates and
+          the others did not answer at all, so the first button was out of place
+          and the rest were missing until you clicked.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.43.0</h3>
       <p class="quando">3 September 2026</p>
@@ -518,24 +529,6 @@ python Inventario.py</pre>
         <li><b>Reordering, adding or removing a line move nothing.</b> It is a
           rename only when the line stays in place and the name changes; two
           rooms with the same name are refused.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.40.0</h3>
-      <p class="quando">3 September 2026</p>
-      <ul>
-        <li><b>Restore from a local file…</b>, in Settings: it puts back the
-          inventory <i>and</i> the rooms from a copy saved off the network. It
-          is the way out if the network folder goes, taking the automatic
-          backups with it.</li>
-        <li><b>The local copy is a zip</b> holding the inventory and the
-          settings: the rooms cannot be recovered from the devices alone.
-          Whoever wants the sheet directly openable picks <i>Devices only
-          (xlsx)</i>, as before.</li>
-        <li><b>You read the summary first</b>: how many devices come back, what
-          date the copy is from, how every room ends up and which settings
-          change. A damaged file is refused without touching anything, and a
-          copy of the current state is kept anyway.</li>
       </ul>
     </div>
   </div>

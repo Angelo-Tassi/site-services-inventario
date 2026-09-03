@@ -440,7 +440,8 @@ This checks the safety net for a deletion made by mistake.
 1. on the home screen delete any three devices, confirming the summary;
 2. search for one of those three in the **Search** box of the main list: it
    **must not appear**. Do an export too: it must not be there;
-3. press **Recently deleted**, next to *General duplicate check*: the three must
+3. press **RECENTLY DELETED**, the black button next to *General duplicate
+   check*. In brackets there must be **3**, the ones you just deleted: they must
    be at the top, with asset tag and type;
 4. select a row and read the line at the bottom: it must say when and by whom it
    was deleted, and which room it would go back to;

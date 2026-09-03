@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fixture
 from tkinter import messagebox
-from inventario import config, ui
+from inventario import config, theme, ui
 from inventario.store import (ELIMINATI_GIORNI, ELIMINATI_MASSIMO, InventoryStore,
                               new_item)
 from inventario.ui import App, CestinoDialog
@@ -150,6 +150,20 @@ assert "11-11 di 11" in dlg.var_pagina.get(), dlg.var_pagina.get()
 assert str(dlg.btn_dopo.cget("state")) == "disabled"
 dlg._vai(-1); dlg.update()
 
+# ---- ogni pulsante Ripristina sta accanto alla SUA riga, non alle intestazioni
+# Appena aperta la finestra, bbox() rispondeva per la prima riga con le
+# coordinate della riga dei titoli: il primo pulsante finiva li' e le altre
+# righe restavano senza, finche' non si cliccava.
+for tag in dlg.elenco.get_children():
+    riquadro = dlg.elenco.bbox(tag, 2)
+    pulsante = dlg._pulsanti.get(tag)
+    assert pulsante is not None, "la riga %s e' senza pulsante" % tag
+    assert riquadro[1] > 0, "la riga %s sta sopra le intestazioni" % tag
+    assert riquadro[1] <= pulsante.winfo_y() <= riquadro[1] + riquadro[3], \
+        (tag, riquadro, pulsante.winfo_y())
+alti = sorted(dlg._pulsanti[t].winfo_y() for t in dlg.elenco.get_children())
+assert len(set(alti)) == len(alti), "due pulsanti alla stessa altezza"
+
 # ---- due sole colonne, piu' quella del pulsante
 assert list(dlg.elenco.cget("columns"))[:2] == ["asset_tag", "tipo"]
 assert len(dlg._pulsanti) == len(dlg.elenco.get_children()), \
@@ -235,6 +249,41 @@ app.on_settings()
 app.store.load()
 assert app.cfg["rooms"] == prima, app.cfg["rooms"]
 assert len(app.store.items) == quanti, "nessun dispositivo doveva muoversi"
+
+# ---- il pulsante in home si vede: stampatello, nero, e con il numero dentro
+app.show_home(); app.update()
+etichetta = str(app.btn_cestino.cget("text"))
+assert etichetta == etichetta.upper(), etichetta
+assert "ELIMINATI DI RECENTE" in etichetta, etichetta
+quanti = len(app.store.eliminati())
+assert ("(%d)" % quanti) in etichetta, (etichetta, quanti)
+assert str(app.btn_cestino.cget("style")) == "Cestino.TButton"
+from tkinter import ttk as _ttk
+stile = _ttk.Style(app)
+assert stile.lookup("Cestino.TButton", "background") == theme.CESTINO_BG
+assert stile.lookup("Cestino.TButton", "foreground") == theme.CESTINO_FG
+corpo = stile.lookup("Cestino.TButton", "font")
+assert "bold" in str(corpo), corpo
+
+# ---- e sta nella sua riga anche a finestra stretta, con gli altri due
+for larghezza in (app.wm_minsize()[0], 1220):
+    app.geometry("%dx700" % larghezza)
+    app.show_home(); app.update(); app.update_idletasks()
+    riga = app.btn_cestino.master
+    for figlio in riga.winfo_children():
+        if figlio.winfo_class() != "TButton":
+            continue
+        destra = figlio.winfo_x() + figlio.winfo_width()
+        assert figlio.winfo_ismapped() and figlio.winfo_x() >= 0 \
+            and destra <= riga.winfo_width() + 1, \
+            (larghezza, figlio.cget("text"), figlio.winfo_x(), riga.winfo_width())
+
+# ---- e il numero cambia da solo dopo un'eliminazione, senza riaprire la home
+app._run(lambda: app.store.add(new_item("IT-7777", "Laptop", "T14", "PF77", BAU)), "ok")
+app._run(lambda: app.store.delete(["IT-7777"]), "ok")
+app.update()
+assert ("(%d)" % (quanti + 1)) in str(app.btn_cestino.cget("text")), \
+    app.btn_cestino.cget("text")
 
 app.destroy()
 print("ELIMINATI DI RECENTE OK")

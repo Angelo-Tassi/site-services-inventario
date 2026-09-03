@@ -447,7 +447,9 @@ Serve a verificare la rete di sicurezza per l'eliminazione sbagliata.
 1. in home elimina tre dispositivi qualsiasi, confermando il riepilogo;
 2. cerca uno di quei tre nella casella **Cerca** dell'elenco principale:
    **non deve comparire**. Fai anche un'esportazione: non deve esserci;
-3. premi **Eliminati di recente**, accanto a *Controllo generale duplicati*:
+3. premi **ELIMINATI DI RECENTE**, il pulsante nero accanto a *Controllo
+   generale duplicati*. Fra parentesi deve esserci **3**, quanti ne hai
+   appena eliminati:
    i tre devono essere in cima, con asset tag e tipo;
 4. seleziona una riga e leggi la scritta in fondo: deve dire quando e da chi e'
    stato eliminato, e in che stanza tornerebbe;
