@@ -13,7 +13,8 @@ from tkinter import filedialog, font as tkfont, messagebox, ttk
 from . import __version__, config, excel_io, theme
 from . import lingua as lang
 from .lingua import T, intestazione, stato as traduci_stato
-from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE, HEADERS,
+from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE,
+                    ELIMINATI_GIORNI, ELIMINATI_MASSIMO, HEADERS,
                     InventoryError, MESI_CONSERVAZIONE,
                     InventoryStore, NON_DISPONIBILE, SPEDITO, clean,
                     is_iphone, is_on_loan, is_shipped, new_item, norm_tag,
@@ -1532,6 +1533,261 @@ def riepilogo_spostamento(spostabili, telefoni, prestati, destinazione,
     return righe
 
 
+class CestinoDialog(_Modal):
+    """Gli eliminati di recente, con il ripristino riga per riga.
+
+    Fa vedere due sole colonne - asset tag e tipo - perche' serve a ritrovare
+    un dispositivo, non a consultarne la scheda: quella torna intera con il
+    ripristino. La data e la stanza di provenienza si leggono in fondo, sulla
+    riga scelta.
+    """
+
+    PER_PAGINA = 10
+
+    def __init__(self, parent, store, stanze):
+        _Modal.__init__(self, parent, T("Eliminati di recente"))
+        self.store = store
+        self.stanze = list(stanze)
+        self.app = parent
+        self.pagina = 0
+        self.ripristinati = 0
+        self._pulsanti = {}
+
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, style="Muted.TLabel", wraplength=520, justify="left",
+                  text=T("Restano qui %d giorni dall'eliminazione, e al massimo %d.\n"
+                         "Non compaiono in nessuna ricerca, esportazione o stampa.")
+                  % (ELIMINATI_GIORNI, ELIMINATI_MASSIMO)).pack(anchor="w",
+                                                                pady=(0, 10))
+
+        riga = ttk.Frame(body)
+        riga.pack(fill="x")
+        ttk.Label(riga, text=T("Cerca")).pack(side="left")
+        self.var_cerca = tk.StringVar()
+        self.var_cerca.trace_add("write", lambda *a: self._cerca_cambiata())
+        entry = ttk.Entry(riga, textvariable=self.var_cerca, width=28)
+        entry.pack(side="left", padx=(6, 14))
+        self.btn_ripristina = ttk.Button(riga, text=T("Ripristina i selezionati"),
+                                         style="Primary.TButton",
+                                         command=self._ripristina_selezionati)
+        self.btn_ripristina.pack(side="left")
+
+        cornice = ttk.Frame(body)
+        cornice.pack(fill="both", expand=True, pady=(12, 0))
+        colonne = ("asset_tag", "tipo", ACTION_COLUMN)
+        self.elenco = ttk.Treeview(cornice, columns=colonne, show="headings",
+                                   height=self.PER_PAGINA, selectmode="extended",
+                                   style="Inv.Treeview")
+        self.elenco.heading("asset_tag", text=intestazione(HEADERS["asset_tag"]))
+        self.elenco.heading("tipo", text=intestazione(HEADERS["tipo"]))
+        self.elenco.heading(ACTION_COLUMN, text="")
+        self.elenco.column("asset_tag", width=200, anchor="w", stretch=False)
+        self.elenco.column("tipo", width=150, anchor="w", stretch=False)
+        self.elenco.column(ACTION_COLUMN, width=140, anchor="w", stretch=False)
+        self.elenco.pack(fill="both", expand=True)
+        self.elenco.bind("<<TreeviewSelect>>", lambda e: self._mostra_dettaglio())
+        self.elenco.bind("<Configure>", lambda e: self._disegna_pulsanti())
+        # Copia e incolla come nell'elenco principale: la scorciatoia e il
+        # menu del tasto destro. installa_copia_incolla() copre i campi di
+        # testo, ma una tabella non e' un campo di testo.
+        self.elenco.bind("<Control-c>", self._copia)
+        self.elenco.bind("<Command-c>", self._copia)
+        for tasto in ("<Button-3>", "<Button-2>"):
+            self.elenco.bind(tasto, self._menu)
+
+        self.var_dettaglio = tk.StringVar()
+        ttk.Label(body, textvariable=self.var_dettaglio, style="Muted.TLabel",
+                  wraplength=520, justify="left").pack(anchor="w", pady=(8, 0))
+
+        piede = ttk.Frame(body)
+        piede.pack(fill="x", pady=(12, 0))
+        self.btn_prima = ttk.Button(piede, text=T("‹  Precedenti"),
+                                    command=lambda: self._vai(-1))
+        self.btn_prima.pack(side="left")
+        self.var_pagina = tk.StringVar()
+        ttk.Label(piede, textvariable=self.var_pagina,
+                  style="Muted.TLabel").pack(side="left", padx=10)
+        self.btn_dopo = ttk.Button(piede, text=T("Successivi  ›"),
+                                   command=lambda: self._vai(1))
+        self.btn_dopo.pack(side="left")
+        ttk.Button(piede, text=T("Chiudi"), command=self._chiudi).pack(side="right")
+
+        self._ricarica()
+        entry.focus_set()
+
+    # ---------------------------------------------------------- contenuto
+
+    def _ricarica(self):
+        self.voci = self.store.eliminati(self.var_cerca.get())
+        pagine = max(1, (len(self.voci) + self.PER_PAGINA - 1) // self.PER_PAGINA)
+        self.pagina = min(self.pagina, pagine - 1)
+        inizio = self.pagina * self.PER_PAGINA
+        self.in_pagina = self.voci[inizio:inizio + self.PER_PAGINA]
+        self.elenco.delete(*self.elenco.get_children())
+        for voce in self.in_pagina:
+            self.elenco.insert("", "end", iid=voce["asset_tag"],
+                               values=(voce.get("asset_tag", ""),
+                                       voce.get("tipo", ""), ""),
+                               tags=("orfano",) if voce.get("orfano") else ())
+        self.elenco.tag_configure("orfano", background=theme.LOAN_BG)
+        if not self.voci:
+            self.var_pagina.set(T("Nessun dispositivo eliminato di recente."))
+        else:
+            self.var_pagina.set(T("%d-%d di %d")
+                                % (inizio + 1, inizio + len(self.in_pagina),
+                                   len(self.voci)))
+        self.btn_prima.configure(state="normal" if self.pagina > 0 else "disabled")
+        self.btn_dopo.configure(
+            state="normal" if inizio + self.PER_PAGINA < len(self.voci) else "disabled")
+        self.btn_ripristina.configure(state="normal" if self.voci else "disabled")
+        self._mostra_dettaglio()
+        self.after_idle(self._disegna_pulsanti)
+
+    def _disegna_pulsanti(self):
+        """Un pulsante Ripristina vero, sopra la cella di ogni riga."""
+        if not self.elenco.winfo_exists():
+            return
+        indice = 2
+        vivi = set()
+        for tag in self.elenco.get_children():
+            try:
+                box = self.elenco.bbox(tag, indice)
+            except tk.TclError:
+                box = None
+            if not box:
+                continue
+            vivi.add(tag)
+            pulsante = self._pulsanti.get(tag)
+            if pulsante is None:
+                pulsante = ttk.Button(self.elenco, text=T("Ripristina"),
+                                      style="Row.TButton", takefocus=False,
+                                      command=lambda t=tag: self._ripristina([t]))
+                self._pulsanti[tag] = pulsante
+            x, y, larghezza, altezza = box
+            pulsante.place(x=x + 6, y=y + 3, width=max(larghezza - 12, 40),
+                           height=max(altezza - 6, 18))
+        for tag in [t for t in self._pulsanti if t not in vivi]:
+            self._pulsanti.pop(tag).destroy()
+
+    def _cerca_cambiata(self):
+        self.pagina = 0
+        self._ricarica()
+
+    def _vai(self, passo):
+        self.pagina = max(0, self.pagina + passo)
+        self._ricarica()
+
+    def _voce(self, tag):
+        return next((v for v in self.voci if v.get("asset_tag") == tag), None)
+
+    def _mostra_dettaglio(self):
+        scelti = self.elenco.selection()
+        if len(scelti) != 1:
+            self.var_dettaglio.set(
+                T("%d selezionati") % len(scelti) if scelti else "")
+            return
+        voce = self._voce(scelti[0])
+        if voce is None:
+            self.var_dettaglio.set("")
+            return
+        if voce.get("orfano"):
+            dove = T("nessuna stanza: la sua e' stata tolta, te la chiedera'")
+        else:
+            dove = T("torna in %s") % (voce.get("stanza") or T("(senza stanza)"))
+        self.var_dettaglio.set(T("Eliminato il %s da %s  -  %s")
+                               % (voce.get("eliminato_il", "?"),
+                                  voce.get("eliminato_da", "?"), dove))
+
+    def _copia(self, _evento=None, solo_identificativo=False):
+        scelti = self.elenco.selection()
+        if not scelti:
+            return "break"
+        righe = []
+        for tag in scelti:
+            valori = self.elenco.item(tag, "values")
+            righe.append(valori[0] if solo_identificativo
+                         else "%s\t%s" % (valori[0], valori[1]))
+        self.clipboard_clear()
+        self.clipboard_append("\n".join(righe))
+        return "break"
+
+    def _menu(self, evento):
+        riga = self.elenco.identify_row(evento.y)
+        if riga and riga not in self.elenco.selection():
+            self.elenco.selection_set([riga])
+        quante = len(self.elenco.selection())
+        if not quante:
+            return "break"
+        menu = tk.Menu(self, tearoff=0)
+        menu.add_command(label=T("Ripristina (%d)") % quante,
+                         command=lambda: self._ripristina(list(self.elenco.selection())))
+        menu.add_separator()
+        menu.add_command(label=T("Copia le righe (%d)") % quante,
+                         command=self._copia)
+        menu.add_command(label=T("Copia l'identificativo"),
+                         command=lambda: self._copia(solo_identificativo=True))
+        try:
+            menu.tk_popup(evento.x_root, evento.y_root)
+        finally:
+            menu.grab_release()
+        return "break"
+
+    # --------------------------------------------------------- ripristino
+
+    def _ripristina_selezionati(self):
+        scelti = list(self.elenco.selection())
+        if not scelti:
+            messagebox.showinfo(T("Ripristina"),
+                                T("Scegli i dispositivi da ripristinare."), parent=self)
+            return
+        self._ripristina(scelti)
+
+    def _ripristina(self, tags):
+        voci = [self._voce(t) for t in tags]
+        voci = [v for v in voci if v is not None]
+        if not voci:
+            return
+        stanza = None
+        orfani = [v for v in voci if v.get("orfano") or not clean(v.get("stanza"))]
+        if orfani:
+            stanza = self._chiedi_stanza(orfani)
+            if not stanza:
+                return
+        try:
+            rimessi, saltati = self.store.ripristina_eliminati(
+                [v["asset_tag"] for v in voci], stanza)
+        except InventoryError as exc:
+            messagebox.showerror(T("Ripristino non riuscito"), str(exc), parent=self)
+            return
+        self.ripristinati += len(rimessi)
+        self._ricarica()
+        righe = []
+        if rimessi:
+            righe.append(T("Ripristinati %d dispositivi.") % len(rimessi))
+        if saltati:
+            righe.append("")
+            righe.append(T("SALTATI: %d") % len(saltati))
+            righe.extend("    %s  -  %s" % (tag, motivo) for tag, motivo in saltati)
+        messagebox.showinfo(T("Ripristino"), "\n".join(righe), parent=self)
+
+    def _chiedi_stanza(self, orfani):
+        """Un orfano non ha una stanza a cui tornare: si chiede quale."""
+        elenco = ", ".join(v["asset_tag"] for v in orfani[:5])
+        if len(orfani) > 5:
+            elenco += "..."
+        return self.app._ask_room(
+            T("Questi dispositivi erano in una stanza che non esiste piu':\n%s\n\n"
+              "In che stanza rimetterli?") % elenco)
+
+    def _chiudi(self):
+        self.result = self.ripristinati
+        self.destroy()
+
+    def _cancel(self):
+        self._chiudi()
+
+
 def riepilogo_copia_locale(rapporto, adesso, stanze_adesso, cfg_adesso):
     """Che cosa tornerebbe indietro ripristinando una copia locale.
 
@@ -2654,6 +2910,8 @@ class App(tk.Tk):
             ttk.Button(header, text=T("Controllo generale duplicati"),
                        style="Rosso.TButton",
                        command=self.on_duplicati).pack(side="right", padx=(0, 6))
+            ttk.Button(header, text=T("Eliminati di recente"),
+                       command=self.on_cestino).pack(side="right", padx=(0, 6))
         else:
             header = ttk.Frame(self.body)
             header.pack(fill="x", pady=(10, 8))
@@ -3413,6 +3671,17 @@ class App(tk.Tk):
                    command=ok).pack(side="right")
         return dialog.show()
 
+    def on_cestino(self):
+        """Gli eliminati di recente, da cui si ripesca quello tolto per sbaglio."""
+        ripristinati = CestinoDialog(self, self.store, self.cfg["rooms"]).show()
+        if ripristinati:
+            self.store.load()
+            self._sync_filter_values()
+            self.show_home()
+            self.var_status.set(
+                T("Ripristinati %d dispositivi dagli eliminati di recente.")
+                % ripristinati + "     " + self.var_status.get())
+
     def on_duplicati(self):
         """Cerca in tutto l'inventario i dispositivi registrati due volte.
 
@@ -4061,6 +4330,27 @@ class App(tk.Tk):
         nuova_lingua = result.pop("lingua", lang.corrente())
         rinomine = result.pop("rinomine", [])
         cambi_tipo = result.pop("rinomine_tipi", [])
+
+        # Una stanza tolta lascerebbe i suoi dispositivi con il nome di una
+        # stanza che non esiste piu': non si trovano con i filtri e non si sa
+        # che fine abbiano fatto. Vanno negli eliminati di recente, ma non di
+        # nascosto: si chiede, e se si dice di no non si salva niente.
+        rinominate = set(v for v, _n in rinomine)
+        tolte = [r for r in self.cfg.get("rooms", [])
+                 if r not in result.get("rooms", []) and r not in rinominate]
+        conteggio = {k: v for k, v in self.store.quanti_nelle_stanze(tolte).items() if v}
+        if conteggio:
+            righe = "\n".join("  %s: %d dispositivi" % (stanza, quanti)
+                               for stanza, quanti in sorted(conteggio.items()))
+            if not messagebox.askyesno(
+                T("Stanza tolta con dispositivi dentro"),
+                T("Stai togliendo dall'elenco stanze che non sono vuote:\n\n%s\n\n"
+                  "Questi dispositivi finiscono in Eliminati di recente, da dove\n"
+                  "si ripristinano scegliendo una stanza. Restano li' %d giorni.\n\n"
+                  "Procedere?") % (righe, ELIMINATI_GIORNI), parent=self):
+                return
+            if self._run(lambda: self.store.porta_via_gli_orfani(tolte)) is None:
+                return
         spostati = {}
         cambiati = {}
         if cambi_tipo:

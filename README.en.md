@@ -618,6 +618,47 @@ and from that moment it moves and deletes like any other.
 Every other change stays possible: notes, model and type can be corrected while
 the device is out.
 
+## Recently deleted
+
+The **`Recently deleted`** button, on the home page next to *General duplicate
+check*, opens the bin: the devices deleted most recently, from which you fish
+back the one removed by mistake.
+
+What sits in there **is no longer inventory**: it appears in no export, no
+printout, no room count and no search of the main list. If it appeared it would
+be a device, and instead it has been deleted.
+
+- records stay **30 days** from the deletion date, and at most **200** of them:
+  when the two hundred and first arrives, the oldest goes. It is not a historical
+  archive, it is the safety net for yesterday's mistake;
+- the list shows **asset tag and type**, ten per page. The rest of the record is
+  not lost: it comes back whole with the restore;
+- the **search field** at the top searches the **whole bin**, not the page you
+  are looking at: what it finds is then paginated in turn;
+- next to every row there is **Restore**, and at the top **Restore the selected
+  ones** to work on several rows at once - Ctrl+click and Shift+click as in the
+  main list, with the same copying (Ctrl+C and the right mouse button);
+- the device goes back **into the room it was in when it was deleted**, with
+  everything it had: serial number, notes, status, loan, shipment.
+
+A restore is **skipped** if that asset tag has come back into the inventory some
+other way in the meantime: the program says so instead of creating a duplicate.
+
+### The devices of a room you removed
+
+When you remove a room from the list in the settings, the devices that were in it
+no longer have a place. Staying in the list with the name of a room that does not
+exist is worse than disappearing: they are not found by the filters and nobody
+knows what became of them.
+
+That is why they end up in **recently deleted** - but not quietly: the program
+**asks for confirmation**, saying which rooms are not empty and how many devices
+are inside them. Say no and nothing is saved, not even the other settings.
+
+These devices are marked as **orphans** and are recognisable by the red
+background in the list: they have no room to go back to, so on restore the
+program **asks which room to put them in**.
+
 ## Duplicates
 
 The program does not create them. **Adding a device refuses** an identifier

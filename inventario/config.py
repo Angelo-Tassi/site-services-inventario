@@ -218,6 +218,18 @@ def shared_config_path(data_path):
     return os.path.join(folder, "inventario_impostazioni.json")
 
 
+def deleted_path(data_path):
+    """Il file degli eliminati di recente, accanto ai dati e quindi condiviso.
+
+    Sta sulla rete come i dati: un dispositivo eliminato da un tecnico deve
+    poterlo ripescare un altro. Non e' dentro l'.xlsx perche' non e' inventario:
+    quei record non devono comparire in nessuna esportazione ne' in nessuna
+    ricerca.
+    """
+    folder = os.path.dirname(os.path.abspath(data_path))
+    return os.path.join(folder, "inventario_eliminati.json")
+
+
 def load_shared_config(data_path):
     """Impostazioni condivise; ritorna sempre un dizionario valido."""
     cfg = {"rooms": list(DEFAULT_ROOMS), "types": list(DEFAULT_TYPES),

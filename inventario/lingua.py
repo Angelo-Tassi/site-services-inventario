@@ -966,6 +966,66 @@ EN = {
         'phone service and the fact that they cannot be deleted.\n'
         'Change it and the phones already registered would stop being\n'
         'phones.',
+    'Eliminati di recente':
+        'Recently deleted',
+    '‹  Precedenti':
+        '‹  Previous',
+    'Successivi  ›':
+        'Next  ›',
+    'Chiudi':
+        'Close',
+    'Nessun dispositivo eliminato di recente.':
+        'No device deleted recently.',
+    '%d-%d di %d':
+        '%d-%d of %d',
+    'torna in %s':
+        'goes back to %s',
+    'Eliminato il %s da %s  -  %s':
+        'Deleted on %s by %s  -  %s',
+    'Scegli i dispositivi da ripristinare.':
+        'Choose the devices to restore.',
+    "Questi dispositivi erano in una stanza che non esiste piu':\n%s\n\n"
+    'In che stanza rimetterli?':
+        'These devices were in a room that no longer exists:\n%s\n\n'
+        'Which room should they go back to?',
+    'Ripristina (%d)':
+        'Restore (%d)',
+    'Ripristinati %d dispositivi.':
+        'Restored %d devices.',
+    'SALTATI: %d':
+        'SKIPPED: %d',
+    'Stanza tolta con dispositivi dentro':
+        'Room removed with devices inside',
+    "Stai togliendo dall'elenco stanze che non sono vuote:\n\n%s\n\n"
+    'Questi dispositivi finiscono in Eliminati di recente, da dove\n'
+    'si ripristinano scegliendo una stanza. Restano li\' %d giorni.\n\n'
+    'Procedere?':
+        'You are removing rooms from the list that are not empty:\n\n%s\n\n'
+        'These devices go into Recently deleted, from where you restore them\n'
+        'by choosing a room. They stay there %d days.\n\n'
+        'Go ahead?',
+    "Restano qui %d giorni dall'eliminazione, e al massimo %d.\n"
+    'Non compaiono in nessuna ricerca, esportazione o stampa.':
+        'They stay here %d days from deletion, and at most %d.\n'
+        'They appear in no search, no export and no printout.',
+    'Ripristinati %d dispositivi dagli eliminati di recente.':
+        'Restored %d devices from the recently deleted.',
+    "non e' piu' fra gli eliminati di recente":
+        'is no longer among the recently deleted',
+    'non aveva una stanza: indica dove rimetterlo':
+        'had no room: say where to put it back',
+    "esiste gia' in inventario":
+        'already exists in the inventory',
+    "nessuna stanza: la sua e' stata tolta, te la chiedera'":
+        'no room: its own was removed, it will ask you',
+    'Ripristino':
+        'Restore',
+    'Ripristina i selezionati':
+        'Restore the selected ones',
+    'Copia le righe (%d)':
+        'Copy the rows (%d)',
+    '%d selezionati':
+        '%d selected',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':

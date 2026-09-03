@@ -23,6 +23,7 @@ Produzione/*
 /avvio.log
 /inventario_percorso.json
 /inventario_impostazioni.json
+/inventario_eliminati.json
 /Inventario.xlsx
 /Inventario dispositivi.lnk
 .*.xlsx.lock

@@ -440,6 +440,38 @@ restano telefoni.
 
 ---
 
+## 14. Eliminati di recente
+
+Serve a verificare la rete di sicurezza per l'eliminazione sbagliata.
+
+1. in home elimina tre dispositivi qualsiasi, confermando il riepilogo;
+2. cerca uno di quei tre nella casella **Cerca** dell'elenco principale:
+   **non deve comparire**. Fai anche un'esportazione: non deve esserci;
+3. premi **Eliminati di recente**, accanto a *Controllo generale duplicati*:
+   i tre devono essere in cima, con asset tag e tipo;
+4. seleziona una riga e leggi la scritta in fondo: deve dire quando e da chi e'
+   stato eliminato, e in che stanza tornerebbe;
+5. premi **Ripristina** sulla riga: il dispositivo torna **nella sua stanza**.
+   Aprine la scheda e controlla che numero di serie, note e stato siano quelli
+   di prima;
+6. seleziona gli altri due con **Ctrl+clic** e premi **Ripristina i selezionati**
+   in alto: tornano tutti e due;
+7. adesso elimina piu' di dieci dispositivi e riapri il cestino: l'elenco deve
+   essere **diviso in pagine da dieci**, con *Precedenti* e *Successivi*;
+8. scrivi nella **ricerca** in cima l'asset tag di uno che sta nella **seconda**
+   pagina: deve trovarlo lo stesso. La ricerca guarda tutto il cestino, non la
+   pagina che stai vedendo;
+9. infine apri **Impostazioni** e togli dall'elenco una stanza che contiene
+   ancora dispositivi. Deve chiedere conferma dicendo quanti sono; confermando
+   finiscono nel cestino con lo **sfondo rosso**. Prova a ripristinarne uno: il
+   programma deve **chiederti in che stanza** rimetterlo.
+
+**Cosa deve succedere:** quello che e' nel cestino non si vede da nessun'altra
+parte del programma, e da li' si torna indietro senza perdere niente della
+scheda.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

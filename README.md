@@ -506,6 +506,49 @@ come qualsiasi altro.
 Le altre modifiche restano possibili: nota, modello e tipo si correggono anche
 mentre il dispositivo e' fuori.
 
+## Eliminati di recente
+
+Il pulsante **`Eliminati di recente`**, in home accanto a *Controllo generale
+duplicati*, apre il cestino: gli ultimi dispositivi eliminati, da cui si ripesca
+quello tolto per sbaglio.
+
+Quello che ci sta dentro **non e' piu' inventario**: non compare nelle
+esportazioni, nella stampa, nei conteggi delle stanze ne' nella ricerca
+dell'elenco principale. Se comparisse sarebbe un dispositivo, e invece e' stato
+eliminato.
+
+- ci restano **30 giorni** dalla data di eliminazione, e al massimo **200
+  record**: arrivato il duecentounesimo esce il piu' vecchio. Non e' un archivio
+  storico, e' la rete di sicurezza per l'errore di ieri;
+- l'elenco mostra **asset tag e tipo**, dieci per pagina. Il resto della scheda
+  non si perde: torna intero con il ripristino;
+- il **campo di ricerca** in cima cerca in **tutto il cestino**, non nella pagina
+  che si sta guardando: quello che trova viene poi impaginato a sua volta;
+- accanto a ogni riga c'e' **Ripristina**, e in cima **Ripristina i selezionati**
+  per lavorare su piu' righe insieme - Ctrl+clic e Maiusc+clic come nell'elenco
+  principale, con la stessa copia (Ctrl+C e tasto destro);
+- il dispositivo torna **nella stanza in cui era al momento dell'eliminazione**,
+  con tutto quello che aveva: numero di serie, note, stato, prestito, spedizione.
+
+Un ripristino viene **saltato** se nel frattempo quell'asset tag e' rientrato in
+inventario in altro modo: il programma lo dice invece di creare un doppione.
+
+### I dispositivi di una stanza tolta
+
+Togliendo una stanza dall'elenco delle impostazioni, i dispositivi che ci
+stavano non hanno piu' un posto. Restare in elenco con il nome di una stanza che
+non esiste e' peggio che sparire: non si trovano con i filtri e non si sa che
+fine abbiano fatto.
+
+Per questo finiscono negli **eliminati di recente**, ma non di nascosto: il
+programma **chiede conferma** dicendo quali stanze non sono vuote e quanti
+dispositivi ci sono dentro. Dicendo di no non si salva niente, nemmeno le altre
+impostazioni.
+
+Questi dispositivi sono segnati come **orfani** e si riconoscono dallo sfondo
+rosso nell'elenco: non hanno una stanza a cui tornare, quindi al ripristino il
+programma **chiede in che stanza rimetterli**.
+
 ## I doppioni
 
 Il programma non ne crea. L'**inserimento singolo rifiuta** un identificativo

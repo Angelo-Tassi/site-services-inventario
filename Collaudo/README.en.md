@@ -433,6 +433,36 @@ for a room that no longer exists, and the phones stay phones.
 
 ---
 
+## 14. Recently deleted
+
+This checks the safety net for a deletion made by mistake.
+
+1. on the home screen delete any three devices, confirming the summary;
+2. search for one of those three in the **Search** box of the main list: it
+   **must not appear**. Do an export too: it must not be there;
+3. press **Recently deleted**, next to *General duplicate check*: the three must
+   be at the top, with asset tag and type;
+4. select a row and read the line at the bottom: it must say when and by whom it
+   was deleted, and which room it would go back to;
+5. press **Restore** on the row: the device goes back **into its room**. Open its
+   record and check that serial number, notes and status are what they were;
+6. select the other two with **Ctrl+click** and press **Restore the selected
+   ones** at the top: both come back;
+7. now delete more than ten devices and reopen the bin: the list must be **split
+   into pages of ten**, with *Previous* and *Next*;
+8. type in the **search** box at the top the asset tag of one that is on the
+   **second** page: it must find it all the same. The search looks at the whole
+   bin, not the page you are on;
+9. finally open **Settings** and remove from the list a room that still holds
+   devices. It must ask for confirmation saying how many there are; on
+   confirmation they end up in the bin with a **red background**. Try restoring
+   one: the program must **ask you which room** to put it in.
+
+**What must happen:** what is in the bin is not visible anywhere else in the
+program, and from there you come back without losing anything on the record.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.

@@ -24,7 +24,7 @@ import tempfile
 import time
 import uuid
 import zipfile
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from openpyxl import Workbook, load_workbook
 
@@ -288,6 +288,11 @@ COPIE_DA_TENERE = 10
 # Come si chiamano i due file dentro la copia locale. I nomi sono fissi, non
 # quelli del file di partenza: una copia salvata da una postazione deve poter
 # essere riaperta da un'altra, dove l'inventario si chiama in un altro modo.
+# Il cestino: quanti record ci stanno e per quanto. Non e' un archivio storico,
+# e' la rete di sicurezza per l'eliminazione sbagliata di ieri.
+ELIMINATI_MASSIMO = 200
+ELIMINATI_GIORNI = 30
+
 NOME_DATI_NELLO_ZIP = "Inventario.xlsx"
 NOME_IMPOSTAZIONI_NELLO_ZIP = "inventario_impostazioni.json"
 
@@ -339,6 +344,17 @@ def clean(value):
 
 def is_iphone(tipo):
     return clean(tipo).lower() == TIPO_IPHONE
+
+
+def _data_eliminazione(voce):
+    """La data di eliminazione di una voce del cestino, o None se illeggibile."""
+    testo = clean((voce or {}).get("eliminato_il"))
+    for formato in ("%d/%m/%Y %H:%M:%S", "%d/%m/%Y %H:%M"):
+        try:
+            return datetime.strptime(testo, formato)
+        except ValueError:
+            continue
+    return None
 
 
 def rinomine_in_elenco(vecchie, nuove):
@@ -794,11 +810,184 @@ class InventoryStore(object):
                 if sblocco is None:
                     raise BloccoIphoneNonSpedito(it)
                 raise BloccoConservazione(it, sblocco)
+            tolti[:] = [dict(it) for it in items if it["asset_tag"] in wanted]
             before = len(items)
             items[:] = [it for it in items if it["asset_tag"] not in wanted]
             return before - len(items)
 
-        return self._apply(op)
+        tolti = []
+        quanti = self._apply(op)
+        # Il cestino si aggiorna dopo: se l'eliminazione fallisce non ci finisce
+        # dentro niente, e se fallisce il cestino l'eliminazione resta valida.
+        self.aggiungi_agli_eliminati(tolti)
+        return quanti
+
+    # ------------------------------------------------- eliminati di recente
+
+    def _percorso_eliminati(self):
+        from . import config
+        return config.deleted_path(self.path)
+
+    def _leggi_eliminati(self):
+        try:
+            with open(self._percorso_eliminati(), "r", encoding="utf-8") as fh:
+                voci = json.load(fh)
+        except (OSError, ValueError):
+            return []
+        return voci if isinstance(voci, list) else []
+
+    def _scrivi_eliminati(self, voci):
+        percorso = self._percorso_eliminati()
+        tmp = percorso + ".tmp"
+        try:
+            with open(tmp, "w", encoding="utf-8") as fh:
+                json.dump(voci, fh, indent=2, ensure_ascii=False)
+            os.replace(tmp, percorso)
+        except OSError:
+            pass          # il cestino e' un di piu': non fa fallire un'eliminazione
+
+    def _pota_eliminati(self, voci, adesso=None):
+        """Toglie quelli scaduti e tiene solo gli ultimi ELIMINATI_MASSIMO."""
+        adesso = adesso or datetime.now()
+        limite = adesso - timedelta(days=ELIMINATI_GIORNI)
+        vivi = []
+        for voce in voci:
+            quando = _data_eliminazione(voce)
+            if quando is not None and quando < limite:
+                continue
+            vivi.append(voce)
+        vivi.sort(key=lambda v: _data_eliminazione(v) or datetime.min, reverse=True)
+        return vivi[:ELIMINATI_MASSIMO]
+
+    def aggiungi_agli_eliminati(self, items, orfani=False):
+        """Mette nel cestino i dispositivi appena tolti dall'inventario.
+
+        Si tiene la scheda intera, non il solo identificativo: il ripristino
+        deve rimettere il dispositivo com'era, stanza compresa. Per un orfano -
+        un dispositivo rimasto senza stanza perche' la stanza e' stata tolta -
+        la stanza di partenza non c'e' piu', e al ripristino verra' chiesta.
+        """
+        if not items:
+            return []
+        quando = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        chi = current_user()
+        voci = self._leggi_eliminati()
+        nuove = []
+        for item in items:
+            scheda = dict(item)
+            if orfani:
+                # La stanza che aveva non esiste piu': tenerla nella scheda
+                # rimetterebbe il dispositivo in una stanza fantasma. Il nome
+                # resta scritto nella voce, che serve a ritrovarlo.
+                scheda["stanza"] = ""
+            nuove.append({"scheda": scheda,
+                          "asset_tag": norm_tag(scheda.get("asset_tag")),
+                          "tipo": clean(scheda.get("tipo")),
+                          "stanza": clean(item.get("stanza")),
+                          "orfano": bool(orfani),
+                          "eliminato_il": quando,
+                          "eliminato_da": chi})
+        voci = self._pota_eliminati(nuove + voci)
+        self._scrivi_eliminati(voci)
+        return nuove
+
+    def eliminati(self, cerca=""):
+        """Il cestino, dal piu' recente. La potatura avviene qui, alla lettura.
+
+        Cosi' un record scaduto non si vede mai, anche se nessuno ha eliminato
+        niente per settimane e il file e' rimasto fermo.
+        """
+        voci = self._pota_eliminati(self._leggi_eliminati())
+        cerca = clean(cerca).lower()
+        if not cerca:
+            return voci
+        return [v for v in voci
+                if cerca in ("%s %s %s" % (v.get("asset_tag", ""), v.get("tipo", ""),
+                                           v.get("stanza", ""))).lower()]
+
+    def ripristina_eliminati(self, chiavi, stanza=None):
+        """Rimette in inventario i record scelti, nella stanza che avevano.
+
+        `chiavi` sono gli asset tag come stanno nel cestino. Un orfano non ha
+        una stanza a cui tornare: per quello si passa `stanza`.
+
+        Ritorna (ripristinati, saltati), dove saltati e' una lista di
+        (asset tag, motivo).
+        """
+        volute = [norm_tag(c) for c in chiavi]
+        voci = self._pota_eliminati(self._leggi_eliminati())
+        per_tag = dict((v.get("asset_tag"), v) for v in voci)
+        da_rimettere, saltati = [], []
+        for tag in volute:
+            voce = per_tag.get(tag)
+            if voce is None:
+                saltati.append((tag, T("non e' piu' fra gli eliminati di recente")))
+                continue
+            scheda = dict(voce.get("scheda") or {})
+            dove = "" if voce.get("orfano") else clean(scheda.get("stanza"))
+            dove = dove or clean(stanza)
+            if not dove:
+                saltati.append((tag, T("non aveva una stanza: indica dove rimetterlo")))
+                continue
+            scheda["stanza"] = dove
+            da_rimettere.append((tag, scheda))
+
+        def op(items):
+            presenti = set(norm_tag(i.get("asset_tag")) for i in items)
+            rimessi = []
+            for tag, scheda in da_rimettere:
+                if tag in presenti:
+                    saltati.append((tag, T("esiste gia' in inventario")))
+                    continue
+                self._enforce_iphone_room(scheda)
+                normalize_state(scheda, self.stati)
+                _stamp_item(scheda)
+                items.append(scheda)
+                presenti.add(tag)
+                rimessi.append(tag)
+            return rimessi
+
+        rimessi = self._apply(op) if da_rimettere else []
+        if rimessi:
+            restanti = [v for v in voci if v.get("asset_tag") not in set(rimessi)]
+            self._scrivi_eliminati(restanti)
+        return rimessi, saltati
+
+    def porta_via_gli_orfani(self, stanze):
+        """Toglie dall'inventario i dispositivi delle stanze indicate.
+
+        Serve quando una stanza viene tolta dalle impostazioni: i dispositivi
+        che ci stavano non hanno piu' un posto, e restare in elenco con il nome
+        di una stanza che non esiste e' peggio che sparire - non si trovano con
+        i filtri e non si sa che fine hanno fatto. Vanno nel cestino segnati
+        come orfani, e al ripristino si chiedera' in che stanza rimetterli.
+
+        Ritorna la lista dei dispositivi portati via.
+        """
+        volute = set(clean(s) for s in stanze if clean(s))
+        if not volute:
+            return []
+        portati = []
+
+        def op(items):
+            portati[:] = [dict(it) for it in items if clean(it.get("stanza")) in volute]
+            items[:] = [it for it in items if clean(it.get("stanza")) not in volute]
+            return len(portati)
+
+        self._apply(op)
+        self.aggiungi_agli_eliminati(portati, orfani=True)
+        return portati
+
+    def quanti_nelle_stanze(self, stanze):
+        """Quanti dispositivi ci sono in ognuna delle stanze indicate."""
+        conteggio = {}
+        for stanza in stanze:
+            stanza = clean(stanza)
+            if not stanza:
+                continue
+            conteggio[stanza] = sum(1 for i in self.items
+                                    if clean(i.get("stanza")) == stanza)
+        return conteggio
 
     def copia_di_sicurezza(self):
         """Salva il file dati nella cartella Backup, prima di un'operazione grossa.
