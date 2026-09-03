@@ -1164,10 +1164,18 @@ reset first, or an import that replaces everything.
 .venv/bin/python tests/run_all.py
 ```
 
-Eighteen suites covering the data store and simultaneous access, path
+Forty-eight suites covering the data store and simultaneous access, path
 resolution, screens and colours, the device record, loans, shipments, import,
-export and translation. They run without needing a window on screen and never
-touch real data: each one builds its own inventory in a temporary folder.
+export and translation. They never touch real data: each one builds its own
+inventory in a temporary folder.
+
+Warning windows **answer themselves**: `tests/fixture.py` answers *No* where the
+answer would start something - the local-copy reminder - and *Ok* where it only
+has to confirm, and the program's own windows close after three seconds if a
+suite opens one without meaning to. Without that net, one forgotten warning was
+enough to leave the suite waiting for a click, only to be killed two minutes
+later with a `BLOCCATA` that did not say on what. A suite that wants different
+answers sets them after the import, as always.
 
 ## Code layout
 

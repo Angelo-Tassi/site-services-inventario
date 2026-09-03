@@ -45,3 +45,64 @@ def build():
                                   "loan_rooms": [KIOSK],
                                   "iphone_room": BAU})
     return p
+
+
+# ------------------------------------------------------- finestre che bloccano
+# Una suite che apre un messagebox si ferma li' e aspetta un clic che nessuno
+# dara' mai: il programma resta fermo finche' run_all.py non lo uccide dopo
+# due minuti, e l'esito dice "BLOCCATA" senza dire su che cosa. Peggio, chi
+# lancia i test si trova le finestre in faccia e deve chiuderle a mano.
+#
+# Qui si risponde da soli, con la risposta che non fa succedere niente:
+#   - askyesno    -> No     (il promemoria della copia locale non parte)
+#   - askokcancel -> Ok     (le conferme vanno avanti)
+#   - le finestre "scegli un file" -> annullate.
+# Ogni risposta viene registrata in `popup`, cosi' una suite puo' verificare
+# che cosa e' stato chiesto invece di limitarsi a non bloccarsi.
+#
+# Una suite che vuole altre risposte le imposta dopo l'import, come ha sempre
+# fatto: l'ultima assegnazione vince.
+
+popup = []
+
+
+def _risposta(tipo, valore):
+    def finta(titolo="", messaggio="", **kwargs):
+        popup.append((tipo, str(titolo), str(messaggio)))
+        return valore
+    return finta
+
+
+def silenzia_i_popup():
+    """Risponde da sola a ogni finestra che aspetterebbe un clic."""
+    from tkinter import filedialog, messagebox
+
+    for nome, valore in (("showinfo", "ok"), ("showwarning", "ok"),
+                         ("showerror", "ok"), ("askyesno", False),
+                         ("askokcancel", True), ("askyesnocancel", False),
+                         ("askretrycancel", False), ("askquestion", "no")):
+        setattr(messagebox, nome, _risposta(nome, valore))
+    for nome in ("asksaveasfilename", "askopenfilename", "askdirectory",
+                 "askopenfilenames"):
+        if hasattr(filedialog, nome):
+            setattr(filedialog, nome, _risposta(nome, ""))
+
+    # Le finestre del programma - la scheda, il riepilogo, il reset - aspettano
+    # con wait_window: se una suite ne apre una senza prevederlo, si chiude da
+    # sola dopo tre secondi come se si fosse premuto Annulla. Meglio un test che
+    # fallisce dicendo che cosa mancava, che una suite ferma per due minuti.
+    from inventario import ui
+
+    if not getattr(ui._Modal, "_show_sorvegliato", False):
+        vero_show = ui._Modal.show
+
+        def show_con_scadenza(self):
+            self.after(3000, lambda: self.winfo_exists() and self._cancel())
+            popup.append(("modale", self.title(), ""))
+            return vero_show(self)
+
+        ui._Modal.show = show_con_scadenza
+        ui._Modal._show_sorvegliato = True
+
+
+silenzia_i_popup()

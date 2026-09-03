@@ -898,11 +898,18 @@ I file si rigenerano con `.venv/bin/python tests/genera_file_di_prova.py`.
 .venv/bin/python tests/run_all.py
 ```
 
-Diciotto suite che coprono archivio dati e accessi concorrenti, risoluzione del
-percorso, schermate e colori, scheda di inserimento, prestiti, spedizioni,
-importazione ed esportazione. Girano senza bisogno di una finestra a schermo e
-non toccano i dati reali: ognuna si costruisce il proprio inventario in una
-cartella temporanea.
+Quarantotto suite che coprono archivio dati e accessi concorrenti, risoluzione
+del percorso, schermate e colori, scheda di inserimento, prestiti, spedizioni,
+importazione ed esportazione. Non toccano i dati reali: ognuna si costruisce il
+proprio inventario in una cartella temporanea.
+
+Le finestre di avviso **rispondono da sole**: `tests/fixture.py` risponde *No*
+dove la risposta avvierebbe qualcosa - il promemoria della copia locale - e *Ok*
+dove serve solo confermare, e le finestre del programma si chiudono da sole dopo
+tre secondi se una suite ne apre una senza prevederlo. Senza questa rete bastava
+un avviso dimenticato perche' la suite restasse ferma ad aspettare un clic, per
+poi essere uccisa dopo due minuti con un `BLOCCATA` che non diceva su che cosa.
+Una suite che vuole risposte diverse le imposta dopo l'import, come sempre.
 
 Una di queste, `test_collaudo.py`, ripete sui file di `Collaudo/` esattamente
 gli scenari descritti nelle istruzioni: se il comportamento cambia, il test
