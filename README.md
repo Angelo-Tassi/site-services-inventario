@@ -723,7 +723,7 @@ tranne la lingua, che e' una preferenza personale del singolo computer.
 | --- | --- |
 | **Stanze** | l'elenco delle stanze, una per riga. L'ordine e' quello con cui compaiono le schede in home |
 | **Tipi di dispositivo** | le voci della tendina *Tipo*, una per riga. Di serie sono *Laptop*, *Tablet* e *Iphone* |
-| **Stanze con prestito** | in quali stanze compare la colonna *Prestito*. Devono essere nomi presenti fra le stanze |
+| **Stanza dei prestiti** | tendina: in quale stanza compare la colonna *Prestito* con i pulsanti *Presta* / *Registra rientro*. Con *(nessuna)* i prestiti si spengono |
 | **Stanza degli iPhone** | dove finiscono i telefoni, sempre |
 | **Lingua** | Italiano o English. La stessa tendina e' anche nell'intestazione della finestra |
 
@@ -822,12 +822,19 @@ telefoni senza che nessuno se ne accorga, quindi il salvataggio viene rifiutato 
 ti viene detto che nome rimettere. Vale in tutte e due le direzioni: nemmeno un
 altro tipo puo' diventare *iPhone* per rinomina.
 
-### Attivare i prestiti in una stanza
+### Scegliere la stanza dei prestiti
 
-Scrivi il nome della stanza nel riquadro **Stanze con prestito**. Se il nome non
-corrisponde a nessuna stanza, il salvataggio viene rifiutato con un avviso: e'
-il modo per accorgersi di un errore di battitura invece di scoprire piu' tardi
-che i pulsanti non compaiono.
+E' una **tendina**, subito sotto quella della stanza degli iPhone: le due cose
+sono la stessa, una stanza a cui viene affidato un ruolo. Si sceglie fra le
+stanze che esistono, quindi non c'e' un nome da azzeccare - prima si scriveva a
+mano e sbagliandolo il salvataggio veniva rifiutato.
+
+In quella stanza ogni riga dell'elenco prende il pulsante **Presta** /
+**Registra rientro**. Con **(nessuna)** i prestiti si spengono ovunque.
+
+Se la stanza scelta viene poi tolta dall'elenco delle stanze, il programma
+chiede dove spostare i suoi dispositivi e la stanza scelta ne prende il posto:
+vedi *Togliere una stanza*.
 
 ### Aggiungere dispositivi
 

@@ -354,7 +354,7 @@ which is a personal preference of the single computer.
 | --- | --- |
 | **Rooms** | the list of rooms, one per line. The order is the order of the cards on the home page |
 | **Device types** | the entries of the *Type* dropdown, one per line. Out of the box: *Laptop*, *Tablet* and *Iphone* |
-| **Rooms with loans** | where the *Loan* column appears. They must be names present among the rooms |
+| **Loan room** | a dropdown: which room gets the *Loan* column with the *Lend* / *Register return* buttons. With *(none)* loans are switched off |
 | **iPhone room** | where phones always end up |
 | **Language** | Italiano or English. The same dropdown is also in the window header |
 
@@ -447,11 +447,19 @@ being phones without anyone noticing, so saving is refused and you are told whic
 name to put back. It holds both ways: no other type can become *iPhone* by
 renaming either.
 
-### Turning loans on in a room
+### Choosing the loan room
 
-Write the room name in the **Rooms with loans** box. If the name matches no
-room, saving is refused with a warning: that is how you notice a typo instead of
-discovering later that the buttons never showed up.
+It is a **dropdown**, right under the iPhone room one: the two are the same
+thing, a room given a role. You pick among the rooms that exist, so there is no
+name to get right - it used to be typed by hand, and getting it wrong had saving
+refused.
+
+In that room every row of the list gets the **Lend** / **Register return**
+button. With **(none)** loans are switched off everywhere.
+
+If the room you chose is later removed from the list of rooms, the program asks
+where to move its devices and the room you pick takes its place: see *Removing a
+room*.
 
 ### Adding devices
 

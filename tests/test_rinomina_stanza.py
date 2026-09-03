@@ -64,8 +64,7 @@ def impostazioni(stanze, prestiti=None, iphone=None):
     dlg.text_rooms.delete("1.0", "end")
     dlg.text_rooms.insert("1.0", "\n".join(stanze))
     if prestiti is not None:
-        dlg.text_loans.delete("1.0", "end")
-        dlg.text_loans.insert("1.0", "\n".join(prestiti))
+        dlg.var_loan_room.set(prestiti[0] if prestiti else ui.SENZA_PRESTITI())
     if iphone is not None:
         dlg.var_iphone_room.set(iphone)
     dlg._ok()

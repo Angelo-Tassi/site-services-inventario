@@ -43,6 +43,11 @@ ORDINE_COLONNE = ["asset_tag", "tipo", "stanza", "note", "stato",
 NO_ROOM_IT = "(senza stanza)"
 
 
+def SENZA_PRESTITI():
+    """La voce della tendina che spegne i prestiti."""
+    return T("(nessuna)")
+
+
 def NO_ROOM():
     return T(NO_ROOM_IT)
 
@@ -525,18 +530,14 @@ class RoomsDialog(_Modal):
         body.pack(fill="both", expand=True)
         ttk.Label(body, text=T("Stanze (una per riga)")).grid(row=0, column=0, sticky="w")
         ttk.Label(body, text=T("Tipi di dispositivo")).grid(row=0, column=1, sticky="w", padx=(14, 0))
-        ttk.Label(body, text=T("Stanze con prestito")).grid(row=0, column=2, sticky="w", padx=(14, 0))
         opts = dict(relief="solid", borderwidth=1, highlightthickness=0,
                     bg=theme.CARD, fg=theme.TEXT)
-        self.text_rooms = tk.Text(body, width=26, height=8, **opts)
+        self.text_rooms = tk.Text(body, width=30, height=8, **opts)
         self.text_rooms.insert("1.0", "\n".join(rooms))
         self.text_rooms.grid(row=1, column=0, sticky="nsew", pady=(4, 0))
-        self.text_types = tk.Text(body, width=18, height=8, **opts)
+        self.text_types = tk.Text(body, width=24, height=8, **opts)
         self.text_types.insert("1.0", "\n".join(types))
         self.text_types.grid(row=1, column=1, sticky="nsew", padx=(14, 0), pady=(4, 0))
-        self.text_loans = tk.Text(body, width=26, height=8, **opts)
-        self.text_loans.insert("1.0", "\n".join(loan_rooms))
-        self.text_loans.grid(row=1, column=2, sticky="nsew", padx=(14, 0), pady=(4, 0))
         riga_lingua = ttk.Frame(body)
         riga_lingua.grid(row=2, column=0, columnspan=3, sticky="w", pady=(12, 0))
         ttk.Label(riga_lingua, text=T("Lingua")).pack(side="left")
@@ -549,22 +550,42 @@ class RoomsDialog(_Modal):
 
         riga_iphone = ttk.Frame(body)
         riga_iphone.grid(row=3, column=0, columnspan=3, sticky="w", pady=(10, 0))
-        ttk.Label(riga_iphone, text=T("Stanza degli iPhone")).pack(side="left")
+        etichetta_iphone = ttk.Label(riga_iphone, text=T("Stanza degli iPhone"))
+        etichetta_iphone.pack(side="left")
         self.var_iphone_room = tk.StringVar(value=iphone_room or (rooms[0] if rooms else ""))
         ttk.Combobox(riga_iphone, textvariable=self.var_iphone_room, values=rooms,
                      width=30).pack(side="left", padx=(10, 0))
 
+        # La stanza dei prestiti si sceglie da una tendina come quella degli
+        # iPhone: sono la stessa cosa - una stanza a cui e' affidato un ruolo -
+        # e prima era l'unica delle due che si scriveva a mano, con il nome da
+        # azzeccare e il salvataggio rifiutato se si sbagliava.
+        riga_prestiti = ttk.Frame(body)
+        riga_prestiti.grid(row=4, column=0, columnspan=3, sticky="w", pady=(8, 0))
+        ttk.Label(riga_prestiti, text=T("Stanza dei prestiti"),
+                  width=len(T("Stanza degli iPhone"))).pack(side="left")
+        prima_prestiti = next((r for r in (loan_rooms or []) if r in rooms), "")
+        self.var_loan_room = tk.StringVar(value=prima_prestiti or SENZA_PRESTITI())
+        self.combo_prestiti = ttk.Combobox(
+            riga_prestiti, textvariable=self.var_loan_room,
+            values=[SENZA_PRESTITI()] + list(rooms), state="readonly", width=30)
+        self.combo_prestiti.pack(side="left", padx=(10, 0))
+        # Se ne erano configurate piu' d'una, le altre non si perdono di
+        # nascosto: restano finche' l'utente non tocca la tendina.
+        self.altre_stanze_prestito = [r for r in (loan_rooms or [])
+                                      if r != prima_prestiti]
+
         ttk.Label(
             body, style="Muted.TLabel",
             text=T("Le impostazioni sono salvate accanto al file dati e valgono per tutti gli utenti.\n"
-                 "Nelle stanze con prestito ogni riga dell'elenco ha il pulsante Presta / Registra rientro.\n"
+                 "Nella stanza dei prestiti ogni riga dell'elenco ha il pulsante Presta / Registra rientro.\n"
                  "Gli iPhone vengono registrati sempre nella stanza indicata qui sopra e non si spostano."),
-        ).grid(row=4, column=0, columnspan=3, sticky="w", pady=(10, 0))
+        ).grid(row=5, column=0, columnspan=3, sticky="w", pady=(10, 0))
         # I comandi che riscrivono l'inventario di tutti stanno qui, non nella
         # barra: si usano di rado, e nella barra rubavano lo spazio ai comandi
         # di tutti i giorni fino a farli sparire dallo schermo.
         comandi = ttk.LabelFrame(body, text=T("Copie e ripristino"), padding=10)
-        comandi.grid(row=5, column=0, columnspan=3, sticky="we", pady=(14, 0))
+        comandi.grid(row=6, column=0, columnspan=3, sticky="we", pady=(14, 0))
         ttk.Button(comandi, text=T("Salva copia in locale..."), style="Verde.TButton",
                    command=self._copia_locale).pack(side="left", padx=(0, 8))
         ttk.Button(comandi, text=T("Ripristina da una copia..."), style="Rosso.TButton",
@@ -582,7 +603,7 @@ class RoomsDialog(_Modal):
                   % COPIE_DA_TENERE).pack(side="left", padx=(14, 0))
 
         buttons = ttk.Frame(body)
-        buttons.grid(row=6, column=0, columnspan=3, sticky="we", pady=(16, 0))
+        buttons.grid(row=7, column=0, columnspan=3, sticky="we", pady=(16, 0))
         ttk.Button(buttons, text=T("Collega inventario condiviso..."),
                    command=self._collega).pack(side="left", padx=(0, 8))
         ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
@@ -612,7 +633,9 @@ class RoomsDialog(_Modal):
     def _ok(self):
         rooms = [r.strip() for r in self.text_rooms.get("1.0", "end").splitlines() if r.strip()]
         types = [t.strip() for t in self.text_types.get("1.0", "end").splitlines() if t.strip()]
-        loans = [r.strip() for r in self.text_loans.get("1.0", "end").splitlines() if r.strip()]
+        scelta_prestiti = self.var_loan_room.get().strip()
+        loans = ([] if scelta_prestiti in ("", SENZA_PRESTITI())
+                 else [scelta_prestiti]) + list(self.altre_stanze_prestito)
         if not rooms:
             messagebox.showwarning(T("Dato mancante"), T("Indica almeno una stanza."), parent=self)
             return
