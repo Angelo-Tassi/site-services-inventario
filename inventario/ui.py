@@ -658,27 +658,23 @@ class RoomsDialog(_Modal):
         stanza_iphone_scelta = rinomine.get(self.var_iphone_room.get().strip(),
                                             self.var_iphone_room.get().strip())
 
-        unknown = [r for r in loans if r not in rooms]
-        if unknown:
-            messagebox.showwarning(
-                T("Stanza sconosciuta"),
-                T("Queste stanze con prestito non sono nell'elenco delle stanze:\n%s")
-                % ", ".join(unknown), parent=self)
-            return
+        # Una stanza con un ruolo - gli iPhone, i prestiti - che sparisce non e'
+        # un errore di battitura: e' un trasloco. Non si dice di no, si chiede
+        # dove va quello che c'era dentro. La domanda la fa on_settings, che
+        # conosce l'inventario; qui si segnala soltanto che serve.
         stanza_iphone = stanza_iphone_scelta
-        if stanza_iphone and stanza_iphone not in rooms:
-            messagebox.showwarning(
-                T("Stanza sconosciuta"),
-                T("La stanza degli iPhone (%s) non e' nell'elenco delle stanze.")
-                % stanza_iphone, parent=self)
-            return
-        scelta = dict((nome, codice) for nome, codice in lang.LINGUE)
         self.result = {"rooms": rooms, "types": types or ["Laptop", "Tablet"],
                        "rinomine": list(rinomine.items()),
                        "rinomine_tipi": cambi_tipo,
-                       "loan_rooms": loans,
-                       "iphone_room": stanza_iphone or rooms[0],
-                       "lingua": scelta.get(self.var_lingua.get(), lang.ITALIANO)}
+                       "loan_rooms": [r for r in loans if r in rooms],
+                       "prestiti_spariti": [r for r in loans if r not in rooms],
+                       "iphone_room": stanza_iphone if stanza_iphone in rooms else "",
+                       "iphone_sparita": (stanza_iphone
+                                          if stanza_iphone and stanza_iphone not in rooms
+                                          else ""),
+                       "lingua": dict((nome, codice)
+                                      for nome, codice in lang.LINGUE).get(
+                                          self.var_lingua.get(), lang.ITALIANO)}
         self.destroy()
 
 
@@ -3698,6 +3694,45 @@ class App(tk.Tk):
                    command=ok).pack(side="right")
         return dialog.show()
 
+    def _chiedi_dove_trasloca(self, stanza, ruolo, stanze_nuove):
+        """Dove vanno i dispositivi di una stanza con un ruolo che sparisce."""
+        quanti = self.store.quanti_nelle_stanze([stanza]).get(stanza, 0)
+        if ruolo == "iphone":
+            titolo = T("Dove vanno gli iPhone?")
+            spiega = T("Stai togliendo %s, che e' la stanza degli iPhone.\n\n"
+                       "I telefoni devono stare in una stanza: scegli quale, e ci\n"
+                       "andranno tutti, rispediti e non - insieme agli altri %d\n"
+                       "dispositivi che ci sono dentro.")
+        else:
+            titolo = T("Dove vanno i prestiti?")
+            spiega = T("Stai togliendo %s, che e' una stanza con prestito.\n\n"
+                       "Scegli dove spostare i suoi %d dispositivi: la stanza\n"
+                       "scelta prendera' il suo posto fra quelle con prestito, e\n"
+                       "anche i dispositivi in prestito si sposteranno.")
+        return self._scegli_stanza(titolo, spiega % (stanza, quanti), stanze_nuove)
+
+    def _scegli_stanza(self, titolo, prompt, stanze):
+        """Come _ask_room, ma fra le stanze indicate invece che fra quelle salvate."""
+        dialog = _Modal(self, titolo)
+        body = ttk.Frame(dialog, padding=18)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, text=prompt, justify="left").pack(anchor="w", pady=(0, 10))
+        var = tk.StringVar(value=stanze[0] if stanze else "")
+        ttk.Combobox(body, textvariable=var, values=list(stanze),
+                     state="readonly", width=32).pack(fill="x")
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(16, 0))
+
+        def ok():
+            dialog.result = var.get()
+            dialog.destroy()
+
+        ttk.Button(buttons, text=T("Annulla"),
+                   command=dialog._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Sposta"), style="Primary.TButton",
+                   command=ok).pack(side="right")
+        return dialog.show()
+
     def _etichetta_cestino(self):
         """ELIMINATI DI RECENTE (n): il numero e' la ragione per aprirlo."""
         try:
@@ -4371,14 +4406,37 @@ class App(tk.Tk):
         nuova_lingua = result.pop("lingua", lang.corrente())
         rinomine = result.pop("rinomine", [])
         cambi_tipo = result.pop("rinomine_tipi", [])
+        iphone_sparita = result.pop("iphone_sparita", "")
+        prestiti_spariti = result.pop("prestiti_spariti", [])
+
+        # Una stanza con un ruolo che sparisce e' un trasloco, non un errore:
+        # si chiede dove va quello che c'era dentro e ci si porta tutto, anche
+        # i dispositivi in prestito - lasciarli in una stanza che non esiste
+        # piu' sarebbe perderne la traccia, che e' proprio cio' che la regola
+        # dei prestiti vuole evitare.
+        traslochi = []
+        for stanza, ruolo in ([(iphone_sparita, "iphone")] if iphone_sparita else []) + \
+                [(r, "prestiti") for r in prestiti_spariti]:
+            dove = self._chiedi_dove_trasloca(stanza, ruolo, result["rooms"])
+            if not dove:
+                return                      # annullato: non si salva niente
+            traslochi.append((stanza, dove, ruolo))
+            if ruolo == "iphone":
+                result["iphone_room"] = dove
+            elif dove not in result["loan_rooms"]:
+                result["loan_rooms"].append(dove)
+        if not result.get("iphone_room"):
+            result["iphone_room"] = result["rooms"][0]
 
         # Una stanza tolta lascerebbe i suoi dispositivi con il nome di una
         # stanza che non esiste piu': non si trovano con i filtri e non si sa
         # che fine abbiano fatto. Vanno negli eliminati di recente, ma non di
         # nascosto: si chiede, e se si dice di no non si salva niente.
         rinominate = set(v for v, _n in rinomine)
+        traslocate = set(v for v, _n, _r in traslochi)
         tolte = [r for r in self.cfg.get("rooms", [])
-                 if r not in result.get("rooms", []) and r not in rinominate]
+                 if r not in result.get("rooms", []) and r not in rinominate
+                 and r not in traslocate]
         conteggio = {k: v for k, v in self.store.quanti_nelle_stanze(tolte).items() if v}
         if conteggio:
             righe = "\n".join("  %s: %d dispositivi" % (stanza, quanti)
@@ -4394,6 +4452,12 @@ class App(tk.Tk):
                 return
         spostati = {}
         cambiati = {}
+        conti_trasloco = []
+        for vecchia, nuova, _ruolo in traslochi:
+            esito = self._run(lambda v=vecchia, n=nuova: self.store.trasloca_stanza(v, n))
+            if esito is None:
+                return
+            conti_trasloco.append((vecchia, nuova, esito))
         if cambi_tipo:
             esito = self._run(lambda: self.store.rinomina_tipi(cambi_tipo))
             if esito is None:
@@ -4424,6 +4488,22 @@ class App(tk.Tk):
         self.store.stati = list(self.cfg.get("states") or [])
         self._sync_filter_values()
         self.show_home()
+        if conti_trasloco:
+            righe = [T("%s  ->  %s   (%d dispositivi)") % (vecchia, nuova, c["totale"])
+                     for vecchia, nuova, c in conti_trasloco]
+            code = []
+            prestiti = sum(c["prestiti"] for _v, _n, c in conti_trasloco)
+            telefoni = sum(c["iphone"] for _v, _n, c in conti_trasloco)
+            if telefoni:
+                code.append(T("%d iPhone, rispediti e non.") % telefoni)
+            if prestiti:
+                code.append(T("%d erano in prestito e si sono spostati lo stesso:\n"
+                              "il prestito resta aperto, cambia solo dove risultano\n"
+                              "registrati.") % prestiti)
+            messagebox.showinfo(
+                T("Stanza traslocata"),
+                "%s\n\n%s" % ("\n".join(righe), "\n".join(code) if code else
+                              T("Si sono spostati tutti.")), parent=self)
         if rinomine or cambi_tipo:
             righe = []
             if rinomine:

@@ -953,6 +953,41 @@ class InventoryStore(object):
             self._scrivi_eliminati(restanti)
         return rimessi, saltati
 
+    def trasloca_stanza(self, vecchia, nuova):
+        """Porta in un'altra stanza tutto quello che sta in questa.
+
+        Serve quando la stanza sparisce ma il suo ruolo no: e' la stanza degli
+        iPhone, o quella dove si prestano i dispositivi. I telefoni devono
+        stare da qualche parte, e i prestiti aperti pure.
+
+        A differenza di Sposta in stanza, qui **si spostano anche i dispositivi
+        in prestito**: la regola che li tiene fermi serve a non perderne la
+        traccia, e lasciarli in una stanza che non esiste piu' sarebbe
+        esattamente perderla. Il prestito resta aperto: cambia dove il
+        dispositivo risulta registrato, non chi ce l'ha.
+
+        Ritorna {"totale": n, "prestiti": n, "iphone": n}.
+        """
+        vecchia, nuova = clean(vecchia), clean(nuova)
+        if not vecchia or not nuova or vecchia == nuova:
+            return {"totale": 0, "prestiti": 0, "iphone": 0}
+
+        def op(items):
+            conto = {"totale": 0, "prestiti": 0, "iphone": 0}
+            for it in items:
+                if clean(it.get("stanza")) != vecchia:
+                    continue
+                it["stanza"] = nuova
+                _stamp_item(it)
+                conto["totale"] += 1
+                if is_on_loan(it):
+                    conto["prestiti"] += 1
+                if is_iphone(it.get("tipo")):
+                    conto["iphone"] += 1
+            return conto
+
+        return self._apply(op)
+
     def porta_via_gli_orfani(self, stanze):
         """Toglie dall'inventario i dispositivi delle stanze indicate.
 

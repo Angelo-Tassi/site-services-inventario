@@ -581,7 +581,9 @@ table{min-width:520px}
   </table></div>
   <div class="avviso">Togliendo una stanza dalle impostazioni, i dispositivi che ci
     stavano finiscono qui - dopo una <b>richiesta di conferma</b> che dice quali stanze
-    non sono vuote. Sono segnati come <b>orfani</b>, sfondo rosso: non hanno una stanza a
+    non sono vuote. Fa eccezione una stanza <b>con un ruolo</b> - quella degli iPhone o
+    una con prestito: li' il programma chiede in che stanza spostarli e ce li porta
+    tutti, iPhone rispediti e non e dispositivi in prestito compresi. Sono segnati come <b>orfani</b>, sfondo rosso: non hanno una stanza a
     cui tornare, quindi al ripristino il programma chiede in quale rimetterli.</div>
 
   <h3>Il riepilogo prima di importare</h3>
@@ -1169,7 +1171,10 @@ table{min-width:520px}
     <tr><td class="d">Skips what has <b>already returned</b></td><td class="d">if that asset tag is back in the inventory by another route, it says so instead of creating a duplicate.</td></tr>
   </table></div>
   <div class="avviso">When you remove a room from the settings, the devices that were in
-    it end up here - after a <b>confirmation</b> saying which rooms are not empty. They
+    it end up here - after a <b>confirmation</b> saying which rooms are not empty. A room
+    with a <b>role</b> is the exception - the iPhone room or one with loans: there the
+    program asks which room to move them to and takes them all, iPhones shipped or not
+    and devices on loan included. They
     are marked as <b>orphans</b>, red background: they have no room to go back to, so on
     restore the program asks which one to put them in.</div>
 

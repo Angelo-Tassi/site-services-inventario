@@ -761,10 +761,27 @@ delle tre e' una rinomina.
 Due stanze non possono chiamarsi allo stesso modo: il salvataggio viene rifiutato
 dicendo quale nome e' ripetuto.
 
-Togliere una riga, invece, continua a non spostare niente: i dispositivi restano
-con il nome della stanza sparita e compaiono in una scheda a parte, da dove si
-spostano con *Sposta in stanza...*. E' voluto - cancellare una riga non puo'
-voler dire cancellare dove sono trenta dispositivi.
+### Togliere una stanza
+
+Togliendo una riga, i dispositivi che ci stavano vanno negli **eliminati di
+recente** dopo una richiesta di conferma - vedi il capitolo apposta.
+
+**Salvo che quella stanza abbia un ruolo.** La *stanza degli iPhone* e una
+*stanza con prestito* non possono semplicemente sparire: i telefoni devono stare
+da qualche parte, e i prestiti aperti pure. In quel caso il programma **chiede in
+che stanza spostare quello che c'era dentro**, e ci porta **tutto**: gli iPhone
+rispediti e non, gli altri dispositivi della stanza, e anche quelli **in
+prestito**.
+
+Sui prestiti e' l'unica eccezione alla regola che li tiene fermi, ed e' voluta:
+quella regola serve a non perdere la traccia di chi ha il dispositivo, e
+lasciarlo in una stanza che non esiste piu' sarebbe esattamente perderla. Il
+prestito **resta aperto**: cambia dove il dispositivo risulta registrato, non chi
+ce l'ha.
+
+Togliendo una stanza con prestito, quella che scegli **ne prende il posto** fra
+le stanze con prestito. Annullando la scelta non viene salvato niente, nemmeno le
+altre impostazioni.
 
 ### Aggiungere o rinominare un tipo di dispositivo
 

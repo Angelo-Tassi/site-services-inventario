@@ -394,10 +394,25 @@ one move nothing: they are different things, and none of the three is a rename.
 
 Two rooms cannot have the same name: saving is refused, naming the repeated one.
 
-Removing a line, on the other hand, still moves nothing: the devices keep the
-name of the room that is gone and show up in a separate card, from where you move
-them with *Move to room...*. That is deliberate - deleting a line cannot be
-allowed to mean deleting where thirty devices are.
+### Removing a room
+
+When you remove a line, the devices that were in it go into **recently deleted**
+after a confirmation - see the chapter about it.
+
+**Unless that room has a role.** The *iPhone room* and a *room with loans* cannot
+simply disappear: the phones have to live somewhere, and so do the open loans. In
+that case the program **asks which room to move what was inside to**, and takes
+**everything** there: the iPhones shipped or not, the other devices of the room,
+and the ones **on loan** too.
+
+On loans that is the only exception to the rule that keeps them still, and it is
+deliberate: that rule is there so the trace of who has the device is not lost,
+and leaving it in a room that no longer exists would be exactly losing it. The
+loan **stays open**: what changes is where the device is booked, not who has it.
+
+When you remove a room with loans, the one you choose **takes its place** among
+the rooms with loans. Cancel the choice and nothing is saved, not even the other
+settings.
 
 ### Adding or renaming a device type
 

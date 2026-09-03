@@ -464,6 +464,33 @@ program, and from there you come back without losing anything on the record.
 
 ---
 
+## 15. Removing a room that has a role
+
+This checks the relocation: the iPhone room and the room with loans cannot
+disappear leaving the devices stranded.
+
+1. open **Settings** and remove **Site Services BAU** from the list, which is the
+   iPhone room. Save;
+2. the program must **ask which room to move them to**, saying how many devices
+   are inside. Choose `Magazzino Disaster Recovery`;
+3. check that the **Iphone** container still holds every phone, **shipped or
+   not**, and that they are in the room you chose. The other devices that were in
+   BAU must be there too;
+4. in **Settings** the *iPhone room* field must carry the new name;
+5. repeat with the **Digital Kiosk**, which is the room with loans, having lent a
+   device first. The program asks where to move them:
+   - the device **on loan** moves too, and the loan **stays open** - the name of
+     whoever has it is still there;
+   - the room you chose takes the Kiosk's place among the **rooms with loans**:
+     going into it, the *Loan* column with its buttons must be there;
+6. do the round again and this time press **Cancel** at the question: it **must
+   save nothing**, not even the other changes made in that window.
+
+**What must happen:** no device is left in a room that no longer exists, and none
+ends up in recently deleted - they were moved, not deleted.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.

@@ -474,6 +474,35 @@ scheda.
 
 ---
 
+## 15. Togliere una stanza che ha un ruolo
+
+Serve a verificare il trasloco: la stanza degli iPhone e quella dei prestiti non
+possono sparire lasciando i dispositivi per strada.
+
+1. apri **Impostazioni** e togli dall'elenco **Site Services BAU**, che e' la
+   stanza degli iPhone. Salva;
+2. il programma deve **chiedere in che stanza spostarli**, dicendo quanti
+   dispositivi ci sono dentro. Scegli `Magazzino Disaster Recovery`;
+3. controlla che nel contenitore **Iphone** ci siano ancora tutti i telefoni,
+   **rispediti e non**, e che risultino nella stanza scelta. Anche gli altri
+   dispositivi che stavano in BAU devono essere li';
+4. in **Impostazioni** il campo *Stanza degli iPhone* deve portare il nome
+   nuovo;
+5. ripeti con il **Digital Kiosk**, che e' la stanza con prestito, avendo prima
+   prestato un dispositivo. Il programma chiede dove spostarli:
+   - anche il dispositivo **in prestito** si sposta, e il prestito **resta
+     aperto** - il nome di chi ce l'ha e' ancora li';
+   - la stanza scelta prende il posto del Kiosk fra le **stanze con prestito**:
+     entrandoci deve esserci la colonna *Prestito* con i pulsanti;
+6. rifai il giro e questa volta premi **Annulla** alla domanda: **non deve
+   salvare niente**, nemmeno le altre modifiche fatte in quella finestra.
+
+**Cosa deve succedere:** nessun dispositivo resta in una stanza che non esiste
+piu', e nessuno finisce negli eliminati di recente - sono stati spostati, non
+eliminati.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

@@ -1028,6 +1028,37 @@ EN = {
         '%d selected',
     'ELIMINATI DI RECENTE (%d)':
         'RECENTLY DELETED (%d)',
+    'Dove vanno gli iPhone?':
+        'Where do the iPhones go?',
+    "Stai togliendo %s, che e' la stanza degli iPhone.\n\n"
+    'I telefoni devono stare in una stanza: scegli quale, e ci\n'
+    'andranno tutti, rispediti e non - insieme agli altri %d\n'
+    'dispositivi che ci sono dentro.':
+        'You are removing %s, which is the iPhone room.\n\n'
+        'The phones have to live in a room: choose which one, and they will\n'
+        'all go there, shipped or not - together with the other %d devices\n'
+        'inside it.',
+    'Dove vanno i prestiti?':
+        'Where do the loans go?',
+    "Stai togliendo %s, che e' una stanza con prestito.\n\n"
+    "Scegli dove spostare i suoi %d dispositivi: la stanza\n"
+    "scelta prendera' il suo posto fra quelle con prestito, e\n"
+    'anche i dispositivi in prestito si sposteranno.':
+        'You are removing %s, which is a room with loans.\n\n'
+        'Choose where to move its %d devices: the room you pick takes its\n'
+        'place among the rooms with loans, and the devices on loan move\n'
+        'too.',
+    'Stanza traslocata':
+        'Room moved',
+    '%d iPhone, rispediti e non.':
+        '%d iPhones, shipped or not.',
+    '%d erano in prestito e si sono spostati lo stesso:\n'
+    'il prestito resta aperto, cambia solo dove risultano\n'
+    'registrati.':
+        '%d were on loan and moved all the same:\n'
+        'the loan stays open, only where they are booked changes.',
+    'Si sono spostati tutti.':
+        'They all moved.',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':
