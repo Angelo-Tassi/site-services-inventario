@@ -667,6 +667,10 @@ be a device, and instead it has been deleted.
 - next to every row there is **Restore**, and at the top **Restore the selected
   ones** to work on several rows at once - Ctrl+click and Shift+click as in the
   main list, with the same copying (Ctrl+C and the right mouse button);
+- **before anything goes back in you read the summary**: which devices return and
+  **into which room**, grouped by destination, with the confirmation underneath.
+  It is a single popup: afterwards the outcome is written under the list. It
+  holds for the single-row button too;
 - the device goes back **into the room it was in when it was deleted**, with
   everything it had: serial number, notes, status, loan, shipment.
 

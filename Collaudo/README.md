@@ -457,7 +457,11 @@ Serve a verificare la rete di sicurezza per l'eliminazione sbagliata.
    Aprine la scheda e controlla che numero di serie, note e stato siano quelli
    di prima;
 6. seleziona gli altri due con **Ctrl+clic** e premi **Ripristina i selezionati**
-   in alto: tornano tutti e due;
+   in alto. Deve aprirsi **un popup solo**: sopra l'elenco di quelli che
+   tornano, **raggruppati per la stanza** in cui finiscono, e sotto i pulsanti
+   *Annulla* e *Ripristina*. Confermando tornano tutti e due, e sotto l'elenco
+   compare quanti ne sono tornati e dove. Prova anche ad **annullare**: non
+   deve tornare dentro niente;
 7. adesso elimina piu' di dieci dispositivi e riapri il cestino: l'elenco deve
    essere **diviso in pagine da dieci**, con *Precedenti* e *Successivi*;
 8. scrivi nella **ricerca** in cima l'asset tag di uno che sta nella **seconda**

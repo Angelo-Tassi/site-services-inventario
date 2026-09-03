@@ -448,7 +448,11 @@ This checks the safety net for a deletion made by mistake.
 5. press **Restore** on the row: the device goes back **into its room**. Open its
    record and check that serial number, notes and status are what they were;
 6. select the other two with **Ctrl+click** and press **Restore the selected
-   ones** at the top: both come back;
+   ones** at the top. A **single popup** must open: above, the list of the ones
+   coming back **grouped by the room** they land in, and below the *Cancel* and
+   *Restore* buttons. On confirmation both come back, and under the list you read
+   how many returned and where. Try **cancelling** too: nothing must go back
+   in;
 7. now delete more than ten devices and reopen the bin: the list must be **split
    into pages of ten**, with *Previous* and *Next*;
 8. type in the **search** box at the top the asset tag of one that is on the

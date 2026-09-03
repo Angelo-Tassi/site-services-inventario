@@ -911,8 +911,10 @@ class InventoryStore(object):
         `chiavi` sono gli asset tag come stanno nel cestino. Un orfano non ha
         una stanza a cui tornare: per quello si passa `stanza`.
 
-        Ritorna (ripristinati, saltati), dove saltati e' una lista di
-        (asset tag, motivo).
+        Ritorna (ripristinati, saltati). `ripristinati` sono dizionari con
+        asset tag, tipo e la stanza in cui il dispositivo e' tornato: chi ha
+        chiesto il ripristino deve poter leggere dove sono finiti, non solo
+        quanti erano. `saltati` sono coppie (asset tag, motivo).
         """
         volute = [norm_tag(c) for c in chiavi]
         voci = self._pota_eliminati(self._leggi_eliminati())
@@ -944,13 +946,15 @@ class InventoryStore(object):
                 _stamp_item(scheda)
                 items.append(scheda)
                 presenti.add(tag)
-                rimessi.append(tag)
+                rimessi.append({"asset_tag": tag,
+                                "tipo": clean(scheda.get("tipo")),
+                                "stanza": clean(scheda.get("stanza"))})
             return rimessi
 
         rimessi = self._apply(op) if da_rimettere else []
         if rimessi:
-            restanti = [v for v in voci if v.get("asset_tag") not in set(rimessi)]
-            self._scrivi_eliminati(restanti)
+            tolti = set(r["asset_tag"] for r in rimessi)
+            self._scrivi_eliminati([v for v in voci if v.get("asset_tag") not in tolti])
         return rimessi, saltati
 
     def trasloca_stanza(self, vecchia, nuova):

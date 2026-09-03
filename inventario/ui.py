@@ -831,7 +831,7 @@ class ResetDialog(_Modal):
         body.pack(fill="both", expand=True)
 
         tk.Label(body, text=T("Stai per svuotare l'inventario condiviso"),
-                 bg=theme.LOAN_FG, fg="#FFFFFF", font=self.master.fonts["card_title"],
+                 bg=theme.LOAN_FG, fg="#FFFFFF", font=_fonts_di(self)["card_title"],
                  padx=12, pady=9, anchor="w").pack(fill="x")
 
         righe = [T("Verranno eliminati %d dispositivi, per tutti gli utenti.") % da_eliminare,
@@ -899,7 +899,7 @@ class EsportazioneFattaDialog(_Modal):
         cornice.pack(fill="both", expand=True, pady=(6, 14))
         percorsi = tk.Text(cornice, width=52, height=min(6, max(1, len(self.percorsi))),
                            wrap="none", relief="flat", highlightthickness=0,
-                           bg=theme.CARD, fg=theme.TEXT, font=self.master.fonts["base"])
+                           bg=theme.CARD, fg=theme.TEXT, font=_fonts_di(self)["base"])
         percorsi.insert("1.0", elenco)
         percorsi.configure(state="disabled")
         barra = ttk.Scrollbar(cornice, orient="horizontal", command=percorsi.xview)
@@ -1201,7 +1201,7 @@ class ImportDialog(_Modal):
         come = T("Sostituzione") if opzioni["mode"] == "replace" else T("Unione")
         tk.Label(body, text=T("%s  \u2192  %s") % (come, dove), anchor="w",
                  bg=theme.HEAD_BG, fg=theme.PRIMARY, padx=10, pady=7,
-                 font=self.master.fonts["bold"]).pack(fill="x", pady=(0, 8))
+                 font=_fonts_di(self)["bold"]).pack(fill="x", pady=(0, 8))
 
         self.var_conferma = tk.StringVar()
         if opzioni["mode"] == "replace":
@@ -1262,7 +1262,7 @@ class ImportDialog(_Modal):
         testo = tk.Text(cornice, width=46,
                         height=min(14, max(4, len(righe))), wrap="none",
                         relief="flat", highlightthickness=0,
-                        bg=theme.CARD, fg=theme.TEXT, font=self.master.fonts["base"])
+                        bg=theme.CARD, fg=theme.TEXT, font=_fonts_di(self)["base"])
         testo.insert("1.0", "\n".join(righe))
         testo.configure(state="disabled")
         testo.pack(fill="both", expand=True, padx=10, pady=8)
@@ -1529,6 +1529,44 @@ def riepilogo_spostamento(spostabili, telefoni, prestati, destinazione,
     return righe
 
 
+def riepilogo_ripristino(voci, stanza_orfani=None):
+    """Che cosa tornerebbe in inventario, e in quale stanza.
+
+    Rimettere dentro un dispositivo cambia l'inventario di tutti come lo cambia
+    toglierlo: si legge prima, raggruppato per stanza di destinazione, come per
+    Elimina e Sposta.
+    """
+    per_stanza = {}
+    for voce in voci:
+        dove = ("" if voce.get("orfano") else clean(voce.get("stanza"))) \
+            or clean(stanza_orfani) or NO_ROOM()
+        per_stanza.setdefault(dove, []).append(voce)
+    righe = [T("TORNANO IN INVENTARIO: %d") % len(voci)]
+    for stanza in sorted(per_stanza):
+        elenco = per_stanza[stanza]
+        righe.append("")
+        righe.append(T("  %s - %d dispositivi") % (stanza, len(elenco)))
+        for voce in elenco:
+            riga = "    %s  %s" % (voce.get("asset_tag", ""),
+                                   (voce.get("tipo") or "")[:24])
+            if voce.get("orfano"):
+                riga += T("   [la sua stanza non c'e' piu']")
+            righe.append(riga.rstrip())
+    return righe
+
+
+def esito_ripristino_breve(rimessi):
+    """L'esito in una riga, da scrivere sotto l'elenco: quanti e dove."""
+    if not rimessi:
+        return [T("Non e' tornato dentro niente.")]
+    per_stanza = {}
+    for voce in rimessi:
+        stanza = clean(voce.get("stanza")) or NO_ROOM()
+        per_stanza[stanza] = per_stanza.get(stanza, 0) + 1
+    return [T("Ripristinati %d dispositivi") % len(rimessi)] + \
+        ["%s: %d" % (stanza, quanti) for stanza, quanti in sorted(per_stanza.items())]
+
+
 class CestinoDialog(_Modal):
     """Gli eliminati di recente, con il ripristino riga per riga.
 
@@ -1774,6 +1812,15 @@ class CestinoDialog(_Modal):
             stanza = self._chiedi_stanza(orfani)
             if not stanza:
                 return
+        righe = riepilogo_ripristino(voci, stanza)
+        if not ConfermaOperazioneDialog(
+            self, T("Conferma ripristino"),
+            T("Ripristinare %d dispositivi?") % len(voci) if len(voci) > 1
+            else T("Ripristinare questo dispositivo?"),
+            righe, T("Ripristina"), "Primary.TButton",
+            T("Tornano nell'inventario di tutti, con la scheda che avevano.")
+        ).show():
+            return
         try:
             rimessi, saltati = self.store.ripristina_eliminati(
                 [v["asset_tag"] for v in voci], stanza)
@@ -1782,14 +1829,18 @@ class CestinoDialog(_Modal):
             return
         self.ripristinati += len(rimessi)
         self._ricarica()
-        righe = []
-        if rimessi:
-            righe.append(T("Ripristinati %d dispositivi.") % len(rimessi))
+        # Un popup solo: il riepilogo si e' gia' letto prima di confermare, e
+        # rileggerlo dopo sarebbe una finestra da chiudere e basta. L'esito si
+        # scrive sotto l'elenco.
+        self.var_dettaglio.set(" - ".join(esito_ripristino_breve(rimessi)))
         if saltati:
-            righe.append("")
-            righe.append(T("SALTATI: %d") % len(saltati))
-            righe.extend("    %s  -  %s" % (tag, motivo) for tag, motivo in saltati)
-        messagebox.showinfo(T("Ripristino"), "\n".join(righe), parent=self)
+            # Uno saltato invece va detto: e' l'unico caso in cui il ripristino
+            # non ha fatto quello che si era appena confermato.
+            messagebox.showwarning(
+                T("Qualcuno non e' tornato dentro"),
+                "\n".join([T("SALTATI: %d") % len(saltati)] +
+                          ["    %s  -  %s" % (tag, motivo) for tag, motivo in saltati]),
+                parent=self)
 
     def _chiedi_stanza(self, orfani):
         """Un orfano non ha una stanza a cui tornare: si chiede quale."""
@@ -1851,6 +1902,21 @@ def riepilogo_copia_locale(rapporto, adesso, stanze_adesso, cfg_adesso):
     return righe
 
 
+def _fonts_di(widget):
+    """I font del tema, risalendo dal widget fino alla finestra principale.
+
+    Una finestra puo' aprirne un'altra - il cestino apre la conferma - e in quel
+    caso il genitore non e' l'applicazione: i font stanno piu' su.
+    """
+    nodo = widget
+    while nodo is not None:
+        fonts = getattr(nodo, "fonts", None)
+        if fonts:
+            return fonts
+        nodo = getattr(nodo, "master", None)
+    return {"base": ("TkDefaultFont", 10)}
+
+
 class ConfermaOperazioneDialog(_Modal):
     """Che cosa sta per succedere, riga per riga, prima di farlo succedere."""
 
@@ -1867,7 +1933,7 @@ class ConfermaOperazioneDialog(_Modal):
         cornice.pack(fill="both", expand=True)
         testo = tk.Text(cornice, width=52, height=min(16, max(4, len(righe))),
                         wrap="none", relief="flat", highlightthickness=0,
-                        bg=theme.CARD, fg=theme.TEXT, font=self.master.fonts["base"])
+                        bg=theme.CARD, fg=theme.TEXT, font=_fonts_di(self)["base"])
         testo.insert("1.0", "\n".join(righe))
         testo.configure(state="disabled")
         barra = ttk.Scrollbar(cornice, orient="vertical", command=testo.yview)

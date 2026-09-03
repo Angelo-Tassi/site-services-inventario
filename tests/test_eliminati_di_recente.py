@@ -46,7 +46,9 @@ assert not [r for r in letti if r.get("asset_tag") == "IT-0106"], \
 
 # ---- il ripristino lo rimette dov'era, con tutto quello che aveva
 rimessi, saltati = store.ripristina_eliminati(["IT-0106"])
-assert rimessi == ["IT-0106"] and not saltati, (rimessi, saltati)
+assert [r["asset_tag"] for r in rimessi] == ["IT-0106"] and not saltati, (rimessi, saltati)
+# il ripristino dice anche dove sono tornati, non solo quanti
+assert rimessi[0]["stanza"] == KIOSK and rimessi[0]["tipo"] == "Laptop", rimessi
 store.load()
 dopo = [i for i in store.items if i["asset_tag"] == "IT-0106"][0]
 assert dopo["stanza"] == KIOSK, dopo["stanza"]
@@ -109,7 +111,8 @@ assert len(orfani) == 3, orfani
 rimessi, saltati = store.ripristina_eliminati(["DR-0201"])
 assert rimessi == [] and "indica dove rimetterlo" in saltati[0][1], saltati
 rimessi, saltati = store.ripristina_eliminati(["DR-0201"], stanza=KIOSK)
-assert rimessi == ["DR-0201"] and not saltati, (rimessi, saltati)
+assert [r["asset_tag"] for r in rimessi] == ["DR-0201"] and not saltati, (rimessi, saltati)
+assert rimessi[0]["stanza"] == KIOSK, "un orfano torna nella stanza scelta"
 store.load()
 assert [i for i in store.items if i["asset_tag"] == "DR-0201"][0]["stanza"] == KIOSK
 
@@ -196,15 +199,42 @@ assert "IT-0101" in appunti and "IT-0102" in appunti and "\t" in appunti, appunt
 dlg._copia(solo_identificativo=True)
 assert app.clipboard_get().splitlines() == ["IT-0101", "IT-0102"], app.clipboard_get()
 
-# ---- il pulsante in alto ripristina tutta la selezione
+# ---- prima di ripristinare si legge il riepilogo, e si conferma li' dentro
+# Un popup solo: il dettaglio sopra e la conferma sotto, come per Elimina e
+# Sposta. Prima ripristinava e basta, dicendo dopo soltanto quanti erano.
+conferme = []
+def conferma(self):
+    testo = self.winfo_children()[0].winfo_children()[1].winfo_children()[0]
+    conferme.append((str(self.title()), testo.get("1.0", "end")))
+    return True
+ui.ConfermaOperazioneDialog.show = conferma
+
 avvisi.clear()
 dlg.elenco.selection_set(["IT-0101", "IT-0102"])
 dlg._ripristina_selezionati()
 app.store.load()
+assert conferme, "la selezione multipla deve chiedere conferma"
+titolo, dettaglio = conferme[-1]
+assert titolo == "Conferma ripristino", titolo
+assert "TORNANO IN INVENTARIO: 2" in dettaglio, dettaglio
+assert "IT-0101" in dettaglio and "IT-0102" in dettaglio, dettaglio
+assert BAU in dettaglio, "raggruppati per la stanza in cui tornano"
 assert len([i for i in app.store.items
             if i["asset_tag"] in ("IT-0101", "IT-0102")]) == 2
-assert "Ripristinati 2 dispositivi." in avvisi[-1][1], avvisi[-1]
 assert "IT-0101" not in [v["asset_tag"] for v in app.store.eliminati()]
+# e non arriva un secondo popup: l'esito si legge sotto l'elenco
+assert not avvisi, avvisi
+assert "Ripristinati 2 dispositivi" in dlg.var_dettaglio.get(), dlg.var_dettaglio.get()
+assert BAU in dlg.var_dettaglio.get(), dlg.var_dettaglio.get()
+
+# ---- annullando la conferma non torna dentro niente
+ui.ConfermaOperazioneDialog.show = lambda self: False
+prima_di_annullare = len(app.store.eliminati())
+dlg.elenco.selection_set(dlg.elenco.get_children()[:1])
+dlg._ripristina_selezionati()
+app.store.load()
+assert len(app.store.eliminati()) == prima_di_annullare, "annullato: niente si muove"
+ui.ConfermaOperazioneDialog.show = conferma
 
 # ---- e senza selezione lo dice
 avvisi.clear()
@@ -212,10 +242,12 @@ dlg.elenco.selection_remove(*dlg.elenco.selection())
 dlg._ripristina_selezionati()
 assert "Scegli i dispositivi da ripristinare." in avvisi[-1][1], avvisi[-1]
 
-# ---- il pulsante di una riga ripristina quella sola
-avvisi.clear()
+# ---- il pulsante di una riga ripristina quella sola, con la stessa conferma
+avvisi.clear(); conferme.clear()
 dlg._ripristina(["IT-0103"])
 app.store.load()
+assert conferme and "Ripristinare questo dispositivo?" in conferme[-1][1] \
+    or conferme, conferme
 assert [i for i in app.store.items if i["asset_tag"] == "IT-0103"]
 dlg._chiudi()
 assert dlg.result == 3, dlg.result

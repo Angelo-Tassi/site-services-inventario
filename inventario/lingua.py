@@ -1070,6 +1070,24 @@ EN = {
         'the loan stays open, only where they are booked changes.',
     'Si sono spostati tutti.':
         'They all moved.',
+    'TORNANO IN INVENTARIO: %d':
+        'GOING BACK INTO THE INVENTORY: %d',
+    "Non e' tornato dentro niente.":
+        'Nothing went back in.',
+    "   [la sua stanza non c'e' piu']":
+        '   [its room is gone]',
+    'Ripristinati %d dispositivi':
+        'Restored %d devices',
+    "Qualcuno non e' tornato dentro":
+        'Some did not go back in',
+    'Conferma ripristino':
+        'Confirm restore',
+    "Tornano nell'inventario di tutti, con la scheda che avevano.":
+        "They go back into everyone's inventory, with the record they had.",
+    'Ripristinare questo dispositivo?':
+        'Restore this device?',
+    'Ripristinare %d dispositivi?':
+        'Restore %d devices?',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':

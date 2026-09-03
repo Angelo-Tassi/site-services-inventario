@@ -529,6 +529,10 @@ eliminato.
 - accanto a ogni riga c'e' **Ripristina**, e in cima **Ripristina i selezionati**
   per lavorare su piu' righe insieme - Ctrl+clic e Maiusc+clic come nell'elenco
   principale, con la stessa copia (Ctrl+C e tasto destro);
+- **prima di rimettere dentro qualcosa si legge il riepilogo**: quali dispositivi
+  tornano e **in quale stanza**, raggruppati per destinazione, con la conferma
+  sotto. E' un popup solo: dopo, l'esito si legge sotto l'elenco. Vale anche per
+  il pulsante di una riga sola;
 - il dispositivo torna **nella stanza in cui era al momento dell'eliminazione**,
   con tutto quello che aveva: numero di serie, note, stato, prestito, spedizione.
 

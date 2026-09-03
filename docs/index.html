@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.44.1 · alfa</div>
+  <div class="alpha">versione 0.45.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,20 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.45.0</h3>
+      <p class="quando">3 settembre 2026</p>
+      <ul>
+        <li><b>Il ripristino dagli eliminati chiede conferma</b>, come Elimina e
+          Sposta. Un popup solo: sopra il riepilogo - quali dispositivi tornano
+          e <b>in quale stanza</b>, raggruppati per destinazione - e sotto la
+          conferma. Prima ripristinava e basta, dicendo dopo soltanto quanti
+          erano.</li>
+        <li><b>L'esito si legge sotto l'elenco</b>: quanti sono tornati e in
+          quali stanze, senza una seconda finestra da chiudere. Se qualcuno
+          viene saltato, quello si' che viene detto a parte.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.44.1</h3>
       <p class="quando">3 settembre 2026</p>
@@ -240,24 +254,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           intestazioni e le altre non rispondevano affatto, cosi' il primo
           pulsante era fuori posto e gli altri mancavano finche' non si
           cliccava.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.43.0</h3>
-      <p class="quando">3 settembre 2026</p>
-      <ul>
-        <li><b>Eliminati di recente</b>, in home accanto al controllo dei
-          doppioni: gli ultimi 200 dispositivi eliminati, che restano 30 giorni.
-          Non compaiono in nessuna esportazione, stampa o ricerca - sono stati
-          eliminati, non nascosti.</li>
-        <li><b>Si ripesca quello tolto per sbaglio</b>: elenco a pagine da
-          dieci, ricerca che guarda tutto il cestino, Ripristina su ogni riga e
-          sulla selezione. Il dispositivo torna nella stanza che aveva, con
-          numero di serie, note, stato, prestito e spedizione.</li>
-        <li><b>I dispositivi di una stanza tolta finiscono li'</b>, dopo una
-          richiesta di conferma: prima restavano in elenco con il nome di una
-          stanza che non esisteva piu'. Non avendo una stanza a cui tornare, al
-          ripristino il programma chiede in quale rimetterli.</li>
       </ul>
     </div>
   </div>
@@ -445,7 +441,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.44.1 · alpha</div>
+  <div class="alpha">version 0.45.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -471,6 +467,20 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.45.0</h3>
+      <p class="quando">3 September 2026</p>
+      <ul>
+        <li><b>Restoring from the deleted asks for confirmation</b>, like Delete
+          and Move. A single popup: the summary above - which devices come back
+          and <b>into which room</b>, grouped by destination - and the
+          confirmation below. Before, it just restored, saying afterwards only
+          how many there were.</li>
+        <li><b>The outcome is read under the list</b>: how many came back and
+          into which rooms, without a second window to close. If one is skipped,
+          that is told separately.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.44.1</h3>
       <p class="quando">3 September 2026</p>
@@ -514,23 +524,6 @@ python Inventario.py</pre>
           laid out yet: the first row answered with the header coordinates and
           the others did not answer at all, so the first button was out of place
           and the rest were missing until you clicked.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.43.0</h3>
-      <p class="quando">3 September 2026</p>
-      <ul>
-        <li><b>Recently deleted</b>, on the home screen next to the duplicate
-          check: the last 200 devices deleted, kept for 30 days. They appear in
-          no export, printout or search - they were deleted, not hidden.</li>
-        <li><b>You fish back the one removed by mistake</b>: a list in pages of
-          ten, a search that looks at the whole bin, Restore on every row and on
-          the selection. The device goes back into the room it had, with serial
-          number, notes, status, loan and shipment.</li>
-        <li><b>The devices of a room you removed end up there</b>, after a
-          confirmation: before, they stayed in the list with the name of a room
-          that no longer existed. Having no room to go back to, on restore the
-          program asks which one to put them in.</li>
       </ul>
     </div>
   </div>
