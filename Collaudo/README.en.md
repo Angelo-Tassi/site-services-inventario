@@ -453,12 +453,18 @@ This checks the safety net for a deletion made by mistake.
    *Restore* buttons. On confirmation both come back, and under the list you read
    how many returned and where. Try **cancelling** too: nothing must go back
    in;
-7. now delete more than ten devices and reopen the bin: the list must be **split
+7. press **Restore everything**: the number in brackets must say how many it
+   holds, and the summary must list them all grouped by room. On confirmation the
+   bin is left empty and the button goes dim. Then delete something again, type
+   something in the search box and press **Restore everything** again: it must act
+   on the **results only** and say so, leaving in the bin what the filter was not
+   showing;
+8. now delete more than ten devices and reopen the bin: the list must be **split
    into pages of ten**, with *Previous* and *Next*;
-8. type in the **search** box at the top the asset tag of one that is on the
+9. type in the **search** box at the top the asset tag of one that is on the
    **second** page: it must find it all the same. The search looks at the whole
    bin, not the page you are on;
-9. finally open **Settings** and remove from the list a room that still holds
+10. finally open **Settings** and remove from the list a room that still holds
    devices. It must ask for confirmation saying how many there are; on
    confirmation they end up in the bin with a **red background**. Try restoring
    one: the program must **ask you which room** to put it in.

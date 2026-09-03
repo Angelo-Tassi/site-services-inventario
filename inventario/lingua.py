@@ -1098,6 +1098,14 @@ EN = {
         'The settings are saved next to the data file and apply to every user.\n'
         'In the loan room every row of the list carries the Lend / Register return button.\n'
         'iPhones are always registered in the room named above and do not move.',
+    'Ripristina tutto':
+        'Restore everything',
+    'Ripristina tutto (%d)':
+        'Restore everything (%d)',
+    'Ripristinare tutti i %d dispositivi del cestino?':
+        'Restore all %d devices in the bin?',
+    'Ripristinare tutti i %d risultati della ricerca?':
+        'Restore all %d results of the search?',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':

@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.45.1 · alfa</div>
+  <div class="alpha">versione 0.46.0 · alfa</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,19 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.46.0</h3>
+      <p class="quando">3 settembre 2026</p>
+      <ul>
+        <li><b>Ripristina tutto</b> negli eliminati di recente: rimette dentro
+          l'intero cestino in un colpo, con lo stesso riepilogo dettagliato e la
+          conferma sotto.</li>
+        <li><b>Con una ricerca attiva agisce sui risultati</b>, non sul cestino
+          intero, e il numero sul pulsante dice sempre su quanti sta per agire:
+          ripristinare di nascosto roba fuori dal filtro sarebbe la sorpresa
+          peggiore.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.45.1</h3>
       <p class="quando">3 settembre 2026</p>
@@ -233,24 +246,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           dispositivo in prestito non si porta via nemmeno chiamando la
           funzione direttamente. L'unica strada che lo sposta resta il trasloco
           della stanza, che lo lascia in inventario.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.44.0</h3>
-      <p class="quando">3 settembre 2026</p>
-      <ul>
-        <li><b>Togliere la stanza degli iPhone non e' piu' un errore.</b> Prima
-          il salvataggio veniva rifiutato dicendo che la stanza non e'
-          nell'elenco; adesso il programma chiede <b>in che stanza spostarli</b>
-          e ce li porta tutti, rispediti e non, insieme agli altri dispositivi
-          che c'erano dentro.</li>
-        <li><b>Lo stesso per una stanza con prestito</b>: si sceglie dove
-          spostare i suoi dispositivi, e la stanza scelta ne prende il posto fra
-          quelle con prestito.</li>
-        <li><b>Si spostano anche i dispositivi in prestito</b>, unica eccezione
-          alla regola che li tiene fermi: lasciarli in una stanza che non esiste
-          piu' sarebbe perderne la traccia, che e' proprio cio' che quella
-          regola evita. Il prestito resta aperto.</li>
       </ul>
     </div>
   </div>
@@ -438,7 +433,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.45.1 · alpha</div>
+  <div class="alpha">version 0.46.0 · alpha</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -464,6 +459,19 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v0.46.0</h3>
+      <p class="quando">3 September 2026</p>
+      <ul>
+        <li><b>Restore everything</b> in the recently deleted: it puts the whole
+          bin back in one go, with the same detailed summary and the
+          confirmation below.</li>
+        <li><b>With a search active it acts on the results</b>, not on the whole
+          bin, and the number on the button always says how many it is about to
+          act on: quietly restoring things outside the filter would be the worst
+          surprise.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.45.1</h3>
       <p class="quando">3 September 2026</p>
@@ -502,23 +510,6 @@ python Inventario.py</pre>
           on loan is not taken away even by calling the function directly. The
           only route that moves it is still relocating the room, which leaves it
           in the inventory.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.44.0</h3>
-      <p class="quando">3 September 2026</p>
-      <ul>
-        <li><b>Removing the iPhone room is no longer an error.</b> Saving used to
-          be refused, saying the room was not in the list; now the program asks
-          <b>which room to move them to</b> and takes them all there, shipped or
-          not, together with the other devices that were inside.</li>
-        <li><b>The same for a room with loans</b>: you choose where to move its
-          devices, and the room you pick takes its place among the rooms with
-          loans.</li>
-        <li><b>Devices on loan move too</b>, the only exception to the rule that
-          keeps them still: leaving them in a room that no longer exists would
-          lose the trace, which is exactly what that rule avoids. The loan stays
-          open.</li>
       </ul>
     </div>
   </div>

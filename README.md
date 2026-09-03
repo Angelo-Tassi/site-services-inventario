@@ -526,8 +526,11 @@ eliminato.
   non si perde: torna intero con il ripristino;
 - il **campo di ricerca** in cima cerca in **tutto il cestino**, non nella pagina
   che si sta guardando: quello che trova viene poi impaginato a sua volta;
-- accanto a ogni riga c'e' **Ripristina**, e in cima **Ripristina i selezionati**
-  per lavorare su piu' righe insieme - Ctrl+clic e Maiusc+clic come nell'elenco
+- accanto a ogni riga c'e' **Ripristina**; in cima **Ripristina i selezionati**
+  per lavorare su piu' righe insieme, e **Ripristina tutto (n)** che rimette
+  dentro l'intero cestino in un colpo. Con una **ricerca attiva** quel pulsante
+  agisce sui **risultati**, non sul cestino intero, e il numero fra parentesi
+  dice sempre su quanti sta per agire - Ctrl+clic e Maiusc+clic come nell'elenco
   principale, con la stessa copia (Ctrl+C e tasto destro);
 - **prima di rimettere dentro qualcosa si legge il riepilogo**: quali dispositivi
   tornano e **in quale stanza**, raggruppati per destinazione, con la conferma

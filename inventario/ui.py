@@ -1629,6 +1629,13 @@ class CestinoDialog(_Modal):
                                          style="Primary.TButton",
                                          command=self._ripristina_selezionati)
         self.btn_ripristina.pack(side="left")
+        # "Tutto" e' tutto quello che si sta guardando: con una ricerca attiva
+        # sono i risultati, non l'intero cestino. Ripristinare di nascosto roba
+        # fuori dal filtro sarebbe la sorpresa peggiore, e il numero sul
+        # pulsante dice sempre su quanti sta per agire.
+        self.btn_tutti = ttk.Button(riga, text=T("Ripristina tutto"),
+                                    command=self._ripristina_tutti)
+        self.btn_tutti.pack(side="left", padx=(8, 0))
 
         cornice = ttk.Frame(body)
         cornice.pack(fill="both", expand=True, pady=(12, 0))
@@ -1698,6 +1705,8 @@ class CestinoDialog(_Modal):
         self.btn_dopo.configure(
             state="normal" if inizio + self.PER_PAGINA < len(self.voci) else "disabled")
         self.btn_ripristina.configure(state="normal" if self.voci else "disabled")
+        self.btn_tutti.configure(state="normal" if self.voci else "disabled",
+                                 text=T("Ripristina tutto (%d)") % len(self.voci))
         self._mostra_dettaglio()
         self.after_idle(self._disegna_pulsanti)
 
@@ -1824,7 +1833,13 @@ class CestinoDialog(_Modal):
             return
         self._ripristina(scelti)
 
-    def _ripristina(self, tags):
+    def _ripristina_tutti(self):
+        """Tutto quello che si sta guardando: con la ricerca attiva, i risultati."""
+        if not self.voci:
+            return
+        self._ripristina([v["asset_tag"] for v in self.voci], tutto=True)
+
+    def _ripristina(self, tags, tutto=False):
         voci = [self._voce(t) for t in tags]
         voci = [v for v in voci if v is not None]
         if not voci:
@@ -1836,10 +1851,18 @@ class CestinoDialog(_Modal):
             if not stanza:
                 return
         righe = riepilogo_ripristino(voci, stanza)
+        if tutto and clean(self.var_cerca.get()):
+            intestazione_conferma = T("Ripristinare tutti i %d risultati della ricerca?") \
+                % len(voci)
+        elif tutto:
+            intestazione_conferma = T("Ripristinare tutti i %d dispositivi del cestino?") \
+                % len(voci)
+        elif len(voci) > 1:
+            intestazione_conferma = T("Ripristinare %d dispositivi?") % len(voci)
+        else:
+            intestazione_conferma = T("Ripristinare questo dispositivo?")
         if not ConfermaOperazioneDialog(
-            self, T("Conferma ripristino"),
-            T("Ripristinare %d dispositivi?") % len(voci) if len(voci) > 1
-            else T("Ripristinare questo dispositivo?"),
+            self, T("Conferma ripristino"), intestazione_conferma,
             righe, T("Ripristina"), "Primary.TButton",
             T("Tornano nell'inventario di tutti, con la scheda che avevano.")
         ).show():

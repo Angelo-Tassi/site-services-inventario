@@ -204,8 +204,10 @@ assert app.clipboard_get().splitlines() == ["IT-0101", "IT-0102"], app.clipboard
 # Sposta. Prima ripristinava e basta, dicendo dopo soltanto quanti erano.
 conferme = []
 def conferma(self):
-    testo = self.winfo_children()[0].winfo_children()[1].winfo_children()[0]
-    conferme.append((str(self.title()), testo.get("1.0", "end")))
+    corpo = self.winfo_children()[0]
+    intestazione = str(corpo.winfo_children()[0].cget("text"))
+    testo = corpo.winfo_children()[1].winfo_children()[0]
+    conferme.append((str(self.title()), intestazione + "\n" + testo.get("1.0", "end")))
     return True
 ui.ConfermaOperazioneDialog.show = conferma
 
@@ -249,8 +251,42 @@ app.store.load()
 assert conferme and "Ripristinare questo dispositivo?" in conferme[-1][1] \
     or conferme, conferme
 assert [i for i in app.store.items if i["asset_tag"] == "IT-0103"]
+# ---- Ripristina tutto: agisce su quello che si sta guardando, non sulla pagina
+for n in range(3):
+    app._run(lambda n=n: app.store.add(
+        new_item("IT-88%02d" % n, "Laptop", "T14", "PF88%d" % n, BAU)), "ok")
+app._run(lambda: app.store.delete(["IT-8800", "IT-8801", "IT-8802"]), "ok")
+dlg._ricarica()
+conferme.clear()
+rimasti = len(app.store.eliminati())
+assert rimasti > dlg.PER_PAGINA, "servono piu' pagine, o la prova non dice niente"
+assert len(dlg.elenco.get_children()) == dlg.PER_PAGINA, "se ne vedono dieci"
+assert ("(%d)" % rimasti) in str(dlg.btn_tutti.cget("text")), dlg.btn_tutti.cget("text")
+dlg._ripristina_tutti()
+app.store.load()
+titolo, dettaglio = conferme[-1]
+assert ("TORNANO IN INVENTARIO: %d" % rimasti) in dettaglio, dettaglio
+assert not app.store.eliminati(), "il cestino deve essere vuoto"
+assert str(dlg.btn_tutti.cget("state")) == "disabled", "e il pulsante spento"
+
+# ---- con una ricerca attiva, "tutto" sono i risultati e lo dice
+app._run(lambda: app.store.delete(["IT-0101", "IT-0102", "DR-0201"]), "ok")
+dlg._ricarica()
+dlg.var_cerca.set("IT-01"); dlg.update()
+quanti = len(dlg.voci)
+assert quanti == 2, quanti
+conferme.clear()
+dlg._ripristina_tutti()
+app.store.load()
+assert "risultati della ricerca" in conferme[-1][1], conferme[-1][1]
+assert ("TORNANO IN INVENTARIO: %d" % quanti) in conferme[-1][1], conferme[-1][1]
+# quello fuori dalla ricerca e' rimasto nel cestino
+assert [v["asset_tag"] for v in app.store.eliminati()] == ["DR-0201"], \
+    app.store.eliminati()
+dlg.var_cerca.set(""); dlg.update()
+
 dlg._chiudi()
-assert dlg.result == 3, dlg.result
+assert dlg.result == dlg.ripristinati and dlg.result > 3, dlg.result
 
 # ---- togliere una stanza chiede conferma e porta i dispositivi nel cestino
 app._run(lambda: app.store.add(new_item("DR-0900", "Laptop", "T14", "PF900", DR)), "ok")
@@ -264,7 +300,9 @@ ui.RoomsDialog.show = lambda self: {
     "lingua": "it", "rinomine": [], "rinomine_tipi": []}
 app.on_settings()
 app.store.load()
-assert risposte and "non sono vuote" in risposte[-1][1], risposte
+# fra le domande puo' esserci anche il promemoria della copia locale, che
+# scatta dopo venti modifiche: si cerca la nostra, non l'ultima arrivata
+assert any("non sono vuote" in messaggio for _t, messaggio in risposte), risposte
 assert DR not in app.cfg["rooms"], app.cfg["rooms"]
 assert not [i for i in app.store.items if i["stanza"] == DR]
 orfani = [v for v in app.store.eliminati() if v.get("orfano")]

@@ -672,8 +672,11 @@ be a device, and instead it has been deleted.
   not lost: it comes back whole with the restore;
 - the **search field** at the top searches the **whole bin**, not the page you
   are looking at: what it finds is then paginated in turn;
-- next to every row there is **Restore**, and at the top **Restore the selected
-  ones** to work on several rows at once - Ctrl+click and Shift+click as in the
+- next to every row there is **Restore**; at the top **Restore the selected
+  ones** to work on several rows at once, and **Restore everything (n)**, which
+  puts the whole bin back in one go. With a **search active** that button acts on
+  the **results**, not on the whole bin, and the number in brackets always says
+  how many it is about to act on - Ctrl+click and Shift+click as in the
   main list, with the same copying (Ctrl+C and the right mouse button);
 - **before anything goes back in you read the summary**: which devices return and
   **into which room**, grouped by destination, with the confirmation underneath.

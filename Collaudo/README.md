@@ -462,12 +462,18 @@ Serve a verificare la rete di sicurezza per l'eliminazione sbagliata.
    *Annulla* e *Ripristina*. Confermando tornano tutti e due, e sotto l'elenco
    compare quanti ne sono tornati e dove. Prova anche ad **annullare**: non
    deve tornare dentro niente;
-7. adesso elimina piu' di dieci dispositivi e riapri il cestino: l'elenco deve
+7. premi **Ripristina tutto**: il numero fra parentesi deve dire quanti ne
+   contiene, e il riepilogo elencarli tutti raggruppati per stanza. Confermando
+   il cestino resta vuoto e il pulsante si spegne. Poi elimina di nuovo qualcosa,
+   scrivi qualcosa nella ricerca e ripremi **Ripristina tutto**: deve agire sui
+   **soli risultati** e dirlo, lasciando nel cestino quello che il filtro non
+   mostrava;
+8. adesso elimina piu' di dieci dispositivi e riapri il cestino: l'elenco deve
    essere **diviso in pagine da dieci**, con *Precedenti* e *Successivi*;
-8. scrivi nella **ricerca** in cima l'asset tag di uno che sta nella **seconda**
+9. scrivi nella **ricerca** in cima l'asset tag di uno che sta nella **seconda**
    pagina: deve trovarlo lo stesso. La ricerca guarda tutto il cestino, non la
    pagina che stai vedendo;
-9. infine apri **Impostazioni** e togli dall'elenco una stanza che contiene
+10. infine apri **Impostazioni** e togli dall'elenco una stanza che contiene
    ancora dispositivi. Deve chiedere conferma dicendo quanti sono; confermando
    finiscono nel cestino con lo **sfondo rosso**. Prova a ripristinarne uno: il
    programma deve **chiederti in che stanza** rimetterlo.
