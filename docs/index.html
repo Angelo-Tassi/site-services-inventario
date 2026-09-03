@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 0.46.0 · alfa</div>
+  <div class="alpha">versione 1.0.0-beta.1 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,24 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.1</h3>
+      <p class="quando">3 settembre 2026</p>
+      <ul>
+        <li><b>Prima beta.</b> Le funzioni principali sono tutte a posto e
+          collaudate: selezione multipla, eliminati di recente, rinomina di
+          stanze e tipi, trasloco delle stanze con un ruolo, copia e ripristino
+          locale. Resta la prova sul campo prima della 1.0 definitiva.</li>
+        <li><b>Il pulsante <i>ELIMINATI DI RECENTE</i> e' un filo piu' piccolo</b>,
+          allineato all'altezza degli altri pulsanti della home invece di
+          sporgere.</li>
+        <li><b>Passata la documentazione</b>: nel manuale, "Doppioni" ed
+          "Eliminati di recente" avevano finito per restare infilati dentro il
+          capitolo "Importare da Excel" - ora hanno una voce propria
+          nell'indice. Il trasloco di una stanza con un ruolo non era mai
+          stato spiegato li' dentro, e adesso c'e'.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.46.0</h3>
       <p class="quando">3 settembre 2026</p>
@@ -231,21 +249,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
         <li><b>L'esito si legge sotto l'elenco</b>: quanti sono tornati e in
           quali stanze, senza una seconda finestra da chiudere. Se qualcuno
           viene saltato, quello si' che viene detto a parte.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.44.1</h3>
-      <p class="quando">3 settembre 2026</p>
-      <ul>
-        <li><b>Un prestito aperto non finisce mai negli eliminati.</b>
-          Togliendo la stanza dall'elenco <i>e</i> da quelle con prestito nello
-          stesso salvataggio, i dispositivi in prestito ci sarebbero finiti:
-          adesso il programma chiede dove spostarli, come per le altre stanze
-          con un ruolo.</li>
-        <li><b>Il divieto sta nell'archivio</b>, non solo nella finestra: un
-          dispositivo in prestito non si porta via nemmeno chiamando la
-          funzione direttamente. L'unica strada che lo sposta resta il trasloco
-          della stanza, che lo lascia in inventario.</li>
       </ul>
     </div>
   </div>
@@ -422,7 +425,7 @@ python Inventario.py</pre>
 
 <footer>
   <div class="wrap" style="padding:0">
-    Strumento interno Site Services · versione alfa ·
+    Strumento interno Site Services · versione beta ·
     <a href="https://github.com/Angelo-Tassi/site-services-inventario/issues">segnala un problema</a>
   </div>
 </footer>
@@ -433,7 +436,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 0.46.0 · alpha</div>
+  <div class="alpha">version 1.0.0-beta.1 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -459,6 +462,24 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.1</h3>
+      <p class="quando">3 September 2026</p>
+      <ul>
+        <li><b>First beta.</b> The main features are all in place and tested:
+          multiple selection, recently deleted, renaming rooms and types,
+          relocating rooms with a role, local copy and restore. Field testing
+          continues before the final 1.0.</li>
+        <li><b>The <i>RECENTLY DELETED</i> button is a touch smaller</b>,
+          matched to the height of the other home buttons instead of standing
+          taller than them.</li>
+        <li><b>The documentation got a pass</b>: in the manual, "Duplicates"
+          and "Recently deleted" had ended up stuck inside the "Importing from
+          Excel" chapter - they now have their own entry in the index.
+          Relocating a room with a role had never been explained there, and
+          now it is.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v0.46.0</h3>
       <p class="quando">3 September 2026</p>
@@ -496,20 +517,6 @@ python Inventario.py</pre>
         <li><b>The outcome is read under the list</b>: how many came back and
           into which rooms, without a second window to close. If one is skipped,
           that is told separately.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.44.1</h3>
-      <p class="quando">3 September 2026</p>
-      <ul>
-        <li><b>An open loan never ends up among the deleted.</b> Removing the
-          room from the list <i>and</i> from the rooms with loans in the same
-          save, the devices on loan would have gone there: now the program asks
-          where to move them, as for the other rooms with a role.</li>
-        <li><b>The ban lives in the store</b>, not only in the window: a device
-          on loan is not taken away even by calling the function directly. The
-          only route that moves it is still relocating the room, which leaves it
-          in the inventory.</li>
       </ul>
     </div>
   </div>
@@ -682,7 +689,7 @@ python Inventario.py</pre>
 
 <footer>
   <div class="wrap" style="padding:0">
-    Site Services internal tool · alpha version ·
+    Site Services internal tool · beta version ·
     <a href="https://github.com/Angelo-Tassi/site-services-inventario/issues">report a problem</a>
   </div>
 </footer>

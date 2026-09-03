@@ -189,6 +189,8 @@ table{min-width:520px}
     <li><a href="#prestiti">Prestiti</a></li>
     <li><a href="#iphone">iPhone</a></li>
     <li><a href="#importare">Importare da Excel</a></li>
+    <li><a href="#doppioni">Doppioni</a></li>
+    <li><a href="#eliminati">Eliminati di recente</a></li>
     <li><a href="#esportare">Esportare e stampare</a></li>
     <li><a href="#sicurezza">Sicurezza dei dati</a></li>
     <li><a href="#ripristino">Tornare indietro</a></li>
@@ -297,8 +299,9 @@ table{min-width:520px}
   <p class="sub">Riscrivono l'inventario di tutti e si usano di rado: nella barra
     rubavano spazio ai comandi di tutti i giorni fino a spingerli fuori dallo schermo.</p>
   <div class="tw"><table class="man">
-    <tr><td><span class="k verde">Salva copia in locale…</span></td><td class="d"><b>La copia di sicurezza che decidi tu.</b> Vedi <a href="#sicurezza">Sicurezza dei dati</a>.</td></tr>
-    <tr><td><span class="k rosso">Ripristina da una copia…</span></td><td class="d">Riporta l'inventario a una delle copie di sicurezza, scelta dall'elenco. Vedi <a href="#ripristino">Tornare indietro</a>.</td></tr>
+    <tr><td><span class="k verde">Salva copia in locale…</span></td><td class="d"><b>La copia di sicurezza che decidi tu</b>: uno zip con inventario e impostazioni. Vedi <a href="#sicurezza">Sicurezza dei dati</a>.</td></tr>
+    <tr><td><span class="k rosso">Ripristina da una copia…</span></td><td class="d">Riporta l'inventario a una delle copie automatiche sulla rete, scelta dall'elenco. Vedi <a href="#ripristino">Tornare indietro</a>.</td></tr>
+    <tr><td><span class="k rosso">Ripristina da un file locale…</span></td><td class="d">Riparte da una copia salvata fuori dalla rete: tornano dispositivi <b>e</b> impostazioni, stanze comprese. E' la via d'uscita se la cartella di rete non c'e' piu'.</td></tr>
     <tr><td><span class="k rosso">Reset inventario</span></td><td class="d">Svuota l'inventario. Chiede di scrivere <span class="mono">ELIMINA TUTTO</span> e salva prima una copia. Gli iPhone non si toccano mai.</td></tr>
   </table></div>
   <p class="note">Se la finestra e' stretta, la barra dei comandi va a capo su due righe:
@@ -314,7 +317,7 @@ table{min-width:520px}
   <h3>Sulle righe dell'elenco</h3>
   <div class="tw"><table class="man">
     <tr><th>Pulsante</th><th>Dove compare</th></tr>
-    <tr><td><span class="k blu">Presta</span> / <span class="k rosso">Rientro</span></td><td class="d">Colonna <b>Prestito</b>, solo nella stanza Digital Kiosk.</td></tr>
+    <tr><td><span class="k blu">Presta</span> / <span class="k rosso">Rientro</span></td><td class="d">Colonna <b>Prestito</b>, solo nella stanza scelta in Impostazioni (di solito Digital Kiosk).</td></tr>
     <tr><td><span class="k blu">Conferma spedizione</span></td><td class="d">Colonna <b>Spedizione</b>, solo nel contenitore Iphone.</td></tr>
   </table></div>
 </section>
@@ -481,7 +484,8 @@ table{min-width:520px}
 
 <section id="prestiti">
   <h2>Prestiti</h2>
-  <p class="sub">Esistono solo dove servono: nella stanza <b>Digital Kiosk</b>.</p>
+  <p class="sub">Esistono solo nella <b>stanza dei prestiti</b>, di serie il Digital
+    Kiosk - si sceglie in <a href="#impostazioni">Impostazioni</a>.</p>
   <ol class="steps">
     <li><b>Presta.</b> Il pulsante sulla riga chiede il nome di chi prende il dispositivo.
       Vengono registrati nome, data e ora.</li>
@@ -492,7 +496,9 @@ table{min-width:520px}
   <div class="avviso">Un dispositivo in prestito <b>non si sposta e non si elimina</b>,
     da nessuna parte del programma: ne' con Elimina, ne' con Elimina +, ne' con Sposta in
     stanza…, ne' cambiando la stanza dentro la scheda. Finche' e' fuori, l'inventario e'
-    l'unica traccia di chi ce l'ha. Si preme <b>Registra rientro</b> e torna libero.</div>
+    l'unica traccia di chi ce l'ha. Si preme <b>Registra rientro</b> e torna libero. L'unica
+    eccezione e' <a href="#trasloco">togliere la stanza dei prestiti</a>: li' si sposta
+    anche lui, e il prestito resta aperto.</div>
   <p class="note">Nelle altre stanze la colonna Prestito non compare affatto. Gli iPhone
     non si prestano mai. Nota, modello e tipo si correggono anche mentre il dispositivo
     e' in prestito.</p>
@@ -545,7 +551,25 @@ table{min-width:520px}
     Vanno bene anche le abbreviazioni <span class="mono">BAU</span>,
     <span class="mono">KIOSK</span>, <span class="mono">DISASTER</span>.</p>
 
-  <h3>I doppioni</h3>
+  <h3>Il riepilogo prima di importare</h3>
+  <p class="sub">Niente viene scritto finche' non confermi, e prima di confermare vedi:</p>
+  <div class="tw"><table class="man">
+    <tr><th>Che cosa dice</th><th>A che serve</th></tr>
+    <tr><td class="d"><b>Dove finiscono</b>, stanza per stanza</td><td class="d">quanti dispositivi <i>nuovi</i> e quanti <i>aggiornati</i> in ognuna: si vede subito se una stanza sta per riempirsi di roba che non le appartiene.</td></tr>
+    <tr><td class="d"><b>Quante righe vengono saltate</b>, e perche'</td><td class="d">senza identificativo, iPhone (che si inseriscono solo a mano), righe di altre stanze, colonne non riconosciute.</td></tr>
+    <tr><td class="d"><b>Quanti dispositivi ci sono adesso e quanti dopo</b></td><td class="d">e' il numero che dice se sta per succedere quello che pensi. Con la sostituzione dice anche quanti ne spariscono prima.</td></tr>
+    <tr><td class="d">Le stanze riconosciute dal foglio</td><td class="d">se non ne trova nessuna te lo dice li', prima di toccare qualsiasi cosa: altrimenti i dispositivi finirebbero senza stanza.</td></tr>
+  </table></div>
+  <p class="note">A operazione avvenuta il riepilogo finale ripete tutto: che cosa e'
+    stato fatto e dove, quante righe non sono state caricate e perche' una per una, come
+    si trova adesso l'inventario stanza per stanza, e dove sta la copia di sicurezza.</p>
+
+  <p class="note">Un foglio da importare non e' un inventario e non va mai aperto come
+    tale: si carica da qui.</p>
+</section>
+
+<section id="doppioni">
+  <h2>Doppioni</h2>
   <p class="sub">Il programma non ne crea: l'inserimento singolo <b>rifiuta</b> un
     identificativo gia' presente, e dicendo dove sta quello che c'e' gia'; l'importazione
     aggiorna la scheda invece di duplicarla. Se un foglio contiene due volte lo stesso
@@ -564,7 +588,10 @@ table{min-width:520px}
     <tr><td class="d">Non tocca gli <b>iPhone protetti</b></td><td class="d">li elenca a parte, con il motivo.</td></tr>
   </table></div>
 
-  <h3>Eliminati di recente</h3>
+</section>
+
+<section id="eliminati">
+  <h2>Eliminati di recente</h2>
   <p class="sub">Il pulsante <span class="k grigio">ELIMINATI DI RECENTE (n)</span> - nero,
     in stampatello, con dentro quanti record contiene - in home accanto al controllo dei
     doppioni, apre il cestino: gli ultimi dispositivi eliminati,
@@ -587,21 +614,6 @@ table{min-width:520px}
     tutti, iPhone rispediti e non e dispositivi in prestito compresi. Sono segnati come <b>orfani</b>, sfondo rosso: non hanno una stanza a
     cui tornare, quindi al ripristino il programma chiede in quale rimetterli.</div>
 
-  <h3>Il riepilogo prima di importare</h3>
-  <p class="sub">Niente viene scritto finche' non confermi, e prima di confermare vedi:</p>
-  <div class="tw"><table class="man">
-    <tr><th>Che cosa dice</th><th>A che serve</th></tr>
-    <tr><td class="d"><b>Dove finiscono</b>, stanza per stanza</td><td class="d">quanti dispositivi <i>nuovi</i> e quanti <i>aggiornati</i> in ognuna: si vede subito se una stanza sta per riempirsi di roba che non le appartiene.</td></tr>
-    <tr><td class="d"><b>Quante righe vengono saltate</b>, e perche'</td><td class="d">senza identificativo, iPhone (che si inseriscono solo a mano), righe di altre stanze, colonne non riconosciute.</td></tr>
-    <tr><td class="d"><b>Quanti dispositivi ci sono adesso e quanti dopo</b></td><td class="d">e' il numero che dice se sta per succedere quello che pensi. Con la sostituzione dice anche quanti ne spariscono prima.</td></tr>
-    <tr><td class="d">Le stanze riconosciute dal foglio</td><td class="d">se non ne trova nessuna te lo dice li', prima di toccare qualsiasi cosa: altrimenti i dispositivi finirebbero senza stanza.</td></tr>
-  </table></div>
-  <p class="note">A operazione avvenuta il riepilogo finale ripete tutto: che cosa e'
-    stato fatto e dove, quante righe non sono state caricate e perche' una per una, come
-    si trova adesso l'inventario stanza per stanza, e dove sta la copia di sicurezza.</p>
-
-  <p class="note">Un foglio da importare non e' un inventario e non va mai aperto come
-    tale: si carica da qui.</p>
 </section>
 
 <section id="esportare">
@@ -691,16 +703,27 @@ table{min-width:520px}
   <h2>Impostazioni</h2>
   <div class="tw"><table class="man">
     <tr><th>Voce</th><th>A che serve</th></tr>
-    <tr><td class="d"><b>Stanze</b></td><td class="d">Una per riga. Rinominarne una <b>sposta anche i dispositivi</b> che ci stavano, e aggiorna le stanze con prestito e la stanza degli iPhone se era una di quelle. Riordinare le righe, aggiungere o togliere una stanza non spostano niente.</td></tr>
-    <tr><td class="d"><b>Tipi di dispositivo</b></td><td class="d">Laptop, Tablet, Iphone. Rinominarne uno <b>aggiorna i dispositivi</b> di quel tipo, senza toccare nient'altro della scheda. <b>Iphone non si rinomina</b>: e' la parola con cui il programma riconosce i telefoni. Togliendo Iphone sparisce tutta la parte dei telefoni.</td></tr>
+    <tr><td class="d"><b>Stanze</b></td><td class="d">Una per riga. Rinominarne una <b>sposta anche i dispositivi</b> che ci stavano, e aggiorna la stanza dei prestiti e quella degli iPhone se era una di quelle. Riordinare le righe o aggiungerne una non sposta niente; togliendone una <b>senza</b> un ruolo i suoi dispositivi vanno in <a href="#eliminati">Eliminati di recente</a>, ma se ha un ruolo - iPhone o prestiti - il programma chiede prima dove spostarli. Vedi <a href="#trasloco">Togliere una stanza con un ruolo</a>.</td></tr>
+    <tr><td class="d"><b>Tipi di dispositivo</b></td><td class="d">Laptop, Tablet, Iphone. Rinominarne uno <b>aggiorna i dispositivi</b> di quel tipo, senza toccare nient'altro della scheda. <b>Iphone non si rinomina</b>, in nessuna delle due direzioni: e' la parola con cui il programma riconosce i telefoni. Togliendo Iphone sparisce tutta la parte dei telefoni.</td></tr>
     <tr><td class="d"><b>Stanza dei prestiti</b></td><td class="d">Una tendina, sotto quella degli iPhone: dove compare la colonna Prestito. Di solito Digital Kiosk. Con <i>(nessuna)</i> i prestiti si spengono.</td></tr>
     <tr><td class="d"><b>Lingua</b></td><td class="d">Italiano o inglese. C'e' anche la tendina in alto a destra nell'intestazione.</td></tr>
     <tr><td class="d"><b>Collega inventario condiviso…</b></td><td class="d">Sceglie la cartella di rete su cui lavorare, sfogliando. Dopo va riaperto il programma.</td></tr>
     <tr><td class="d"><b>Ripristina da una copia…</b></td><td class="d">L'elenco di tutte le copie di sicurezza disponibili, quelle sulla rete.</td></tr>
     <tr><td class="d"><b>Ripristina da un file locale…</b></td><td class="d">Riparte da una copia che ti sei salvato tu, fuori dalla rete: tornano i dispositivi <b>e</b> le impostazioni. E' la via d'uscita se la cartella di rete non c'e' piu'.</td></tr>
   </table></div>
-  <p class="note">Stanze, tipi, stati e stanze con prestito sono <b>condivisi</b>: stanno
+  <p class="note">Stanze, tipi, stati e stanza dei prestiti sono <b>condivisi</b>: stanno
     sulla rete e valgono per tutti. La lingua no: e' una preferenza tua, resta sul tuo PC.</p>
+
+  <h3 id="trasloco">Togliere una stanza con un ruolo</h3>
+  <p class="sub">La stanza degli iPhone e quella dei prestiti non possono semplicemente
+    sparire: i telefoni devono stare da qualche parte, e i prestiti aperti pure. Togliendo
+    una di queste dall'elenco, il programma chiede <b>in che stanza spostare</b> quello
+    che c'era dentro, e ci porta tutto - gli iPhone rispediti e non, gli altri
+    dispositivi, e anche quelli <b>in prestito</b>.</p>
+  <div class="avviso">E' l'unica eccezione alla regola che i dispositivi in prestito non
+    si spostano: qui il dispositivo <b>resta in inventario</b>, gli cambia la stanza sotto
+    invece di sparire, e il prestito resta aperto. Togliendo una stanza con prestito, la
+    stanza scelta ne prende il posto come <i>stanza dei prestiti</i>.</div>
 </section>
 
 <section id="lingua">
@@ -783,6 +806,8 @@ table{min-width:520px}
     <li><a href="#prestiti-en">Loans</a></li>
     <li><a href="#iphone-en">iPhones</a></li>
     <li><a href="#importare-en">Importing from Excel</a></li>
+    <li><a href="#doppioni-en">Duplicates</a></li>
+    <li><a href="#eliminati-en">Recently deleted</a></li>
     <li><a href="#esportare-en">Exporting and printing</a></li>
     <li><a href="#sicurezza-en">Keeping the data safe</a></li>
     <li><a href="#ripristino-en">Going back</a></li>
@@ -892,8 +917,9 @@ table{min-width:520px}
     they stole room from the everyday commands, to the point of pushing them off the
     screen.</p>
   <div class="tw"><table class="man">
-    <tr><td><span class="k verde">Save a local copy…</span></td><td class="d"><b>The backup you decide on.</b> See <a href="#sicurezza-en">Keeping the data safe</a>.</td></tr>
-    <tr><td><span class="k rosso">Restore from a copy…</span></td><td class="d">Takes the inventory back to one of the backup copies, chosen from the list. See <a href="#ripristino-en">Going back</a>.</td></tr>
+    <tr><td><span class="k verde">Save a local copy…</span></td><td class="d"><b>The backup you decide on</b>: a zip with the inventory and the settings. See <a href="#sicurezza-en">Keeping the data safe</a>.</td></tr>
+    <tr><td><span class="k rosso">Restore from a copy…</span></td><td class="d">Takes the inventory back to one of the automatic copies on the network, chosen from the list. See <a href="#ripristino-en">Going back</a>.</td></tr>
+    <tr><td><span class="k rosso">Restore from a local file…</span></td><td class="d">Starts again from a copy saved off the network: devices <b>and</b> settings come back, rooms included. It is the way out if the network folder is gone.</td></tr>
     <tr><td><span class="k rosso">Reset inventory</span></td><td class="d">Empties the inventory. It asks you to type <span class="mono">ELIMINA TUTTO</span> and saves a copy first. iPhones are never touched.</td></tr>
   </table></div>
   <p class="note">If the window is narrow, the toolbar wraps onto two rows: no button is
@@ -909,7 +935,7 @@ table{min-width:520px}
   <h3>On the rows of the list</h3>
   <div class="tw"><table class="man">
     <tr><th>Button</th><th>Where it appears</th></tr>
-    <tr><td><span class="k blu">Lend</span> / <span class="k rosso">Return</span></td><td class="d">The <b>Loan</b> column, only in the Digital Kiosk room.</td></tr>
+    <tr><td><span class="k blu">Lend</span> / <span class="k rosso">Return</span></td><td class="d">The <b>Loan</b> column, only in the room chosen in Settings (usually the Digital Kiosk).</td></tr>
     <tr><td><span class="k blu">Confirm shipment</span></td><td class="d">The <b>Shipment</b> column, only in the Iphone container.</td></tr>
   </table></div>
 </section>
@@ -1075,7 +1101,8 @@ table{min-width:520px}
 
 <section id="prestiti-en">
   <h2>Loans</h2>
-  <p class="sub">They exist only where they are needed: in the <b>Digital Kiosk</b> room.</p>
+  <p class="sub">They exist only in the <b>loan room</b>, the Digital Kiosk by default -
+    chosen in <a href="#impostazioni-en">Settings</a>.</p>
   <ol class="steps">
     <li><b>Lend.</b> The button on the row asks for the name of whoever takes the device.
       Name, date and time are recorded.</li>
@@ -1086,7 +1113,9 @@ table{min-width:520px}
   <div class="avviso">A device on loan <b>is neither moved nor deleted</b>, anywhere in
     the program: not with Delete, not with Delete +, not with Move to room…, not by
     changing the room inside the record. While it is out, the inventory is the only trace
-    of who has it. Press <b>Register return</b> and it is free again.</div>
+    of who has it. Press <b>Register return</b> and it is free again. The only exception is
+    <a href="#trasloco-en">removing the loan room</a>: there it moves too, and the loan
+    stays open.</div>
   <p class="note">In other rooms the Loan column does not appear at all. iPhones are never
     lent. Notes, model and type can be corrected while the device is on loan.</p>
 </section>
@@ -1138,7 +1167,25 @@ table{min-width:520px}
     <span class="mono">BAU</span>, <span class="mono">KIOSK</span> and
     <span class="mono">DISASTER</span> work too.</p>
 
-  <h3>Duplicates</h3>
+  <h3>The summary before importing</h3>
+  <p class="sub">Nothing is written until you confirm, and before confirming you see:</p>
+  <div class="tw"><table class="man">
+    <tr><th>What it says</th><th>What for</th></tr>
+    <tr><td class="d"><b>Where they go</b>, room by room</td><td class="d">how many devices are <i>new</i> and how many <i>updated</i> in each: you see at once if a room is about to fill with things that do not belong to it.</td></tr>
+    <tr><td class="d"><b>How many rows are skipped</b>, and why</td><td class="d">no identifier, iPhones (which are entered by hand only), rows of other rooms, columns not recognised.</td></tr>
+    <tr><td class="d"><b>How many devices there are now and how many after</b></td><td class="d">that is the number that tells you whether what you think is about to happen. With Replace it also says how many disappear first.</td></tr>
+    <tr><td class="d">The rooms recognised in the sheet</td><td class="d">if it finds none it tells you right there, before touching anything: otherwise the devices would end up with no room.</td></tr>
+  </table></div>
+  <p class="note">Once it is done the final summary repeats everything: what was done and
+    where, how many rows were not loaded and why, one by one, how the inventory stands now
+    room by room, and where the backup copy is.</p>
+
+  <p class="note">A sheet to import is not an inventory and must never be opened as one: it
+    is loaded from here.</p>
+</section>
+
+<section id="doppioni-en">
+  <h2>Duplicates</h2>
   <p class="sub">The program does not create them: adding a device <b>refuses</b> an
     identifier already present, and says where the existing one is; an import updates the
     record instead of duplicating it. If a sheet contains the same identifier twice, the
@@ -1156,7 +1203,10 @@ table{min-width:520px}
     <tr><td class="d">Leaves <b>protected iPhones</b> alone</td><td class="d">they are listed separately, with the reason.</td></tr>
   </table></div>
 
-  <h3>Recently deleted</h3>
+</section>
+
+<section id="eliminati-en">
+  <h2>Recently deleted</h2>
   <p class="sub">The <span class="k grigio">RECENTLY DELETED (n)</span> button - black, in
     capitals, carrying how many records it holds - on the home screen next to the
     duplicate check, opens the bin: the devices deleted most recently,
@@ -1180,21 +1230,6 @@ table{min-width:520px}
     are marked as <b>orphans</b>, red background: they have no room to go back to, so on
     restore the program asks which one to put them in.</div>
 
-  <h3>The summary before importing</h3>
-  <p class="sub">Nothing is written until you confirm, and before confirming you see:</p>
-  <div class="tw"><table class="man">
-    <tr><th>What it says</th><th>What for</th></tr>
-    <tr><td class="d"><b>Where they go</b>, room by room</td><td class="d">how many devices are <i>new</i> and how many <i>updated</i> in each: you see at once if a room is about to fill with things that do not belong to it.</td></tr>
-    <tr><td class="d"><b>How many rows are skipped</b>, and why</td><td class="d">no identifier, iPhones (which are entered by hand only), rows of other rooms, columns not recognised.</td></tr>
-    <tr><td class="d"><b>How many devices there are now and how many after</b></td><td class="d">that is the number that tells you whether what you think is about to happen. With Replace it also says how many disappear first.</td></tr>
-    <tr><td class="d">The rooms recognised in the sheet</td><td class="d">if it finds none it tells you right there, before touching anything: otherwise the devices would end up with no room.</td></tr>
-  </table></div>
-  <p class="note">Once it is done the final summary repeats everything: what was done and
-    where, how many rows were not loaded and why, one by one, how the inventory stands now
-    room by room, and where the backup copy is.</p>
-
-  <p class="note">A sheet to import is not an inventory and must never be opened as one: it
-    is loaded from here.</p>
 </section>
 
 <section id="esportare-en">
@@ -1284,17 +1319,28 @@ table{min-width:520px}
   <h2>Settings</h2>
   <div class="tw"><table class="man">
     <tr><th>Item</th><th>What it is for</th></tr>
-    <tr><td class="d"><b>Rooms</b></td><td class="d">One per line. Renaming one <b>also moves the devices</b> that were in it, and updates the rooms with loans and the iPhone room if it was one of those. Reordering the lines, adding or removing a room move nothing.</td></tr>
-    <tr><td class="d"><b>Device types</b></td><td class="d">Laptop, Tablet, Iphone. Renaming one <b>updates the devices</b> of that type, touching nothing else on the record. <b>Iphone cannot be renamed</b>: it is the word the program recognises phones by. Removing Iphone removes the whole phone side of the program.</td></tr>
+    <tr><td class="d"><b>Rooms</b></td><td class="d">One per line. Renaming one <b>also moves the devices</b> that were in it, and updates the loan room and the iPhone room if it was one of those. Reordering the lines or adding one moves nothing; removing one <b>without</b> a role sends its devices to <a href="#eliminati-en">Recently deleted</a>, but if it has a role - iPhone or loans - the program asks first where to move them. See <a href="#trasloco-en">Removing a room that has a role</a>.</td></tr>
+    <tr><td class="d"><b>Device types</b></td><td class="d">Laptop, Tablet, Iphone. Renaming one <b>updates the devices</b> of that type, touching nothing else on the record. <b>Iphone cannot be renamed</b>, either way round: it is the word the program recognises phones by. Removing Iphone removes the whole phone side of the program.</td></tr>
     <tr><td class="d"><b>Loan room</b></td><td class="d">A dropdown, under the iPhone one: where the Loan column appears. Usually Digital Kiosk. With <i>(none)</i> loans are switched off.</td></tr>
     <tr><td class="d"><b>Language</b></td><td class="d">Italian or English. There is also the dropdown at the top right of the header.</td></tr>
     <tr><td class="d"><b>Link shared inventory…</b></td><td class="d">Picks the network folder to work on, by browsing. The program has to be reopened afterwards.</td></tr>
     <tr><td class="d"><b>Restore from a copy…</b></td><td class="d">The list of every backup copy available, the ones on the network.</td></tr>
     <tr><td class="d"><b>Restore from a local file…</b></td><td class="d">Starts again from a copy you saved yourself, off the network: the devices <b>and</b> the settings come back. It is the way out if the network folder is no longer there.</td></tr>
   </table></div>
-  <p class="note">Rooms, types, statuses and loan rooms are <b>shared</b>: they live on the
-    network and apply to everybody. The language does not: it is your own preference and
-    stays on your PC.</p>
+  <p class="note">Rooms, types, statuses and the loan room are <b>shared</b>: they live on
+    the network and apply to everybody. The language does not: it is your own preference
+    and stays on your PC.</p>
+
+  <h3 id="trasloco-en">Removing a room that has a role</h3>
+  <p class="sub">The iPhone room and the loan room cannot simply disappear: the phones
+    have to live somewhere, and so do the open loans. Removing one of these from the
+    list, the program asks <b>which room to move</b> what was inside to, and takes
+    everything there - the iPhones shipped or not, the other devices, and the ones
+    <b>on loan</b> too.</p>
+  <div class="avviso">It is the only exception to the rule that devices on loan do not
+    move: here the device <b>stays in the inventory</b>, the room changes underneath it
+    instead of it disappearing, and the loan stays open. Removing the loan room, the one
+    you pick takes its place as the <i>loan room</i>.</div>
 </section>
 
 <section id="lingua-en">

@@ -148,7 +148,7 @@ def apply(root):
     # quando ci si accorge di aver eliminato la riga sbagliata.
     style.configure("Cestino.TButton", background=CESTINO_BG, foreground=CESTINO_FG,
                     font=(family, 11, "bold"), borderwidth=0, relief="flat",
-                    padding=(12, 6))
+                    padding=(10, 4))
     style.map("Cestino.TButton",
               background=[("active", CESTINO_BG_ON), ("pressed", CESTINO_BG_ON)],
               foreground=[("active", CESTINO_FG), ("pressed", CESTINO_FG)])

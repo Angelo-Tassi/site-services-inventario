@@ -10,9 +10,10 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione alfa.** Funziona ed e' collaudata, ma e' al primo giro di prova sul
-> campo: aspettati aggiustamenti. Segnala qualsiasi cosa non torni aprendo una
-> issue.
+> **Versione beta (1.0.0-beta.1).** Le funzioni sono complete e ogni versione
+> passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
+> aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
+> qualsiasi cosa non torni aprendo una issue.
 
 ## Prima di tutto: come si usa
 
@@ -659,10 +660,10 @@ tastiera: `Ctrl` e `Cmd` funzionano tutti e due, ovunque.
 
 ## Prestiti
 
-Aprendo una stanza elencata fra le *stanze con prestito* (di serie il Digital
-Kiosk) l'elenco guadagna la colonna *Prestito*, con su ogni riga un pulsante che
-cambia in base allo stato del dispositivo. Fuori da quella stanza la colonna non
-esiste:
+Aprendo la *stanza dei prestiti* (di serie il Digital Kiosk, si sceglie in
+*Impostazioni*) l'elenco guadagna la colonna *Prestito*, con su ogni riga un
+pulsante che cambia in base allo stato del dispositivo. Fuori da quella stanza la
+colonna non esiste:
 
 | Stato | Pulsante | Cosa succede |
 | --- | --- | --- |
@@ -1016,7 +1017,7 @@ I file si rigenerano con `.venv/bin/python tests/genera_file_di_prova.py`.
 .venv/bin/python tests/run_all.py
 ```
 
-Quarantotto suite che coprono archivio dati e accessi concorrenti, risoluzione
+Cinquantaquattro suite che coprono archivio dati e accessi concorrenti, risoluzione
 del percorso, schermate e colori, scheda di inserimento, prestiti, spedizioni,
 importazione ed esportazione. Non toccano i dati reali: ognuna si costruisce il
 proprio inventario in una cartella temporanea.

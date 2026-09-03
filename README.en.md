@@ -10,9 +10,10 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Alpha version.** It works and it is tested, but it is on its first round in
-> the field: expect adjustments. Report anything that looks wrong by opening an
-> issue.
+> **Beta version (1.0.0-beta.1).** The features are complete and every release
+> passes its test suite before shipping, but field testing continues: expect a
+> few more adjustments before the final 1.0. Report anything that looks wrong by
+> opening an issue.
 
 ## First of all: how it is meant to be used
 
@@ -804,10 +805,9 @@ both work, everywhere.
 
 ## Loans
 
-Opening a room listed among the *rooms with loans* (the Digital Kiosk by
-default) the list gains the *Loan* column, with a button on every row that
-changes with the state of the device. Outside that room the column does not
-exist.
+Opening the *loan room* (the Digital Kiosk by default, chosen in *Settings*) the
+list gains the *Loan* column, with a button on every row that changes with the
+state of the device. Outside that room the column does not exist.
 
 *Lend* asks for the person's name and records date and time. While the device is
 out, the row is red and the status is *On loan*. *Register return* closes
@@ -1301,7 +1301,7 @@ reset first, or an import that replaces everything.
 .venv/bin/python tests/run_all.py
 ```
 
-Forty-eight suites covering the data store and simultaneous access, path
+Fifty-four suites covering the data store and simultaneous access, path
 resolution, screens and colours, the device record, loans, shipments, import,
 export and translation. They never touch real data: each one builds its own
 inventory in a temporary folder.
