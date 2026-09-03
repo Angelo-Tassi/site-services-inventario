@@ -17,13 +17,28 @@ from inventario.ui import App
 app = App(fixture.build())
 app._initial_load()
 app.geometry("980x600")
-app.update(); app.update_idletasks()
+
+def respira(millisecondi=250):
+    """Lascia scadere i callback in coda e aspetta che la tabella sia ferma.
+
+    App.__init__ programma `_initial_load` fra cento millisecondi: una suite che
+    lo chiama anche a mano se lo ritrova eseguito una seconda volta poco dopo, e
+    quello torna in home ricostruendo la tabella. Chi tiene un riferimento al
+    vecchio widget se lo ritrova distrutto a meta' prova.
+    """
+    scaduto = []
+    app.after(millisecondi, lambda: scaduto.append(True))
+    while not scaduto:
+        app.update()
+        app.update_idletasks()
+
+respira()
 
 def scarti(dove):
     """Di quanti pixel ogni righello sbaglia il bordo della sua colonna."""
-    tree = app.tree
-    tree.xview_moveto(dove)
+    app.tree.xview_moveto(dove)
     app.update(); app.update_idletasks()
+    tree = app.tree          # dopo update: la tabella potrebbe essere rifatta
     colonne = app._columns()
     riga = tree.get_children()[0]
     fuori = []
@@ -44,7 +59,8 @@ def scarti(dove):
 
 # ---- dentro una stanza, dove le colonne superano la finestra
 app.show_room(fixture.BAU)
-app.update(); app.update_idletasks()
+respira()
+assert app.view == "room", app.view
 assert app.tree.xview()[1] < 1.0, "la prova ha senso solo se si puo' scorrere"
 
 for dove in (0.0, 0.1, 0.25, 0.5, 0.75, 1.0):
@@ -67,7 +83,7 @@ assert app._righelli[0].winfo_x() != larghezze[0] - 1 or not \
 
 # ---- e in panoramica, dove le colonne ci stanno tutte
 app.show_home()
-app.update(); app.update_idletasks()
+respira()
 for colonna, scarto in scarti(0.0):
     assert scarto == 0, "in home la riga di %s sbaglia di %s px" % (colonna, scarto)
 
