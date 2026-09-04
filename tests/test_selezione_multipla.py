@@ -142,7 +142,7 @@ assert [i for i in app.store.items if i["asset_tag"] == "IT-0107"], \
     "il laptop in prestito resta: prima si registra il rientro"
 titolo, corpo = avvisi[-1]
 assert titolo == "Eliminazione completata", avvisi[-1]
-assert "Eliminati 2 dispositivi." in corpo and "Copia di sicurezza" in corpo, corpo
+assert "2 dispositivi eliminati." in corpo and "Copia di sicurezza" in corpo, corpo
 
 # ---- senza selezione si dice perche' non succede niente
 app.tree.selection_remove(*app.tree.selection())

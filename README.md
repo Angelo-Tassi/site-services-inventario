@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.5.3).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5.4).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -237,8 +237,17 @@ nessuna stanza, non uscirebbe da nessuna esportazione per stanza ne' da nessuna
 stampa, e per ritrovarlo bisognerebbe gia' sapere che c'e'. Vale per ogni
 importazione, da qualunque pagina e con qualunque opzione.
 
-Quando il foglio non lo dice - non ha righe separatore, oppure ha righe sopra la
-prima - il programma **chiede dove vanno**, prima di scrivere qualsiasi cosa:
+Non basta che la stanza ci sia scritta: deve essere **una delle stanze
+dell'inventario**. Un nome che non c'e' - `Cantina` - non e' una stanza: il
+dispositivo non comparirebbe in nessuna scheda, ed e' esattamente il problema di
+prima con un'altra faccia. Vale come se non ne avesse nessuna, e viene chiesta.
+Quello che invece si perdona e' il **modo di scriverla**: lo spazio di troppo e
+la maiuscola sbagliata - `digital  kiosk` e' Digital Kiosk - perche' quella e' la
+stanza giusta scritta male. In inventario entra comunque col nome ufficiale.
+
+Quando il foglio non lo dice - non ha righe separatore, ha righe sopra la prima,
+o la stanza scritta non e' una di quelle dell'inventario - il programma **chiede
+dove vanno**, prima di scrivere qualsiasi cosa:
 
 - **Tutti nella stessa stanza**: si sceglie la stanza e tutte le righe rimaste
   senza finiscono li'. Chi la stanza ce l'ha gia' non viene toccato;
@@ -478,6 +487,31 @@ cercarli uno per uno - e senza rinunciare a sapere che cosa sparisce.
 I doppioni contano una volta sola, le righe vuote si ignorano, e gli iPhone
 mantengono tutte le loro protezioni.
 
+## Eliminare da un file Excel
+
+Il pulsante **`Elimina da Excel`**, rosso, in home subito a destra di *ELIMINATI
+DI RECENTE*, elimina in blocco i dispositivi elencati in un file. E' la stessa
+cosa di *Elimina +*, per chi l'elenco ce l'ha gia' in un foglio invece che negli
+appunti: chi deve dismettere ottanta portatili ha un file, non una colonna da
+incollare.
+
+- va bene **un'esportazione del programma** - riconosce le colonne *Asset Tag* e
+  *IMEI* e legge solo quelle - e va bene anche **una colonna sola** di codici,
+  salvata senza intestazioni. Non c'e' un formato da rispettare;
+- si eliminano al massimo **200 dispositivi per volta**. Non e' un limite
+  tecnico: e' il punto oltre il quale l'elenco di quello che sta per sparire non
+  lo legge piu' nessuno, e una conferma che non si legge non e' una conferma. Se
+  il file ne contiene di piu' il programma lo dice e non fa niente;
+- appena scelto il file compare il **riepilogo**, che dice **da quali stanze**
+  spariscono i dispositivi, uno per uno, con modello ed eventuale prestito; e a
+  parte quelli **saltati** - non sono in inventario, oppure non si possono
+  eliminare (in prestito, iPhone non ancora rispedito, in conservazione) - con il
+  motivo di ciascuno;
+- per procedere si **scrive la parola** `ACCETTO`, come per l'eliminazione in
+  blocco. Finche' non e' scritta il pulsante rosso resta spento;
+- prima di eliminare viene salvata una **copia di sicurezza** del file dati, e i
+  dispositivi finiscono negli **eliminati di recente**, da cui si ripescano.
+
 ## Selezionare piu' dispositivi
 
 Un clic sceglie una riga. **Ctrl+clic** ne aggiunge altre, anche lontane fra
@@ -546,9 +580,17 @@ esportazioni, nella stampa, nei conteggi delle stanze ne' nella ricerca
 dell'elenco principale. Se comparisse sarebbe un dispositivo, e invece e' stato
 eliminato.
 
-- ci restano **30 giorni** dalla data di eliminazione, e al massimo **200
-  record**: arrivato il duecentounesimo esce il piu' vecchio. Non e' un archivio
-  storico, e' la rete di sicurezza per l'errore di ieri;
+- ci restano **30 giorni** dalla data di eliminazione, e al massimo **300
+  record**. Non e' un archivio storico, e' la rete di sicurezza per l'errore di
+  ieri;
+- **quando non ci stanno tutti il programma chiede che fare**, invece di
+  buttare fuori i piu' vecchi in silenzio: quello che esce dal cestino e' perso
+  per sempre, e non e' una decisione da prendere al posto di chi elimina. La
+  finestra dice quanti sono quelli in eccesso e offre due strade - *mettili nel
+  cestino al posto dei piu' vecchi*, e allora i piu' vecchi escono per sempre;
+  oppure *cancella definitivamente quelli in eccesso*, e allora quelli non
+  passano dal cestino e il cestino resta com'e'. Il riepilogo finale elenca
+  sempre quelli cancellati per sempre;
 - l'elenco mostra **asset tag e tipo**, dieci per pagina. Il resto della scheda
   non si perde: torna intero con il ripristino;
 - il **campo di ricerca** in cima cerca in **tutto il cestino**, non nella pagina

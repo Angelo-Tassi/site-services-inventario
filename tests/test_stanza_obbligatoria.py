@@ -62,6 +62,42 @@ assert a["senza_stanza"] == 1, a
 assert a["aggiunti"] == 1 and a["dopo"] == a["prima"] + 1, a
 assert list(a["per_stanza"]) == [DR], a["per_stanza"]
 
+# ============ una stanza che non esiste vale come nessuna stanza ============
+# "Cantina", o "Digital  Kiosk" con due spazi, non e' una stanza: il
+# dispositivo non comparirebbe in nessuna scheda, e per ritrovarlo bisognerebbe
+# gia' sapere che c'e'.
+store = InventoryStore(fixture.build(), iphone_room=BAU)
+store.stanze = [BAU, KIOSK, DR]
+store.load()
+assert store.stanza_ammessa(KIOSK) and not store.stanza_ammessa("Cantina")
+assert not store.stanza_ammessa("")
+# scritta male ma riconoscibile e' la stessa stanza, e entra col nome ufficiale
+assert store.stanza_canonica("digital  kiosk") == KIOSK, store.stanza_canonica("digital  kiosk")
+assert store.stanza_canonica("Cantina") == ""
+
+fantasma = new_item("IT-8400", "Laptop", "T14", "PF4", "Cantina di Zio Bob")
+buono = new_item("IT-8401", "Laptop", "T14", "PF1", DR)
+a = store.anteprima_importazione([fantasma, buono], "merge")
+assert a["senza_stanza"] == 1 and a["aggiunti"] == 1, a
+esito = store.import_items([fantasma, buono], "merge")
+assert esito["aggiunti"] == 1 and esito["senza_stanza"] == ["IT-8400"], esito
+store.load()
+assert not [i for i in store.items if i["asset_tag"] == "IT-8400"], "non doveva entrare"
+assert not [i for i in store.items if i["stanza"] not in (BAU, KIOSK, DR)], \
+    "nessuno in una stanza che non esiste"
+
+# ---- e chi la scrive male entra lo stesso, ma col nome ufficiale
+store.import_items([new_item("IT-8402", "Laptop", "T14", "PF2", "digital  kiosk")],
+                   "merge")
+store.load()
+messo = [i for i in store.items if i["asset_tag"] == "IT-8402"][0]
+assert messo["stanza"] == KIOSK, messo["stanza"]
+
+# ---- senza l'elenco delle stanze l'archivio non puo' saperlo, e non lo pretende
+libero = InventoryStore(fixture.build(), iphone_room=BAU)
+libero.load()
+assert libero.stanze is None and libero.stanza_ammessa("Cantina")
+
 # ======================= le due finestre, quelle vere =======================
 app = App(fixture.build())
 app._initial_load()
@@ -111,6 +147,10 @@ def righe():
     return [senza_stanza("IT-8201"), senza_stanza("IT-8202"),
             new_item("IT-8203", "Laptop", "T14", "PF3", DR)]
 
+def con_fantasma():
+    return [new_item("IT-8210", "Laptop", "T14", "PF0", "Cantina di Zio Bob"),
+            new_item("IT-8211", "Laptop", "T14", "PF1", DR)]
+
 # ---- niente da chiedere se la stanza ce l'hanno tutti
 rispondi(None)
 intatte = [new_item("IT-8300", "Laptop", "T14", "PF0", DR)]
@@ -135,6 +175,11 @@ uscite, fuori = app._chiedi_le_stanze_mancanti(righe())
 assert fuori == 1, fuori
 assert [i["asset_tag"] for i in uscite] == ["IT-8202", "IT-8203"], uscite
 assert all(i["stanza"] for i in uscite), "chi resta ha la stanza"
+
+# ---- e una stanza che non esiste si chiede come se non ci fosse
+rispondi({"come": "una", "stanza": KIOSK})
+uscite, fuori = app._chiedi_le_stanze_mancanti(con_fantasma())
+assert fuori == 0 and [i["stanza"] for i in uscite] == [KIOSK, DR], uscite
 
 # ---- annullando non si importa niente, nemmeno le righe gia' a posto
 rispondi(None)

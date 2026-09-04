@@ -593,6 +593,61 @@ colonna Stanza: non deve esserci nemmeno una cella vuota.
 
 ---
 
+## 18. Eliminare da un file Excel
+
+Serve a verificare il pulsante rosso **Elimina da Excel**, in home subito a
+destra di *ELIMINATI DI RECENTE*.
+
+Prepara il file: apri `Inventario_di_prova.xlsx`, tieni **tre asset tag** di
+stanze diverse e mettili in una colonna sola, in un file nuovo salvato in una
+cartella tua. Aggiungi in fondo un codice inventato, per esempio `IT-9999`.
+
+1. premi **Elimina da Excel**, poi **Scegli il file Excel**;
+2. il riepilogo deve dire **VERRANNO ELIMINATI: 3**, elencandoli **raggruppati
+   per stanza** con il modello di ognuno, e a parte **SALTATI perche' non sono
+   in inventario: 1** con `IT-9999`;
+3. il pulsante rosso **Elimina** deve essere spento. Scrivi `ACCETTO` nella
+   casella: si accende;
+4. conferma. Il messaggio finale dice quanti ne sono stati eliminati, quanti ne
+   restano e dove sta la copia di sicurezza. Il pulsante nero degli eliminati di
+   recente deve essere salito di **3**, e i tre dispositivi devono essere li'
+   dentro, ripristinabili;
+5. riprova con un file che contenga un dispositivo **in prestito** e un iPhone
+   **non ancora rispedito**: devono comparire fra i **SALTATI perche' non si
+   possono eliminare**, ognuno con il suo motivo, e non devono sparire;
+6. prova anche con un'**esportazione del programma** cosi' com'e', con tutte le
+   colonne e le righe separatore: deve funzionare uguale - legge solo la colonna
+   *Asset Tag*.
+
+**Cosa deve succedere:** non sparisce mai niente prima della parola scritta, e
+quello che sparisce e' esattamente quello elencato nel riepilogo.
+
+## 19. Il cestino pieno
+
+Serve a verificare che, quando gli eliminati di recente non ci stanno tutti, il
+programma chieda invece di buttare fuori i piu' vecchi in silenzio. Il cestino
+tiene **300** record: la prova ha senso solo su un inventario grosso, o dopo
+molte eliminazioni.
+
+1. porta il cestino vicino al limite (il numero fra parentesi sul pulsante nero
+   lo dice sempre), poi elimina un gruppo che lo faccia superare;
+2. deve aprirsi la finestra **Il cestino e' pieno**, che dice quanti record ci
+   sono adesso, quanti ne stai eliminando e **quanti non ci entrano**;
+3. scegli **Mettili nel cestino al posto dei piu' vecchi**: dopo l'eliminazione
+   il pulsante nero deve segnare esattamente **300**, i dispositivi appena
+   eliminati devono essere nel cestino, e i piu' vecchi non devono esserci piu';
+4. rifai la prova scegliendo **Cancella definitivamente quelli in eccesso**: il
+   pulsante nero resta a **300**, il riepilogo finale deve avere la riga
+   **CANCELLATI DEFINITIVAMENTE** con l'elenco, e quei dispositivi non devono
+   essere ne' in inventario ne' nel cestino;
+5. rifai la prova e premi **Annulla**: non deve essere eliminato **niente**.
+
+**Cosa deve succedere:** nessun record esce dal cestino senza che qualcuno lo
+abbia deciso, e quello che e' stato cancellato per sempre e' scritto nel
+riepilogo finale.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

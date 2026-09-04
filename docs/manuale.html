@@ -190,6 +190,7 @@ table{min-width:520px}
     <li><a href="#iphone">iPhone</a></li>
     <li><a href="#importare">Importare da Excel</a></li>
     <li><a href="#doppioni">Doppioni</a></li>
+    <li><a href="#elimina-excel">Eliminare da un file Excel</a></li>
     <li><a href="#eliminati">Eliminati di recente</a></li>
     <li><a href="#esportare">Esportare e stampare</a></li>
     <li><a href="#sicurezza">Sicurezza dei dati</a></li>
@@ -287,6 +288,7 @@ table{min-width:520px}
     <tr><td><span class="k grigio">Modifica</span></td><td class="d">Apre il dispositivo selezionato per cambiarne i campi.</td></tr>
     <tr><td><span class="k grigio">Elimina</span></td><td class="d">Toglie <b>tutti i dispositivi selezionati</b>, dopo un riepilogo che li elenca uno per uno e una copia di sicurezza. Gli iPhone hanno protezioni in piu': vedi <a href="#iphone">iPhone</a>.</td></tr>
     <tr><td><span class="k rosso">Elimina +</span></td><td class="d"><b>Eliminazione in blocco.</b> Si incollano i codici presi da Excel, uno per riga; il programma dice quali esistono, da quale stanza spariranno e che cosa salta e perche'. Per procedere si scrive <span class="mono">ACCETTO</span>. Una copia di sicurezza viene salvata comunque prima.</td></tr>
+    <tr><td><span class="k rosso">Elimina da Excel</span></td><td class="d">In home, subito a destra degli eliminati di recente. Come <b>Elimina +</b>, ma l'elenco si carica da un <b>file</b> invece di incollarlo: al massimo 200 dispositivi per volta. Vedi <a href="#elimina-excel">Eliminare da un file Excel</a>.</td></tr>
     <tr><td><span class="k grigio">Sposta in stanza…</span></td><td class="d">Cambia la stanza di <b>tutti i dispositivi selezionati</b>, dopo un riepilogo che dice da dove partono e come restano le stanze. Gli iPhone non si spostano.</td></tr>
     <tr><td><span class="k arancio">Importa xls…</span></td><td class="d">Carica dispositivi da un foglio Excel. Prima chiede <b>che cosa</b> importare e <b>come</b>. Vedi <a href="#importare">Importare</a>.</td></tr>
     <tr><td><span class="k verde">Esporta xls…</span></td><td class="d">Produce un file Excel dell'inventario. Prima chiede ambito e forma. Vedi <a href="#esportare">Esportare</a>.</td></tr>
@@ -557,6 +559,12 @@ table{min-width:520px}
     per ritrovarlo bisognerebbe gia' sapere che c'e'. Quindi, se il foglio non dichiara
     le stanze - non ha separatori, o ha righe sopra il primo - il programma <b>la chiede
     prima di importare</b>, e nessuna riga viene scritta finche' non ha una risposta.</p>
+  <p class="sub">Non basta che la stanza ci sia scritta: deve essere <b>una delle stanze
+    dell'inventario</b>. Un nome che non c'e' - <span class="mono">Cantina</span> - non e'
+    una stanza, e vale come se non ce ne fosse nessuna: viene chiesta anche lui. Si
+    perdona invece il <b>modo di scriverla</b> - lo spazio di troppo e la maiuscola
+    sbagliata, <span class="mono">digital  kiosk</span> e' Digital Kiosk - e in inventario
+    il dispositivo entra col nome ufficiale della stanza.</p>
   <div class="tw"><table class="man">
     <tr><th>Scelta</th><th>Che cosa fa</th></tr>
     <tr><td><b>Tutti nella stessa stanza</b></td><td class="d">si sceglie la stanza dalla tendina e tutte le righe senza stanza finiscono li'. Quelle che la stanza ce l'hanno gia' - da un separatore o dalla colonna Stanza - non si toccano.</td></tr>
@@ -617,6 +625,23 @@ table{min-width:520px}
 
 </section>
 
+<section id="elimina-excel">
+  <h2>Eliminare da un file Excel</h2>
+  <p class="sub">Il pulsante <span class="k rosso">Elimina da Excel</span>, in home subito
+    a destra di <span class="k grigio">ELIMINATI DI RECENTE</span>, elimina in blocco i
+    dispositivi elencati in un file. E' la stessa cosa di <b>Elimina +</b>, per chi
+    l'elenco ce l'ha gia' in un foglio invece che negli appunti: chi deve dismettere
+    ottanta portatili ha un file, non una colonna da incollare.</p>
+  <div class="tw"><table class="man">
+    <tr><th>Che cosa fa</th><th>Come</th></tr>
+    <tr><td class="d">Legge <b>qualsiasi forma</b></td><td class="d">un'esportazione del programma - riconosce le colonne <i>Asset Tag</i> e <i>IMEI</i> e legge solo quelle - oppure una colonna sola di codici, salvata senza intestazioni. Non c'e' un formato da rispettare.</td></tr>
+    <tr><td class="d">Al massimo <b>200 per volta</b></td><td class="d">non e' un limite tecnico: e' il punto oltre il quale l'elenco di quello che sta per sparire non lo legge piu' nessuno, e una conferma che non si legge non e' una conferma. Se il file ne contiene di piu' il programma lo dice e non fa niente.</td></tr>
+    <tr><td class="d">Mostra il <b>riepilogo</b></td><td class="d">da quali stanze spariscono i dispositivi, uno per uno, con modello ed eventuale prestito; e a parte quelli saltati - non in inventario, o che non si possono eliminare - con il motivo di ciascuno.</td></tr>
+    <tr><td class="d">Chiede la <b>parola</b></td><td class="d">per procedere si scrive <span class="mono">ACCETTO</span>. Finche' non e' scritta il pulsante rosso resta spento.</td></tr>
+    <tr><td class="d">Finiscono negli <b>eliminati di recente</b></td><td class="d">e prima di toccare qualsiasi cosa viene salvata una copia di sicurezza del file dati. Se il cestino non li tiene tutti, il programma chiede che fare: vedi <a href="#eliminati">Eliminati di recente</a>.</td></tr>
+  </table></div>
+</section>
+
 <section id="eliminati">
   <h2>Eliminati di recente</h2>
   <p class="sub">Il pulsante <span class="k grigio">ELIMINATI DI RECENTE (n)</span> - nero,
@@ -626,7 +651,8 @@ table{min-width:520px}
     inventario</b>: non compare in nessuna esportazione, stampa o ricerca.</p>
   <div class="tw"><table class="man">
     <tr><th>Che cosa fa</th><th>Come</th></tr>
-    <tr><td class="d">Tiene gli ultimi <b>200</b>, per <b>30 giorni</b></td><td class="d">arrivato il duecentounesimo esce il piu' vecchio. Non e' un archivio storico: e' la rete di sicurezza per l'errore di ieri.</td></tr>
+    <tr><td class="d">Tiene gli ultimi <b>300</b>, per <b>30 giorni</b></td><td class="d">non e' un archivio storico: e' la rete di sicurezza per l'errore di ieri.</td></tr>
+    <tr><td class="d">Se non ci stanno tutti, <b>chiede</b></td><td class="d">quello che esce dal cestino e' perso per sempre, e non si decide al posto di chi elimina. La finestra dice quanti sono quelli in eccesso e offre due strade: <b>mettili nel cestino al posto dei piu' vecchi</b> - e i piu' vecchi escono per sempre - oppure <b>cancella definitivamente quelli in eccesso</b>, che non passano dal cestino e non si ripristinano. Il riepilogo finale li elenca.</td></tr>
     <tr><td class="d">Mostra <b>asset tag e tipo</b></td><td class="d">dieci per pagina. Il resto della scheda non si perde: torna intero con il ripristino.</td></tr>
     <tr><td class="d">La <b>ricerca</b> in cima</td><td class="d">guarda tutto il cestino, non la pagina che si sta vedendo; i risultati vengono impaginati a loro volta.</td></tr>
     <tr><td class="d"><b>Ripristina</b> su ogni riga</td><td class="d">e <b>Ripristina i selezionati</b> in cima per piu' righe insieme, con Ctrl+clic e Maiusc+clic come nell'elenco principale. <b>Ripristina tutto (n)</b> rimette dentro l'intero cestino - o i soli risultati, se c'e' una ricerca attiva.</td></tr>
@@ -836,6 +862,7 @@ table{min-width:520px}
     <li><a href="#iphone-en">iPhones</a></li>
     <li><a href="#importare-en">Importing from Excel</a></li>
     <li><a href="#doppioni-en">Duplicates</a></li>
+    <li><a href="#elimina-excel-en">Deleting from an Excel file</a></li>
     <li><a href="#eliminati-en">Recently deleted</a></li>
     <li><a href="#esportare-en">Exporting and printing</a></li>
     <li><a href="#sicurezza-en">Keeping the data safe</a></li>
@@ -932,6 +959,7 @@ table{min-width:520px}
     <tr><td><span class="k blu">Add</span></td><td class="d">Asks first <b>which type</b> of device, then whether to enter it by hand or with the barcode reader.</td></tr>
     <tr><td><span class="k grigio">Edit</span></td><td class="d">Opens the selected device to change its fields.</td></tr>
     <tr><td><span class="k grigio">Delete</span></td><td class="d">Removes <b>every selected device</b>, after a summary listing them one by one and a backup copy. iPhones have extra protection: see <a href="#iphone-en">iPhones</a>.</td></tr>
+    <tr><td><span class="k rosso">Delete from Excel</span></td><td class="d">On the home screen, just to the right of the recently deleted. Like <b>Delete +</b>, but the list is loaded from a <b>file</b> instead of pasted: at most 200 devices at a time. See <a href="#elimina-excel-en">Deleting from an Excel file</a>.</td></tr>
     <tr><td><span class="k rosso">Delete +</span></td><td class="d"><b>Bulk deletion.</b> You paste the codes from Excel, one per line; the program says which exist, which room they will disappear from, and what it skips and why. To go ahead you type <span class="mono">ACCETTO</span>. A backup copy is saved first anyway.</td></tr>
     <tr><td><span class="k grigio">Move to room…</span></td><td class="d">Changes the room of <b>every selected device</b>, after a summary saying where they come from and how the rooms end up. iPhones do not move.</td></tr>
     <tr><td><span class="k arancio">Import xls…</span></td><td class="d">Loads devices from an Excel sheet. It asks first <b>what</b> to import and <b>how</b>. See <a href="#importare-en">Importing</a>.</td></tr>
@@ -1202,6 +1230,12 @@ table{min-width:520px}
     have to know already that it is there. So, if the sheet does not declare the rooms -
     no separators, or rows above the first one - the program <b>asks before importing</b>,
     and no row is written until it has an answer.</p>
+  <p class="sub">It is not enough for a room to be written: it must be <b>one of the
+    inventory's rooms</b>. A name that does not exist - <span class="mono">Cantina</span> -
+    is not a room, and counts as having none: it gets asked as well. What is forgiven is
+    <b>the way it is written</b> - the extra space and the wrong case,
+    <span class="mono">digital  kiosk</span> is Digital Kiosk - and the device goes into
+    the inventory under the room's official name.</p>
   <div class="tw"><table class="man">
     <tr><th>Choice</th><th>What it does</th></tr>
     <tr><td><b>All in the same room</b></td><td class="d">you pick the room from the dropdown and every row with no room goes there. The ones that already have a room - from a separator or from the Room column - are left alone.</td></tr>
@@ -1261,6 +1295,23 @@ table{min-width:520px}
 
 </section>
 
+<section id="elimina-excel-en">
+  <h2>Deleting from an Excel file</h2>
+  <p class="sub">The <span class="k rosso">Delete from Excel</span> button, on the home
+    screen just to the right of <span class="k grigio">RECENTLY DELETED</span>, deletes in
+    bulk the devices listed in a file. It is the same thing as <b>Delete +</b>, for whoever
+    already has the list in a sheet rather than on the clipboard: someone decommissioning
+    eighty laptops has a file, not a column to paste.</p>
+  <div class="tw"><table class="man">
+    <tr><th>What it does</th><th>How</th></tr>
+    <tr><td class="d">Reads <b>any shape</b></td><td class="d">an export from the program - it recognises the <i>Asset Tag</i> and <i>IMEI</i> columns and reads only those - or a single column of codes saved without headers. There is no format to comply with.</td></tr>
+    <tr><td class="d">At most <b>200 at a time</b></td><td class="d">not a technical limit: it is the point beyond which nobody reads the list of what is about to disappear any more, and a confirmation nobody reads is not a confirmation. If the file holds more, the program says so and does nothing.</td></tr>
+    <tr><td class="d">Shows the <b>summary</b></td><td class="d">which rooms the devices disappear from, one by one, with model and any loan; and separately the ones skipped - not in the inventory, or impossible to delete - with the reason for each.</td></tr>
+    <tr><td class="d">Asks for the <b>word</b></td><td class="d">to go on you type <span class="mono">ACCETTO</span>. Until it is typed the red button stays off.</td></tr>
+    <tr><td class="d">They land in the <b>recently deleted</b></td><td class="d">and before anything is touched a backup copy of the data file is saved. If the bin cannot hold them all, the program asks what to do: see <a href="#eliminati-en">Recently deleted</a>.</td></tr>
+  </table></div>
+</section>
+
 <section id="eliminati-en">
   <h2>Recently deleted</h2>
   <p class="sub">The <span class="k grigio">RECENTLY DELETED (n)</span> button - black, in
@@ -1270,7 +1321,8 @@ table{min-width:520px}
     longer inventory</b>: it appears in no export, printout or search.</p>
   <div class="tw"><table class="man">
     <tr><th>What it does</th><th>How</th></tr>
-    <tr><td class="d">Keeps the last <b>200</b>, for <b>30 days</b></td><td class="d">when the two hundred and first arrives, the oldest goes. It is not a historical archive: it is the safety net for yesterday's mistake.</td></tr>
+    <tr><td class="d">Keeps the last <b>300</b>, for <b>30 days</b></td><td class="d">it is not a historical archive: it is the safety net for yesterday's mistake.</td></tr>
+    <tr><td class="d">If they do not all fit, it <b>asks</b></td><td class="d">what leaves the bin is lost for good, and that is not decided on behalf of whoever is deleting. The window says how many are in excess and offers two ways: <b>put them in the bin in place of the oldest</b> - and the oldest leave for good - or <b>delete the ones in excess for good</b>, which never go through the bin and cannot be restored. The final summary lists them.</td></tr>
     <tr><td class="d">Shows <b>asset tag and type</b></td><td class="d">ten per page. The rest of the record is not lost: it comes back whole with the restore.</td></tr>
     <tr><td class="d">The <b>search</b> at the top</td><td class="d">looks at the whole bin, not the page you are on; the results are paginated in turn.</td></tr>
     <tr><td class="d"><b>Restore</b> on every row</td><td class="d">and <b>Restore the selected ones</b> at the top for several rows at once, with Ctrl+click and Shift+click as in the main list. <b>Restore everything (n)</b> puts the whole bin back - or only the results, if a search is active.</td></tr>

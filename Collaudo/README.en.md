@@ -577,6 +577,56 @@ column: there must not be a single empty cell.
 
 ---
 
+## 18. Deleting from an Excel file
+
+This checks the red **Delete from Excel** button, on the home screen just to the
+right of *RECENTLY DELETED*.
+
+Prepare the file: open `Inventario_di_prova.xlsx`, keep **three asset tags** from
+different rooms and put them in a single column, in a new file saved in a folder
+of your own. Add a made-up code at the bottom, say `IT-9999`.
+
+1. press **Delete from Excel**, then **Choose the Excel file**;
+2. the summary must say **WILL BE DELETED: 3**, listing them **grouped by room**
+   with each model, and separately **SKIPPED because they are not in the
+   inventory: 1** with `IT-9999`;
+3. the red **Delete** button must be off. Type `ACCETTO` in the box: it comes on;
+4. confirm. The final message says how many were deleted, how many are left and
+   where the backup copy is. The black recently-deleted button must have gone up
+   by **3**, and the three devices must be in there, restorable;
+5. try again with a file holding a device **on loan** and an iPhone **not yet
+   shipped back**: they must appear among the **SKIPPED because they cannot be
+   deleted**, each with its reason, and must not disappear;
+6. try it with an **export from the program** as it is, with every column and the
+   separator rows: it must work the same - it reads only the *Asset Tag* column.
+
+**What must happen:** nothing ever disappears before the word is typed, and what
+disappears is exactly what the summary listed.
+
+## 19. The full bin
+
+This checks that, when the recently deleted cannot hold them all, the program
+asks instead of throwing the oldest out in silence. The bin holds **300**
+records: the check only makes sense on a large inventory, or after many
+deletions.
+
+1. bring the bin close to the limit (the number in brackets on the black button
+   always says it), then delete a group that pushes it over;
+2. the **The bin is full** window must open, saying how many records there are
+   now, how many you are deleting and **how many do not fit**;
+3. choose **Put them in the bin in place of the oldest**: after the deletion the
+   black button must read exactly **300**, the devices just deleted must be in
+   the bin, and the oldest must be gone;
+4. repeat choosing **Delete the ones in excess for good**: the black button stays
+   at **300**, the final summary must carry the **DELETED FOR GOOD** line with
+   the list, and those devices must be neither in the inventory nor in the bin;
+5. repeat and press **Cancel**: **nothing** must be deleted.
+
+**What must happen:** no record leaves the bin without someone having decided it,
+and what was deleted for good is written in the final summary.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.

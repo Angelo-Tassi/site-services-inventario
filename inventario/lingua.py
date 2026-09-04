@@ -1158,6 +1158,78 @@ EN = {
         'These were already in the inventory, and I took them out of the\n'
         'recently deleted: a device cannot be in the list and in the bin\n'
         'at the same time.\n',
+    # --- elimina da Excel, e il cestino pieno
+    "Elimina da Excel": "Delete from Excel",
+    "Elimina i dispositivi elencati in un file Excel":
+        'Delete the devices listed in an Excel file',
+    "Va bene un'esportazione del programma, o un file con una\n"
+    "sola colonna di asset tag. Al massimo %d dispositivi per\n"
+    "volta: piu' di cosi' nessuno legge davvero l'elenco di\n"
+    "quello che sta per sparire.":
+        "An export from the program works, and so does a file with a\n"
+        "single column of asset tags. At most %d devices at a time:\n"
+        "beyond that nobody really reads the list of what is about to\n"
+        "disappear.",
+    "Scegli il file Excel": "Choose the Excel file",
+    "Nessun file scelto.": "No file chosen.",
+    "File con i dispositivi da eliminare": "File with the devices to delete",
+    "File non leggibile": "File cannot be read",
+    "Nel file non c'e' nessuna riga con un codice.":
+        'There is no row with a code in the file.',
+    "Righe lette da %s: %d": "Rows read from %s: %d",
+    "   (lette solo le prime %d)": "   (only the first %d were read)",
+    "Il file contiene %d dispositivi in inventario.":
+        'The file holds %d devices that are in the inventory.',
+    "Se ne possono eliminare al massimo %d per volta: oltre quel\n"
+    "numero l'elenco di quello che sta per sparire non lo legge\n"
+    "piu' nessuno, e una conferma che non si legge non e' una\n"
+    "conferma.":
+        'At most %d can be deleted at a time: beyond that number nobody\n'
+        'reads the list of what is about to disappear any more, and a\n'
+        'confirmation nobody reads is not a confirmation.',
+    "Dividi il file e ripeti l'operazione.":
+        'Split the file and repeat the operation.',
+    "Il cestino e' pieno": "The bin is full",
+    "Gli eliminati di recente tengono %d record, e adesso ne\n"
+    "contengono %d. Stai eliminando %d dispositivi: %d di loro\n"
+    "nel cestino non ci entrano.":
+        'The recently deleted hold %d records, and right now they hold\n'
+        '%d. You are deleting %d devices: %d of them do not fit in the\n'
+        'bin.',
+    "Mettili nel cestino al posto dei piu' vecchi":
+        'Put them in the bin in place of the oldest',
+    "I %d record piu' vecchi escono dal cestino e sono persi\n"
+    "per sempre. Quelli che elimini adesso si possono\n"
+    "ripristinare.":
+        'The %d oldest records leave the bin and are lost for good.\n'
+        'The ones you are deleting now can be restored.',
+    "Cancella definitivamente quelli in eccesso":
+        'Delete the ones in excess for good',
+    "%d dei dispositivi che elimini adesso non passano dal\n"
+    "cestino: spariscono subito e non si ripristinano. Il\n"
+    "cestino resta com'e'.":
+        '%d of the devices you are deleting now do not go through the\n'
+        'bin: they disappear at once and cannot be restored. The bin\n'
+        'stays as it is.',
+    "%d dispositivi eliminati.": "%d devices deleted.",
+    "In inventario ne restano %d.": "%d are left in the inventory.",
+    "CANCELLATI DEFINITIVAMENTE: %d": "DELETED FOR GOOD: %d",
+    "Nel cestino non ci stavano: non si ripristinano.":
+        'They did not fit in the bin: they cannot be restored.',
+    "Nel foglio non c'e' nessuna riga che dichiari una stanza:\n"
+    "la stanza dei %d dispositivi te l'ha chiesta il programma,\n"
+    "perche' senza stanza non sarebbero entrati.\n\n"
+    "Per non doverlo fare la prossima volta, aggiungi al foglio le\n"
+    "righe separatore: una riga con scritto solo il nome della\n"
+    "stanza, per esempio  Site Services BAU  (vanno bene anche BAU,\n"
+    "KIOSK, DISASTER). Vale per tutte le righe che la seguono.":
+        'There is no row in the sheet declaring a room: the program asked\n'
+        'you for the room of the %d devices, because with no room they\n'
+        'would not have got in.\n\n'
+        'So you do not have to next time, add the separator rows to the\n'
+        'sheet: a row carrying only the room name, for example\n'
+        'Site Services BAU (BAU, KIOSK and DISASTER work too). It holds\n'
+        'for every row that follows it.',
     # --- la stanza mancante nell'importazione
     "In che stanza vanno?": "Which room do they go in?",
     "In che stanza va?": "Which room does it go in?",

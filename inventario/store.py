@@ -290,8 +290,13 @@ COPIE_DA_TENERE = 10
 # essere riaperta da un'altra, dove l'inventario si chiama in un altro modo.
 # Il cestino: quanti record ci stanno e per quanto. Non e' un archivio storico,
 # e' la rete di sicurezza per l'eliminazione sbagliata di ieri.
-ELIMINATI_MASSIMO = 200
+ELIMINATI_MASSIMO = 300
 ELIMINATI_GIORNI = 30
+# Quanti dispositivi si possono eliminare in un colpo da un file Excel. Non e'
+# un limite tecnico: e' il punto oltre il quale nessuno legge davvero l'elenco
+# di quello che sta per sparire, e una conferma che non si legge non e' una
+# conferma.
+MASSIMO_ELIMINA_EXCEL = 200
 
 NOME_DATI_NELLO_ZIP = "Inventario.xlsx"
 NOME_IMPOSTAZIONI_NELLO_ZIP = "inventario_impostazioni.json"
@@ -633,6 +638,41 @@ class InventoryStore(object):
         # Voci del cestino tolte dall'ultimo ripristino perche' il dispositivo
         # era gia' in inventario.
         self.tolti_perche_presenti = []
+        # Le stanze dell'inventario. None significa "non me le hanno dette":
+        # in quel caso una stanza vale purche' ci sia. L'interfaccia le passa
+        # sempre, ed e' li' che serve il controllo.
+        self.stanze = None
+        # Dispositivi che l'ultima eliminazione ha cancellato per sempre invece
+        # di metterli nel cestino, perche' non ci stavano.
+        self.cancellati_per_sempre = []
+
+    def stanza_canonica(self, valore):
+        """Il nome esatto della stanza, o "" se quel nome non e' una stanza.
+
+        Un nome che non c'e' - "Cantina" - non e' una stanza: il dispositivo
+        non comparirebbe in nessuna scheda, non uscirebbe da nessuna
+        esportazione per stanza, e per ritrovarlo bisognerebbe gia' sapere che
+        c'e'. Vale come se non ne avesse nessuna, e l'importazione la chiede.
+
+        Quello che invece si perdona e' il modo di scriverla: lo spazio di
+        troppo e la maiuscola sbagliata - "digital  kiosk" e' Digital Kiosk -
+        perche' quella e' la stanza giusta scritta male, non un'altra stanza.
+        Il nome che entra in inventario e' comunque quello ufficiale, o si
+        ritroverebbero due stanze dove ce n'e' una.
+        """
+        nome = clean(valore)
+        if not nome:
+            return ""
+        if self.stanze is None:
+            return nome
+        for stanza in list(self.stanze) + [self.iphone_room]:
+            if clean(stanza) and clean(stanza).lower() == nome.lower():
+                return clean(stanza)
+        return ""
+
+    def stanza_ammessa(self, valore):
+        """Vero se quel nome e' davvero una stanza dell'inventario."""
+        return bool(self.stanza_canonica(valore))
 
     def _enforce_iphone_room(self, item):
         """Un iPhone appartiene sempre alla sua stanza, comunque lo si registri."""
@@ -808,8 +848,25 @@ class InventoryStore(object):
 
         return self._apply(op)
 
-    def delete(self, tags):
-        """Elimina i dispositivi, salvo quelli spediti da meno di tre mesi."""
+    def eccesso_cestino(self, quanti):
+        """Quanti dei prossimi `quanti` eliminati non entrerebbero nel cestino.
+
+        Il cestino tiene ELIMINATI_MASSIMO record: oltre quel numero qualcosa
+        deve sparire per sempre, e chi elimina deve poter decidere che cosa
+        invece di scoprirlo dopo.
+        """
+        dentro = len(self._pota_eliminati(self._leggi_eliminati()))
+        return max(0, dentro + quanti - ELIMINATI_MASSIMO)
+
+    def delete(self, tags, in_eccesso="cestino"):
+        """Elimina i dispositivi, salvo quelli spediti da meno di tre mesi.
+
+        in_eccesso dice che fare di quelli che nel cestino non ci stanno:
+        "cestino" li mette dentro al posto dei piu' vecchi, che escono per
+        sempre; "definitivo" li cancella subito senza passare dal cestino, che
+        resta com'e'. Quelli cancellati per sempre restano in
+        `cancellati_per_sempre`, per poterlo dire a chi ha eliminato.
+        """
         wanted = set(norm_tag(t) for t in tags)
 
         def op(items):
@@ -831,6 +888,14 @@ class InventoryStore(object):
 
         tolti = []
         quanti = self._apply(op)
+        self.cancellati_per_sempre = []
+        if in_eccesso == "definitivo":
+            # non ci stanno tutti: chi e' in fondo alla fila non entra affatto
+            eccesso = self.eccesso_cestino(len(tolti))
+            if eccesso:
+                taglio = max(0, len(tolti) - eccesso)
+                self.cancellati_per_sempre = tolti[taglio:]
+                tolti = tolti[:taglio]
         # Il cestino si aggiorna dopo: se l'eliminazione fallisce non ci finisce
         # dentro niente, e se fallisce il cestino l'eliminazione resta valida.
         self.aggiungi_agli_eliminati(tolti)
@@ -1965,7 +2030,7 @@ class InventoryStore(object):
             dove = clean(stanza) if stanza is not None else clean(item.get("stanza"))
             if not dove and self.iphone_room and is_iphone(item.get("tipo")):
                 dove = clean(self.iphone_room)
-            if not dove:
+            if not self.stanza_ammessa(dove):
                 # senza stanza non si importa: si dice prima, non dopo
                 senza_stanza += 1
                 continue
@@ -2063,7 +2128,10 @@ class InventoryStore(object):
                          "stanza": clean(gia.get("stanza")) or SENZA_STANZA})
                     continue
                 self._enforce_iphone_room(item)
-                if not clean(item.get("stanza")):
+                # la stanza entra sempre col nome ufficiale: scritta a modo suo
+                # da chi ha preparato il foglio, sarebbe una stanza in piu'
+                item["stanza"] = self.stanza_canonica(item.get("stanza"))
+                if not item["stanza"]:
                     esito["senza_stanza"].append(item["asset_tag"])
                     continue
                 normalize_state(item, self.stati)
@@ -2175,6 +2243,66 @@ def _row_to_item(row, mapping):
     normalize_identity(item)
     normalize_state(item)
     return item if item["asset_tag"] else None
+
+
+# Un file da cui si eliminano dispositivi non ha bisogno di essere un
+# inventario: se ne leggono al massimo queste righe, oltre non e' piu' un
+# elenco preparato a mano ma un file sbagliato.
+RIGHE_MASSIME_ELIMINAZIONE = 5000
+
+
+def righe_da_workbook(path):
+    """Le righe di un file Excel, come testo, per l'eliminazione in blocco.
+
+    Va bene un'esportazione del programma - se trova le intestazioni prende
+    solo le colonne Asset Tag e IMEI - ma va bene anche una colonna di codici
+    incollata a mano e salvata senza intestazioni: in quel caso vale tutta la
+    riga, e a riconoscere il codice ci pensa l'anteprima, che prova ogni pezzo.
+    Chi prepara un elenco di cose da eliminare non deve doverlo formattare.
+
+    Ritorna (righe, esito), con esito = {"fogli", "vuote", "troncato"}.
+    """
+    try:
+        wb = load_workbook(path, read_only=True, data_only=True)
+    except Exception as exc:
+        raise InventoryError(T("Impossibile leggere il file:\n%s") % exc)
+    try:
+        righe = []
+        esito = {"fogli": 0, "vuote": 0, "troncato": False}
+        for ws in wb.worksheets:
+            tutte = list(ws.iter_rows(values_only=True))
+            if not tutte:
+                continue
+            esito["fogli"] += 1
+            header, mapping = _trova_intestazioni(iter(tutte))
+            colonne = [i for i, campo in mapping.items()
+                       if campo in ("asset_tag", "imei")] if header else []
+            saltare = True if header is not None else False
+            for row in tutte:
+                if row is None or all(c is None or clean(c) == "" for c in row):
+                    esito["vuote"] += 1
+                    continue
+                if saltare:
+                    # la riga delle intestazioni non e' un dispositivo
+                    if row is header or list(row) == list(header):
+                        saltare = False
+                        continue
+                    continue          # i titoli sopra la tabella
+                if colonne:
+                    pezzi = [clean(row[i]) for i in colonne if i < len(row)]
+                else:
+                    pezzi = [clean(c) for c in row]
+                pezzi = [p for p in pezzi if p]
+                if not pezzi:
+                    esito["vuote"] += 1
+                    continue
+                righe.append("\t".join(pezzi))
+                if len(righe) >= RIGHE_MASSIME_ELIMINAZIONE:
+                    esito["troncato"] = True
+                    return righe, esito
+        return righe, esito
+    finally:
+        wb.close()
 
 
 def rows_from_workbook(path, rooms=None):

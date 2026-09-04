@@ -15,12 +15,12 @@ from . import lingua as lang
 from .lingua import T, intestazione, stato as traduci_stato
 from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE,
                     ELIMINATI_GIORNI, ELIMINATI_MASSIMO, HEADERS,
-                    InventoryError, MESI_CONSERVAZIONE,
+                    InventoryError, MASSIMO_ELIMINA_EXCEL, MESI_CONSERVAZIONE,
                     InventoryStore, NON_DISPONIBILE, SPEDITO, clean,
                     is_iphone, is_on_loan, is_shipped, new_item, norm_tag,
                     puo_essere_eliminato, righe_separatore,
                     rinomina_tocca_gli_iphone, rinomine_stanze,
-                    rinomine_tipi, rows_from_workbook,
+                    rinomine_tipi, righe_da_workbook, rows_from_workbook,
                     sembra_un_foglio_da_importare, testo_spedizione,
                     valore_visibile)
 
@@ -1423,13 +1423,12 @@ class ImportDialog(_Modal):
         opzioni = opzioni or {}
         if count and opzioni.get("stanza") is None \
                 and not esito.get("stanze_trovate"):
-            # e' il difetto che si nota solo dopo: le schede delle stanze
-            # restano a zero e tutto finisce nell'elenco completo
             messaggi.append(
-                T("Nel foglio non c'e' nessuna riga che dichiari una stanza.\n"
-                  "I %d dispositivi verranno importati SENZA STANZA: le schede\n"
-                  "delle stanze resteranno vuote.\n\n"
-                  "Una riga separatore e' una riga con scritto solo il nome della\n"
+                T("Nel foglio non c'e' nessuna riga che dichiari una stanza:\n"
+                  "la stanza dei %d dispositivi te l'ha chiesta il programma,\n"
+                  "perche' senza stanza non sarebbero entrati.\n\n"
+                  "Per non doverlo fare la prossima volta, aggiungi al foglio le\n"
+                  "righe separatore: una riga con scritto solo il nome della\n"
                   "stanza, per esempio  Site Services BAU  (vanno bene anche BAU,\n"
                   "KIOSK, DISASTER). Vale per tutte le righe che la seguono.")
                 % count)
@@ -1462,6 +1461,225 @@ class ImportDialog(_Modal):
 
 
 # ------------------------------------------------------------ scheda stanza
+
+
+def testo_riepilogo_eliminazione(intestazione, da_eliminare, non_trovati, bloccati):
+    """Le righe da leggere prima di eliminare in blocco, divise per stanza.
+
+    Serve a due strade che finiscono nello stesso posto - i codici incollati a
+    mano e il file Excel caricato - e deve dire le stesse cose in tutte e due:
+    da quali stanze spariscono i dispositivi, uno per uno, e che cosa resta
+    fuori e perche'.
+    """
+    fuori = [intestazione, ""]
+    if da_eliminare:
+        per_stanza = {}
+        for item in da_eliminare:
+            per_stanza.setdefault(item.get("stanza") or T("(senza stanza)"),
+                                  []).append(item)
+        fuori.append(T("VERRANNO ELIMINATI: %d") % len(da_eliminare))
+        for stanza in sorted(per_stanza):
+            elenco = per_stanza[stanza]
+            fuori.append("")
+            fuori.append(T("  %s - %d dispositivi") % (stanza, len(elenco)))
+            for item in elenco:
+                riga = "    %s  %s" % (valore_visibile(item, "asset_tag"),
+                                       item.get("modello") or "")
+                if item.get("prestato_a"):
+                    riga += T("   [in prestito a %s]") % item["prestato_a"]
+                fuori.append(riga.rstrip())
+    else:
+        fuori.append(T("Non c'e' niente da eliminare."))
+    if bloccati:
+        fuori.append("")
+        fuori.append(T("SALTATI perche' non si possono eliminare: %d") % len(bloccati))
+        for item, motivo in bloccati:
+            fuori.append("    %s  -  %s"
+                         % (valore_visibile(item, "asset_tag"), motivo))
+    if non_trovati:
+        fuori.append("")
+        fuori.append(T("SALTATI perche' non sono in inventario: %d") % len(non_trovati))
+        for codice in non_trovati[:20]:
+            fuori.append("    %s" % codice)
+        if len(non_trovati) > 20:
+            fuori.append(T("    e altri %d") % (len(non_trovati) - 20))
+    return fuori
+
+
+class EliminaDaExcelDialog(_Modal):
+    """Eliminazione in blocco partendo da un file Excel.
+
+    E' la stessa cosa di Elimina piu' dispositivi, per chi l'elenco ce l'ha
+    gia' in un file invece che negli appunti: chi deve dismettere ottanta
+    portatili ha un foglio, non una colonna da incollare. Quello che sparisce
+    si legge prima, stanza per stanza, e per confermare si scrive la parola.
+    """
+
+    def __init__(self, parent, store):
+        _Modal.__init__(self, parent, T("Elimina da Excel"))
+        self.store = store
+        self.esito = None
+        self.percorso = None
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+
+        ttk.Label(body, text=T("Elimina i dispositivi elencati in un file Excel"),
+                  style="Section.TLabel").pack(anchor="w")
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text=T("Va bene un'esportazione del programma, o un file con una\n"
+                       "sola colonna di asset tag. Al massimo %d dispositivi per\n"
+                       "volta: piu' di cosi' nessuno legge davvero l'elenco di\n"
+                       "quello che sta per sparire.") % MASSIMO_ELIMINA_EXCEL).pack(
+            anchor="w", pady=(2, 10))
+
+        riga = ttk.Frame(body)
+        riga.pack(fill="x")
+        ttk.Button(riga, text=T("Scegli il file Excel"), style="Primary.TButton",
+                   command=self._scegli).pack(side="left")
+        self.var_file = tk.StringVar(value=T("Nessun file scelto."))
+        ttk.Label(riga, textvariable=self.var_file, style="Muted.TLabel").pack(
+            side="left", padx=(10, 0))
+
+        self.riepilogo = tk.Text(body, width=46, height=14, wrap="word", relief="solid",
+                                 borderwidth=1, highlightthickness=0, bg=theme.CARD,
+                                 fg=theme.TEXT, state="disabled")
+        self.riepilogo.pack(fill="both", expand=True, pady=(12, 0))
+
+        self.conferma = ttk.Frame(body)
+        self.conferma.pack(fill="x", pady=(10, 0))
+        self.var_conferma = tk.StringVar()
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(14, 0))
+        ttk.Button(buttons, text=T("Annulla"),
+                   command=self._cancel).pack(side="right", padx=6)
+        self.btn_elimina = ttk.Button(buttons, text=T("Elimina"), style="Rosso.TButton",
+                                      command=self._ok, state="disabled")
+        self.btn_elimina.pack(side="right")
+
+    # ------------------------------------------------------------ il file
+
+    def _scegli(self):
+        percorso = filedialog.askopenfilename(
+            parent=self, title=T("File con i dispositivi da eliminare"),
+            filetypes=[(T("File Excel"), "*.xlsx *.xlsm"), (T("Tutti i file"), "*.*")])
+        if not percorso:
+            return
+        try:
+            righe, letto = righe_da_workbook(percorso)
+        except InventoryError as exc:
+            messagebox.showerror(T("File non leggibile"), str(exc), parent=self)
+            return
+        self.percorso = percorso
+        self.var_file.set(os.path.basename(percorso))
+        self._spegni_conferma()
+        if not righe:
+            self._scrivi([T("Nel file non c'e' nessuna riga con un codice.")])
+            return
+        da_eliminare, non_trovati, bloccati = self.store.anteprima_eliminazione(righe)
+        if len(da_eliminare) > MASSIMO_ELIMINA_EXCEL:
+            self._scrivi([
+                T("Il file contiene %d dispositivi in inventario.")
+                % len(da_eliminare),
+                "",
+                T("Se ne possono eliminare al massimo %d per volta: oltre quel\n"
+                "numero l'elenco di quello che sta per sparire non lo legge\n"
+                "piu' nessuno, e una conferma che non si legge non e' una\n"
+                "conferma.") % MASSIMO_ELIMINA_EXCEL,
+                "",
+                T("Dividi il file e ripeti l'operazione.")])
+            return
+        self.esito = (da_eliminare, non_trovati, bloccati)
+        testa = T("Righe lette da %s: %d") % (os.path.basename(percorso), len(righe))
+        if letto.get("troncato"):
+            testa += T("   (lette solo le prime %d)") % len(righe)
+        self._scrivi(testo_riepilogo_eliminazione(
+            testa, da_eliminare, non_trovati, bloccati))
+        if not da_eliminare:
+            return
+        ttk.Label(self.conferma,
+                  text=T("Per eliminare questi %d dispositivi, scrivi   %s")
+                  % (len(da_eliminare), PAROLA_ELIMINA)).pack(anchor="w")
+        self.var_conferma.set("")
+        ttk.Entry(self.conferma, textvariable=self.var_conferma,
+                  width=34).pack(fill="x", pady=(4, 0))
+        self.btn_elimina.state(["!disabled"])
+
+    def _spegni_conferma(self):
+        self.esito = None
+        self.btn_elimina.state(["disabled"])
+        for figlio in self.conferma.winfo_children():
+            figlio.destroy()
+
+    def _scrivi(self, righe):
+        self.riepilogo.configure(state="normal")
+        self.riepilogo.delete("1.0", "end")
+        self.riepilogo.insert("1.0", "\n".join(righe))
+        self.riepilogo.configure(state="disabled")
+
+    def _ok(self):
+        if not self.esito or not self.esito[0]:
+            return
+        if self.var_conferma.get().strip().upper() != PAROLA_ELIMINA:
+            messagebox.showwarning(
+                T("Conferma non valida"),
+                T("Stai per eliminare %d dispositivi dall'inventario di tutti.\n\n"
+                  "Per procedere scrivi esattamente:\n%s")
+                % (len(self.esito[0]), PAROLA_ELIMINA), parent=self)
+            return
+        self.result = [i["asset_tag"] for i in self.esito[0]]
+        self.destroy()
+
+
+class CestinoPienoDialog(_Modal):
+    """Il cestino non ci sta tutto: si decide che fare di quelli in eccesso.
+
+    Prima i piu' vecchi uscivano dal cestino in silenzio. Ma quello che esce
+    dal cestino e' perso per sempre, e una perdita non si decide da soli: si
+    dice quanti sono quelli che non ci entrano, e si chiede.
+    """
+
+    def __init__(self, parent, eccesso, quanti, dentro, massimo):
+        _Modal.__init__(self, parent, T("Il cestino e' pieno"))
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, text=T("Il cestino e' pieno"),
+                  style="Section.TLabel").pack(anchor="w")
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text=T("Gli eliminati di recente tengono %d record, e adesso ne\n"
+                       "contengono %d. Stai eliminando %d dispositivi: %d di loro\n"
+                       "nel cestino non ci entrano.")
+                  % (massimo, dentro, quanti, eccesso)).pack(anchor="w", pady=(4, 12))
+
+        self.var_come = tk.StringVar(value="cestino")
+        ttk.Radiobutton(body, variable=self.var_come, value="cestino",
+                        text=T("Mettili nel cestino al posto dei piu' vecchi")
+                        ).pack(anchor="w")
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text=T("I %d record piu' vecchi escono dal cestino e sono persi\n"
+                       "per sempre. Quelli che elimini adesso si possono\n"
+                       "ripristinare.") % eccesso).pack(anchor="w", padx=(24, 0),
+                                                        pady=(2, 0))
+        ttk.Radiobutton(body, variable=self.var_come, value="definitivo",
+                        text=T("Cancella definitivamente quelli in eccesso")
+                        ).pack(anchor="w", pady=(10, 0))
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text=T("%d dei dispositivi che elimini adesso non passano dal\n"
+                       "cestino: spariscono subito e non si ripristinano. Il\n"
+                       "cestino resta com'e'.") % eccesso).pack(anchor="w",
+                                                                padx=(24, 0),
+                                                                pady=(2, 0))
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(18, 0))
+        ttk.Button(buttons, text=T("Annulla"),
+                   command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Continua"), style="Primary.TButton",
+                   command=self._ok).pack(side="right")
+
+    def _ok(self):
+        self.result = self.var_come.get()
+        self.destroy()
 
 
 class EliminaPlusDialog(_Modal):
@@ -1544,39 +1762,9 @@ class EliminaPlusDialog(_Modal):
         self.btn_elimina.state(["!disabled"])
 
     def _testo_riepilogo(self, righe, da_eliminare, non_trovati, bloccati):
-        fuori = [T("Righe incollate: %d") % len(righe), ""]
-        if da_eliminare:
-            per_stanza = {}
-            for item in da_eliminare:
-                per_stanza.setdefault(item.get("stanza") or T("(senza stanza)"),
-                                      []).append(item)
-            fuori.append(T("VERRANNO ELIMINATI: %d") % len(da_eliminare))
-            for stanza in sorted(per_stanza):
-                elenco = per_stanza[stanza]
-                fuori.append("")
-                fuori.append(T("  %s - %d dispositivi") % (stanza, len(elenco)))
-                for item in elenco:
-                    riga = "    %s  %s" % (valore_visibile(item, "asset_tag"),
-                                           item.get("modello") or "")
-                    if item.get("prestato_a"):
-                        riga += T("   [in prestito a %s]") % item["prestato_a"]
-                    fuori.append(riga.rstrip())
-        else:
-            fuori.append(T("Non c'e' niente da eliminare."))
-        if bloccati:
-            fuori.append("")
-            fuori.append(T("SALTATI perche' non si possono eliminare: %d") % len(bloccati))
-            for item, motivo in bloccati:
-                fuori.append("    %s  -  %s"
-                             % (valore_visibile(item, "asset_tag"), motivo))
-        if non_trovati:
-            fuori.append("")
-            fuori.append(T("SALTATI perche' non sono in inventario: %d") % len(non_trovati))
-            for codice in non_trovati[:20]:
-                fuori.append("    %s" % codice)
-            if len(non_trovati) > 20:
-                fuori.append(T("    e altri %d") % (len(non_trovati) - 20))
-        return fuori
+        return testo_riepilogo_eliminazione(
+            T("Righe incollate: %d") % len(righe),
+            da_eliminare, non_trovati, bloccati)
 
     def _scrivi(self, righe):
         self.riepilogo.configure(state="normal")
@@ -2227,6 +2415,7 @@ class App(tk.Tk):
         self.store = InventoryStore(data_path,
                                     iphone_room=self.cfg.get("iphone_room"),
                                     stati=self.cfg.get("states"))
+        self.store.stanze = list(self.cfg.get("rooms") or [])
         self.sort_field = "modificato_il"
         self.sort_reverse = True        # il piu' recente in cima
         self.visible = []
@@ -2266,6 +2455,7 @@ class App(tk.Tk):
         self.cfg = config.load_shared_config(self.store.path)
         self.store.iphone_room = self.cfg.get("iphone_room")
         self.store.stati = list(self.cfg.get("states") or [])
+        self.store.stanze = list(self.cfg.get("rooms") or [])
         self.tree = None
         self._build_header()
         self._build_toolbar()
@@ -3199,6 +3389,10 @@ class App(tk.Tk):
             ttk.Button(header, text=T("Controllo generale duplicati"),
                        style="Rosso.TButton",
                        command=self.on_duplicati).pack(side="right", padx=(0, 6))
+            ttk.Button(header, text=T("Elimina da Excel"),
+                       style="Rosso.TButton",
+                       command=self.on_elimina_da_excel).pack(side="right",
+                                                              padx=(0, 6))
             self.btn_cestino = ttk.Button(header, style="Cestino.TButton",
                                           text=self._etichetta_cestino(),
                                           command=self.on_cestino)
@@ -3478,6 +3672,7 @@ class App(tk.Tk):
         self.cfg = config.load_shared_config(self.store.path)
         self.store.iphone_room = self.cfg.get("iphone_room")
         self.store.stati = list(self.cfg.get("states") or [])
+        self.store.stanze = list(self.cfg.get("rooms") or [])
         self._sync_filter_values()
         scelti, ancora = self.selected_tags(), (self.tree.focus() if self.tree else "")
         self._render()
@@ -3751,6 +3946,9 @@ class App(tk.Tk):
         ).show():
             return
 
+        regola = self._regola_cestino(len(da_eliminare))
+        if regola is None:
+            return
         try:
             copia = self.store.copia_di_sicurezza()
         except InventoryError as exc:
@@ -3760,19 +3958,81 @@ class App(tk.Tk):
         # solo quelli davvero eliminabili: store.delete e' tutto-o-niente, e un
         # iPhone protetto in mezzo bloccherebbe anche gli altri
         eliminabili = [i["asset_tag"] for i in da_eliminare]
-        fatto = self._run(lambda: self.store.delete(eliminabili))
+        fatto = self._run(lambda: self.store.delete(eliminabili, in_eccesso=regola))
         if fatto is None:
             return
-        messagebox.showinfo(
-            T("Eliminazione completata"),
-            T("Eliminati %d dispositivi.\n\nIn inventario ne restano %d.\n\n"
-              "Copia di sicurezza del file precedente:\n%s")
-            % (len(eliminabili), len(self.store.items), copia), parent=self)
+        self._aggiorna_cestino()
+        messagebox.showinfo(T("Eliminazione completata"),
+                            self._dopo_eliminazione(len(eliminabili), copia),
+                            parent=self)
+
+    def _regola_cestino(self, quanti):
+        """Che fare di quelli che nel cestino non ci stanno.
+
+        Ritorna "cestino", "definitivo", o None se si e' annullato. Finche' ci
+        stanno tutti non chiede niente: la domanda serve solo quando qualcosa
+        sta per essere perso per sempre.
+        """
+        try:
+            eccesso = self.store.eccesso_cestino(quanti)
+        except Exception:
+            return "cestino"          # il cestino e' un di piu': non blocca nulla
+        if not eccesso:
+            return "cestino"
+        dentro = len(self.store.eliminati())
+        return CestinoPienoDialog(self, eccesso, quanti, dentro,
+                                  ELIMINATI_MASSIMO).show()
+
+    def _dopo_eliminazione(self, quanti, copia):
+        """Il messaggio finale, che dice anche chi non e' passato dal cestino."""
+        righe = [T("%d dispositivi eliminati.") % quanti, "",
+                 T("In inventario ne restano %d.") % len(self.store.items)]
+        persi = getattr(self.store, "cancellati_per_sempre", None) or []
+        if persi:
+            righe.append("")
+            righe.append(T("CANCELLATI DEFINITIVAMENTE: %d") % len(persi))
+            righe.append(T("Nel cestino non ci stavano: non si ripristinano."))
+            for item in persi[:12]:
+                righe.append("    %s  -  %s"
+                             % (valore_visibile(item, "asset_tag"),
+                                item.get("stanza") or T("(senza stanza)")))
+            if len(persi) > 12:
+                righe.append(T("    ...e altri %d") % (len(persi) - 12))
+        if copia:
+            righe.append("")
+            righe.append(T("Copia di sicurezza del file precedente:"))
+            righe.append(copia)
+        return "\n".join(righe)
+
+    def on_elimina_da_excel(self):
+        """Eliminazione in blocco leggendo l'elenco da un file Excel."""
+        tags = EliminaDaExcelDialog(self, self.store).show()
+        if not tags:
+            return
+        regola = self._regola_cestino(len(tags))
+        if regola is None:
+            return
+        try:
+            copia = self.store.copia_di_sicurezza()
+        except InventoryError as exc:
+            messagebox.showerror(T("Eliminazione annullata"), str(exc), parent=self)
+            return
+        if not self._run(lambda: self.store.delete(tags, in_eccesso=regola),
+                         T("Eliminati %d dispositivi.") % len(tags)):
+            return
+        self.refresh_table()
+        self._aggiorna_cestino()
+        self.show_home() if self.view == "home" else self._render()
+        messagebox.showinfo(T("Eliminazione completata"),
+                            self._dopo_eliminazione(len(tags), copia), parent=self)
 
     def on_delete_many(self):
         """Eliminazione in blocco, incollando i codici da un foglio."""
         tags = EliminaPlusDialog(self, self.store).show()
         if not tags:
+            return
+        regola = self._regola_cestino(len(tags))
+        if regola is None:
             return
         copia = None
         try:
@@ -3780,16 +4040,14 @@ class App(tk.Tk):
         except InventoryError as exc:
             messagebox.showerror(T("Eliminazione annullata"), str(exc), parent=self)
             return
-        if not self._run(lambda: self.store.delete(tags),
+        if not self._run(lambda: self.store.delete(tags, in_eccesso=regola),
                          T("Eliminati %d dispositivi.") % len(tags)):
             return
         self.refresh_table()
+        self._aggiorna_cestino()
         self.show_home() if self.view == "home" else self._render()
-        messagebox.showinfo(
-            T("Eliminazione completata"),
-            T("%d dispositivi eliminati.\n\nIn inventario ne restano %d.\n\n"
-              "Copia di sicurezza del file precedente:\n%s")
-            % (len(tags), len(self.store.items), copia), parent=self)
+        messagebox.showinfo(T("Eliminazione completata"),
+                            self._dopo_eliminazione(len(tags), copia), parent=self)
 
     def on_move(self):
         """Sposta in un'altra stanza i dispositivi selezionati."""
@@ -4408,7 +4666,11 @@ class App(tk.Tk):
         caso non si importa niente, nemmeno le righe gia' a posto - a meta'
         strada nessuno sa piu' che cosa e' entrato e che cosa no.
         """
-        orfani = [i for i in items if not clean(i.get("stanza"))]
+        # Non basta che la stanza ci sia: deve essere una di quelle
+        # dell'inventario. "Cantina", o "Digital  Kiosk" con due spazi, non e'
+        # una stanza - il dispositivo non comparirebbe in nessuna scheda - e va
+        # trattata come se non ce ne fosse nessuna.
+        orfani = [i for i in items if not self.store.stanza_ammessa(i.get("stanza"))]
         if not orfani:
             return items, 0
         stanze = list(self.cfg.get("rooms") or [])
@@ -4709,6 +4971,7 @@ class App(tk.Tk):
         self.cfg = config.load_shared_config(self.store.path)
         self.store.iphone_room = self.cfg.get("iphone_room")
         self.store.stati = list(self.cfg.get("states") or [])
+        self.store.stanze = list(self.cfg.get("rooms") or [])
         self._sync_filter_values()
         self.show_home()
         coda = T("Sono tornate anche le impostazioni: stanze, tipi e stati.") \
@@ -4936,6 +5199,7 @@ class App(tk.Tk):
         self.cfg = config.load_shared_config(self.store.path)
         self.store.iphone_room = self.cfg.get("iphone_room")
         self.store.stati = list(self.cfg.get("states") or [])
+        self.store.stanze = list(self.cfg.get("rooms") or [])
         self._sync_filter_values()
         self.show_home()
         if conti_trasloco:

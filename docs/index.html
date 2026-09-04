@@ -174,7 +174,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 1.0.0-beta.5.3 · beta</div>
+  <div class="alpha">versione 1.0.0-beta.5.4 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -200,6 +200,33 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.4</h3>
+      <p class="quando">4 settembre 2026</p>
+      <ul>
+        <li><b>Elimina da Excel</b>, il pulsante rosso in home accanto agli
+          eliminati di recente. Carica un file - un'esportazione del programma o
+          una colonna sola di codici - dice da quali stanze spariscono i
+          dispositivi, uno per uno, e che cosa salta e perche'; per procedere si
+          scrive <span class="mono">ACCETTO</span>. Al massimo 200 per volta:
+          oltre quel numero l'elenco di quello che sta per sparire non lo legge
+          piu' nessuno. Finiscono negli eliminati di recente, da cui si
+          ripescano.</li>
+        <li><b>Una stanza che non esiste vale come nessuna stanza.</b> Se nella
+          colonna Stanza c'era scritto un nome che nel programma non c'e' -
+          <span class="mono">Cantina</span> - il dispositivo entrava lo stesso e
+          poi non compariva in nessuna scheda. Adesso viene chiesta, come per le
+          righe senza stanza. Si perdona il modo di scriverla - lo spazio di
+          troppo e la maiuscola sbagliata - e il dispositivo entra col nome
+          ufficiale della stanza.</li>
+        <li><b>Il cestino tiene 300 record, e quando e' pieno chiede.</b> Prima i
+          piu' vecchi uscivano in silenzio. Ma quello che esce dal cestino e'
+          perso per sempre: adesso il programma dice quanti sono quelli che non
+          ci entrano e lascia scegliere - metterli dentro al posto dei piu'
+          vecchi, o cancellare definitivamente quelli in eccesso. Il riepilogo
+          finale elenca sempre quelli cancellati per sempre.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.3</h3>
       <p class="quando">4 settembre 2026</p>
@@ -258,26 +285,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           dispositivo in meno di quelli che poi si trovavano davvero in
           inventario, perche' considerava aggiornate righe che invece venivano
           prima cancellate e poi reinserite.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5</h3>
-      <p class="quando">4 settembre 2026</p>
-      <ul>
-        <li><b>Gli eliminati di recente viaggiano con l'inventario.</b> Il
-          cestino stava in un file a parte accanto ai dati, e restava fuori da
-          tutto: la copia in locale portava via dispositivi e impostazioni ma
-          non lui, e le copie automatiche solo il foglio. Chi si fosse trovato
-          senza la cartella di rete avrebbe recuperato i dispositivi e perso
-          l'unico posto da cui si ripesca quello tolto per sbaglio.</li>
-        <li><b>Adesso e' dentro lo zip della copia locale</b>, accanto a ogni
-          copia automatica, e torna indietro con tutti e due i ripristini: sono
-          lo stesso stato condiviso, e riportare i dispositivi senza gli
-          eliminati lascerebbe nel cestino roba nel frattempo rientrata in
-          inventario.</li>
-        <li><b>Le copie vecchie restano valide</b>: quelle salvate prima non
-          hanno il cestino, e in quel caso gli eliminati di adesso restano dove
-          sono invece di essere azzerati.</li>
       </ul>
     </div>
   </div>
@@ -356,6 +363,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
         <span class="cnt">14 dispositivi</span>
         <span class="dx">
           <span class="tb nero">ELIMINATI DI RECENTE (2)</span>
+          <span class="tb rosso">Elimina da Excel</span>
           <span class="tb rosso">Controllo generale duplicati</span>
           <span class="tb">Scarica il modello di importazione</span>
         </span>
@@ -432,6 +440,14 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
         vuoi, fuori dalla rete. <b>Ripristina da un file locale…</b> lo rimette a posto
         tutto - dispositivi e stanze - dopo un riepilogo che dice come resterebbe ogni
         stanza.</p></div>
+    <div class="card"><h3>Eliminare in blocco</h3>
+      <p>Due strade per togliere trenta dispositivi senza cercarli uno per uno:
+        <b>Elimina +</b> con i codici incollati, e <b>Elimina da Excel</b> con un file -
+        fino a 200 per volta. Tutte e due mostrano prima da quali stanze spariscono,
+        uno per uno, e chiedono di scrivere <code>ACCETTO</code>. Finiscono negli
+        eliminati di recente, che tengono 300 record per 30 giorni: se non ci stanno
+        tutti il programma chiede che fare, invece di buttare fuori i piu' vecchi in
+        silenzio.</p></div>
     <div class="card"><h3>Ripartire da zero</h3>
       <p>Un pulsante svuota l'inventario per ricaricarlo da un file, dopo una conferma
         da scrivere per esteso e una copia di sicurezza automatica. Gli iPhone non
@@ -474,7 +490,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 1.0.0-beta.5.3 · beta</div>
+  <div class="alpha">version 1.0.0-beta.5.4 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -500,6 +516,30 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.4</h3>
+      <p class="quando">4 September 2026</p>
+      <ul>
+        <li><b>Delete from Excel</b>, the red button on the home screen next to
+          the recently deleted. It loads a file - an export from the program, or
+          a single column of codes - says which rooms the devices disappear from,
+          one by one, and what it skips and why; to go on you type
+          <span class="mono">ACCETTO</span>. At most 200 at a time: beyond that
+          number nobody reads the list of what is about to disappear. They land
+          in the recently deleted, from where they are fished back.</li>
+        <li><b>A room that does not exist counts as no room.</b> If the Room
+          column held a name the program does not have -
+          <span class="mono">Cantina</span> - the device got in all the same and
+          then showed up in no card. Now it is asked for, as for rows with no
+          room. The way it is written is forgiven - the extra space and the wrong
+          case - and the device goes in under the room's official name.</li>
+        <li><b>The bin holds 300 records, and when it is full it asks.</b> The
+          oldest used to leave in silence. But what leaves the bin is lost for
+          good: now the program says how many do not fit and lets you choose -
+          put them in in place of the oldest, or delete the ones in excess for
+          good. The final summary always lists the ones deleted for good.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.3</h3>
       <p class="quando">4 September 2026</p>
@@ -556,26 +596,6 @@ python Inventario.py</pre>
         <li><b>The replace preview counted wrong.</b> It promised one device
           fewer than you actually found in the inventory, because it treated as
           updates the rows that were in fact wiped first and then added back.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5</h3>
-      <p class="quando">4 September 2026</p>
-      <ul>
-        <li><b>The recently deleted travel with the inventory.</b> The bin lived
-          in a separate file next to the data and was left out of everything:
-          the local copy took the devices and the settings but not it, and the
-          automatic copies only the sheet. Anyone left without the network
-          folder would have got the devices back and lost the only place you
-          fish back what was removed by mistake.</li>
-        <li><b>Now it is inside the local copy's zip</b>, next to every
-          automatic copy, and it comes back with both restores: they are the
-          same shared state, and bringing the devices back without the deleted
-          ones would leave in the bin things that have meanwhile returned to
-          the inventory.</li>
-        <li><b>Older copies stay valid</b>: the ones saved before do not have
-          the bin, and in that case the deleted ones you have now stay where
-          they are instead of being wiped.</li>
       </ul>
     </div>
   </div>
@@ -653,6 +673,7 @@ python Inventario.py</pre>
         <span class="cnt">14 devices</span>
         <span class="dx">
           <span class="tb nero">RECENTLY DELETED (2)</span>
+          <span class="tb rosso">Delete from Excel</span>
           <span class="tb rosso">General duplicate check</span>
           <span class="tb">Download the import template</span>
         </span>
@@ -727,6 +748,13 @@ python Inventario.py</pre>
         wherever you want, off the network. <b>Restore from a local file…</b> puts it all
         back - devices and rooms - after a summary saying how every room would end
         up.</p></div>
+    <div class="card"><h3>Deleting in bulk</h3>
+      <p>Two ways to remove thirty devices without looking for them one by one:
+        <b>Delete +</b> with the codes pasted, and <b>Delete from Excel</b> with a file -
+        up to 200 at a time. Both show first which rooms they disappear from, one by
+        one, and ask you to type <code>ACCETTO</code>. They land in the recently
+        deleted, which hold 300 records for 30 days: if they do not all fit the program
+        asks what to do, instead of throwing the oldest out in silence.</p></div>
     <div class="card"><h3>Starting over</h3>
       <p>A button empties the inventory to reload it from a file, after a confirmation
         typed in full and an automatic copy into the <code>Backup</code> folder.

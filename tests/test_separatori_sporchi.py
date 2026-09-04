@@ -63,13 +63,15 @@ senza = scrivi([INTESTAZIONI,
 items, esito = rows_from_workbook(senza, STANZE)
 assert esito["stanze_trovate"] == []
 avvisi = ImportDialog._avvertenze(esito, {"stanza": None, "mode": "merge"}, len(items))
-assert any("SENZA STANZA" in a for a in avvisi), avvisi
+assert any("nessuna riga che dichiari una stanza" in a for a in avvisi), avvisi
 assert any("2 dispositivi" in a for a in avvisi), avvisi
+assert not [a for a in avvisi if "SENZA STANZA" in a], \
+    "non entrano piu' senza stanza: la stanza viene chiesta"
 
 # ---- ma non si avvisa quando le stanze ci sono, o quando si importa in una sola
 avvisi = ImportDialog._avvertenze({"stanze_trovate": [BAU]},
                                   {"stanza": None, "mode": "merge"}, 5)
-assert not [a for a in avvisi if "SENZA STANZA" in a]
+assert not [a for a in avvisi if "dichiari una stanza" in a]
 avvisi = ImportDialog._avvertenze({"stanze_trovate": []},
                                   {"stanza": KIOSK, "mode": "merge"}, 5)
 assert not [a for a in avvisi if "SENZA STANZA" in a]

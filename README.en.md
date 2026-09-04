@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.5.3).** The features are complete and every release
+> **Beta version (1.0.0-beta.5.4).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -232,8 +232,17 @@ room, come out of no per-room export and no printout, and to find it again you
 would have to know already that it is there. This holds for every import, from
 any page and with any option.
 
-When the sheet does not say it - no separator rows, or rows above the first one -
-the program **asks where they go**, before writing anything:
+It is not enough for a room to be written: it must be **one of the inventory's
+rooms**. A name that does not exist - `Cantina` - is not a room: the device would
+show up in no card, which is exactly the earlier problem wearing another face. It
+counts as having none, and it gets asked. What is forgiven instead is **the way
+it is written**: the extra space and the wrong case - `digital  kiosk` is Digital
+Kiosk - because that is the right room written badly. It goes into the inventory
+under the official name all the same.
+
+When the sheet does not say it - no separator rows, rows above the first one, or
+a room written that is not one of the inventory's - the program **asks where they
+go**, before writing anything:
 
 - **All in the same room**: you pick the room and every row left without one goes
   there. The ones that already have a room are left alone;
@@ -626,6 +635,30 @@ them one by one - and without giving up knowing what disappears.
 Duplicates count once, empty lines are ignored, and iPhones keep every one of
 their protections.
 
+## Deleting from an Excel file
+
+The **`Delete from Excel`** button, red, on the home screen just to the right of
+*RECENTLY DELETED*, deletes in bulk the devices listed in a file. It is the same
+thing as *Delete +*, for whoever already has the list in a sheet rather than on
+the clipboard: someone decommissioning eighty laptops has a file, not a column to
+paste.
+
+- **an export from the program** works - it recognises the *Asset Tag* and *IMEI*
+  columns and reads only those - and **a single column** of codes saved without
+  headers works too. There is no format to comply with;
+- at most **200 devices at a time** can be deleted. It is not a technical limit:
+  it is the point beyond which nobody reads the list of what is about to
+  disappear any more, and a confirmation nobody reads is not a confirmation. If
+  the file holds more, the program says so and does nothing;
+- as soon as the file is chosen the **summary** appears, saying **which rooms**
+  the devices disappear from, one by one, with model and any loan; and separately
+  the ones **skipped** - not in the inventory, or impossible to delete (on loan,
+  iPhone not yet shipped back, kept in storage) - with the reason for each;
+- to go on you **type the word** `ACCETTO`, as for bulk deletion. Until it is
+  typed the red button stays off;
+- before deleting, a **backup copy** of the data file is saved, and the devices
+  land in the **recently deleted**, from where they are fished back.
+
 ## Selecting several devices
 
 A click picks one row. **Ctrl+click** adds others, however far apart;
@@ -691,9 +724,15 @@ What sits in there **is no longer inventory**: it appears in no export, no
 printout, no room count and no search of the main list. If it appeared it would
 be a device, and instead it has been deleted.
 
-- records stay **30 days** from the deletion date, and at most **200** of them:
-  when the two hundred and first arrives, the oldest goes. It is not a historical
-  archive, it is the safety net for yesterday's mistake;
+- records stay **30 days** from the deletion date, and at most **300** of them.
+  It is not a historical archive, it is the safety net for yesterday's mistake;
+- **when they do not all fit the program asks what to do**, instead of throwing
+  the oldest out in silence: what leaves the bin is lost for good, and that is
+  not a decision to take on behalf of whoever is deleting. The window says how
+  many are in excess and offers two ways - *put them in the bin in place of the
+  oldest*, and then the oldest leave for good; or *delete the ones in excess for
+  good*, and then those never go through the bin and the bin stays as it is. The
+  final summary always lists the ones deleted for good;
 - the list shows **asset tag and type**, ten per page. The rest of the record is
   not lost: it comes back whole with the restore;
 - the **search field** at the top searches the **whole bin**, not the page you
