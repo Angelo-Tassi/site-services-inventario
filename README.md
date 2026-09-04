@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.4).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -1175,9 +1175,11 @@ dell'inventario **com'e' in quel secondo**:
   che il programma aveva letto prima;
 - se in quell'istante un altro tecnico sta salvando, il programma aspetta che
   finisca: non ottieni mai un file colto a meta' scrittura;
-- e' uno **zip** che contiene due file: l'inventario (`Inventario.xlsx`) e le
-  impostazioni (`inventario_impostazioni.json`). Da soli i dispositivi non
-  basterebbero: le **stanze** non stanno dentro il file dei dati;
+- e' uno **zip** che contiene tre file: l'inventario (`Inventario.xlsx`), le
+  impostazioni (`inventario_impostazioni.json`) e gli eliminati di recente
+  (`inventario_eliminati.json`). Da soli i dispositivi non basterebbero: le
+  **stanze** non stanno dentro il file dei dati, e il cestino nemmeno - e se
+  sparisce la cartella di rete sparisce con lei anche quello;
 - **e' un inventario completo, non un estratto**. Per guardarlo in Excel si apre
   lo zip con un doppio clic: dentro c'e' un `.xlsx` normale.
 
@@ -1220,6 +1222,13 @@ Il nome porta **la data del file salvato**, non quella della copia:
 inventario non producono due file identici, e cercando una versione si guarda a
 quando risale il contenuto invece che a quando qualcuno ha premuto un pulsante.
 Se una copia con quel nome esiste gia', ne viene aggiunta una numerata.
+
+Accanto a ogni copia viene salvato anche **il cestino di quel momento**, con lo
+stesso nome piu' `_eliminati.json`. Ripristinando quella copia torna indietro
+anche lui: sono lo stesso stato condiviso, e riportare i dispositivi senza gli
+eliminati lascerebbe nel cestino roba nel frattempo rientrata in inventario. Le
+copie salvate prima che il cestino esistesse non ce l'hanno, e in quel caso gli
+eliminati di adesso restano dove sono.
 
 **Se ne tengono dieci.** Quando ne arriva una nuova e sono gia' dieci, la piu'
 vecchia viene cancellata. Servono a tornare indietro di qualche passo dopo un

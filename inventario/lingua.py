@@ -1106,6 +1106,24 @@ EN = {
         'Restore all %d devices in the bin?',
     'Ripristinare tutti i %d risultati della ricerca?':
         'Restore all %d results of the search?',
+    'Torna anche il cestino della copia: %d eliminati di recente,\n'
+    'al posto di quelli di adesso.':
+        'The copy\'s bin comes back too: %d recently deleted, in place of the\n'
+        'ones there now.',
+    'La copia non porta il cestino: gli eliminati di recente\n'
+    'restano quelli di adesso.':
+        'The copy does not carry the bin: the recently deleted stay as they\n'
+        'are now.',
+    "\n\nE' tornato anche il cestino di quel momento: %d eliminati\n"
+    'di recente.':
+        '\n\nThe bin from that moment came back too: %d recently deleted.',
+    "\nE' tornato anche il cestino: %d eliminati di recente.":
+        '\nThe bin came back too: %d recently deleted.',
+    "Dentro ci sono l'inventario, le impostazioni - stanze,\n"
+    "tipi e stati per rimetterlo com'era - e gli eliminati\n"
+    'di recente.':
+        'Inside are the inventory, the settings - rooms, types and statuses to\n'
+        'put it back as it was - and the recently deleted.',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':

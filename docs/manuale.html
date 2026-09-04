@@ -299,7 +299,7 @@ table{min-width:520px}
   <p class="sub">Riscrivono l'inventario di tutti e si usano di rado: nella barra
     rubavano spazio ai comandi di tutti i giorni fino a spingerli fuori dallo schermo.</p>
   <div class="tw"><table class="man">
-    <tr><td><span class="k verde">Salva copia in locale…</span></td><td class="d"><b>La copia di sicurezza che decidi tu</b>: uno zip con inventario e impostazioni. Vedi <a href="#sicurezza">Sicurezza dei dati</a>.</td></tr>
+    <tr><td><span class="k verde">Salva copia in locale…</span></td><td class="d"><b>La copia di sicurezza che decidi tu</b>: uno zip con inventario, impostazioni ed eliminati di recente. Vedi <a href="#sicurezza">Sicurezza dei dati</a>.</td></tr>
     <tr><td><span class="k rosso">Ripristina da una copia…</span></td><td class="d">Riporta l'inventario a una delle copie automatiche sulla rete, scelta dall'elenco. Vedi <a href="#ripristino">Tornare indietro</a>.</td></tr>
     <tr><td><span class="k rosso">Ripristina da un file locale…</span></td><td class="d">Riparte da una copia salvata fuori dalla rete: tornano dispositivi <b>e</b> impostazioni, stanze comprese. E' la via d'uscita se la cartella di rete non c'e' piu'.</td></tr>
     <tr><td><span class="k rosso">Reset inventario</span></td><td class="d">Svuota l'inventario. Chiede di scrivere <span class="mono">ELIMINA TUTTO</span> e salva prima una copia. Gli iPhone non si toccano mai.</td></tr>
@@ -646,13 +646,15 @@ table{min-width:520px}
     <div class="card"><h3>2 · Copie automatiche</h3>
       <p>Prima di <b>ogni</b> operazione che cancella o sostituisce, il programma salva
         da solo una copia in <span class="mono">Produzione\Backup\</span>, con la data
-        nel nome. Non devi ricordartene tu. Se ne tengono <b>dieci</b>: quando ne arriva
-        una nuova, la piu' vecchia viene cancellata.</p></div>
+        nel nome, e accanto il <b>cestino di quel momento</b>. Non devi ricordartene tu.
+        Se ne tengono <b>dieci</b>: quando ne arriva una nuova, la piu' vecchia viene
+        cancellata, gemello compreso.</p></div>
     <div class="card"><h3>3 · La copia che decidi tu</h3>
-      <p><span class="k verde">Salva copia in locale…</span> mette uno zip con inventario
-        e impostazioni dove vuoi: sul tuo PC, su una chiavetta, fuori dalla rete. Da li'
-        si riparte con <span class="k rosso">Ripristina da un file locale…</span> anche
-        se la cartella di rete non c'e' piu'.</p></div>
+      <p><span class="k verde">Salva copia in locale…</span> mette uno zip con inventario,
+        impostazioni ed eliminati di recente dove vuoi: sul tuo PC, su una chiavetta,
+        fuori dalla rete. Da li' si riparte con
+        <span class="k rosso">Ripristina da un file locale…</span> anche se la cartella
+        di rete non c'e' piu'.</p></div>
     <div class="card"><h3>4 · Il promemoria</h3>
       <p>Ogni venti dispositivi aggiunti, modificati o eliminati, il programma chiede se
         vuoi salvare una copia locale. Si puo' dire di no: torna a chiedere dopo altri
@@ -917,7 +919,7 @@ table{min-width:520px}
     they stole room from the everyday commands, to the point of pushing them off the
     screen.</p>
   <div class="tw"><table class="man">
-    <tr><td><span class="k verde">Save a local copy…</span></td><td class="d"><b>The backup you decide on</b>: a zip with the inventory and the settings. See <a href="#sicurezza-en">Keeping the data safe</a>.</td></tr>
+    <tr><td><span class="k verde">Save a local copy…</span></td><td class="d"><b>The backup you decide on</b>: a zip with the inventory, the settings and the recently deleted. See <a href="#sicurezza-en">Keeping the data safe</a>.</td></tr>
     <tr><td><span class="k rosso">Restore from a copy…</span></td><td class="d">Takes the inventory back to one of the automatic copies on the network, chosen from the list. See <a href="#ripristino-en">Going back</a>.</td></tr>
     <tr><td><span class="k rosso">Restore from a local file…</span></td><td class="d">Starts again from a copy saved off the network: devices <b>and</b> settings come back, rooms included. It is the way out if the network folder is gone.</td></tr>
     <tr><td><span class="k rosso">Reset inventory</span></td><td class="d">Empties the inventory. It asks you to type <span class="mono">ELIMINA TUTTO</span> and saves a copy first. iPhones are never touched.</td></tr>
@@ -1261,14 +1263,16 @@ table{min-width:520px}
         each other.</p></div>
     <div class="card"><h3>2 · Automatic copies</h3>
       <p>Before <b>every</b> operation that deletes or replaces, the program saves a copy by
-        itself into <span class="mono">Produzione\Backup\</span>, with the date in the name.
-        You do not have to remember. <b>Ten</b> are kept: when a new one arrives, the
-        oldest is deleted.</p></div>
+        itself into <span class="mono">Produzione\Backup\</span>, with the date in the name,
+        and next to it the <b>bin of that moment</b>. You do not have to remember.
+        <b>Ten</b> are kept: when a new one arrives, the oldest is deleted, its twin
+        included.</p></div>
     <div class="card"><h3>3 · The copy you decide on</h3>
-      <p><span class="k verde">Save a local copy…</span> puts a zip with the inventory and
-        the settings wherever you want: your PC, a USB stick, off the network. From there
-        you start again with <span class="k rosso">Restore from a local file…</span>, even
-        if the network folder is gone.</p></div>
+      <p><span class="k verde">Save a local copy…</span> puts a zip with the inventory, the
+        settings and the recently deleted wherever you want: your PC, a USB stick, off the
+        network. From there you start again with
+        <span class="k rosso">Restore from a local file…</span>, even if the network folder
+        is gone.</p></div>
     <div class="card"><h3>4 · The reminder</h3>
       <p>Every twenty devices added, changed or deleted, the program asks whether you want
         to save a local copy. You can say no: it comes back after another twenty.</p></div>

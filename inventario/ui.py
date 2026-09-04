@@ -1923,6 +1923,14 @@ def riepilogo_copia_locale(rapporto, adesso, stanze_adesso, cfg_adesso):
         righe.append("  %-28s %d  ->  %d"
                      % (stanza, stanze_adesso.get(stanza, 0), dalla_copia.get(stanza, 0)))
 
+    righe.append("")
+    if rapporto.get("eliminati"):
+        righe.append(T("Torna anche il cestino della copia: %d eliminati di recente,\n"
+                       "al posto di quelli di adesso.") % rapporto["eliminati"])
+    else:
+        righe.append(T("La copia non porta il cestino: gli eliminati di recente\n"
+                       "restano quelli di adesso."))
+
     impostazioni = rapporto.get("impostazioni")
     righe.append("")
     if not impostazioni:
@@ -4350,12 +4358,17 @@ class App(tk.Tk):
         ripristinati, precedente = esito
         self._sync_filter_values()
         self.show_home()
+        coda = ""
+        if self.store.eliminati_ripristinati:
+            coda = T("\n\nE' tornato anche il cestino di quel momento: %d eliminati\n"
+                     "di recente.") % self.store.eliminati_ripristinati
         messagebox.showinfo(
             T("Inventario ripristinato"),
             T("Ripristinati %d dispositivi dalla copia del %s.\n\n"
               "Lo stato precedente e' stato salvato in:\n%s")
-            % (ripristinati, quando.strftime("%d/%m/%Y %H:%M:%S"), precedente),
+            % (ripristinati, quando.strftime("%d/%m/%Y %H:%M:%S"), precedente) + coda,
             parent=self)
+        self._aggiorna_cestino()
 
     def on_ripristino_locale(self):
         """Rimette tutto - inventario e stanze - da una copia salvata in locale.
@@ -4406,11 +4419,15 @@ class App(tk.Tk):
             if con_impostazioni else \
             T("La copia non portava le impostazioni: stanze e tipi sono rimasti\n"
               "quelli di prima.")
+        if self.store.eliminati_ripristinati:
+            coda += T("\nE' tornato anche il cestino: %d eliminati di recente.") \
+                % self.store.eliminati_ripristinati
         messagebox.showinfo(
             T("Inventario ripristinato"),
             T("Ripristinati %d dispositivi da %s.\n\n%s\n\n"
               "Lo stato precedente e' stato salvato in:\n%s")
             % (quanti, os.path.basename(percorso), coda, precedente), parent=self)
+        self._aggiorna_cestino()
 
     def on_copia_locale(self):
         """Salva una copia dell'inventario dove decide l'utente.
@@ -4441,8 +4458,13 @@ class App(tk.Tk):
                  salvato]
         if impostazioni and e_uno_zip:
             righe.append("")
-            righe.append(T("Dentro ci sono l'inventario e le impostazioni: stanze,\n"
-                           "tipi e stati per rimetterlo com'era."))
+            if self.store.eliminati_nella_copia:
+                righe.append(T("Dentro ci sono l'inventario, le impostazioni - stanze,\n"
+                               "tipi e stati per rimetterlo com'era - e gli eliminati\n"
+                               "di recente."))
+            else:
+                righe.append(T("Dentro ci sono l'inventario e le impostazioni: stanze,\n"
+                               "tipi e stati per rimetterlo com'era."))
         elif impostazioni:
             righe.append(os.path.basename(impostazioni))
             righe.append("")

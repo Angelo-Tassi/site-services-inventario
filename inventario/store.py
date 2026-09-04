@@ -295,6 +295,7 @@ ELIMINATI_GIORNI = 30
 
 NOME_DATI_NELLO_ZIP = "Inventario.xlsx"
 NOME_IMPOSTAZIONI_NELLO_ZIP = "inventario_impostazioni.json"
+NOME_ELIMINATI_NELLO_ZIP = "inventario_eliminati.json"
 
 
 def e_una_copia_automatica(nome):
@@ -344,6 +345,11 @@ def clean(value):
 
 def is_iphone(tipo):
     return clean(tipo).lower() == TIPO_IPHONE
+
+
+def _cestino_accanto(copia):
+    """Il file del cestino che accompagna una copia di sicurezza."""
+    return os.path.splitext(copia)[0] + "_eliminati.json"
 
 
 def _data_eliminazione(voce):
@@ -620,6 +626,10 @@ class InventoryStore(object):
         # Le copie automatiche buttate via dall'ultima rotazione: chi vuole puo'
         # dirlo, ma nessuno deve dipenderne.
         self.copie_scartate = []
+        # Se il cestino e' entrato nell'ultima copia locale, e quanti record ne
+        # sono tornati con l'ultimo ripristino.
+        self.eliminati_nella_copia = False
+        self.eliminati_ripristinati = 0
 
     def _enforce_iphone_room(self, item):
         """Un iPhone appartiene sempre alla sua stanza, comunque lo si registri."""
@@ -1056,6 +1066,11 @@ class InventoryStore(object):
         Il nome porta la data del file salvato, non quella della copia: due
         reset di fila sullo stesso inventario non producono due file uguali, e
         cercando una versione si guarda a quando risale il contenuto.
+
+        Accanto alla copia viene salvato anche il cestino di quel momento, come
+        `<nome>_eliminati.json`: l'inventario e gli eliminati di recente sono
+        una cosa sola, e tornare indietro sull'uno senza l'altro lascerebbe nel
+        cestino roba che nel frattempo e' rientrata in inventario.
         """
         from . import config
 
@@ -1081,6 +1096,14 @@ class InventoryStore(object):
             raise InventoryError(
                 T("Non riesco a creare la copia di sicurezza:\n%s\n\n"
                 "L'operazione e' stata annullata: nessun dato e' stato toccato.") % exc)
+        # Il cestino dopo i dati e senza far fallire niente: e' un di piu' utile,
+        # non una condizione perche' l'operazione possa procedere.
+        cestino = self._percorso_eliminati()
+        if os.path.exists(cestino):
+            try:
+                shutil.copy2(cestino, _cestino_accanto(destinazione))
+            except OSError:
+                pass
         self.copie_scartate = self._tieni_solo_le_ultime(cartella)
         return destinazione
 
@@ -1111,6 +1134,14 @@ class InventoryStore(object):
         copie.sort(reverse=True)          # dalla piu' recente, come Ripristina
         scartate = []
         for _quando, _nome, percorso in copie[quante:]:
+            # il cestino gemello se ne va con la sua copia, o resterebbe li' per
+            # sempre a occupare posto senza piu' un inventario a cui riferirsi
+            gemello = _cestino_accanto(percorso)
+            if os.path.exists(gemello):
+                try:
+                    os.remove(gemello)
+                except OSError:
+                    pass
             try:
                 os.remove(percorso)
                 scartate.append(percorso)
@@ -1128,9 +1159,12 @@ class InventoryStore(object):
 
         Accanto all'inventario viene salvato anche il file delle impostazioni -
         stanze, tipi, stati - perche' da soli i dati non bastano a ricostruire
-        l'inventario com'era.
+        l'inventario com'era, e quello degli eliminati di recente: se la copia
+        serve dopo che la share e' sparita, sparirebbe con lei anche il cestino,
+        cioe' l'unico posto da cui si ripesca quello tolto per sbaglio.
 
         Ritorna (file dati, file impostazioni o None, quanti dispositivi).
+        `eliminati_nella_copia` dice se il cestino ci e' entrato.
         """
         from . import config
 
@@ -1138,6 +1172,8 @@ class InventoryStore(object):
         if not os.path.isdir(cartella):
             raise InventoryError(T("La cartella non esiste:\n%s") % cartella)
         sorgente = config.shared_config_path(self.path)
+        cestino = self._percorso_eliminati()
+        self.eliminati_nella_copia = False
         if destinazione.lower().endswith(".zip"):
             with _Lock(self.path):
                 if not os.path.exists(self.path):
@@ -1151,6 +1187,9 @@ class InventoryStore(object):
                         if os.path.exists(sorgente):
                             archivio.write(sorgente, NOME_IMPOSTAZIONI_NELLO_ZIP)
                             impostazioni = NOME_IMPOSTAZIONI_NELLO_ZIP
+                        if os.path.exists(cestino):
+                            archivio.write(cestino, NOME_ELIMINATI_NELLO_ZIP)
+                            self.eliminati_nella_copia = True
                 except OSError as exc:
                     raise InventoryError(T("Non riesco a salvare la copia:\n%s") % exc)
             return destinazione, impostazioni, quanti
@@ -1171,23 +1210,38 @@ class InventoryStore(object):
                     impostazioni = accanto
                 except OSError:
                     impostazioni = None      # i dati sono salvi: basta e avanza
+            if os.path.exists(cestino):
+                try:
+                    shutil.copy2(cestino,
+                                 os.path.splitext(destinazione)[0] + "_eliminati.json")
+                    self.eliminati_nella_copia = True
+                except OSError:
+                    pass                     # come sopra: il cestino e' un di piu'
         return destinazione, impostazioni, quanti
 
     def _estrai_copia_locale(self, percorso, cartella):
-        """Tira fuori dati e impostazioni da una copia locale.
+        """Tira fuori dati, impostazioni e cestino da una copia locale.
 
-        Accetta sia lo zip - dati piu' impostazioni - sia il vecchio .xlsx da
-        solo, con il suo _impostazioni.json accanto se c'e': le copie salvate
-        prima che lo zip esistesse devono restare ripristinabili.
+        Accetta sia lo zip - i tre file insieme - sia il vecchio .xlsx da solo,
+        con i suoi _impostazioni.json e _eliminati.json accanto se ci sono: le
+        copie salvate prima che lo zip esistesse devono restare ripristinabili.
 
-        Ritorna (file dati, file impostazioni o None).
+        Ritorna (file dati, file impostazioni o None, file eliminati o None).
         """
         if not os.path.exists(percorso):
             raise InventoryError(T("Il file %s non esiste piu'.")
                                  % os.path.basename(percorso))
         if not percorso.lower().endswith(".zip"):
-            accanto = os.path.splitext(percorso)[0] + "_impostazioni.json"
-            return percorso, (accanto if os.path.exists(accanto) else None)
+            radice = os.path.splitext(percorso)[0]
+            accanto = radice + "_impostazioni.json"
+            cestino = radice + "_eliminati.json"
+            return (percorso,
+                    accanto if os.path.exists(accanto) else None,
+                    cestino if os.path.exists(cestino) else None)
+
+        def per_nome(dentro, atteso):
+            return next((n for n in dentro
+                         if os.path.basename(n).lower() == atteso.lower()), None)
 
         try:
             with zipfile.ZipFile(percorso) as archivio:
@@ -1200,11 +1254,16 @@ class InventoryStore(object):
                         T("Nella copia %s non c'e' nessun inventario.\n\n"
                           "Non e' stato ripristinato niente.")
                         % os.path.basename(percorso))
-                impostazioni = next((n for n in dentro
-                                     if n.lower().endswith(".json")), None)
-                archivio.extract(dati, cartella)
-                if impostazioni:
-                    archivio.extract(impostazioni, cartella)
+                eliminati = per_nome(dentro, NOME_ELIMINATI_NELLO_ZIP)
+                impostazioni = per_nome(dentro, NOME_IMPOSTAZIONI_NELLO_ZIP)
+                if impostazioni is None:
+                    # copie vecchie: un solo .json, che erano le impostazioni
+                    impostazioni = next((n for n in dentro
+                                         if n.lower().endswith(".json")
+                                         and n != eliminati), None)
+                for dentro_lo_zip in (dati, impostazioni, eliminati):
+                    if dentro_lo_zip:
+                        archivio.extract(dentro_lo_zip, cartella)
         except zipfile.BadZipFile:
             raise InventoryError(
                 T("%s non e' una copia leggibile: il file e' rovinato o non e'\n"
@@ -1213,7 +1272,8 @@ class InventoryStore(object):
         except OSError as exc:
             raise InventoryError(T("Non riesco a leggere la copia:\n%s") % exc)
         return (os.path.join(cartella, dati),
-                os.path.join(cartella, impostazioni) if impostazioni else None)
+                os.path.join(cartella, impostazioni) if impostazioni else None,
+                os.path.join(cartella, eliminati) if eliminati else None)
 
     def anteprima_copia_locale(self, percorso):
         """Che cosa c'e' dentro una copia locale, senza toccare niente.
@@ -1225,7 +1285,7 @@ class InventoryStore(object):
 
         cartella = tempfile.mkdtemp()
         try:
-            dati, impostazioni = self._estrai_copia_locale(percorso, cartella)
+            dati, impostazioni, eliminati = self._estrai_copia_locale(percorso, cartella)
             try:
                 dispositivi = InventoryStore(dati)._read()
             except InventoryError as exc:
@@ -1234,7 +1294,7 @@ class InventoryStore(object):
                       "Non e' stato ripristinato niente.")
                     % (os.path.basename(percorso), exc))
             rapporto = {"dispositivi": len(dispositivi), "impostazioni": None,
-                        "per_stanza": {}, "quando": None}
+                        "per_stanza": {}, "quando": None, "eliminati": 0}
             for it in dispositivi:
                 stanza = clean(it.get("stanza")) or SENZA_STANZA
                 rapporto["per_stanza"][stanza] = rapporto["per_stanza"].get(stanza, 0) + 1
@@ -1248,6 +1308,13 @@ class InventoryStore(object):
                         rapporto["impostazioni"] = json.load(fh)
                 except (OSError, ValueError):
                     rapporto["impostazioni"] = None
+            if eliminati:
+                try:
+                    with open(eliminati, "r", encoding="utf-8") as fh:
+                        voci = json.load(fh)
+                    rapporto["eliminati"] = len(voci) if isinstance(voci, list) else 0
+                except (OSError, ValueError):
+                    rapporto["eliminati"] = 0
             return rapporto
         finally:
             shutil.rmtree(cartella, ignore_errors=True)
@@ -1266,7 +1333,7 @@ class InventoryStore(object):
 
         cartella = tempfile.mkdtemp()
         try:
-            dati, impostazioni = self._estrai_copia_locale(percorso, cartella)
+            dati, impostazioni, eliminati = self._estrai_copia_locale(percorso, cartella)
             try:
                 recuperati = InventoryStore(dati)._read()
             except InventoryError as exc:
@@ -1296,6 +1363,18 @@ class InventoryStore(object):
                     config.save_shared_config(self.path, letta)
                 except OSError:
                     letta = None
+            # E il cestino per ultimo, per la stessa ragione: se manca, quello
+            # che c'e' adesso resta dov'e' invece di essere azzerato.
+            self.eliminati_ripristinati = 0
+            if eliminati:
+                try:
+                    with open(eliminati, "r", encoding="utf-8") as fh:
+                        voci = json.load(fh)
+                    if isinstance(voci, list):
+                        self._scrivi_eliminati(self._pota_eliminati(voci))
+                        self.eliminati_ripristinati = len(voci)
+                except (OSError, ValueError):
+                    pass
         finally:
             shutil.rmtree(cartella, ignore_errors=True)
         self.load()
@@ -1334,7 +1413,14 @@ class InventoryStore(object):
         Prima di sostituire il file viene salvata una copia dello stato attuale,
         cosi' anche un ripristino sbagliato si puo' annullare.
 
+        Torna indietro anche il cestino salvato insieme a quella copia: sono lo
+        stesso stato condiviso, e riportare i dispositivi senza gli eliminati
+        lascerebbe nel cestino roba che nel frattempo e' rientrata in
+        inventario. Delle copie vecchie, salvate prima che il cestino
+        esistesse, quello che c'e' adesso resta com'e'.
+
         Ritorna (dispositivi ripristinati, copia dello stato precedente).
+        `eliminati_ripristinati` dice quanti record sono tornati nel cestino.
         """
         if not os.path.exists(percorso):
             raise InventoryError(T("La copia %s non esiste piu'.") % os.path.basename(percorso))
@@ -1353,6 +1439,19 @@ class InventoryStore(object):
                 raise InventoryError(
                     T("Non riesco a ripristinare la copia:\n%s\n\n"
                     "L'inventario e' rimasto com'era.") % exc)
+        # Il cestino dopo i dati: se qui va storto qualcosa, l'inventario e'
+        # comunque tornato al suo posto.
+        self.eliminati_ripristinati = 0
+        gemello = _cestino_accanto(percorso)
+        if os.path.exists(gemello):
+            try:
+                with open(gemello, "r", encoding="utf-8") as fh:
+                    voci = json.load(fh)
+                if isinstance(voci, list):
+                    self._scrivi_eliminati(self._pota_eliminati(voci))
+                    self.eliminati_ripristinati = len(voci)
+            except (OSError, ValueError):
+                pass
         self.load()
         return len(recuperati), precedente
 

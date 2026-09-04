@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.4).** The features are complete and every release
+> **Beta version (1.0.0-beta.5).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -1113,9 +1113,11 @@ you decide - your PC, a USB stick, off the network - a copy of the inventory
   the program had read earlier;
 - if another technician is saving right then, the program waits for them to
   finish: you never get a file caught mid-write;
-- it is a **zip** holding two files: the inventory (`Inventario.xlsx`) and the
-  settings (`inventario_impostazioni.json`). The devices alone would not be
-  enough: the **rooms** are not inside the data file;
+- it is a **zip** holding three files: the inventory (`Inventario.xlsx`), the
+  settings (`inventario_impostazioni.json`) and the recently deleted
+  (`inventario_eliminati.json`). The devices alone would not be enough: the
+  **rooms** are not inside the data file, and neither is the bin - and if the
+  network folder goes, that goes with it;
 - **it is a complete inventory, not an extract**. To look at it in Excel, open
   the zip with a double click: inside is an ordinary `.xlsx`.
 
@@ -1159,6 +1161,13 @@ The name carries **the date of the file being saved**, not the date of the copy:
 inventory do not produce two identical files, and looking for a version you go
 by when the contents date from rather than when somebody pressed a button. If a
 copy with that name already exists, a numbered one is added.
+
+Next to every copy the **bin of that moment** is saved too, with the same name
+plus `_eliminati.json`. Restoring that copy brings it back as well: they are the
+same shared state, and bringing the devices back without the deleted ones would
+leave in the bin things that have meanwhile returned to the inventory. Copies
+saved before the bin existed do not have it, and in that case the deleted ones
+you have now stay where they are.
 
 **Ten of them are kept.** When a new one arrives and there are already ten, the
 oldest is deleted. They are there to step back after a mistake, not to be an

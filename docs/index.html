@@ -168,7 +168,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 1.0.0-beta.4 · beta</div>
+  <div class="alpha">versione 1.0.0-beta.5 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -194,6 +194,26 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5</h3>
+      <p class="quando">4 settembre 2026</p>
+      <ul>
+        <li><b>Gli eliminati di recente viaggiano con l'inventario.</b> Il
+          cestino stava in un file a parte accanto ai dati, e restava fuori da
+          tutto: la copia in locale portava via dispositivi e impostazioni ma
+          non lui, e le copie automatiche solo il foglio. Chi si fosse trovato
+          senza la cartella di rete avrebbe recuperato i dispositivi e perso
+          l'unico posto da cui si ripesca quello tolto per sbaglio.</li>
+        <li><b>Adesso e' dentro lo zip della copia locale</b>, accanto a ogni
+          copia automatica, e torna indietro con tutti e due i ripristini: sono
+          lo stesso stato condiviso, e riportare i dispositivi senza gli
+          eliminati lascerebbe nel cestino roba nel frattempo rientrata in
+          inventario.</li>
+        <li><b>Le copie vecchie restano valide</b>: quelle salvate prima non
+          hanno il cestino, e in quel caso gli eliminati di adesso restano dove
+          sono invece di essere azzerati.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.4</h3>
       <p class="quando">3 settembre 2026</p>
@@ -235,19 +255,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           capitolo "Importare da Excel" - ora hanno una voce propria
           nell'indice. Il trasloco di una stanza con un ruolo non era mai
           stato spiegato li' dentro, e adesso c'e'.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.46.0</h3>
-      <p class="quando">3 settembre 2026</p>
-      <ul>
-        <li><b>Ripristina tutto</b> negli eliminati di recente: rimette dentro
-          l'intero cestino in un colpo, con lo stesso riepilogo dettagliato e la
-          conferma sotto.</li>
-        <li><b>Con una ricerca attiva agisce sui risultati</b>, non sul cestino
-          intero, e il numero sul pulsante dice sempre su quanti sta per agire:
-          ripristinare di nascosto roba fuori dal filtro sarebbe la sorpresa
-          peggiore.</li>
       </ul>
     </div>
   </div>
@@ -435,7 +442,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 1.0.0-beta.4 · beta</div>
+  <div class="alpha">version 1.0.0-beta.5 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -461,6 +468,26 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5</h3>
+      <p class="quando">4 September 2026</p>
+      <ul>
+        <li><b>The recently deleted travel with the inventory.</b> The bin lived
+          in a separate file next to the data and was left out of everything:
+          the local copy took the devices and the settings but not it, and the
+          automatic copies only the sheet. Anyone left without the network
+          folder would have got the devices back and lost the only place you
+          fish back what was removed by mistake.</li>
+        <li><b>Now it is inside the local copy's zip</b>, next to every
+          automatic copy, and it comes back with both restores: they are the
+          same shared state, and bringing the devices back without the deleted
+          ones would leave in the bin things that have meanwhile returned to
+          the inventory.</li>
+        <li><b>Older copies stay valid</b>: the ones saved before do not have
+          the bin, and in that case the deleted ones you have now stay where
+          they are instead of being wiped.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.4</h3>
       <p class="quando">3 September 2026</p>
@@ -502,19 +529,6 @@ python Inventario.py</pre>
           Excel" chapter - they now have their own entry in the index.
           Relocating a room with a role had never been explained there, and
           now it is.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v0.46.0</h3>
-      <p class="quando">3 September 2026</p>
-      <ul>
-        <li><b>Restore everything</b> in the recently deleted: it puts the whole
-          bin back in one go, with the same detailed summary and the
-          confirmation below.</li>
-        <li><b>With a search active it acts on the results</b>, not on the whole
-          bin, and the number on the button always says how many it is about to
-          act on: quietly restoring things outside the filter would be the worst
-          surprise.</li>
       </ul>
     </div>
   </div>
