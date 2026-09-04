@@ -630,6 +630,9 @@ class InventoryStore(object):
         # sono tornati con l'ultimo ripristino.
         self.eliminati_nella_copia = False
         self.eliminati_ripristinati = 0
+        # Voci del cestino tolte dall'ultimo ripristino perche' il dispositivo
+        # era gia' in inventario.
+        self.tolti_perche_presenti = []
 
     def _enforce_iphone_room(self, item):
         """Un iPhone appartiene sempre alla sua stanza, comunque lo si registri."""
@@ -772,6 +775,7 @@ class InventoryStore(object):
             normalize_state(item, self.stati)
             _stamp_item(item)
             items.append(item)
+            return item["asset_tag"]      # cosi' chi chiama sa che e' andata
 
         return self._apply(op)
 
@@ -915,6 +919,41 @@ class InventoryStore(object):
                 if cerca in ("%s %s %s" % (v.get("asset_tag", ""), v.get("tipo", ""),
                                            v.get("stanza", ""))).lower()]
 
+    def togli_dal_cestino(self, tags=None):
+        """Toglie dal cestino i record che intanto sono (tornati) in inventario.
+
+        Un dispositivo non puo' essere insieme in elenco e fra gli eliminati di
+        recente: sarebbe un doppione fra due posti che si contraddicono, e chi
+        lo ripescasse dal cestino ne creerebbe una seconda copia. Ogni strada
+        che rimette dentro un identificativo - importazione, inserimento
+        singolo, controllo doppioni - passa di qui.
+
+        `tags` limita la pulizia a quegli identificativi; senza, guarda tutto
+        l'inventario. Si toglie solo cio' che in inventario c'e' davvero: il
+        cestino non si svuota per sbaglio.
+
+        Ritorna la lista dei tolti, con la stanza in cui il dispositivo si trova
+        adesso in inventario - la domanda che si fa chi legge il riepilogo.
+        """
+        voci = self._pota_eliminati(self._leggi_eliminati())
+        if not voci:
+            return []
+        in_inventario = dict((norm_tag(i.get("asset_tag")), i) for i in self.items)
+        volute = set(norm_tag(t) for t in tags) if tags is not None else None
+        tolti, restano = [], []
+        for voce in voci:
+            tag = norm_tag(voce.get("asset_tag"))
+            dentro = in_inventario.get(tag)
+            if dentro is None or (volute is not None and tag not in volute):
+                restano.append(voce)
+                continue
+            tolti.append({"asset_tag": tag,
+                          "tipo": clean(voce.get("tipo")),
+                          "stanza": clean(dentro.get("stanza")) or SENZA_STANZA})
+        if tolti:
+            self._scrivi_eliminati(restano)
+        return tolti
+
     def ripristina_eliminati(self, chiavi, stanza=None):
         """Rimette in inventario i record scelti, nella stanza che avevano.
 
@@ -925,6 +964,12 @@ class InventoryStore(object):
         asset tag, tipo e la stanza in cui il dispositivo e' tornato: chi ha
         chiesto il ripristino deve poter leggere dove sono finiti, non solo
         quanti erano. `saltati` sono coppie (asset tag, motivo).
+
+        Un identificativo che intanto e' tornato in inventario per un'altra
+        strada non e' un errore da segnalare: e' una voce del cestino che non
+        ha piu' ragione di esistere. Viene tolta, e finisce in
+        `tolti_perche_presenti` con la stanza in cui il dispositivo si trova
+        adesso - la prima cosa che si vuole sapere.
         """
         volute = [norm_tag(c) for c in chiavi]
         voci = self._pota_eliminati(self._leggi_eliminati())
@@ -944,26 +989,36 @@ class InventoryStore(object):
             scheda["stanza"] = dove
             da_rimettere.append((tag, scheda))
 
+        gia_dentro = []
+
         def op(items):
-            presenti = set(norm_tag(i.get("asset_tag")) for i in items)
+            presenti = dict((norm_tag(i.get("asset_tag")), i) for i in items)
             rimessi = []
             for tag, scheda in da_rimettere:
                 if tag in presenti:
-                    saltati.append((tag, T("esiste gia' in inventario")))
+                    gia_dentro.append(
+                        {"asset_tag": tag,
+                         "tipo": clean(scheda.get("tipo")),
+                         "stanza": clean(presenti[tag].get("stanza")) or SENZA_STANZA})
                     continue
                 self._enforce_iphone_room(scheda)
                 normalize_state(scheda, self.stati)
                 _stamp_item(scheda)
                 items.append(scheda)
-                presenti.add(tag)
+                presenti[tag] = scheda
                 rimessi.append({"asset_tag": tag,
                                 "tipo": clean(scheda.get("tipo")),
                                 "stanza": clean(scheda.get("stanza"))})
             return rimessi
 
         rimessi = self._apply(op) if da_rimettere else []
-        if rimessi:
-            tolti = set(r["asset_tag"] for r in rimessi)
+        self.tolti_perche_presenti = gia_dentro
+        # Escono dal cestino sia quelli tornati dentro adesso, sia quelli che
+        # c'erano gia': in tutti e due i casi il dispositivo e' in inventario,
+        # e restare anche nel cestino non avrebbe senso.
+        tolti = set(r["asset_tag"] for r in rimessi) | set(
+            r["asset_tag"] for r in gia_dentro)
+        if tolti:
             self._scrivi_eliminati([v for v in voci if v.get("asset_tag") not in tolti])
         return rimessi, saltati
 
@@ -1876,15 +1931,30 @@ class InventoryStore(object):
     def anteprima_importazione(self, incoming, mode="merge", stanza=None):
         """Che cosa succederebbe importando, senza scrivere niente.
 
-        Un riepilogo con dei numeri soltanto - "12 aggiunti, 3 aggiornati" - non
+        Un riepilogo con dei numeri soltanto - "12 aggiunti, 3 saltati" - non
         dice dove finiranno i dispositivi ne' che cosa si sta per perdere. Qui si
-        contano le aggiunte e gli aggiornamenti stanza per stanza, e si dice
-        quanti dispositivi ci saranno alla fine.
+        contano le aggiunte e i salti stanza per stanza, e si dice quanti
+        dispositivi ci saranno alla fine.
+
+        Un asset tag gia' in inventario non viene importato: la riga si salta e
+        si dice dov'e' quello che c'e' gia'. Chi sta importando decide se e' un
+        errore di battitura o il dispositivo che aveva gia' registrato, ma
+        l'importazione non gli riscrive la scheda sotto senza dirglielo.
         """
         items = self.load()
-        presenti = set(norm_tag(i["asset_tag"]) for i in items)
+        # In sostituzione il confronto si fa con quello che sopravvive alla
+        # pulizia, non con l'inventario di adesso: il resto sta per sparire.
+        sopravvissuti = items
+        if mode == "replace":
+            sopravvissuti = [it for it in items
+                             if is_iphone(it.get("tipo"))
+                             or (stanza is not None and it.get("stanza") != stanza)]
+        dove_sta = dict((norm_tag(i["asset_tag"]), i) for i in sopravvissuti)
+        presenti = set(dove_sta)
         per_stanza = {}
         senza_identificativo = 0
+        gia_presenti = []
+        nuovi = set()
         for raw in incoming:
             item = dict(raw)
             tag = norm_tag(item.get("asset_tag"))
@@ -1893,12 +1963,17 @@ class InventoryStore(object):
                 continue
             dove = clean(stanza) if stanza is not None else clean(item.get("stanza"))
             riga = per_stanza.setdefault(dove or SENZA_STANZA,
-                                         {"aggiunti": 0, "aggiornati": 0})
+                                         {"aggiunti": 0, "saltati": 0})
             if tag in presenti:
-                riga["aggiornati"] += 1
-            else:
+                riga["saltati"] += 1
+                trovato = dove_sta.get(tag)
+                gia_presenti.append(
+                    {"asset_tag": tag,
+                     "stanza": clean((trovato or {}).get("stanza")) or SENZA_STANZA})
+            elif tag not in nuovi:
+                # ripetuto nel foglio: entrera' una volta sola, vale l'ultima riga
                 riga["aggiunti"] += 1
-                presenti.add(tag)
+                nuovi.add(tag)
 
         eliminati = 0
         if mode == "replace":
@@ -1910,7 +1985,8 @@ class InventoryStore(object):
         return {
             "per_stanza": per_stanza,
             "aggiunti": aggiunti,
-            "aggiornati": sum(r["aggiornati"] for r in per_stanza.values()),
+            "saltati": sum(r["saltati"] for r in per_stanza.values()),
+            "gia_presenti": gia_presenti,
             "eliminati": eliminati,
             "senza_identificativo": senza_identificativo,
             "prima": len(items),
@@ -1928,11 +2004,23 @@ class InventoryStore(object):
         iPhone non si toccano mai: non arrivano da un'importazione, quindi una
         sostituzione li cancellerebbe senza possibilita' di recupero.
 
-        Ritorna un dizionario con aggiunti, aggiornati, eliminati e copia.
+        Un asset tag gia' in inventario **non viene importato**: la riga si
+        salta e finisce in `gia_presenti`, con la stanza in cui sta quello che
+        c'e' gia'. Un'importazione non riscrive di nascosto la scheda di un
+        dispositivo gia' registrato: se e' lo stesso non serve, e se e' un altro
+        e' un errore di battitura da guardare.
+
+        Chi era solo nel cestino invece entra: quello non e' in inventario. La
+        sua voce fra gli eliminati di recente viene tolta subito dopo, o il
+        dispositivo resterebbe in tutti e due i posti.
+
+        Ritorna un dizionario con aggiunti, gia_presenti, eliminati, copia e
+        tolti_dal_cestino.
         """
 
         def op(items):
-            esito = {"aggiunti": 0, "aggiornati": 0, "eliminati": 0, "copia": None}
+            esito = {"aggiunti": 0, "gia_presenti": [], "eliminati": 0,
+                     "copia": None}
             if mode == "replace":
                 esito["copia"] = self.copia_di_sicurezza()
                 prima = len(items)
@@ -1940,7 +2028,13 @@ class InventoryStore(object):
                             if is_iphone(it.get("tipo"))
                             or (stanza is not None and it.get("stanza") != stanza)]
                 esito["eliminati"] = prima - len(items)
-            index = {it["asset_tag"]: i for i, it in enumerate(items)}
+            # Chi c'era gia' prima di questa importazione: e' con loro che si
+            # fa il confronto. Le righe aggiunte adesso non entrano nel
+            # paragone, o un foglio che ripete lo stesso identificativo si
+            # salterebbe da solo la seconda volta - e li' vale un'altra regola,
+            # quella del foglio: l'ultima riga vince.
+            c_erano_prima = {it["asset_tag"]: it for it in items}
+            appena_messi = {}
             for raw in incoming:
                 item = dict(raw)
                 item["asset_tag"] = norm_tag(item.get("asset_tag"))
@@ -1949,19 +2043,28 @@ class InventoryStore(object):
                 if not item["asset_tag"]:
                     continue
                 normalize_identity(item)
+                gia = c_erano_prima.get(item["asset_tag"])
+                if gia is not None:
+                    esito["gia_presenti"].append(
+                        {"asset_tag": item["asset_tag"],
+                         "stanza": clean(gia.get("stanza")) or SENZA_STANZA})
+                    continue
                 self._enforce_iphone_room(item)
                 normalize_state(item, self.stati)
                 _stamp_item(item)
-                if item["asset_tag"] in index:
-                    items[index[item["asset_tag"]]] = item
-                    esito["aggiornati"] += 1
+                if item["asset_tag"] in appena_messi:
+                    items[appena_messi[item["asset_tag"]]] = item
                 else:
-                    index[item["asset_tag"]] = len(items)
+                    appena_messi[item["asset_tag"]] = len(items)
                     items.append(item)
                     esito["aggiunti"] += 1
             return esito
 
-        return self._apply(op)
+        esito = self._apply(op)
+        # Il cestino si ripulisce dopo, sui soli identificativi appena entrati:
+        # erano eliminati, adesso sono di nuovo in inventario.
+        esito["tolti_dal_cestino"] = self.togli_dal_cestino()
+        return esito
 
 
 # ------------------------------------------------------------- utilita'

@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.5).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5.1).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -546,8 +546,12 @@ eliminato.
 - il dispositivo torna **nella stanza in cui era al momento dell'eliminazione**,
   con tutto quello che aveva: numero di serie, note, stato, prestito, spedizione.
 
-Un ripristino viene **saltato** se nel frattempo quell'asset tag e' rientrato in
-inventario in altro modo: il programma lo dice invece di creare un doppione.
+Se nel frattempo quell'asset tag e' **rientrato in inventario** per un'altra
+strada, non c'e' niente da ripristinare e non e' un errore: quella voce del
+cestino non ha piu' ragione di esistere. Il programma **la toglie** e te lo dice,
+indicando **in che stanza** si trova adesso il dispositivo - la prima cosa che
+si vuole sapere. Cosi' non resta in due posti che si contraddicono, e non se ne
+puo' ripristinare una seconda copia.
 
 ### I dispositivi di una stanza tolta
 
@@ -567,11 +571,24 @@ programma **chiede in che stanza rimetterli**.
 
 ## I doppioni
 
-Il programma non ne crea. L'**inserimento singolo rifiuta** un identificativo
-gia' presente, dicendo dove sta e che cos'e' quello che c'e' gia', e senza
-inserire niente; l'**importazione aggiorna** la scheda invece di duplicarla. Se
-un foglio contiene due volte lo stesso identificativo vale l'ultima riga, e il
-riepilogo lo dichiara prima di importare.
+Il programma non ne crea, e un identificativo gia' in inventario **non entra mai
+una seconda volta**.
+
+- l'**inserimento singolo rifiuta** un identificativo gia' presente, dicendo
+  dove sta e che cos'e' quello che c'e' gia', e senza inserire niente;
+- l'**importazione salta** la riga e dice **in che stanza** sta il dispositivo
+  che c'e' gia'. Non ne riscrive la scheda: se e' lo stesso dispositivo non
+  serve, e se e' un altro con lo stesso codice e' un errore di battitura da
+  guardare, non da applicare in silenzio;
+- se un foglio contiene **due volte lo stesso identificativo** vale l'ultima
+  riga - quella e' una regola del foglio, non dell'inventario - e il riepilogo
+  lo dichiara prima di importare.
+
+**Gli eliminati di recente contano come "non in inventario".** Un dispositivo
+che sta solo nel cestino viene importato o inserito normalmente, e la sua voce
+nel cestino sparisce: non puo' stare insieme in elenco e fra gli eliminati,
+altrimenti da li' si potrebbe "ripristinare" una seconda copia. Il riepilogo
+dell'operazione lo dice, con l'identificativo e la stanza in cui e' finito.
 
 Entrano da un'altra strada: il file dati e' un `.xlsx` che si puo' aprire e
 correggere a mano. Per quello c'e' **`Controllo generale duplicati`**, accanto
@@ -1401,7 +1418,7 @@ ma la scelta di **che cosa** si carica e **come**.
 
 | | |
 | --- | --- |
-| Unisci | aggiunge i nuovi e aggiorna quelli gia' presenti con lo stesso asset tag |
+| Unisci | aggiunge i nuovi e **salta** quelli gia' in inventario, senza toccarne la scheda |
 | Sostituisci | svuota prima, poi carica solo cio' che c'e' nel file |
 
 Le due scelte si combinano: *sostituisci una sola stanza* rifa' da zero il

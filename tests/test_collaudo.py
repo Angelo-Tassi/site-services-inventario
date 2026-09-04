@@ -42,7 +42,7 @@ assert esito["da_tag"] == 30, esito
 assert esito["scartate"] == 0 and esito["colonne_ignorate"] == [], esito
 s = inventario_vuoto()
 r = s.import_items(items, "merge")
-assert (r["aggiunti"], r["aggiornati"]) == (30, 0), r
+assert (r["aggiunti"], r["gia_presenti"]) == (30, []), r
 s.load()
 assert per_stanza(s) == {BAU: 10, KIOSK: 10, DR: 10}, per_stanza(s)
 # i tablet Dell ci sono e si distinguono dai laptop
@@ -50,16 +50,28 @@ tablet = [i for i in s.items if i["tipo"] == "Tablet"]
 assert len(tablet) == 9 and all("Dell" in i["modello"] for i in tablet), len(tablet)
 
 # ---------------------------------------------------- 2. l'unione non duplica
+# Sono tutti gia' in inventario: nessuno entra, nessuno viene riscritto, e per
+# ognuno si dice in che stanza sta quello che c'e' gia'.
 r = s.import_items(items, "merge")
-assert (r["aggiunti"], r["aggiornati"]) == (0, 30), r
+assert r["aggiunti"] == 0, r
+assert len(r["gia_presenti"]) == 30, len(r["gia_presenti"])
+assert {v["stanza"] for v in r["gia_presenti"]} == {BAU, KIOSK, DR}, r["gia_presenti"]
 s.load()
 assert per_stanza(s) == {BAU: 10, KIOSK: 10, DR: 10}
 
 # ---------------------------------------------------- 3. sostituire una stanza
+# Qui si passano tutte e 30 le righe forzando la stanza Digital Kiosk: dentro il
+# programma non succede mai - "Una sola stanza" filtra prima le righe di quella
+# stanza - ma serve a controllare che cosa fa l'archivio se ci provi.
+# Le 10 del Kiosk vengono cancellate e rimesse; le 20 delle altre due stanze
+# sono gia' in inventario e vengono saltate: un'importazione dentro una stanza
+# non trascina li' dispositivi registrati altrove.
 r = s.import_items(items, "replace", KIOSK)
 assert r["eliminati"] == 10, r
+assert r["aggiunti"] == 10, r
+assert len(r["gia_presenti"]) == 20, len(r["gia_presenti"])
 s.load()
-assert per_stanza(s) == {KIOSK: 30}, per_stanza(s)
+assert per_stanza(s) == {BAU: 10, KIOSK: 10, DR: 10}, per_stanza(s)
 assert r["copia"] and os.path.exists(r["copia"])
 assert os.path.basename(os.path.dirname(r["copia"])) == "Backup", r["copia"]
 

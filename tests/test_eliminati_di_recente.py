@@ -56,13 +56,22 @@ for campo in ("tipo", "modello", "seriale", "note", "prestato_a", "prestato_il")
     assert dopo[campo] == prima[campo], (campo, prima[campo], dopo[campo])
 assert not store.eliminati(), "ripristinato, esce dal cestino"
 
-# ---- ripristinare un asset tag che esiste gia' viene saltato, non duplicato
+# ---- un asset tag che esiste gia' non e' un errore: e' una voce del cestino
+# che non ha piu' ragione di esistere, e se ne va dicendo dov'e' il dispositivo
 store.delete(["IT-0101"])
-store.add(new_item("IT-0101", "Laptop", "Rimesso a mano", "SN", BAU))
-rimessi, saltati = store.ripristina_eliminati(["IT-0101"])
-assert rimessi == [] and saltati and "esiste gia'" in saltati[0][1], (rimessi, saltati)
+store.add(new_item("IT-0101", "Laptop", "Rimesso a mano", "SN", KIOSK))
 store.load()
-assert len([i for i in store.items if i["asset_tag"] == "IT-0101"]) == 1
+rimessi, saltati = store.ripristina_eliminati(["IT-0101"])
+assert rimessi == [] and saltati == [], (rimessi, saltati)
+assert [v["asset_tag"] for v in store.tolti_perche_presenti] == ["IT-0101"], \
+    store.tolti_perche_presenti
+assert store.tolti_perche_presenti[0]["stanza"] == KIOSK, \
+    "va detto in che stanza si trova adesso"
+assert "IT-0101" not in [v["asset_tag"] for v in store.eliminati()], \
+    "la voce del cestino se ne va: il dispositivo e' in inventario"
+store.load()
+assert len([i for i in store.items if i["asset_tag"] == "IT-0101"]) == 1, \
+    "e non se ne crea una seconda copia"
 
 # ---- e uno che non c'e' piu' nel cestino
 rimessi, saltati = store.ripristina_eliminati(["IT-9999"])

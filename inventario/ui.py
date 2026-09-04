@@ -1250,7 +1250,7 @@ class ImportDialog(_Modal):
     def _dettaglio(self, body, anteprima, opzioni):
         """Che cosa entra, dove, e quanti dispositivi ci saranno alla fine.
 
-        Un riepilogo con due numeri - "12 aggiunti, 3 aggiornati" - non dice in
+        Un riepilogo con due numeri - "12 aggiunti, 3 saltati" - non dice in
         quale stanza finiscono ne' se l'inventario raddoppia. Chi sta per
         riscrivere l'inventario di tutti ha il diritto di vederlo prima.
         """
@@ -1264,8 +1264,8 @@ class ImportDialog(_Modal):
             pezzi = []
             if conto["aggiunti"]:
                 pezzi.append(T("%d nuovi") % conto["aggiunti"])
-            if conto["aggiornati"]:
-                pezzi.append(T("%d aggiornati") % conto["aggiornati"])
+            if conto.get("saltati"):
+                pezzi.append(T("%d gia' in inventario") % conto["saltati"])
             righe.append("  %-30s %s" % (stanza, ", ".join(pezzi) or T("niente")))
         if righe:
             righe.insert(0, T("Dove finiscono:"))
@@ -1273,6 +1273,15 @@ class ImportDialog(_Modal):
         if anteprima.get("senza_identificativo"):
             saltate.append(T("  %d senza asset tag")
                            % anteprima["senza_identificativo"])
+        gia = anteprima.get("gia_presenti") or []
+        if gia:
+            saltate.append(T("  %d gia' in inventario: non vengono importate")
+                           % len(gia))
+            for voce in gia[:6]:
+                saltate.append("      %s  ->  %s"
+                               % (voce["asset_tag"], voce["stanza"]))
+            if len(gia) > 6:
+                saltate.append(T("      ...e altre %d") % (len(gia) - 6))
         if saltate:
             righe.append("")
             righe.append(T("Saltate:"))
@@ -1879,6 +1888,29 @@ class CestinoDialog(_Modal):
         # rileggerlo dopo sarebbe una finestra da chiudere e basta. L'esito si
         # scrive sotto l'elenco.
         self.var_dettaglio.set(" - ".join(esito_ripristino_breve(rimessi)))
+
+        # Uno che era gia' in inventario non e' un errore: e' una voce del
+        # cestino che non aveva piu' ragione di esistere. Si dice che e' stata
+        # tolta e, soprattutto, dove il dispositivo si trova adesso.
+        gia_dentro = list(getattr(self.store, "tolti_perche_presenti", []))
+        if gia_dentro:
+            self.app._aggiorna_cestino()
+            if len(gia_dentro) == 1:
+                voce = gia_dentro[0]
+                testo = T("%s era gia' in inventario, in %s.\n\n"
+                          "Non c'era niente da ripristinare: l'ho tolto dagli\n"
+                          "eliminati di recente, perche' un dispositivo non puo'\n"
+                          "stare insieme in elenco e nel cestino.") % (
+                              voce["asset_tag"], voce["stanza"])
+            else:
+                testo = "\n".join(
+                    [T("Questi erano gia' in inventario, e li ho tolti dagli\n"
+                       "eliminati di recente: un dispositivo non puo' stare\n"
+                       "insieme in elenco e nel cestino.\n")] +
+                    ["    %s  ->  %s" % (v["asset_tag"], v["stanza"])
+                     for v in gia_dentro])
+            messagebox.showinfo(T("Erano gia' in inventario"), testo, parent=self)
+
         if saltati:
             # Uno saltato invece va detto: e' l'unico caso in cui il ripristino
             # non ha fatto quello che si era appena confermato.
@@ -3441,7 +3473,36 @@ class App(tk.Tk):
                           iphone_room=self.iphone_room(),
                           stati=self.cfg.get("states")).show()
         if item:
-            self._run(lambda: self.store.add(item), T("Aggiunto %s.") % item["asset_tag"])
+            self._aggiungi(item)
+
+    def _aggiungi(self, item):
+        """Inserisce un dispositivo, e toglie dal cestino la sua vecchia voce.
+
+        Se quell'identificativo era fra gli eliminati di recente, adesso e' di
+        nuovo in inventario: lasciarcelo vorrebbe dire poterlo "ripristinare"
+        una seconda volta, cioe' creare un doppione dal nulla.
+        """
+        if not self._run(lambda: self.store.add(item),
+                         T("Aggiunto %s.") % item["asset_tag"]):
+            return
+        tolti = self._pulisci_cestino([item["asset_tag"]])
+        if tolti:
+            messagebox.showinfo(
+                T("Tolto dagli eliminati di recente"),
+                T("%s era anche fra gli eliminati di recente.\n\n"
+                  "L'ho tolto da li': adesso e' in inventario, in %s.")
+                % (tolti[0]["asset_tag"], tolti[0]["stanza"]), parent=self)
+
+    def _pulisci_cestino(self, tags=None):
+        """Toglie dal cestino cio' che intanto e' in inventario, e aggiorna il
+        pulsante con il conteggio. Non fa fallire mai l'operazione che la
+        chiama: e' una pulizia, non un passaggio obbligato."""
+        try:
+            tolti = self.store.togli_dal_cestino(tags)
+        except Exception:
+            return []
+        self._aggiorna_cestino()
+        return tolti
 
     def stanza_predefinita(self):
         if self.view == "room":
@@ -3471,7 +3532,7 @@ class App(tk.Tk):
                           iphone_room=self.iphone_room(),
                           stati=self.cfg.get("states")).show()
         if item:
-            self._run(lambda: self.store.add(item), T("Aggiunto %s.") % item["asset_tag"])
+            self._aggiungi(item)
 
     def on_new(self, tipo=None):
         rooms = self.cfg["rooms"]
@@ -3482,7 +3543,7 @@ class App(tk.Tk):
                           iphone_room=self.iphone_room(),
                           stati=self.cfg.get("states")).show()
         if item:
-            self._run(lambda: self.store.add(item), T("Aggiunto %s.") % item["asset_tag"])
+            self._aggiungi(item)
 
     def on_edit(self):
         items = self.selected_items()
@@ -3885,13 +3946,31 @@ class App(tk.Tk):
                 T("Ripristinati %d dispositivi dagli eliminati di recente.")
                 % ripristinati + "     " + self.var_status.get())
 
+    def _righe_tolti_dal_cestino(self, tolti):
+        """Le righe che raccontano che cosa e' uscito dagli eliminati di recente."""
+        if not tolti:
+            return []
+        righe = ["", T("TOLTI DAGLI ELIMINATI DI RECENTE: %d") % len(tolti),
+                 T("Erano nel cestino ma sono in inventario: un dispositivo non"),
+                 T("puo' stare in tutti e due i posti.")]
+        for voce in tolti[:12]:
+            righe.append("    %s  ->  %s" % (voce["asset_tag"], voce["stanza"]))
+        if len(tolti) > 12:
+            righe.append(T("    ...e altri %d") % (len(tolti) - 12))
+        return righe
+
     def on_duplicati(self):
         """Cerca in tutto l'inventario i dispositivi registrati due volte.
 
         Il file dati e' un .xlsx che si puo' aprire e correggere a mano: e' da
         li' che i doppioni entrano. Il programma non ne crea, ma deve saperli
         togliere.
+
+        Guarda anche nel cestino: un identificativo che sta insieme in elenco e
+        fra gli eliminati di recente e' un doppione come gli altri, e da li' si
+        potrebbe "ripristinare" una seconda copia.
         """
+        tolti = self._pulisci_cestino()
         gruppi, seriali = self.store.trova_duplicati()
         if not gruppi and not seriali:
             messagebox.showinfo(
@@ -3900,11 +3979,15 @@ class App(tk.Tk):
                   "volta sola. E' quello l'identificativo, e su quello si controlla.\n\n"
                   "Nemmeno un numero di serie risulta ripetuto, ma quella e' solo una\n"
                   "verifica in piu': il seriale non identifica il dispositivo.")
-                % len(self.store.items), parent=self)
+                % len(self.store.items)
+                + "\n".join([""] + self._righe_tolti_dal_cestino(tolti)), parent=self)
             return
 
         righe = [T("Confrontato l'asset tag di %d dispositivi.")
                  % len(self.store.items), ""]
+        righe.extend(self._righe_tolti_dal_cestino(tolti))
+        if tolti:
+            righe.append("")
         if gruppi:
             quanti = sum(len(e) - 1 for _t, e in gruppi)
             righe.append(T("DOPPIONI TROVATI: %d asset tag registrati piu' volte, "
@@ -4042,12 +4125,15 @@ class App(tk.Tk):
             items, opzioni["mode"], stanza))
         if not risultato:
             return
+        tolti = risultato.get("tolti_dal_cestino") or []
+        self._aggiorna_cestino()
         messagebox.showinfo(T("Importazione completata"),
                             "\n".join(self._resoconto_importazione(
-                                risultato, esito, opzioni, scartati)),
+                                risultato, esito, opzioni, scartati, tolti)),
                             parent=self)
 
-    def _resoconto_importazione(self, risultato, esito, opzioni, scartati=0):
+    def _resoconto_importazione(self, risultato, esito, opzioni, scartati=0,
+                                tolti_dal_cestino=()):
         """Che cosa e' stato fatto davvero, riga per riga.
 
         A operazione avvenuta i numeri non bastano: chi ha appena riscritto
@@ -4062,7 +4148,16 @@ class App(tk.Tk):
             righe.append(T("Eliminati prima del caricamento: %d")
                          % risultato["eliminati"])
         righe.append(T("Aggiunti: %d") % risultato["aggiunti"])
-        righe.append(T("Aggiornati: %d") % risultato["aggiornati"])
+        gia = risultato.get("gia_presenti") or []
+        if gia:
+            righe.append("")
+            righe.append(T("NON IMPORTATI, gia' in inventario: %d") % len(gia))
+            righe.append(T("La scheda di un dispositivo gia' registrato non si"))
+            righe.append(T("riscrive da un foglio: e' rimasta com'era."))
+            for voce in gia[:12]:
+                righe.append("    %s  ->  %s" % (voce["asset_tag"], voce["stanza"]))
+            if len(gia) > 12:
+                righe.append(T("    ...e altri %d") % (len(gia) - 12))
 
         saltate = []
         if esito.get("scartate"):
@@ -4085,6 +4180,17 @@ class App(tk.Tk):
             righe.append("")
             righe.append(T("Colonne del foglio non riconosciute: %s")
                          % ", ".join(esito["colonne_ignorate"][:6]))
+
+        if tolti_dal_cestino:
+            righe.append("")
+            righe.append(T("TOLTI DAGLI ELIMINATI DI RECENTE: %d")
+                         % len(tolti_dal_cestino))
+            righe.append(T("Erano nel cestino e l'importazione li ha rimessi in"))
+            righe.append(T("inventario: non possono stare in tutti e due i posti."))
+            for voce in tolti_dal_cestino[:12]:
+                righe.append("    %s  ->  %s" % (voce["asset_tag"], voce["stanza"]))
+            if len(tolti_dal_cestino) > 12:
+                righe.append(T("    ...e altri %d") % (len(tolti_dal_cestino) - 12))
 
         righe.append("")
         righe.append(T("In inventario adesso: %d dispositivi.") % len(self.store.items))
@@ -4140,9 +4246,11 @@ class App(tk.Tk):
             miei, opzioni["mode"], stanza))
         if not risultato:
             return
+        tolti = risultato.get("tolti_dal_cestino") or []
+        self._aggiorna_cestino()
         messagebox.showinfo(T("Importazione completata"),
                             "\n".join(self._resoconto_importazione(
-                                risultato, esito_stanza, opzioni, scartati)),
+                                risultato, esito_stanza, opzioni, scartati, tolti)),
                             parent=self)
 
     def _avviso_stanza_mancante(self, stanza, esito):

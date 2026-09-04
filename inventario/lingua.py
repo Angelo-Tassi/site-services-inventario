@@ -1124,6 +1124,52 @@ EN = {
     'di recente.':
         'Inside are the inventory, the settings - rooms, types and statuses to\n'
         'put it back as it was - and the recently deleted.',
+    'TOLTI DAGLI ELIMINATI DI RECENTE: %d':
+        'TAKEN OUT OF THE RECENTLY DELETED: %d',
+    "Erano nel cestino e l'importazione li ha rimessi in":
+        'They were in the bin and the import put them back into the',
+    'inventario: non possono stare in tutti e due i posti.':
+        'inventory: they cannot be in both places.',
+    'Erano nel cestino ma sono in inventario: un dispositivo non':
+        'They were in the bin but they are in the inventory: a device cannot',
+    "puo' stare in tutti e due i posti.":
+        'be in both places.',
+    '    ...e altri %d':
+        '    ...and %d more',
+    'Tolto dagli eliminati di recente':
+        'Taken out of the recently deleted',
+    "%s era anche fra gli eliminati di recente.\n\n"
+    "L'ho tolto da li': adesso e' in inventario, in %s.":
+        '%s was among the recently deleted too.\n\n'
+        'I took it out of there: it is in the inventory now, in %s.',
+    "Erano gia' in inventario":
+        'They were already in the inventory',
+    "%s era gia' in inventario, in %s.\n\n"
+    "Non c'era niente da ripristinare: l'ho tolto dagli\n"
+    "eliminati di recente, perche' un dispositivo non puo'\n"
+    'stare insieme in elenco e nel cestino.':
+        '%s was already in the inventory, in %s.\n\n'
+        'There was nothing to restore: I took it out of the recently\n'
+        'deleted, because a device cannot be in the list and in the bin\n'
+        'at the same time.',
+    "Questi erano gia' in inventario, e li ho tolti dagli\n"
+    "eliminati di recente: un dispositivo non puo' stare\n"
+    'insieme in elenco e nel cestino.\n':
+        'These were already in the inventory, and I took them out of the\n'
+        'recently deleted: a device cannot be in the list and in the bin\n'
+        'at the same time.\n',
+    "NON IMPORTATI, gia' in inventario: %d":
+        'NOT IMPORTED, already in the inventory: %d',
+    "La scheda di un dispositivo gia' registrato non si":
+        'The record of a device already registered is not',
+    "riscrive da un foglio: e' rimasta com'era.":
+        'rewritten from a sheet: it stayed as it was.',
+    "  %d gia' in inventario: non vengono importate":
+        '  %d already in the inventory: they are not imported',
+    "%d gia' in inventario":
+        '%d already in the inventory',
+    '      ...e altre %d':
+        '      ...and %d more',
     'in conservazione fino al %s':
         'kept until %s',
 'in prestito a %s: registra prima il rientro':

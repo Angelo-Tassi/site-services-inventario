@@ -138,11 +138,16 @@ finto.
 **Cosa deve risultare.** In home tre schede stanza con **10** ciascuna, e
 l'inventario completo sotto. I tablet Dell sono azzurri, i laptop no.
 
-## 2. L'unione non duplica
+## 2. L'unione non duplica e non riscrive
 
-Ripeti esattamente il punto 1. Al termine il messaggio deve dire
-**Aggiunti: 0, Aggiornati: 30**, e i totali delle schede devono restare 10, 10 e
-10. Se qualcosa fosse duplicato, i conteggi salirebbero.
+Ripeti esattamente il punto 1. Al termine il messaggio deve dire **Aggiunti: 0**
+e **NON IMPORTATI, gia' in inventario: 30**, elencando per ognuno la stanza in
+cui si trova. I totali delle schede devono restare 10, 10 e 10.
+
+Un identificativo gia' in inventario non entra mai una seconda volta, e la sua
+scheda **non viene riscritta** dal foglio. Per verificarlo: prima di ripetere
+l'importazione cambia a mano la nota di un dispositivo dall'elenco, poi reimporta
+e controlla che la nota sia rimasta quella che hai scritto tu.
 
 ## 3. Sostituire una sola stanza
 
@@ -510,6 +515,39 @@ possono sparire lasciando i dispositivi per strada.
 **Cosa deve succedere:** nessun dispositivo resta in una stanza che non esiste
 piu', e nessuno finisce negli eliminati di recente - sono stati spostati, non
 eliminati.
+
+---
+
+## 16. Un identificativo non sta in due posti
+
+Serve a verificare che un dispositivo non possa essere insieme in elenco e fra
+gli eliminati di recente, da nessuna strada.
+
+1. elimina un dispositivo qualsiasi, per esempio `IT-BAU-101`: finisce nel
+   cestino, e il pulsante nero in home passa a **(1)**;
+2. **rimettilo dentro con Aggiungi**, con lo stesso asset tag. Deve comparire un
+   avviso che dice che l'ha tolto dagli eliminati di recente e **in che stanza**
+   si trova adesso. Riapri il cestino: deve essere vuoto;
+3. adesso il contrario: elimina di nuovo lo stesso dispositivo, poi **importa**
+   un foglio che lo contiene. Deve entrare normalmente, e il riepilogo finale
+   deve avere la riga **TOLTI DAGLI ELIMINATI DI RECENTE** con il suo codice e
+   la stanza;
+4. prova a **importare un dispositivo che c'e' gia'** in inventario: la riga
+   **non deve entrare**. Il riepilogo dice *NON IMPORTATI, gia' in inventario*
+   con la stanza in cui sta quello che c'e'. Controlla che la sua scheda non sia
+   cambiata: se prima di importare gli scrivi una nota a mano, dopo deve essere
+   ancora quella;
+5. infine il caso storto: elimina un dispositivo, poi reinseriscilo con
+   **Aggiungi**, e prova a **ripristinarlo dal cestino**. Non deve comparire un
+   errore: deve dire che era gia' in inventario, **in che stanza**, e che l'ha
+   tolto dal cestino;
+6. premi **Controllo generale duplicati**: se nel cestino fosse rimasto qualcosa
+   che intanto e' in inventario, lo toglie e lo elenca. Ripremendolo subito dopo
+   non deve trovare piu' niente.
+
+**Cosa deve succedere:** nessun dispositivo compare contemporaneamente in elenco
+e nel cestino, e nessuna importazione riscrive la scheda di un dispositivo gia'
+registrato.
 
 ---
 

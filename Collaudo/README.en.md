@@ -138,11 +138,16 @@ right moment to try while the inventory is still fake.
 **What you should get.** Three room cards on the home page with **10** each, and
 the full inventory below. Dell tablets are blue, laptops are not.
 
-## 2. Merging does not duplicate
+## 2. Merging neither duplicates nor rewrites
 
-Repeat step 1 exactly. At the end the message must say **Added: 0, Updated: 30**,
-and the card totals must stay 10, 10 and 10. Anything duplicated would push the
-counts up.
+Repeat step 1 exactly. At the end the message must say **Added: 0** and **NOT
+IMPORTED, already in the inventory: 30**, listing for each one the room it is in.
+The card totals must stay 10, 10 and 10.
+
+An identifier already in the inventory never gets in a second time, and its
+record is **not rewritten** from the sheet. To check it: before repeating the
+import, change a device's note by hand from the list, then import again and check
+the note is still the one you wrote.
 
 ## 3. Replacing a single room
 
@@ -498,6 +503,37 @@ disappear leaving the devices stranded.
 
 **What must happen:** no device is left in a room that no longer exists, and none
 ends up in recently deleted - they were moved, not deleted.
+
+---
+
+## 16. One identifier is never in two places
+
+This checks that a device cannot be in the list and among the recently deleted at
+the same time, by any route.
+
+1. delete any device, say `IT-BAU-101`: it goes into the bin, and the black
+   button on the home screen goes to **(1)**;
+2. **put it back with Add**, with the same asset tag. A message must say it took
+   it out of the recently deleted and **which room** it is in now. Reopen the
+   bin: it must be empty;
+3. now the other way round: delete the same device again, then **import** a sheet
+   containing it. It must come in normally, and the final summary must carry the
+   **TAKEN OUT OF THE RECENTLY DELETED** line with its code and the room;
+4. try to **import a device that is already** in the inventory: the row **must
+   not come in**. The summary says *NOT IMPORTED, already in the inventory* with
+   the room the existing one is in. Check its record has not changed: if you
+   write a note on it by hand before importing, afterwards it must still be
+   there;
+5. finally the awkward case: delete a device, put it back with **Add**, then try
+   to **restore it from the bin**. No error must appear: it must say it was
+   already in the inventory, **in which room**, and that it took it out of the
+   bin;
+6. press **General duplicate check**: if anything was left in the bin that is
+   meanwhile in the inventory, it removes it and lists it. Pressing it again
+   right after must find nothing.
+
+**What must happen:** no device shows up in the list and in the bin at the same
+time, and no import rewrites the record of an already registered device.
 
 ---
 

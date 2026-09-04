@@ -541,7 +541,7 @@ table{min-width:520px}
     <tr><th>Scelta</th><th>Significato</th></tr>
     <tr><td><b>Tutto l'inventario</b></td><td class="d">Carica tutte le righe del foglio, assegnando le stanze in base alle righe separatore.</td></tr>
     <tr><td><b>Una sola stanza</b></td><td class="d">Carica solo la sezione di quella stanza e scarta il resto. Serve la riga separatore.</td></tr>
-    <tr><td><b>Unisci</b></td><td class="d">Aggiunge i nuovi e aggiorna quelli che hanno lo stesso asset tag. Non cancella niente.</td></tr>
+    <tr><td><b>Unisci</b></td><td class="d">Aggiunge i nuovi e <b>salta</b> quelli gia' in inventario, senza toccarne la scheda. Non cancella niente.</td></tr>
     <tr><td><b>Sostituisci</b></td><td class="d">Svuota prima, poi carica. Salva sempre una copia di sicurezza. Gli iPhone restano.</td></tr>
   </table></div>
 
@@ -555,7 +555,7 @@ table{min-width:520px}
   <p class="sub">Niente viene scritto finche' non confermi, e prima di confermare vedi:</p>
   <div class="tw"><table class="man">
     <tr><th>Che cosa dice</th><th>A che serve</th></tr>
-    <tr><td class="d"><b>Dove finiscono</b>, stanza per stanza</td><td class="d">quanti dispositivi <i>nuovi</i> e quanti <i>aggiornati</i> in ognuna: si vede subito se una stanza sta per riempirsi di roba che non le appartiene.</td></tr>
+    <tr><td class="d"><b>Dove finiscono</b>, stanza per stanza</td><td class="d">quanti dispositivi <i>nuovi</i> e quanti <i>gia' in inventario</i> - quelli si saltano - in ognuna: si vede subito se una stanza sta per riempirsi di roba che non le appartiene.</td></tr>
     <tr><td class="d"><b>Quante righe vengono saltate</b>, e perche'</td><td class="d">senza identificativo, iPhone (che si inseriscono solo a mano), righe di altre stanze, colonne non riconosciute.</td></tr>
     <tr><td class="d"><b>Quanti dispositivi ci sono adesso e quanti dopo</b></td><td class="d">e' il numero che dice se sta per succedere quello che pensi. Con la sostituzione dice anche quanti ne spariscono prima.</td></tr>
     <tr><td class="d">Le stanze riconosciute dal foglio</td><td class="d">se non ne trova nessuna te lo dice li', prima di toccare qualsiasi cosa: altrimenti i dispositivi finirebbero senza stanza.</td></tr>
@@ -570,10 +570,17 @@ table{min-width:520px}
 
 <section id="doppioni">
   <h2>Doppioni</h2>
-  <p class="sub">Il programma non ne crea: l'inserimento singolo <b>rifiuta</b> un
-    identificativo gia' presente, e dicendo dove sta quello che c'e' gia'; l'importazione
-    aggiorna la scheda invece di duplicarla. Se un foglio contiene due volte lo stesso
-    identificativo, vale l'ultima riga e il riepilogo lo dichiara.</p>
+  <p class="sub">Il programma non ne crea, e un identificativo gia' in inventario non
+    entra mai una seconda volta: l'inserimento singolo <b>rifiuta</b>, dicendo dove sta
+    quello che c'e' gia'; l'importazione <b>salta la riga</b> e dice in che stanza sta il
+    dispositivo gia' registrato, senza riscrivergli la scheda. Se un foglio contiene due
+    volte lo stesso identificativo vale l'ultima riga - quella e' una regola del foglio -
+    e il riepilogo lo dichiara.</p>
+  <div class="avviso">Gli <b>eliminati di recente</b> contano come "non in inventario":
+    un dispositivo che sta solo nel cestino viene importato o inserito normalmente, e la
+    sua voce nel cestino sparisce. Non puo' stare insieme in elenco e fra gli eliminati,
+    o da li' si potrebbe ripristinarne una seconda copia. Il riepilogo lo dice, con
+    l'identificativo e la stanza in cui e' finito.</div>
   <p class="sub">I doppioni entrano da un'altra strada: il file dati e' un
     <code>.xlsx</code> che si puo' aprire e correggere a mano. Per quello c'e'
     <span class="k rosso">Controllo generale duplicati</span>, accanto al pulsante del
@@ -605,7 +612,7 @@ table{min-width:520px}
     <tr><td class="d"><b>Ripristina</b> su ogni riga</td><td class="d">e <b>Ripristina i selezionati</b> in cima per piu' righe insieme, con Ctrl+clic e Maiusc+clic come nell'elenco principale. <b>Ripristina tutto (n)</b> rimette dentro l'intero cestino - o i soli risultati, se c'e' una ricerca attiva.</td></tr>
     <tr><td class="d">Chiede <b>conferma</b> prima</td><td class="d">un popup solo, con sopra il riepilogo - quali dispositivi tornano e in quale stanza - e la conferma sotto. L'esito si legge poi sotto l'elenco.</td></tr>
     <tr><td class="d">Torna <b>dov'era</b></td><td class="d">nella stanza che aveva al momento dell'eliminazione, con numero di serie, note, stato, prestito e spedizione.</td></tr>
-    <tr><td class="d">Salta chi e' <b>gia' rientrato</b></td><td class="d">se quell'asset tag e' tornato in inventario per un'altra strada, lo dice invece di creare un doppione.</td></tr>
+    <tr><td class="d">Toglie chi e' <b>gia' rientrato</b></td><td class="d">se quell'asset tag e' tornato in inventario per un'altra strada, la voce nel cestino non serve piu': viene tolta, e il programma dice in che stanza si trova adesso il dispositivo. Non e' un errore.</td></tr>
   </table></div>
   <div class="avviso">Togliendo una stanza dalle impostazioni, i dispositivi che ci
     stavano finiscono qui - dopo una <b>richiesta di conferma</b> che dice quali stanze
@@ -1159,7 +1166,7 @@ table{min-width:520px}
     <tr><th>Choice</th><th>Meaning</th></tr>
     <tr><td><b>The whole inventory</b></td><td class="d">Loads every row of the sheet, assigning rooms from the separator rows.</td></tr>
     <tr><td><b>One room only</b></td><td class="d">Loads only that room's section and discards the rest. The separator row is required.</td></tr>
-    <tr><td><b>Merge</b></td><td class="d">Adds the new ones and updates those with the same asset tag. Nothing is deleted.</td></tr>
+    <tr><td><b>Merge</b></td><td class="d">Adds the new ones and <b>skips</b> those already in the inventory, without touching their record. Nothing is deleted.</td></tr>
     <tr><td><b>Replace</b></td><td class="d">Empties first, then loads. It always saves a backup copy. iPhones stay.</td></tr>
   </table></div>
 
@@ -1173,7 +1180,7 @@ table{min-width:520px}
   <p class="sub">Nothing is written until you confirm, and before confirming you see:</p>
   <div class="tw"><table class="man">
     <tr><th>What it says</th><th>What for</th></tr>
-    <tr><td class="d"><b>Where they go</b>, room by room</td><td class="d">how many devices are <i>new</i> and how many <i>updated</i> in each: you see at once if a room is about to fill with things that do not belong to it.</td></tr>
+    <tr><td class="d"><b>Where they go</b>, room by room</td><td class="d">how many devices are <i>new</i> and how many <i>already in the inventory</i> - those get skipped - in each: you see at once if a room is about to fill with things that do not belong to it.</td></tr>
     <tr><td class="d"><b>How many rows are skipped</b>, and why</td><td class="d">no identifier, iPhones (which are entered by hand only), rows of other rooms, columns not recognised.</td></tr>
     <tr><td class="d"><b>How many devices there are now and how many after</b></td><td class="d">that is the number that tells you whether what you think is about to happen. With Replace it also says how many disappear first.</td></tr>
     <tr><td class="d">The rooms recognised in the sheet</td><td class="d">if it finds none it tells you right there, before touching anything: otherwise the devices would end up with no room.</td></tr>
@@ -1188,10 +1195,17 @@ table{min-width:520px}
 
 <section id="doppioni-en">
   <h2>Duplicates</h2>
-  <p class="sub">The program does not create them: adding a device <b>refuses</b> an
-    identifier already present, and says where the existing one is; an import updates the
-    record instead of duplicating it. If a sheet contains the same identifier twice, the
-    last row wins and the summary says so.</p>
+  <p class="sub">The program does not create them, and an identifier already in the
+    inventory never gets in a second time: adding a device <b>refuses</b>, saying where
+    the existing one is; an import <b>skips the row</b> and says which room the already
+    registered device is in, without rewriting its record. If a sheet contains the same
+    identifier twice the last row wins - that is a rule of the sheet - and the summary
+    says so.</p>
+  <div class="avviso">The <b>recently deleted</b> count as "not in the inventory": a
+    device that is only in the bin is imported or added normally, and its bin entry
+    disappears. It cannot be in the list and among the deleted at the same time, or a
+    second copy could be restored from there. The summary says so, with the identifier
+    and the room it landed in.</div>
   <p class="sub">Duplicates get in another way: the data file is an <code>.xlsx</code>
     anyone can open and correct by hand. That is what <span class="k rosso">General
     duplicate check</span> is for, next to the template button on the home screen.</p>
@@ -1222,7 +1236,7 @@ table{min-width:520px}
     <tr><td class="d"><b>Restore</b> on every row</td><td class="d">and <b>Restore the selected ones</b> at the top for several rows at once, with Ctrl+click and Shift+click as in the main list. <b>Restore everything (n)</b> puts the whole bin back - or only the results, if a search is active.</td></tr>
     <tr><td class="d">Asks for <b>confirmation</b> first</td><td class="d">a single popup, with the summary above - which devices go back and into which room - and the confirmation below. The outcome is then read under the list.</td></tr>
     <tr><td class="d">Goes back <b>where it was</b></td><td class="d">into the room it had when it was deleted, with serial number, notes, status, loan and shipment.</td></tr>
-    <tr><td class="d">Skips what has <b>already returned</b></td><td class="d">if that asset tag is back in the inventory by another route, it says so instead of creating a duplicate.</td></tr>
+    <tr><td class="d">Removes what has <b>already returned</b></td><td class="d">if that asset tag is back in the inventory by another route, the bin entry is no longer needed: it is removed, and the program says which room the device is in now. It is not an error.</td></tr>
   </table></div>
   <div class="avviso">When you remove a room from the settings, the devices that were in
     it end up here - after a <b>confirmation</b> saying which rooms are not empty. A room

@@ -85,7 +85,7 @@ excel_io.export([new_item("IT-0101", "Laptop", "T14 Gen 4", "PF4A1B2C", BAU),
                  new_item("IT-0106", "Laptop", "T14 Gen 5", "PF5K9M8F", KIOSK)], sorgente)
 items, _ = rows_from_workbook(sorgente, app.cfg["rooms"])
 e = app._run(lambda: app.store.import_items(items, "replace"), "ok")
-assert (e["aggiunti"], e["aggiornati"]) == (2, 0), e
+assert (e["aggiunti"], e["gia_presenti"]) == (2, []), e
 app.store.load()
 assert len(app.store.items) == 4, [i["asset_tag"] for i in app.store.items]
 assert all(t in [i["asset_tag"] for i in app.store.items] for t in protetti), \

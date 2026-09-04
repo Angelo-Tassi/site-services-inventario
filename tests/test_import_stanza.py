@@ -38,15 +38,18 @@ s = InventoryStore(os.path.join(d, "Inventario.xlsx"), iphone_room=BAU)
 s.create_if_missing()
 miei = [i for i in items if i["stanza"] == KIOSK]
 r = s.import_items(miei, "merge", KIOSK)
-assert (r["aggiunti"], r["aggiornati"]) == (10, 0), r
+assert (r["aggiunti"], r["gia_presenti"]) == (10, []), r
 s.load()
 assert len(s.items) == 10 and all(i["stanza"] == KIOSK for i in s.items)
 assert not any(i["asset_tag"].startswith("IT-BAU") for i in s.items), \
     "le righe delle altre stanze non devono entrare"
 
-# ---- rifare la stessa importazione non duplica
+# ---- rifare la stessa importazione non duplica: sono tutti gia' in inventario,
+# quindi non entra niente e si dice dove stanno quelli che ci sono gia'
 r = s.import_items(miei, "merge", KIOSK)
-assert (r["aggiunti"], r["aggiornati"]) == (0, 10), r
+assert r["aggiunti"] == 0, r
+assert len(r["gia_presenti"]) == 10, r["gia_presenti"]
+assert all(v["stanza"] == KIOSK for v in r["gia_presenti"]), r["gia_presenti"]
 s.load(); assert len(s.items) == 10
 
 # ---- in sostituzione tocca solo quella stanza

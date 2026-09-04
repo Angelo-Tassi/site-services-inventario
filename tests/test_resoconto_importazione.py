@@ -14,7 +14,9 @@ BAU, KIOSK, DR = fixture.BAU, fixture.KIOSK, fixture.DR
 app = App(fixture.build())
 app._initial_load()
 
-risultato = {"aggiunti": 12, "aggiornati": 3, "eliminati": 0, "copia": None}
+risultato = {"aggiunti": 12, "eliminati": 0, "copia": None,
+             "gia_presenti": [{"asset_tag": "IT-0101", "stanza": BAU},
+                              {"asset_tag": "IT-0102", "stanza": KIOSK}]}
 esito = {"scartate": 2, "iphone": 1, "doppioni": ["IT-1", "IT-2"],
          "senza_modello": 4, "colonne_ignorate": ["Costo", "Fornitore"]}
 righe = app._resoconto_importazione(risultato, esito,
@@ -23,7 +25,10 @@ testo = "\n".join(righe)
 
 # ---- che cosa e' stato fatto
 assert "Unione in tutto l'inventario." in testo, testo
-assert "Aggiunti: 12" in testo and "Aggiornati: 3" in testo
+assert "Aggiunti: 12" in testo, testo
+# le righe gia' in inventario non entrano, e si dice dov'e' quello che c'e' gia'
+assert "NON IMPORTATI, gia' in inventario: 2" in testo, testo
+assert ("IT-0101  ->  %s" % BAU) in testo, testo
 
 # ---- e che cosa non e' stato caricato, con il motivo di ognuno
 assert "2 senza asset tag" in testo, testo

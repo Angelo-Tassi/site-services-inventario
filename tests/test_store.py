@@ -96,7 +96,7 @@ vuoto.create_if_missing()
 vuoto.add(new_item(tipo="Iphone", modello="Apple iPhone 14",
                    imei="356938035643809", restituito_da="M. B."))
 e = vuoto.import_items(items, "replace")
-assert (e["aggiunti"], e["aggiornati"]) == (1, 0), e
+assert (e["aggiunti"], e["gia_presenti"]) == (1, []), e
 vuoto.load()
 assert len(vuoto.items) == 2, [i["asset_tag"] for i in vuoto.items]
 tel = [i for i in vuoto.items if i["asset_tag"] == "356938035643809"][0]

@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.5).** The features are complete and every release
+> **Beta version (1.0.0-beta.5.1).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -692,8 +692,12 @@ be a device, and instead it has been deleted.
 - the device goes back **into the room it was in when it was deleted**, with
   everything it had: serial number, notes, status, loan, shipment.
 
-A restore is **skipped** if that asset tag has come back into the inventory some
-other way in the meantime: the program says so instead of creating a duplicate.
+If that asset tag has **come back into the inventory** some other way in the
+meantime, there is nothing to restore and it is not an error: that bin entry has
+no reason to exist any more. The program **removes it** and tells you, naming
+**which room** the device is in now - the first thing you want to know. That way
+it does not stay in two places that contradict each other, and no second copy can
+be restored from it.
 
 ### The devices of a room you removed
 
@@ -712,11 +716,24 @@ program **asks which room to put them in**.
 
 ## Duplicates
 
-The program does not create them. **Adding a device refuses** an identifier
-already present, saying where the existing one is and what it is, and without
-inserting anything; an **import updates** the record instead of duplicating it.
-If a sheet contains the same identifier twice the last row wins, and the summary
-says so before importing.
+The program does not create them, and an identifier already in the inventory
+**never gets in a second time**.
+
+- **adding a device refuses** an identifier already present, saying where the
+  existing one is and what it is, and without inserting anything;
+- an **import skips** the row and says **which room** the existing device is in.
+  It does not rewrite its record: if it is the same device there is no need, and
+  if it is a different one with the same code it is a typo to look at, not to
+  apply silently;
+- if a sheet contains **the same identifier twice** the last row wins - that is a
+  rule of the sheet, not of the inventory - and the summary says so before
+  importing.
+
+**The recently deleted count as "not in the inventory".** A device that is only
+in the bin is imported or added normally, and its bin entry disappears: it cannot
+be in the list and among the deleted at the same time, or a second copy could be
+"restored" from there. The summary of the operation says so, with the identifier
+and the room it landed in.
 
 They get in another way: the data file is an `.xlsx` anyone can open and correct
 by hand. That is what **`General duplicate check`** is for, next to the template
@@ -856,8 +873,9 @@ but the choice of **what** to load and **how**.
 
 **What** - the whole inventory, or a single room chosen from the dropdown.
 
-**How** - *Merge* adds the new ones and updates those already there;
-*Replace* empties first, then loads only what the file contains.
+**How** - *Merge* adds the new ones and **skips** those already in the
+inventory, without touching their record; *Replace* empties first, then loads
+only what the file contains.
 
 Once the file is chosen, a summary shows how many rows were read, what was
 ignored and - for a replacement - how many devices will be deleted. Up to that
