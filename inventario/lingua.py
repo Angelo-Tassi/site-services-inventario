@@ -1230,6 +1230,14 @@ EN = {
         'sheet: a row carrying only the room name, for example\n'
         'Site Services BAU (BAU, KIOSK and DISASTER work too). It holds\n'
         'for every row that follows it.',
+    "%s non e' una stanza dell'inventario.\n\n"
+    "Un dispositivo senza una stanza vera non comparirebbe in "
+    "nessuna scheda. Scegli una delle stanze esistenti, o creala "
+    "prima dalle impostazioni.":
+        '%s is not a room of the inventory.\n\n'
+        'A device without a real room would show up in no card. Pick one of '
+        'the existing rooms, or create it first from the settings.',
+    "(nessuna stanza)": "(no room)",
     # --- la stanza mancante nell'importazione
     "In che stanza vanno?": "Which room do they go in?",
     "In che stanza va?": "Which room does it go in?",

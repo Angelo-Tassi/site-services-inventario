@@ -1866,7 +1866,7 @@ def riepilogo_spostamento(spostabili, telefoni, prestati, destinazione,
     return righe
 
 
-def riepilogo_ripristino(voci, stanza_orfani=None):
+def riepilogo_ripristino(voci, stanza_orfani=None, store=None):
     """Che cosa tornerebbe in inventario, e in quale stanza.
 
     Rimettere dentro un dispositivo cambia l'inventario di tutti come lo cambia
@@ -1875,7 +1875,8 @@ def riepilogo_ripristino(voci, stanza_orfani=None):
     """
     per_stanza = {}
     for voce in voci:
-        dove = ("" if voce.get("orfano") else clean(voce.get("stanza"))) \
+        dove = (store.stanza_del_ritorno(voce) if store is not None
+                else ("" if voce.get("orfano") else clean(voce.get("stanza")))) \
             or clean(stanza_orfani) or NO_ROOM()
         per_stanza.setdefault(dove, []).append(voce)
     righe = [T("TORNANO IN INVENTARIO: %d") % len(voci)]
@@ -1886,7 +1887,8 @@ def riepilogo_ripristino(voci, stanza_orfani=None):
         for voce in elenco:
             riga = "    %s  %s" % (voce.get("asset_tag", ""),
                                    (voce.get("tipo") or "")[:24])
-            if voce.get("orfano"):
+            if voce.get("orfano") or (store is not None
+                                      and not store.stanza_del_ritorno(voce)):
                 riga += T("   [la sua stanza non c'e' piu']")
             righe.append(riga.rstrip())
     return righe
@@ -2095,10 +2097,11 @@ class CestinoDialog(_Modal):
         if voce is None:
             self.var_dettaglio.set("")
             return
-        if voce.get("orfano"):
+        torna_in = self.store.stanza_del_ritorno(voce)
+        if not torna_in:
             dove = T("nessuna stanza: la sua e' stata tolta, te la chiedera'")
         else:
-            dove = T("torna in %s") % (voce.get("stanza") or T("(senza stanza)"))
+            dove = T("torna in %s") % torna_in
         self.var_dettaglio.set(T("Eliminato il %s da %s  -  %s")
                                % (voce.get("eliminato_il", "?"),
                                   voce.get("eliminato_da", "?"), dove))
@@ -2159,12 +2162,14 @@ class CestinoDialog(_Modal):
         if not voci:
             return
         stanza = None
-        orfani = [v for v in voci if v.get("orfano") or not clean(v.get("stanza"))]
+        # non basta il segno "orfano": anche una stanza rinominata o tolta dopo
+        # l'eliminazione non esiste piu', e va chiesta
+        orfani = [v for v in voci if not self.store.stanza_del_ritorno(v)]
         if orfani:
             stanza = self._chiedi_stanza(orfani)
             if not stanza:
                 return
-        righe = riepilogo_ripristino(voci, stanza)
+        righe = riepilogo_ripristino(voci, stanza, self.store)
         if tutto and clean(self.var_cerca.get()):
             intestazione_conferma = T("Ripristinare tutti i %d risultati della ricerca?") \
                 % len(voci)
@@ -4920,6 +4925,9 @@ class App(tk.Tk):
         if self.store.eliminati_ripristinati:
             coda = T("\n\nE' tornato anche il cestino di quel momento: %d eliminati\n"
                      "di recente.") % self.store.eliminati_ripristinati
+        tolti = getattr(self.store, "tolti_dal_ripristino", None) or []
+        if tolti:
+            coda += "\n" + "\n".join(self._righe_tolti_dal_cestino(tolti))
         messagebox.showinfo(
             T("Inventario ripristinato"),
             T("Ripristinati %d dispositivi dalla copia del %s.\n\n"
@@ -4981,6 +4989,9 @@ class App(tk.Tk):
         if self.store.eliminati_ripristinati:
             coda += T("\nE' tornato anche il cestino: %d eliminati di recente.") \
                 % self.store.eliminati_ripristinati
+        tolti = getattr(self.store, "tolti_dal_ripristino", None) or []
+        if tolti:
+            coda += "\n" + "\n".join(self._righe_tolti_dal_cestino(tolti))
         messagebox.showinfo(
             T("Inventario ripristinato"),
             T("Ripristinati %d dispositivi da %s.\n\n%s\n\n"

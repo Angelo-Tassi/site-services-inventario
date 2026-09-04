@@ -71,7 +71,24 @@ h2{margin:0 0 8px;font-family:Archivo,sans-serif;font-weight:600;font-size:24px;
   align-items:flex-end;gap:16px;flex-wrap:wrap}
 .appbar b{font-size:19px;font-weight:600}
 .appbar .s{color:#BBD4EA;font-size:12px;margin-top:2px}
-.appbar .t{margin-left:auto;color:#BBD4EA;font-size:12px}
+.appbar .ver{color:#8FB6DA;font-size:11.5px;margin-top:1px}
+.appbar .dx{margin-left:auto;display:flex;flex-direction:column;
+  align-items:flex-end;gap:7px}
+.appbar .lin{display:flex;align-items:center;gap:7px;color:#BBD4EA;font-size:12px}
+.appbar .t{color:#BBD4EA;font-size:12px}
+.sel{background:#fff;border:1px solid var(--w-border);border-radius:3px;
+  padding:5px 9px;font-size:12px;color:var(--w-text);display:inline-flex;
+  align-items:center;gap:14px}
+.sel s{text-decoration:none;color:var(--w-muted);font-size:9px}
+.filtri{display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  padding:8px 16px 0;font-size:12.5px}
+.filtri .et{color:var(--w-text)}
+.filtri .cerca{background:#fff;border:1px solid var(--w-border);border-radius:3px;
+  padding:5px 9px;min-width:190px;color:#9AA7B3;font-size:12px}
+.filtri .gap{width:9px}
+.stato{border-top:1px solid var(--w-border);background:#fff;
+  padding:8px 16px;font-size:11.5px;color:var(--w-muted)}
+.tools .div{width:1px;background:var(--w-border);margin:2px 6px;align-self:stretch}
 .tools{display:flex;gap:6px;flex-wrap:wrap;padding:11px 16px 4px}
 .tb{background:#fff;border:1px solid var(--w-border);border-radius:3px;
   padding:7px 12px;font-size:12.5px;color:var(--w-text)}
@@ -174,7 +191,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 1.0.0-beta.5.4 · beta</div>
+  <div class="alpha">versione 1.0.0-beta.5.5 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -200,6 +217,32 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.5</h3>
+      <p class="quando">4 settembre 2026</p>
+      <ul>
+        <li><b>La stanza fantasma rientrava dal cestino.</b> Un record eliminato
+          si porta dietro il nome della stanza che aveva. Se quella stanza
+          veniva <b>rinominata</b>, il ripristino rimetteva il dispositivo in
+          una stanza che non esiste piu' e spariva da tutte le schede: adesso la
+          voce nel cestino segue la rinomina. Se la stanza veniva <b>tolta</b>,
+          il programma chiede dove rimetterlo, come per un orfano.</li>
+        <li><b>Un ripristino da una copia poteva lasciare un dispositivo in due
+          posti.</b> Tornando a una copia presa quando il dispositivo c'era
+          ancora, quello rientrava in inventario ma la sua voce restava nel
+          cestino - e da li' se ne poteva "ripristinare" una seconda copia.
+          Adesso esce dal cestino, e il messaggio finale lo dice. Le copie si
+          portano dietro il cestino anche quando e' vuoto, cosi' il ripristino
+          lo riporta davvero com'era.</li>
+        <li><b>Inserimento e modifica rifiutano una stanza che non esiste.</b>
+          Dalla finestra non poteva succedere - la stanza si sceglie da una
+          tendina - ma adesso la regola vale per chiunque scriva
+          nell'archivio.</li>
+        <li>Le <b>schermate</b> sulla pagina del progetto rifanno l'interfaccia
+          di adesso: numero di versione, tendina della lingua, riga dei filtri e
+          barra di stato in fondo.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.4</h3>
       <p class="quando">4 settembre 2026</p>
@@ -263,30 +306,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           prove di collaudo, che prima lo lasciavano intendere e basta.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.1</h3>
-      <p class="quando">4 settembre 2026</p>
-      <ul>
-        <li><b>Un identificativo gia' in inventario non entra mai una seconda
-          volta.</b> L'importazione, da qualunque pagina, ora <b>salta</b> la
-          riga e dice in che stanza sta il dispositivo che c'e' gia', invece di
-          riscrivergli la scheda dal foglio: se e' lo stesso non serve, se e' un
-          altro con lo stesso codice e' un errore di battitura da guardare.</li>
-        <li><b>Gli eliminati di recente contano come "non in inventario".</b>
-          Un dispositivo che sta solo nel cestino viene importato o inserito
-          normalmente, e la sua voce nel cestino sparisce: il riepilogo lo dice,
-          con il codice e la stanza. Vale per le importazioni, per l'inserimento
-          singolo e per il controllo generale duplicati.</li>
-        <li><b>Ripristinare qualcosa che c'e' gia' non e' piu' un errore.</b>
-          Prima usciva un avviso di ripristino non riuscito; adesso il programma
-          toglie quella voce dal cestino - non aveva piu' ragione di esistere -
-          e dice in che stanza si trova il dispositivo.</li>
-        <li><b>L'anteprima della sostituzione contava male.</b> Diceva un
-          dispositivo in meno di quelli che poi si trovavano davvero in
-          inventario, perche' considerava aggiornate righe che invece venivano
-          prima cancellate e poi reinserite.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -328,17 +347,31 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
     <div class="bar"><span class="dot"></span><span>Site Services : Inventario Iphone, Laptop e Tablet</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : Inventario Iphone, Laptop e Tablet</b>
+        <div class="ver">v1.0.0-beta.5.5</div>
         <div class="s">Laptop e tablet in nostro possesso</div></div>
-      <div class="t">14 dispositivi &nbsp;&nbsp; Site Services BAU: 6 &nbsp;&nbsp; Digital Kiosk: 5 &nbsp;&nbsp; Magazzino DR: 3</div>
+      <div class="dx">
+        <span class="lin">Lingua <span class="sel">Italiano <s>▼</s></span></span>
+        <span class="t">14 dispositivi &nbsp;&nbsp; Site Services BAU: 6 &nbsp;&nbsp; Digital Kiosk: 5 &nbsp;&nbsp; Magazzino Disaster Recovery: 3</span>
+      </div>
     </div>
     <div class="tools">
       <span class="tb">‹ Home</span><span class="tb p">Aggiungi</span><span class="tb">Modifica</span>
       <span class="tb">Elimina</span><span class="tb rosso">Elimina +</span>
       <span class="tb">Sposta in stanza…</span>
+      <span class="div"></span>
       <span class="tb arancio">Importa xls…</span><span class="tb verde">Esporta xls…</span>
       <span class="tb">Stampa</span>
       <span class="sp"></span>
       <span class="tb">Aggiorna</span><span class="tb">Impostazioni</span>
+    </div>
+    <div class="filtri">
+      <span class="et">Cerca</span><span class="cerca">asset tag, modello, seriale, note…</span>
+      <span class="gap"></span>
+      <span class="et">Stanza</span><span class="sel">Tutte <s>▼</s></span>
+      <span class="gap"></span>
+      <span class="et">Tipo</span><span class="sel">Tutti <s>▼</s></span>
+      <span class="gap"></span>
+      <span class="tb">Azzera filtri</span>
     </div>
     <div class="stage">
       <div class="cards">
@@ -383,6 +416,9 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
         </table>
       </div>
     </div>
+    <div class="stato">14 dispositivi&nbsp; (Site Services BAU: 6, Digital Kiosk: 5,
+      Magazzino Disaster Recovery: 3)&nbsp;&nbsp;&nbsp;&nbsp;
+      File: \\server\Condivisa\Inventario\Produzione\Inventario.xlsx</div>
   </div>
   <p class="note">Verde chiaro gli iPhone, azzurro i tablet Dell, viola quelli gia' rispediti,
     rosso quelli in prestito. Ogni riga porta il pulsante che le serve:
@@ -490,7 +526,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 1.0.0-beta.5.4 · beta</div>
+  <div class="alpha">version 1.0.0-beta.5.5 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -516,6 +552,30 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.5</h3>
+      <p class="quando">4 September 2026</p>
+      <ul>
+        <li><b>The ghost room was coming back through the bin.</b> A deleted
+          record carries the name of the room it had. If that room was
+          <b>renamed</b>, the restore put the device into a room that no longer
+          exists and it vanished from every card: now the bin entry follows the
+          rename. If the room was <b>removed</b>, the program asks where to put
+          it, as for an orphan.</li>
+        <li><b>A restore from a copy could leave a device in two places.</b>
+          Going back to a copy taken while the device was still there put it
+          back into the inventory, but its entry stayed in the bin - and from
+          there a second copy could be "restored". Now it leaves the bin, and
+          the final message says so. Copies carry the bin even when it is empty,
+          so a restore really puts it back as it was.</li>
+        <li><b>Adding and editing refuse a room that does not exist.</b> It could
+          not happen from the window - the room is picked from a dropdown - but
+          the rule now holds for anyone writing into the store.</li>
+        <li>The <b>screenshots</b> on the project page redraw the interface as it
+          is now: version number, language dropdown, filter row and the status
+          bar at the bottom.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.4</h3>
       <p class="quando">4 September 2026</p>
@@ -575,29 +635,6 @@ python Inventario.py</pre>
           they only implied it.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.1</h3>
-      <p class="quando">4 September 2026</p>
-      <ul>
-        <li><b>An identifier already in the inventory never gets in a second
-          time.</b> The import, from any page, now <b>skips</b> the row and says
-          which room the existing device is in, instead of rewriting its record
-          from the sheet: if it is the same one there is no need, if it is a
-          different one with the same code it is a typo to look at.</li>
-        <li><b>The recently deleted count as "not in the inventory".</b> A device
-          that is only in the bin is imported or added normally, and its bin
-          entry disappears: the summary says so, with the code and the room. It
-          holds for imports, for adding a single device and for the general
-          duplicate check.</li>
-        <li><b>Restoring something that is already there is no longer an
-          error.</b> It used to show a "restore failed" warning; now the program
-          removes that bin entry - it had no reason to exist any more - and says
-          which room the device is in.</li>
-        <li><b>The replace preview counted wrong.</b> It promised one device
-          fewer than you actually found in the inventory, because it treated as
-          updates the rows that were in fact wiped first and then added back.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -638,17 +675,31 @@ python Inventario.py</pre>
     <div class="bar"><span class="dot"></span><span>Site Services : iPhone, Laptop and Tablet Inventory</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : iPhone, Laptop and Tablet Inventory</b>
+        <div class="ver">v1.0.0-beta.5.5</div>
         <div class="s">Laptops and tablets we hold</div></div>
-      <div class="t">14 devices &nbsp;&nbsp; Site Services BAU: 6 &nbsp;&nbsp; Digital Kiosk: 5 &nbsp;&nbsp; Magazzino DR: 3</div>
+      <div class="dx">
+        <span class="lin">Language <span class="sel">English <s>▼</s></span></span>
+        <span class="t">14 devices &nbsp;&nbsp; Site Services BAU: 6 &nbsp;&nbsp; Digital Kiosk: 5 &nbsp;&nbsp; Magazzino Disaster Recovery: 3</span>
+      </div>
     </div>
     <div class="tools">
       <span class="tb">‹ Home</span><span class="tb p">Add</span><span class="tb">Edit</span>
       <span class="tb">Delete</span><span class="tb rosso">Delete +</span>
       <span class="tb">Move to room…</span>
+      <span class="div"></span>
       <span class="tb arancio">Import xls…</span><span class="tb verde">Export xls…</span>
       <span class="tb">Print</span>
       <span class="sp"></span>
       <span class="tb">Refresh</span><span class="tb">Settings</span>
+    </div>
+    <div class="filtri">
+      <span class="et">Search</span><span class="cerca">asset tag, model, serial, notes…</span>
+      <span class="gap"></span>
+      <span class="et">Room</span><span class="sel">All <s>▼</s></span>
+      <span class="gap"></span>
+      <span class="et">Type</span><span class="sel">All <s>▼</s></span>
+      <span class="gap"></span>
+      <span class="tb">Clear filters</span>
     </div>
     <div class="stage">
       <div class="cards">
@@ -693,6 +744,9 @@ python Inventario.py</pre>
         </table>
       </div>
     </div>
+    <div class="stato">14 devices&nbsp; (Site Services BAU: 6, Digital Kiosk: 5,
+      Magazzino Disaster Recovery: 3)&nbsp;&nbsp;&nbsp;&nbsp;
+      File: \\server\Condivisa\Inventario\Produzione\Inventario.xlsx</div>
   </div>
   <p class="note">Light green for iPhones, blue for Dell tablets, purple for
     those already shipped back, red for those on loan. Each row carries the button

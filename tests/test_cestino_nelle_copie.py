@@ -67,6 +67,39 @@ assert [v["asset_tag"] for v in store.eliminati()] == prima, \
     "senza cestino nella copia, quello di adesso resta dov'e'"
 assert store.eliminati_ripristinati == 0
 
+# ---- e da un ripristino nessuno esce in due posti insieme
+# Il caso vero: si elimina un dispositivo, poi si torna a una copia presa
+# quando quel dispositivo c'era ancora. Il ripristino lo rimette in
+# inventario, e se la sua voce restasse nel cestino da li' se ne potrebbe
+# "ripristinare" una seconda copia.
+due_posti = InventoryStore(fixture.build(), iphone_room=BAU)
+due_posti.load()
+vecchia = os.path.join(fuori, "PrimaDiTutto.zip")
+due_posti.copia_in(vecchia)                    # cestino vuoto: ci va lo stesso
+assert zipfile.ZipFile(vecchia).namelist() == [
+    NOME_DATI_NELLO_ZIP, NOME_IMPOSTAZIONI_NELLO_ZIP, NOME_ELIMINATI_NELLO_ZIP], \
+    "il cestino viaggia anche quando e' vuoto"
+due_posti.delete(["IT-0101"])
+due_posti.load()
+assert [v["asset_tag"] for v in due_posti.eliminati()] == ["IT-0101"]
+due_posti.ripristina_da_copia_locale(vecchia)
+due_posti.load()
+assert [i for i in due_posti.items if i["asset_tag"] == "IT-0101"], "e' tornato"
+assert not due_posti.eliminati(), "e non e' rimasto anche nel cestino"
+
+# ---- e se la copia e' vecchia e il cestino non ce l'ha, ci pensa la pulizia
+antica = os.path.join(fuori, "Antica.xlsx")
+due_posti.copia_in(antica)
+os.remove(os.path.join(fuori, "Antica_eliminati.json"))
+due_posti.delete(["IT-0102"])
+due_posti.load()
+due_posti.ripristina_da_copia_locale(antica)
+due_posti.load()
+assert [i for i in due_posti.items if i["asset_tag"] == "IT-0102"], "e' tornato"
+assert not due_posti.eliminati(), "tolto dal cestino: e' in inventario"
+assert [v["asset_tag"] for v in due_posti.tolti_dal_ripristino] == ["IT-0102"], \
+    due_posti.tolti_dal_ripristino
+
 # ============================ le copie automatiche ============================
 finta_app = tempfile.mkdtemp()
 config.app_dir = lambda: finta_app

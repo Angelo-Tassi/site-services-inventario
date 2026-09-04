@@ -645,6 +645,9 @@ class InventoryStore(object):
         # Dispositivi che l'ultima eliminazione ha cancellato per sempre invece
         # di metterli nel cestino, perche' non ci stavano.
         self.cancellati_per_sempre = []
+        # Voci tolte dal cestino dall'ultimo ripristino, perche' il dispositivo
+        # e' tornato in inventario.
+        self.tolti_dal_ripristino = []
 
     def stanza_canonica(self, valore):
         """Il nome esatto della stanza, o "" se quel nome non e' una stanza.
@@ -812,6 +815,7 @@ class InventoryStore(object):
                     % (item["asset_tag"],
                        "  -  " + ", ".join(dettagli) if dettagli else ""))
             self._enforce_iphone_room(item)
+            self._stanza_o_rifiuta(item)
             normalize_state(item, self.stati)
             _stamp_item(item)
             items.append(item)
@@ -842,11 +846,30 @@ class InventoryStore(object):
                     precedente.get("stanza")):
                 raise BloccoPrestito(precedente)
             self._enforce_iphone_room(item)
+            self._stanza_o_rifiuta(item)
             normalize_state(item, self.stati)
             _stamp_item(item)
             items[index] = item
 
         return self._apply(op)
+
+    def _stanza_o_rifiuta(self, item):
+        """Scrive nel dispositivo il nome ufficiale della sua stanza.
+
+        Un dispositivo in una stanza che non esiste non comparirebbe in nessuna
+        scheda: e' lo stesso di non averne una. Dalla finestra non puo'
+        succedere - la stanza si sceglie da una tendina - ma la regola vale per
+        chiunque scriva nell'archivio, non solo per chi passa di li'.
+        """
+        nome = self.stanza_canonica(item.get("stanza"))
+        if not nome:
+            raise InventoryError(
+                T("%s non e' una stanza dell'inventario.\n\n"
+                "Un dispositivo senza una stanza vera non comparirebbe in "
+                "nessuna scheda. Scegli una delle stanze esistenti, o creala "
+                "prima dalle impostazioni.")
+                % (clean(item.get("stanza")) or T("(nessuna stanza)")))
+        item["stanza"] = nome
 
     def eccesso_cestino(self, quanti):
         """Quanti dei prossimi `quanti` eliminati non entrerebbero nel cestino.
@@ -1019,6 +1042,21 @@ class InventoryStore(object):
             self._scrivi_eliminati(restano)
         return tolti
 
+    def stanza_del_ritorno(self, voce):
+        """La stanza in cui un record del cestino tornerebbe, o "" se va chiesta.
+
+        Non basta che la voce porti scritto un nome di stanza: quella stanza
+        puo' non esserci piu' - tolta, o rinominata mentre il record stava nel
+        cestino. Rimetterci dentro il dispositivo lo farebbe sparire da tutte
+        le schede, che e' lo stesso di non avere stanza. Allora si chiede,
+        esattamente come per un orfano.
+        """
+        if voce.get("orfano"):
+            return ""
+        scheda = voce.get("scheda") or {}
+        return self.stanza_canonica(clean(scheda.get("stanza"))
+                                    or clean(voce.get("stanza")))
+
     def ripristina_eliminati(self, chiavi, stanza=None):
         """Rimette in inventario i record scelti, nella stanza che avevano.
 
@@ -1046,8 +1084,8 @@ class InventoryStore(object):
                 saltati.append((tag, T("non e' piu' fra gli eliminati di recente")))
                 continue
             scheda = dict(voce.get("scheda") or {})
-            dove = "" if voce.get("orfano") else clean(scheda.get("stanza"))
-            dove = dove or clean(stanza)
+            dove = self.stanza_del_ritorno(voce)
+            dove = dove or self.stanza_canonica(stanza) or clean(stanza)
             if not dove:
                 saltati.append((tag, T("non aveva una stanza: indica dove rimetterlo")))
                 continue
@@ -1217,13 +1255,21 @@ class InventoryStore(object):
                 T("Non riesco a creare la copia di sicurezza:\n%s\n\n"
                 "L'operazione e' stata annullata: nessun dato e' stato toccato.") % exc)
         # Il cestino dopo i dati e senza far fallire niente: e' un di piu' utile,
-        # non una condizione perche' l'operazione possa procedere.
+        # non una condizione perche' l'operazione possa procedere. Si scrive
+        # anche quando e' vuoto: senza il gemello, il ripristino non saprebbe
+        # che in quel momento il cestino era vuoto e lascerebbe dentro quello di
+        # adesso - con dentro dispositivi che il ripristino ha appena rimesso in
+        # inventario.
         cestino = self._percorso_eliminati()
-        if os.path.exists(cestino):
-            try:
+        try:
+            if os.path.exists(cestino):
                 shutil.copy2(cestino, _cestino_accanto(destinazione))
-            except OSError:
-                pass
+            else:
+                with open(_cestino_accanto(destinazione), "w",
+                          encoding="utf-8") as fh:
+                    json.dump([], fh)
+        except OSError:
+            pass
         self.copie_scartate = self._tieni_solo_le_ultime(cartella)
         return destinazione
 
@@ -1307,9 +1353,13 @@ class InventoryStore(object):
                         if os.path.exists(sorgente):
                             archivio.write(sorgente, NOME_IMPOSTAZIONI_NELLO_ZIP)
                             impostazioni = NOME_IMPOSTAZIONI_NELLO_ZIP
+                        # anche vuoto: senza, il ripristino non saprebbe che
+                        # in quel momento il cestino era vuoto
                         if os.path.exists(cestino):
                             archivio.write(cestino, NOME_ELIMINATI_NELLO_ZIP)
-                            self.eliminati_nella_copia = True
+                        else:
+                            archivio.writestr(NOME_ELIMINATI_NELLO_ZIP, "[]")
+                        self.eliminati_nella_copia = True
                 except OSError as exc:
                     raise InventoryError(T("Non riesco a salvare la copia:\n%s") % exc)
             return destinazione, impostazioni, quanti
@@ -1330,13 +1380,16 @@ class InventoryStore(object):
                     impostazioni = accanto
                 except OSError:
                     impostazioni = None      # i dati sono salvi: basta e avanza
-            if os.path.exists(cestino):
-                try:
-                    shutil.copy2(cestino,
-                                 os.path.splitext(destinazione)[0] + "_eliminati.json")
-                    self.eliminati_nella_copia = True
-                except OSError:
-                    pass                     # come sopra: il cestino e' un di piu'
+            accanto_cestino = os.path.splitext(destinazione)[0] + "_eliminati.json"
+            try:
+                if os.path.exists(cestino):
+                    shutil.copy2(cestino, accanto_cestino)
+                else:
+                    with open(accanto_cestino, "w", encoding="utf-8") as fh:
+                        json.dump([], fh)
+                self.eliminati_nella_copia = True
+            except OSError:
+                pass                         # come sopra: il cestino e' un di piu'
         return destinazione, impostazioni, quanti
 
     def _estrai_copia_locale(self, percorso, cartella):
@@ -1498,6 +1551,9 @@ class InventoryStore(object):
         finally:
             shutil.rmtree(cartella, ignore_errors=True)
         self.load()
+        # Come per il ripristino da una copia automatica: chi e' tornato in
+        # inventario esce dal cestino, o starebbe in tutti e due i posti.
+        self.tolti_dal_ripristino = self.togli_dal_cestino()
         return len(recuperati), precedente, bool(letta)
 
     def copie_disponibili(self, quante=40):
@@ -1573,6 +1629,11 @@ class InventoryStore(object):
             except (OSError, ValueError):
                 pass
         self.load()
+        # Una copia vecchia puo' non avere il gemello, e allora il cestino di
+        # adesso resta dov'e': dentro ci sarebbero dispositivi che il ripristino
+        # ha appena rimesso in inventario, e da li' se ne "ripristinerebbe" una
+        # seconda copia. Non possono stare in tutti e due i posti.
+        self.tolti_dal_ripristino = self.togli_dal_cestino()
         return len(recuperati), precedente
 
     def reset(self):
@@ -1633,6 +1694,8 @@ class InventoryStore(object):
         if not coppie:
             return {}
 
+        self._rinomina_nel_cestino(coppie)
+
         def op(items):
             spostati = dict((nuovo, 0) for _v, nuovo in coppie)
             for vecchio, nuovo in coppie:
@@ -1645,6 +1708,30 @@ class InventoryStore(object):
             return spostati
 
         return self._apply(op)
+
+    def _rinomina_nel_cestino(self, coppie):
+        """Rinominando una stanza, i record nel cestino la seguono.
+
+        Senza questo, un dispositivo eliminato prima della rinomina tornerebbe
+        in una stanza che non esiste piu': sparirebbe da tutte le schede. La
+        stanza e' la stessa, ha solo cambiato nome, e il ripristino non deve
+        chiedere niente a nessuno.
+        """
+        voci = self._leggi_eliminati()
+        if not voci:
+            return
+        cambiate = False
+        for voce in voci:
+            for vecchio, nuovo in coppie:
+                if clean(voce.get("stanza")) == vecchio:
+                    voce["stanza"] = nuovo
+                    cambiate = True
+                scheda = voce.get("scheda") or {}
+                if clean(scheda.get("stanza")) == vecchio:
+                    scheda["stanza"] = nuovo
+                    cambiate = True
+        if cambiate:
+            self._scrivi_eliminati(voci)
 
     def rinomina_tipi(self, coppie):
         """Riscrive il tipo dei dispositivi che avevano quello vecchio.
@@ -2030,7 +2117,11 @@ class InventoryStore(object):
             dove = clean(stanza) if stanza is not None else clean(item.get("stanza"))
             if not dove and self.iphone_room and is_iphone(item.get("tipo")):
                 dove = clean(self.iphone_room)
-            if not self.stanza_ammessa(dove):
+            # il nome ufficiale, come quello con cui entrera' davvero: l'anteprima
+            # deve mostrare la stanza in cui il dispositivo si trovera', non
+            # quella scritta a modo suo da chi ha preparato il foglio
+            dove = self.stanza_canonica(dove)
+            if not dove:
                 # senza stanza non si importa: si dice prima, non dopo
                 senza_stanza += 1
                 continue

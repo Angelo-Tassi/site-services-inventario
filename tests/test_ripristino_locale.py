@@ -11,7 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fixture
 from tkinter import filedialog, messagebox
 from inventario import config, ui
-from inventario.store import (NOME_DATI_NELLO_ZIP, NOME_IMPOSTAZIONI_NELLO_ZIP,
+from inventario.store import (NOME_DATI_NELLO_ZIP, NOME_ELIMINATI_NELLO_ZIP,
+                              NOME_IMPOSTAZIONI_NELLO_ZIP,
                               InventoryError, InventoryStore, new_item)
 from inventario.ui import App, riepilogo_copia_locale
 
@@ -28,7 +29,10 @@ salvato, impostazioni, quanti = store.copia_in(archivio)
 assert salvato == archivio and quanti == 13, (salvato, quanti)
 assert impostazioni == NOME_IMPOSTAZIONI_NELLO_ZIP, impostazioni
 dentro = zipfile.ZipFile(archivio).namelist()
-assert dentro == [NOME_DATI_NELLO_ZIP, NOME_IMPOSTAZIONI_NELLO_ZIP], dentro
+# il cestino viaggia sempre, anche vuoto: senza, il ripristino non saprebbe che
+# in quel momento era vuoto e lascerebbe dentro quello di adesso
+assert dentro == [NOME_DATI_NELLO_ZIP, NOME_IMPOSTAZIONI_NELLO_ZIP,
+                  NOME_ELIMINATI_NELLO_ZIP], dentro
 
 # ---- l'anteprima dice che cosa tornerebbe, senza toccare niente
 rapporto = store.anteprima_copia_locale(archivio)

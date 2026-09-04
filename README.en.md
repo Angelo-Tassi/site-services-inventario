@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.5.4).** The features are complete and every release
+> **Beta version (1.0.0-beta.5.5).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -735,6 +735,14 @@ be a device, and instead it has been deleted.
   final summary always lists the ones deleted for good;
 - the list shows **asset tag and type**, ten per page. The rest of the record is
   not lost: it comes back whole with the restore;
+- the device goes back **into the room it had**. If that room has meanwhile been
+  **renamed**, the bin entry follows it and the restore asks nothing; if it has
+  been **removed**, that room no longer exists and the program **asks where to
+  put it**, as for an orphan - putting it back where it was would make it vanish
+  from every card;
+- a **restore from a copy** takes out of the bin the devices that copy puts back
+  into the inventory: they cannot be in both places, and from there a second copy
+  could be "restored". The final message lists them;
 - the **search field** at the top searches the **whole bin**, not the page you
   are looking at: what it finds is then paginated in turn;
 - next to every row there is **Restore**; at the top **Restore the selected

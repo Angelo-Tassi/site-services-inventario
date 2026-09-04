@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fixture
 from tkinter import messagebox
 from inventario import ui
-from inventario.store import InventoryStore, new_item
+from inventario.store import InventoryError, InventoryStore, new_item
 from inventario.ui import App, StanzaDelDispositivoDialog, StanzeDaAssegnareDialog
 
 BAU, KIOSK, DR = fixture.BAU, fixture.KIOSK, fixture.DR
@@ -86,6 +86,11 @@ assert not [i for i in store.items if i["asset_tag"] == "IT-8400"], "non doveva 
 assert not [i for i in store.items if i["stanza"] not in (BAU, KIOSK, DR)], \
     "nessuno in una stanza che non esiste"
 
+# ---- e l'anteprima mostra la stanza in cui finira' davvero, non come e' scritta
+a = store.anteprima_importazione(
+    [new_item("IT-8403", "Laptop", "T14", "PF3", "digital  kiosk")], "merge")
+assert list(a["per_stanza"]) == [KIOSK], a["per_stanza"]
+
 # ---- e chi la scrive male entra lo stesso, ma col nome ufficiale
 store.import_items([new_item("IT-8402", "Laptop", "T14", "PF2", "digital  kiosk")],
                    "merge")
@@ -97,6 +102,81 @@ assert messo["stanza"] == KIOSK, messo["stanza"]
 libero = InventoryStore(fixture.build(), iphone_room=BAU)
 libero.load()
 assert libero.stanze is None and libero.stanza_ammessa("Cantina")
+
+# ============ e nemmeno dall'inserimento o dalla modifica ============
+# Dalla finestra non puo' succedere - la stanza si sceglie da una tendina - ma
+# la regola vale per chiunque scriva nell'archivio.
+muro = InventoryStore(fixture.build(), iphone_room=BAU)
+muro.stanze = [BAU, KIOSK, DR]
+muro.load()
+try:
+    muro.add(new_item("IT-8600", "Laptop", "T14", "PFX", "Sgabuzzino"))
+    raise SystemExit("ha accettato una stanza che non esiste")
+except InventoryError as exc:
+    assert "non e' una stanza dell'inventario" in str(exc), str(exc)
+muro.load()
+assert not [i for i in muro.items if i["asset_tag"] == "IT-8600"], "non e' entrato"
+
+# ---- scritta male invece si accetta, e viene raddrizzata
+assert muro.add(new_item("IT-8601", "Laptop", "T14", "PFY", "digital  kiosk")) == "IT-8601"
+muro.load()
+assert [i for i in muro.items if i["asset_tag"] == "IT-8601"][0]["stanza"] == KIOSK
+
+# ---- e la modifica segue la stessa regola
+libero = [i for i in muro.items if not i.get("prestato_a")
+          and i["asset_tag"] == "IT-8601"][0]
+try:
+    muro.update("IT-8601", dict(libero, stanza="Sgabuzzino"))
+    raise SystemExit("la modifica ha accettato una stanza che non esiste")
+except InventoryError as exc:
+    assert "non e' una stanza dell'inventario" in str(exc), str(exc)
+muro.load()
+assert [i for i in muro.items if i["asset_tag"] == "IT-8601"][0]["stanza"] == KIOSK
+
+# ============ e la stanza fantasma non rientra dal cestino ============
+# Un record nel cestino si porta dietro il nome della stanza che aveva. Se
+# quella stanza intanto viene rinominata o tolta, il ripristino lo rimetteva
+# in una stanza che non esiste piu': il dispositivo spariva da tutte le schede.
+
+# ---- rinominata: il cestino la segue, e non si chiede niente a nessuno
+s = InventoryStore(fixture.build(), iphone_room=BAU)
+s.stanze = [BAU, KIOSK, DR]
+s.load()
+s.give_back("IT-0107"); s.give_back("IT-0110"); s.load()
+s.delete(["IT-0106"]); s.load()
+assert s.eliminati()[0]["stanza"] == KIOSK
+s.rinomina_stanze([(KIOSK, "Chiosco Digitale")])
+s.stanze = [BAU, "Chiosco Digitale", DR]
+s.load()
+voce = s.eliminati()[0]
+assert voce["stanza"] == "Chiosco Digitale", voce["stanza"]
+assert voce["scheda"]["stanza"] == "Chiosco Digitale", voce["scheda"]["stanza"]
+assert s.stanza_del_ritorno(voce) == "Chiosco Digitale", "torna senza domande"
+s.ripristina_eliminati(["IT-0106"])
+s.load()
+assert [i for i in s.items if i["asset_tag"] == "IT-0106"][0]["stanza"] == "Chiosco Digitale"
+
+# ---- tolta: la stanza va chiesta, come per un orfano
+s = InventoryStore(fixture.build(), iphone_room=BAU)
+s.stanze = [BAU, KIOSK, DR]
+s.load()
+s.delete(["IT-0101"]); s.load()
+voce = s.eliminati()[0]
+assert s.stanza_del_ritorno(voce) == BAU, "finche' la stanza c'e', torna li'"
+s.stanze = [KIOSK, DR]
+s.iphone_room = KIOSK            # come dopo il trasloco della stanza degli iPhone
+assert s.stanza_del_ritorno(voce) == "", "senza quella stanza, va chiesta"
+rimessi, saltati = s.ripristina_eliminati(["IT-0101"])
+assert not rimessi and saltati, (rimessi, saltati)
+assert "indica dove rimetterlo" in saltati[0][1], saltati
+s.load()
+assert not [i for i in s.items if i["asset_tag"] == "IT-0101"], "non e' rientrato"
+rimessi, saltati = s.ripristina_eliminati(["IT-0101"], stanza=DR)
+s.load()
+tornato = [i for i in s.items if i["asset_tag"] == "IT-0101"]
+assert tornato and tornato[0]["stanza"] == DR, tornato
+assert s.stanza_ammessa(tornato[0]["stanza"]), \
+    "e non in una stanza che non esiste piu'"
 
 # ======================= le due finestre, quelle vere =======================
 app = App(fixture.build())

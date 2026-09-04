@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.5.4).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5.5).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -593,6 +593,15 @@ eliminato.
   sempre quelli cancellati per sempre;
 - l'elenco mostra **asset tag e tipo**, dieci per pagina. Il resto della scheda
   non si perde: torna intero con il ripristino;
+- il dispositivo torna **nella stanza che aveva**. Se quella stanza intanto e'
+  stata **rinominata**, la voce nel cestino la segue e il ripristino non chiede
+  niente; se e' stata **tolta**, quella stanza non esiste piu' e il programma
+  **chiede dove rimetterlo**, come per un orfano - rimetterlo dov'era lo farebbe
+  sparire da tutte le schede;
+- un **ripristino da una copia** toglie dal cestino i dispositivi che quella
+  copia rimette in inventario: non possono stare in tutti e due i posti, e da li'
+  se ne potrebbe "ripristinare" una seconda copia. Il messaggio finale li
+  elenca;
 - il **campo di ricerca** in cima cerca in **tutto il cestino**, non nella pagina
   che si sta guardando: quello che trova viene poi impaginato a sua volta;
 - accanto a ogni riga c'e' **Ripristina**; in cima **Ripristina i selezionati**
