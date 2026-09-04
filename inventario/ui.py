@@ -1175,6 +1175,120 @@ class ImportOptionsDialog(_Modal):
         self.destroy()
 
 
+class StanzeDaAssegnareDialog(_Modal):
+    """Il foglio non dice dove vanno: si chiede prima di importare.
+
+    Un dispositivo senza stanza non entra in inventario - non comparirebbe in
+    nessuna stanza, non uscirebbe da nessuna esportazione per stanza, e per
+    ritrovarlo bisognerebbe sapere gia' che c'e'. Quando il foglio non dichiara
+    le stanze, o quando alcune righe stanno sopra il primo separatore, la
+    stanza si chiede: tutte insieme in una sola, oppure una per una.
+    """
+
+    def __init__(self, parent, quanti, stanze):
+        _Modal.__init__(self, parent, T("In che stanza vanno?"))
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, text=T("%d dispositivi senza stanza") % quanti,
+                  style="Section.TLabel").pack(anchor="w")
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text=T("Il foglio non dice in che stanza vanno. Un dispositivo\n"
+                       "senza stanza non entra in inventario: bisogna dirlo\n"
+                       "adesso, o quelle righe non vengono importate.")).pack(
+            anchor="w", pady=(4, 12))
+
+        self.var_come = tk.StringVar(value="una")
+        ttk.Radiobutton(body, variable=self.var_come, value="una",
+                        text=T("Tutti nella stessa stanza"),
+                        command=self._aggiorna).pack(anchor="w")
+        riga = ttk.Frame(body)
+        riga.pack(anchor="w", fill="x", padx=(24, 0), pady=(4, 0))
+        self.var_stanza = tk.StringVar(value=stanze[0] if stanze else "")
+        self.combo = ttk.Combobox(riga, textvariable=self.var_stanza,
+                                  values=list(stanze), state="readonly", width=30)
+        self.combo.pack(side="left")
+        ttk.Radiobutton(body, variable=self.var_come, value="uno",
+                        text=T("Uno per uno: la scelgo per ciascun dispositivo"),
+                        command=self._aggiorna).pack(anchor="w", pady=(10, 0))
+        ttk.Label(body, style="Muted.TLabel", justify="left",
+                  text=T("Si aprira' una finestra per ognuno, con quello che il\n"
+                       "foglio dice di lui.")).pack(anchor="w", padx=(24, 0),
+                                                    pady=(2, 0))
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(18, 0))
+        ttk.Button(buttons, text=T("Annulla"),
+                   command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Continua"), style="Primary.TButton",
+                   command=self._ok).pack(side="right")
+        self._aggiorna()
+
+    def _aggiorna(self):
+        self.combo.configure(state="readonly" if self.var_come.get() == "una"
+                             else "disabled")
+
+    def _ok(self):
+        if self.var_come.get() == "una" and not self.var_stanza.get():
+            messagebox.showwarning(T("Stanza mancante"), T("Scegli la stanza."),
+                                   parent=self)
+            return
+        self.result = {"come": self.var_come.get(),
+                       "stanza": self.var_stanza.get()}
+        self.destroy()
+
+
+class StanzaDelDispositivoDialog(_Modal):
+    """La stanza di un dispositivo alla volta, con la sua scheda sotto gli occhi.
+
+    Chi sceglie una per una lo fa perche' i dispositivi vanno in posti diversi:
+    per deciderlo deve vedere di quale si tratta, non solo un codice.
+    """
+
+    def __init__(self, parent, item, stanze, numero, totale):
+        _Modal.__init__(self, parent, T("Dispositivo %d di %d") % (numero, totale))
+        body = ttk.Frame(self, padding=18)
+        body.pack(fill="both", expand=True)
+        ttk.Label(body, text=T("Dispositivo %d di %d") % (numero, totale),
+                  style="Muted.TLabel").pack(anchor="w")
+        ttk.Label(body, text=clean(item.get("asset_tag")) or T("(senza asset tag)"),
+                  style="Section.TLabel").pack(anchor="w", pady=(2, 0))
+        descrizione = [clean(item.get(campo)) for campo in ("tipo", "modello")]
+        dettagli = [d for d in descrizione if d]
+        if clean(item.get("seriale")):
+            dettagli.append(T("seriale %s") % clean(item["seriale"]))
+        if clean(item.get("note")):
+            dettagli.append(clean(item["note"]))
+        if dettagli:
+            ttk.Label(body, text="\n".join(dettagli), style="Muted.TLabel",
+                      justify="left").pack(anchor="w", pady=(2, 0))
+
+        ttk.Label(body, text=T("In che stanza va?")).pack(anchor="w", pady=(14, 4))
+        self.var_stanza = tk.StringVar(value=stanze[0] if stanze else "")
+        ttk.Combobox(body, textvariable=self.var_stanza, values=list(stanze),
+                     state="readonly", width=32).pack(fill="x")
+
+        buttons = ttk.Frame(body)
+        buttons.pack(anchor="e", pady=(18, 0))
+        ttk.Button(buttons, text=T("Annulla tutto"),
+                   command=self._cancel).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Non importarlo"),
+                   command=self._salta).pack(side="right", padx=6)
+        ttk.Button(buttons, text=T("Avanti"), style="Primary.TButton",
+                   command=self._ok).pack(side="right")
+
+    def _salta(self):
+        self.result = {"salta": True}
+        self.destroy()
+
+    def _ok(self):
+        if not self.var_stanza.get():
+            messagebox.showwarning(T("Stanza mancante"), T("Scegli la stanza."),
+                                   parent=self)
+            return
+        self.result = {"stanza": self.var_stanza.get()}
+        self.destroy()
+
+
 class ImportDialog(_Modal):
     """Riepilogo di quello che si sta per caricare, e conferma finale."""
 
@@ -1273,6 +1387,9 @@ class ImportDialog(_Modal):
         if anteprima.get("senza_identificativo"):
             saltate.append(T("  %d senza asset tag")
                            % anteprima["senza_identificativo"])
+        if anteprima.get("senza_stanza"):
+            saltate.append(T("  %d senza stanza: non verrebbero importati")
+                           % anteprima["senza_stanza"])
         gia = anteprima.get("gia_presenti") or []
         if gia:
             saltate.append(T("  %d gia' in inventario: non vengono importate")
@@ -4101,7 +4218,23 @@ class App(tk.Tk):
             return
         stanza = opzioni["stanza"]
         scartati = 0
-        if stanza is not None:
+        non_assegnati = 0
+        if stanza is None:
+            # tutto l'inventario: la stanza la dice il foglio, e se non la dice
+            # va chiesta - senza stanza non si importa
+            items, non_assegnati = self._chiedi_le_stanze_mancanti(items)
+            if items is None:
+                return
+            if not items:
+                messagebox.showwarning(
+                    T("Importazione"),
+                    T("Non e' rimasto niente da importare: tutti i dispositivi\n"
+                    "del foglio erano senza stanza e non ne hai assegnata\n"
+                    "nessuna. Non e' stato importato niente."), parent=self)
+                return
+            esito = dict(esito)
+            esito["non_assegnati"] = non_assegnati
+        else:
             items, scartati, regola = seleziona_per_stanza(items, esito, stanza)
             if regola == "mancante":
                 self._avviso_stanza_mancante(stanza, esito)
@@ -4159,9 +4292,23 @@ class App(tk.Tk):
             if len(gia) > 12:
                 righe.append(T("    ...e altri %d") % (len(gia) - 12))
 
+        senza_stanza = risultato.get("senza_stanza") or []
+        if senza_stanza:
+            righe.append("")
+            righe.append(T("NON IMPORTATI, senza stanza: %d") % len(senza_stanza))
+            righe.append(T("Un dispositivo senza stanza non entra in inventario:"))
+            righe.append(T("non comparirebbe in nessuna stanza."))
+            for tag in senza_stanza[:12]:
+                righe.append("    %s" % tag)
+            if len(senza_stanza) > 12:
+                righe.append(T("    ...e altri %d") % (len(senza_stanza) - 12))
+
         saltate = []
         if esito.get("scartate"):
             saltate.append(T("  %d senza asset tag") % esito["scartate"])
+        if esito.get("non_assegnati"):
+            saltate.append(T("  %d senza stanza: non ne hai assegnata nessuna")
+                           % esito["non_assegnati"])
         if esito.get("iphone"):
             saltate.append(T("  %d iPhone: si inseriscono solo a mano") % esito["iphone"])
         if scartati:
@@ -4252,6 +4399,47 @@ class App(tk.Tk):
                             "\n".join(self._resoconto_importazione(
                                 risultato, esito_stanza, opzioni, scartati, tolti)),
                             parent=self)
+
+    def _chiedi_le_stanze_mancanti(self, items):
+        """Nessun dispositivo entra senza stanza: se il foglio non la dice, si chiede.
+
+        Ritorna (righe, non_assegnati). Le righe tornano con la stanza dentro,
+        pronte per l'importazione. Ritorna (None, 0) se si e' annullato: in quel
+        caso non si importa niente, nemmeno le righe gia' a posto - a meta'
+        strada nessuno sa piu' che cosa e' entrato e che cosa no.
+        """
+        orfani = [i for i in items if not clean(i.get("stanza"))]
+        if not orfani:
+            return items, 0
+        stanze = list(self.cfg.get("rooms") or [])
+        if not stanze:
+            messagebox.showwarning(
+                T("Nessuna stanza"),
+                T("Nel foglio ci sono %d dispositivi senza stanza, ma\n"
+                "l'inventario non ha nessuna stanza in cui metterli.\n"
+                "Aggiungine una dalle impostazioni e riprova.") % len(orfani),
+                parent=self)
+            return None, 0
+        scelta = StanzeDaAssegnareDialog(self, len(orfani), stanze).show()
+        if not scelta:
+            return None, 0
+        if scelta["come"] == "una":
+            for item in orfani:
+                item["stanza"] = scelta["stanza"]
+            return items, 0
+        saltati = set()
+        for numero, item in enumerate(orfani, start=1):
+            risposta = StanzaDelDispositivoDialog(
+                self, item, stanze, numero, len(orfani)).show()
+            if not risposta:
+                return None, 0
+            if risposta.get("salta"):
+                saltati.add(id(item))
+                continue
+            item["stanza"] = risposta["stanza"]
+        if not saltati:
+            return items, 0
+        return [i for i in items if id(i) not in saltati], len(saltati)
 
     def _avviso_stanza_mancante(self, stanza, esito):
         trovate = esito.get("stanze_trovate") or []

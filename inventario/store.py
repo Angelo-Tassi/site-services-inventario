@@ -1953,6 +1953,7 @@ class InventoryStore(object):
         presenti = set(dove_sta)
         per_stanza = {}
         senza_identificativo = 0
+        senza_stanza = 0
         gia_presenti = []
         nuovi = set()
         for raw in incoming:
@@ -1962,8 +1963,13 @@ class InventoryStore(object):
                 senza_identificativo += 1
                 continue
             dove = clean(stanza) if stanza is not None else clean(item.get("stanza"))
-            riga = per_stanza.setdefault(dove or SENZA_STANZA,
-                                         {"aggiunti": 0, "saltati": 0})
+            if not dove and self.iphone_room and is_iphone(item.get("tipo")):
+                dove = clean(self.iphone_room)
+            if not dove:
+                # senza stanza non si importa: si dice prima, non dopo
+                senza_stanza += 1
+                continue
+            riga = per_stanza.setdefault(dove, {"aggiunti": 0, "saltati": 0})
             if tag in presenti:
                 riga["saltati"] += 1
                 trovato = dove_sta.get(tag)
@@ -1989,6 +1995,7 @@ class InventoryStore(object):
             "gia_presenti": gia_presenti,
             "eliminati": eliminati,
             "senza_identificativo": senza_identificativo,
+            "senza_stanza": senza_stanza,
             "prima": len(items),
             "dopo": len(items) - eliminati + aggiunti,
         }
@@ -2014,13 +2021,19 @@ class InventoryStore(object):
         sua voce fra gli eliminati di recente viene tolta subito dopo, o il
         dispositivo resterebbe in tutti e due i posti.
 
-        Ritorna un dizionario con aggiunti, gia_presenti, eliminati, copia e
-        tolti_dal_cestino.
+        Un dispositivo **senza stanza non entra**: non si saprebbe dove
+        cercarlo, non comparirebbe in nessuna stanza e nessuna esportazione per
+        stanza lo conterrebbe. La riga si salta e finisce in `senza_stanza`. Chi
+        importa dall'interfaccia la stanza se l'e' gia' vista chiedere; questo
+        e' il muro che regge anche se qualcuno chiama l'archivio direttamente.
+
+        Ritorna un dizionario con aggiunti, gia_presenti, senza_stanza,
+        eliminati, copia e tolti_dal_cestino.
         """
 
         def op(items):
-            esito = {"aggiunti": 0, "gia_presenti": [], "eliminati": 0,
-                     "copia": None}
+            esito = {"aggiunti": 0, "gia_presenti": [], "senza_stanza": [],
+                     "eliminati": 0, "copia": None}
             if mode == "replace":
                 esito["copia"] = self.copia_di_sicurezza()
                 prima = len(items)
@@ -2050,6 +2063,9 @@ class InventoryStore(object):
                          "stanza": clean(gia.get("stanza")) or SENZA_STANZA})
                     continue
                 self._enforce_iphone_room(item)
+                if not clean(item.get("stanza")):
+                    esito["senza_stanza"].append(item["asset_tag"])
+                    continue
                 normalize_state(item, self.stati)
                 _stamp_item(item)
                 if item["asset_tag"] in appena_messi:

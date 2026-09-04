@@ -551,6 +551,20 @@ table{min-width:520px}
     Vanno bene anche le abbreviazioni <span class="mono">BAU</span>,
     <span class="mono">KIOSK</span>, <span class="mono">DISASTER</span>.</p>
 
+  <h3>Se il foglio non dice la stanza</h3>
+  <p class="sub">Un dispositivo <b>senza stanza non entra in inventario</b>: non
+    comparirebbe in nessuna stanza, non uscirebbe da nessuna esportazione per stanza e
+    per ritrovarlo bisognerebbe gia' sapere che c'e'. Quindi, se il foglio non dichiara
+    le stanze - non ha separatori, o ha righe sopra il primo - il programma <b>la chiede
+    prima di importare</b>, e nessuna riga viene scritta finche' non ha una risposta.</p>
+  <div class="tw"><table class="man">
+    <tr><th>Scelta</th><th>Che cosa fa</th></tr>
+    <tr><td><b>Tutti nella stessa stanza</b></td><td class="d">si sceglie la stanza dalla tendina e tutte le righe senza stanza finiscono li'. Quelle che la stanza ce l'hanno gia' - da un separatore o dalla colonna Stanza - non si toccano.</td></tr>
+    <tr><td><b>Uno per uno</b></td><td class="d">si apre una finestra per ogni dispositivo, con asset tag, tipo, modello, seriale e note, e per ognuno si sceglie la stanza. <b>Non importarlo</b> lo lascia fuori; <b>Annulla tutto</b> ferma l'intera importazione, e non viene scritto niente.</td></tr>
+  </table></div>
+  <p class="note">Chi importa <b>in una sola stanza</b> questa domanda non la vede: quella
+    scelta vale gia' per tutte le righe.</p>
+
   <h3>Il riepilogo prima di importare</h3>
   <p class="sub">Niente viene scritto finche' non confermi, e prima di confermare vedi:</p>
   <div class="tw"><table class="man">
@@ -558,7 +572,7 @@ table{min-width:520px}
     <tr><td class="d"><b>Dove finiscono</b>, stanza per stanza</td><td class="d">quanti dispositivi <i>nuovi</i> e quanti <i>gia' in inventario</i> - quelli si saltano - in ognuna: si vede subito se una stanza sta per riempirsi di roba che non le appartiene.</td></tr>
     <tr><td class="d"><b>Quante righe vengono saltate</b>, e perche'</td><td class="d">senza identificativo, iPhone (che si inseriscono solo a mano), righe di altre stanze, colonne non riconosciute.</td></tr>
     <tr><td class="d"><b>Quanti dispositivi ci sono adesso e quanti dopo</b></td><td class="d">e' il numero che dice se sta per succedere quello che pensi. Con la sostituzione dice anche quanti ne spariscono prima.</td></tr>
-    <tr><td class="d">Le stanze riconosciute dal foglio</td><td class="d">se non ne trova nessuna te lo dice li', prima di toccare qualsiasi cosa: altrimenti i dispositivi finirebbero senza stanza.</td></tr>
+    <tr><td class="d">Le stanze riconosciute dal foglio</td><td class="d">se non ne trova nessuna te lo dice li', prima di toccare qualsiasi cosa, e ti chiede dove vanno i dispositivi che ne restano senza.</td></tr>
   </table></div>
   <p class="note">A operazione avvenuta il riepilogo finale ripete tutto: che cosa e'
     stato fatto e dove, quante righe non sono state caricate e perche' una per una, come
@@ -1182,6 +1196,20 @@ table{min-width:520px}
     <span class="mono">BAU</span>, <span class="mono">KIOSK</span> and
     <span class="mono">DISASTER</span> work too.</p>
 
+  <h3>When the sheet does not say the room</h3>
+  <p class="sub">A device <b>with no room does not get into the inventory</b>: it would
+    show up in no room, come out of no per-room export, and to find it again you would
+    have to know already that it is there. So, if the sheet does not declare the rooms -
+    no separators, or rows above the first one - the program <b>asks before importing</b>,
+    and no row is written until it has an answer.</p>
+  <div class="tw"><table class="man">
+    <tr><th>Choice</th><th>What it does</th></tr>
+    <tr><td><b>All in the same room</b></td><td class="d">you pick the room from the dropdown and every row with no room goes there. The ones that already have a room - from a separator or from the Room column - are left alone.</td></tr>
+    <tr><td><b>One by one</b></td><td class="d">a window opens for each device, with asset tag, type, model, serial and notes, and you choose the room for each. <b>Do not import it</b> leaves it out; <b>Cancel everything</b> stops the whole import, and nothing is written.</td></tr>
+  </table></div>
+  <p class="note">Importing <b>into one room only</b> never shows this question: that
+    choice already covers every row.</p>
+
   <h3>The summary before importing</h3>
   <p class="sub">Nothing is written until you confirm, and before confirming you see:</p>
   <div class="tw"><table class="man">
@@ -1189,7 +1217,7 @@ table{min-width:520px}
     <tr><td class="d"><b>Where they go</b>, room by room</td><td class="d">how many devices are <i>new</i> and how many <i>already in the inventory</i> - those get skipped - in each: you see at once if a room is about to fill with things that do not belong to it.</td></tr>
     <tr><td class="d"><b>How many rows are skipped</b>, and why</td><td class="d">no identifier, iPhones (which are entered by hand only), rows of other rooms, columns not recognised.</td></tr>
     <tr><td class="d"><b>How many devices there are now and how many after</b></td><td class="d">that is the number that tells you whether what you think is about to happen. With Replace it also says how many disappear first.</td></tr>
-    <tr><td class="d">The rooms recognised in the sheet</td><td class="d">if it finds none it tells you right there, before touching anything: otherwise the devices would end up with no room.</td></tr>
+    <tr><td class="d">The rooms recognised in the sheet</td><td class="d">if it finds none it tells you right there, before touching anything, and asks where the devices left without one should go.</td></tr>
   </table></div>
   <p class="note">Once it is done the final summary repeats everything: what was done and
     where, how many rows were not loaded and why, one by one, how the inventory stands now

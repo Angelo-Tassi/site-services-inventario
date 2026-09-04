@@ -47,7 +47,10 @@ assert all(i["modello"] == "" for i in items)
 assert any("non hanno il modello" in a for a in ImportDialog._avvertenze(esito))
 s = InventoryStore(os.path.join(d, "Inv.xlsx"), iphone_room=fixture.BAU)
 s.create_if_missing()
-assert s.import_items(items, "merge")["aggiunti"] == 2, "si importano lo stesso"
+# il foglio non dice la stanza: qui si importa dentro una, come fa la finestra
+# dopo averla chiesta. Quello che manca e' il modello, e non e' un ostacolo.
+assert s.import_items(items, "merge", fixture.KIOSK)["aggiunti"] == 2, \
+    "si importano lo stesso"
 
 # ---- nessuna colonna identificativa: errore chiaro, niente importato
 p = foglio("inutile", ["Costo", "Fornitore"], [[100, "Dell"]])

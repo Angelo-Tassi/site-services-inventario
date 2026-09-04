@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.5.2).** The features are complete and every release
+> **Beta version (1.0.0-beta.5.3).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -224,6 +224,25 @@ If running unsigned programs is governed by security policy in your company
 (AppLocker, Windows Defender Application Control), you need an allowance from the
 administrators: a binary signed by the Python Software Foundation, installed
 locally, is however the easiest case to get approved.
+
+## No device gets in without a room
+
+A device with no room **does not get into the inventory**: it would show up in no
+room, come out of no per-room export and no printout, and to find it again you
+would have to know already that it is there. This holds for every import, from
+any page and with any option.
+
+When the sheet does not say it - no separator rows, or rows above the first one -
+the program **asks where they go**, before writing anything:
+
+- **All in the same room**: you pick the room and every row left without one goes
+  there. The ones that already have a room are left alone;
+- **One by one**: a window opens for each device - asset tag, type, model,
+  serial, notes - and you choose the room for each. *Do not import it* leaves it
+  out, *Cancel everything* stops the import without writing anything.
+
+Importing **into one room only** never shows this question: that choice already
+covers every row. The rows left out are declared in the final summary.
 
 ## A sheet to import is not an inventory
 

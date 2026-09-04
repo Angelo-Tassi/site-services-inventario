@@ -174,7 +174,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 1.0.0-beta.5.2 · beta</div>
+  <div class="alpha">versione 1.0.0-beta.5.3 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -200,6 +200,29 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.3</h3>
+      <p class="quando">4 settembre 2026</p>
+      <ul>
+        <li><b>Nessun dispositivo entra piu' senza stanza.</b> Prima, importando
+          un foglio che non dichiarava le stanze, i dispositivi entravano senza:
+          non comparivano in nessuna stanza, non uscivano da nessuna
+          esportazione per stanza, e per ritrovarli bisognava gia' sapere che
+          c'erano. Adesso non entrano, da nessuna opzione e da nessuna
+          pagina.</li>
+        <li><b>Se il foglio non dice la stanza, il programma la chiede.</b>
+          Prima di scrivere qualsiasi cosa si apre una finestra con due strade:
+          <b>tutti nella stessa stanza</b>, oppure <b>uno per uno</b> - una
+          finestra per ogni dispositivo, con asset tag, tipo, modello, seriale e
+          note sotto gli occhi. Si puo' lasciarne fuori qualcuno, o annullare
+          tutto senza che venga scritto niente. Importando in una sola stanza la
+          domanda non compare: quella scelta vale gia' per tutte le righe.</li>
+        <li><b>Il foglio istruzioni del modello diceva ancora una cosa vecchia.</b>
+          Sosteneva che importando due volte lo stesso asset tag la scheda
+          "viene aggiornata": da due versioni non e' piu' vero - la riga si
+          salta e il programma dice dove sta quello che c'e' gia'.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.2</h3>
       <p class="quando">4 settembre 2026</p>
@@ -255,19 +278,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
         <li><b>Le copie vecchie restano valide</b>: quelle salvate prima non
           hanno il cestino, e in quel caso gli eliminati di adesso restano dove
           sono invece di essere azzerati.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.4</h3>
-      <p class="quando">3 settembre 2026</p>
-      <ul>
-        <li><b>La finestra "scegli la cartella" viene in primo piano.</b> Su
-          Windows poteva aprirsi dietro le altre finestre, o comparire solo
-          come icona sulla barra delle applicazioni: chi eseguiva "Collega
-          inventario condiviso..." non la vedeva e credeva che il programma si
-          fosse bloccato, mentre era li' ad aspettare.</li>
-        <li><b>Anche la domanda di conferma dopo</b> torna in primo piano da
-          sola nel terminale, per lo stesso motivo.</li>
       </ul>
     </div>
   </div>
@@ -464,7 +474,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 1.0.0-beta.5.2 · beta</div>
+  <div class="alpha">version 1.0.0-beta.5.3 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -490,6 +500,28 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.3</h3>
+      <p class="quando">4 September 2026</p>
+      <ul>
+        <li><b>No device gets in without a room any more.</b> Before, importing a
+          sheet that did not declare the rooms let devices in without one: they
+          showed up in no room, came out of no per-room export, and to find them
+          again you had to know already that they were there. Now they do not get
+          in, from any option and from any page.</li>
+        <li><b>If the sheet does not say the room, the program asks.</b> Before
+          anything is written a window opens with two ways: <b>all in the same
+          room</b>, or <b>one by one</b> - a window for each device, with asset
+          tag, type, model, serial and notes in front of you. You can leave some
+          out, or cancel everything with nothing written. Importing into one room
+          only never shows the question: that choice already covers every
+          row.</li>
+        <li><b>The template's instruction sheet still said something out of
+          date.</b> It claimed that importing the same asset tag twice "updates
+          the record": that has not been true for two versions - the row is
+          skipped and the program says where the existing one is.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.2</h3>
       <p class="quando">4 September 2026</p>
@@ -544,19 +576,6 @@ python Inventario.py</pre>
         <li><b>Older copies stay valid</b>: the ones saved before do not have
           the bin, and in that case the deleted ones you have now stay where
           they are instead of being wiped.</li>
-      </ul>
-    </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.4</h3>
-      <p class="quando">3 September 2026</p>
-      <ul>
-        <li><b>The "choose the folder" window comes to the front.</b> On
-          Windows it could open behind other windows, or show up only as an
-          icon on the taskbar: whoever ran "Link shared inventory..." would not
-          see it and think the program had frozen, while it was sitting there
-          waiting.</li>
-        <li><b>The confirmation question that follows</b> also comes back to
-          the front by itself in the terminal, for the same reason.</li>
       </ul>
     </div>
   </div>

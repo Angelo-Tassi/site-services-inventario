@@ -1158,6 +1158,50 @@ EN = {
         'These were already in the inventory, and I took them out of the\n'
         'recently deleted: a device cannot be in the list and in the bin\n'
         'at the same time.\n',
+    # --- la stanza mancante nell'importazione
+    "In che stanza vanno?": "Which room do they go in?",
+    "In che stanza va?": "Which room does it go in?",
+    "%d dispositivi senza stanza": "%d devices with no room",
+    "Il foglio non dice in che stanza vanno. Un dispositivo\n"
+    "senza stanza non entra in inventario: bisogna dirlo\n"
+    "adesso, o quelle righe non vengono importate.":
+        'The sheet does not say which room they go in. A device with\n'
+        'no room does not get into the inventory: you have to say it\n'
+        'now, or those rows are not imported.',
+    "Tutti nella stessa stanza": "All in the same room",
+    "Uno per uno: la scelgo per ciascun dispositivo":
+        'One by one: I choose it for each device',
+    "Si aprira' una finestra per ognuno, con quello che il\n"
+    "foglio dice di lui.":
+        'A window will open for each one, with what the sheet says\n'
+        'about it.',
+    "Continua": "Continue",
+    "Dispositivo %d di %d": "Device %d of %d",
+    "(senza asset tag)": "(no asset tag)",
+    "seriale %s": "serial %s",
+    "Annulla tutto": "Cancel everything",
+    "Non importarlo": "Do not import it",
+    "Nessuna stanza": "No rooms",
+    "Nel foglio ci sono %d dispositivi senza stanza, ma\n"
+    "l'inventario non ha nessuna stanza in cui metterli.\n"
+    "Aggiungine una dalle impostazioni e riprova.":
+        'The sheet holds %d devices with no room, but the inventory\n'
+        'has no room to put them in.\n'
+        'Add one from the settings and try again.',
+    "Non e' rimasto niente da importare: tutti i dispositivi\n"
+    "del foglio erano senza stanza e non ne hai assegnata\n"
+    "nessuna. Non e' stato importato niente.":
+        'Nothing is left to import: every device in the sheet had no\n'
+        'room and you assigned none. Nothing was imported.',
+    "NON IMPORTATI, senza stanza: %d": 'NOT IMPORTED, with no room: %d',
+    "Un dispositivo senza stanza non entra in inventario:":
+        'A device with no room does not get into the inventory:',
+    "non comparirebbe in nessuna stanza.":
+        'it would show up in no room at all.',
+    "  %d senza stanza: non ne hai assegnata nessuna":
+        '  %d with no room: you assigned none',
+    "  %d senza stanza: non verrebbero importati":
+        '  %d with no room: they would not be imported',
     "NON IMPORTATI, gia' in inventario: %d":
         'NOT IMPORTED, already in the inventory: %d',
     "La scheda di un dispositivo gia' registrato non si":

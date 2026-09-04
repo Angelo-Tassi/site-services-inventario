@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.5.2).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5.3).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -229,6 +229,26 @@ Se in azienda l'esecuzione di programmi non firmati e' regolata da criteri di
 sicurezza (AppLocker, Windows Defender Application Control), serve
 un'autorizzazione dagli amministratori: un binario firmato dalla Python Software
 Foundation, installato in locale, e' pero' il caso piu' facile da far passare.
+
+## Nessun dispositivo entra senza stanza
+
+Un dispositivo senza stanza **non entra in inventario**: non comparirebbe in
+nessuna stanza, non uscirebbe da nessuna esportazione per stanza ne' da nessuna
+stampa, e per ritrovarlo bisognerebbe gia' sapere che c'e'. Vale per ogni
+importazione, da qualunque pagina e con qualunque opzione.
+
+Quando il foglio non lo dice - non ha righe separatore, oppure ha righe sopra la
+prima - il programma **chiede dove vanno**, prima di scrivere qualsiasi cosa:
+
+- **Tutti nella stessa stanza**: si sceglie la stanza e tutte le righe rimaste
+  senza finiscono li'. Chi la stanza ce l'ha gia' non viene toccato;
+- **Uno per uno**: si apre una finestra per ogni dispositivo - asset tag, tipo,
+  modello, seriale, note - e per ciascuno si sceglie la stanza. *Non importarlo*
+  lo lascia fuori, *Annulla tutto* ferma l'importazione senza scrivere niente.
+
+Chi importa **in una sola stanza** questa domanda non la vede: quella scelta
+vale gia' per tutte le righe. Le righe lasciate fuori sono dichiarate nel
+riepilogo finale.
 
 ## Un foglio da importare non e' un inventario
 

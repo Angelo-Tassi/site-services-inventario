@@ -558,6 +558,41 @@ registrato.
 
 ---
 
+## 17. Un foglio che non dice le stanze
+
+Serve a verificare che nessun dispositivo entri senza stanza, e che quando il
+foglio non la dice il programma la chieda.
+
+Prepara il file: apri `Inventario_di_prova.xlsx`, **cancella le tre righe
+separatore** e **svuota la colonna Stanza**, poi salva con un altro nome in una
+cartella tua, cosi' il file di prova resta intatto.
+
+1. *Importa xls...* > **Tutto l'inventario** > **Unisci**, e scegli quel file.
+   Prima del riepilogo deve aprirsi una finestra che dice **30 dispositivi senza
+   stanza** e offre due strade;
+2. scegli **Tutti nella stessa stanza**, prendi `Digital Kiosk` e vai avanti: il
+   riepilogo deve mostrare tutte e 30 le righe dirette li'. Conferma e controlla
+   le schede in home;
+3. riparti dall'inventario vuoto (o usa un file con pochi dispositivi) e riprova
+   scegliendo **Uno per uno**: si apre una finestra per ogni dispositivo, che
+   dice *Dispositivo 1 di N* e mostra asset tag, tipo, modello e seriale. Manda
+   il primo in una stanza, il secondo in un'altra, e sul terzo premi **Non
+   importarlo**;
+4. al termine il riepilogo deve dire che quel dispositivo e' rimasto fuori
+   (*senza stanza: non ne hai assegnata nessuna*), e gli altri devono trovarsi
+   ognuno nella stanza che hai scelto;
+5. rifai il punto 3 e a meta' premi **Annulla tutto**: non deve essere importato
+   **niente**, nemmeno i dispositivi che avevi gia' assegnato;
+6. infine la prova che non deve chiedere niente: con lo stesso file, *Importa
+   xls...* > **Una sola stanza** > `Digital Kiosk`. La domanda **non** deve
+   comparire - quella scelta vale gia' per tutte le righe.
+
+**Cosa deve succedere:** nessun dispositivo si trova in inventario senza stanza,
+in nessun caso. Per controllarlo apri l'inventario completo in home e guarda la
+colonna Stanza: non deve esserci nemmeno una cella vuota.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

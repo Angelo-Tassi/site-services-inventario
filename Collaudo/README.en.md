@@ -544,6 +544,39 @@ time, and no import rewrites the record of an already registered device.
 
 ---
 
+## 17. A sheet that does not say the rooms
+
+This checks that no device gets in without a room, and that when the sheet does
+not say it the program asks.
+
+Prepare the file: open `Inventario_di_prova.xlsx`, **delete the three separator
+rows** and **empty the Room column**, then save under another name in a folder of
+your own, so the test file stays untouched.
+
+1. *Import xls...* > **The whole inventory** > **Merge**, and choose that file.
+   Before the summary a window must open saying **30 devices with no room** and
+   offering two ways;
+2. choose **All in the same room**, take `Digital Kiosk` and go on: the summary
+   must show all 30 rows heading there. Confirm and check the cards on the home
+   screen;
+3. start again from an empty inventory (or use a file with few devices) and try
+   again choosing **One by one**: a window opens for each device, saying *Device
+   1 of N* and showing asset tag, type, model and serial. Send the first to one
+   room, the second to another, and on the third press **Do not import it**;
+4. at the end the summary must say that device was left out (*with no room: you
+   assigned none*), and the others must each be in the room you chose;
+5. repeat point 3 and press **Cancel everything** halfway: **nothing** must be
+   imported, not even the devices you had already assigned;
+6. finally the case where it must ask nothing: with the same file, *Import
+   xls...* > **One room only** > `Digital Kiosk`. The question must **not**
+   appear - that choice already covers every row.
+
+**What must happen:** no device is in the inventory without a room, in any case.
+To check it open the full inventory on the home screen and look at the Room
+column: there must not be a single empty cell.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.
