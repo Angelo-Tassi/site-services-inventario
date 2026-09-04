@@ -149,6 +149,13 @@ record is **not rewritten** from the sheet. To check it: before repeating the
 import, change a device's note by hand from the list, then import again and check
 the note is still the one you wrote.
 
+What decides is **the asset tag alone**: the other fields are not looked at. To
+see it, in a copy of your own of the sheet change a device's **model, serial and
+note**, leaving the asset tag as it is, and import again: it must be skipped all
+the same, because that code is already in. The other way round, changing only a
+row's **asset tag** makes it come in as a new device even if everything else is
+identical to one already there.
+
 ## 3. Replacing a single room
 
 1. *Import xls...* > **A single room** > `Digital Kiosk` > **Replace**

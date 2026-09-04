@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.5.1).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5.2).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -574,12 +574,19 @@ programma **chiede in che stanza rimetterli**.
 Il programma non ne crea, e un identificativo gia' in inventario **non entra mai
 una seconda volta**.
 
+L'unico campo che non puo' mai ripetersi e' l'**asset tag** - per gli iPhone
+l'IMEI. Tutto il resto della scheda - tipo, modello, seriale, stanza, note - puo'
+variare liberamente, e per decidere se un dispositivo c'e' gia' non viene
+nemmeno guardato: due schede diverse in ogni campo con lo stesso asset tag sono
+lo stesso dispositivo, due schede identiche in tutto con asset tag diversi sono
+due dispositivi.
+
 - l'**inserimento singolo rifiuta** un identificativo gia' presente, dicendo
   dove sta e che cos'e' quello che c'e' gia', e senza inserire niente;
 - l'**importazione salta** la riga e dice **in che stanza** sta il dispositivo
-  che c'e' gia'. Non ne riscrive la scheda: se e' lo stesso dispositivo non
-  serve, e se e' un altro con lo stesso codice e' un errore di battitura da
-  guardare, non da applicare in silenzio;
+  che c'e' gia'. Non ne riscrive la scheda, per quanto diversa sia quella nel
+  foglio: se e' lo stesso dispositivo non serve, e se e' un altro con lo stesso
+  codice e' un errore di battitura da guardare, non da applicare in silenzio;
 - se un foglio contiene **due volte lo stesso identificativo** vale l'ultima
   riga - quella e' una regola del foglio, non dell'inventario - e il riepilogo
   lo dichiara prima di importare.

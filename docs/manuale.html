@@ -576,6 +576,12 @@ table{min-width:520px}
     dispositivo gia' registrato, senza riscrivergli la scheda. Se un foglio contiene due
     volte lo stesso identificativo vale l'ultima riga - quella e' una regola del foglio -
     e il riepilogo lo dichiara.</p>
+  <p class="sub">L'unico campo che non puo' mai ripetersi e' l'<b>asset tag</b> - per gli
+    iPhone l'IMEI. Tutto il resto della scheda - tipo, modello, seriale, stanza, note -
+    puo' variare liberamente, e per decidere se un dispositivo c'e' gia' non viene nemmeno
+    guardato: due schede diverse in ogni campo con lo stesso asset tag sono lo stesso
+    dispositivo, due schede identiche in tutto con asset tag diversi sono due
+    dispositivi.</p>
   <div class="avviso">Gli <b>eliminati di recente</b> contano come "non in inventario":
     un dispositivo che sta solo nel cestino viene importato o inserito normalmente, e la
     sua voce nel cestino sparisce. Non puo' stare insieme in elenco e fra gli eliminati,
@@ -1201,6 +1207,12 @@ table{min-width:520px}
     registered device is in, without rewriting its record. If a sheet contains the same
     identifier twice the last row wins - that is a rule of the sheet - and the summary
     says so.</p>
+  <p class="sub">The only field that can never repeat is the <b>asset tag</b> - the IMEI
+    for iPhones. Everything else in the record - type, model, serial, room, notes - may
+    vary freely, and is not even looked at when deciding whether a device is already
+    there: two records different in every field with the same asset tag are the same
+    device, two records identical in everything with different asset tags are two
+    devices.</p>
   <div class="avviso">The <b>recently deleted</b> count as "not in the inventory": a
     device that is only in the bin is imported or added normally, and its bin entry
     disappears. It cannot be in the list and among the deleted at the same time, or a

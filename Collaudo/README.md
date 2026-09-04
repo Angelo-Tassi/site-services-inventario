@@ -149,6 +149,13 @@ scheda **non viene riscritta** dal foglio. Per verificarlo: prima di ripetere
 l'importazione cambia a mano la nota di un dispositivo dall'elenco, poi reimporta
 e controlla che la nota sia rimasta quella che hai scritto tu.
 
+A decidere e' **solo l'asset tag**: gli altri campi non vengono guardati. Per
+vederlo, in una copia tua del foglio cambia a un dispositivo **modello, seriale e
+nota**, lasciando l'asset tag com'e', e reimporta: deve essere saltato lo stesso,
+perche' e' quel codice a essere gia' dentro. Al contrario, cambiando solo
+l'**asset tag** di una riga, quella entra come dispositivo nuovo anche se tutto
+il resto e' identico a uno che c'e' gia'.
+
 ## 3. Sostituire una sola stanza
 
 1. *Importa xls...* > **Una sola stanza** > `Digital Kiosk` > **Sostituisci**

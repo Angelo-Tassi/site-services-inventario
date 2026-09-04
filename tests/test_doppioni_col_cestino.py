@@ -1,5 +1,12 @@
 """Un identificativo non puo' stare in due posti, e non si riscrive di nascosto.
 
+L'identificativo, e solo quello, decide: l'unico campo che non puo' mai
+ripetersi e' l'**asset tag** - per gli iPhone l'IMEI. Tutto il resto della
+scheda puo' variare quanto vuole, e nella decisione non viene nemmeno guardato:
+due schede diverse in ogni campo con lo stesso asset tag sono lo stesso
+dispositivo, due schede identiche in tutto con asset tag diversi sono due
+dispositivi.
+
 Tre regole, che valgono da ogni strada che rimette dentro un dispositivo -
 importazione da qualsiasi pagina, inserimento singolo, controllo doppioni:
 
@@ -32,7 +39,9 @@ def prepara():
 # ============================ importazione ============================
 store = prepara()
 prima = dict([i for i in store.items if i["asset_tag"] == "IT-0101"][0])
-righe = [new_item("IT-0101", "Laptop", "RISCRITTO DAL FOGLIO", "XXX", KIOSK, "nota nuova"),
+# la riga di IT-0101 ha lo stesso asset tag e TUTTO il resto diverso - tipo,
+# modello, seriale, stanza, note: deve bastare il tag a riconoscerla
+righe = [new_item("IT-0101", "Tablet", "RISCRITTO DAL FOGLIO", "XXX", KIOSK, "nota nuova"),
          new_item("IT-0106", "Laptop", "Tornato dal cestino", "PF5K9M8F", KIOSK),
          new_item("IT-9001", "Laptop", "Nuovo di zecca", "PF9001", KIOSK)]
 
@@ -46,9 +55,12 @@ esito = store.import_items(righe, "merge")
 assert esito["aggiunti"] == 2, esito
 # 1. gia' in inventario: saltato, e si dice dov'e'
 assert esito["gia_presenti"] == [{"asset_tag": "IT-0101", "stanza": BAU}], esito
+# e la conseguenza di averla saltata: la scheda di chi c'era gia' resta la sua.
+# Non e' un criterio di confronto - i campi non si guardano per decidere - e'
+# quello che succede a chi non e' stato toccato.
 store.load()
 dopo = [i for i in store.items if i["asset_tag"] == "IT-0101"][0]
-for campo in ("modello", "seriale", "stanza", "note"):
+for campo in ("tipo", "modello", "seriale", "stanza", "note"):
     assert dopo[campo] == prima[campo], \
         "la scheda di chi c'era gia' non si tocca: %s" % campo
 # 2. era solo nel cestino: entra, e dal cestino sparisce
@@ -63,6 +75,18 @@ assert [i for i in store.items if i["asset_tag"] == "IT-9001"]
 for tag in ("IT-0101", "IT-0106", "IT-9001"):
     assert len([i for i in store.items if i["asset_tag"] == tag]) == 1, tag
 
+# ---- il contrario: due schede identiche in tutto ma con asset tag diverso NON
+# sono un doppione, ed entrano tutte e due. A contare e' solo l'identificativo.
+gemella = dict(prima)
+gemella["asset_tag"] = "IT-9002"
+assert store.import_items([gemella], "merge")["aggiunti"] == 1
+store.load()
+entrata = [i for i in store.items if i["asset_tag"] == "IT-9002"][0]
+for campo in ("tipo", "modello", "seriale", "stanza", "note"):
+    assert entrata[campo] == prima[campo], campo
+assert store.add(dict(gemella, asset_tag="IT-9003")) == "IT-9003", \
+    "nemmeno l'inserimento singolo guarda gli altri campi"
+
 # ---- le righe ripetute DENTRO il foglio seguono la loro regola: vale l'ultima
 store = prepara()
 doppie = [new_item("IT-9002", "Laptop", "prima riga", "PF1", BAU),
@@ -74,14 +98,18 @@ assert len(uno) == 1 and uno[0]["stanza"] == DR, uno
 
 # ============================ inserimento singolo ============================
 store = prepara()
-# 1. gia' in inventario: rifiutato, come sempre
+# 1. gia' in inventario: rifiutato, come sempre - e anche qui basta il tag,
+# la scheda che si prova a inserire e' diversa in ogni altro campo
 try:
-    store.add(new_item("IT-0101", "Laptop", "T14", "PF1", DR))
+    store.add(new_item("IT-0101", "Tablet", "tutt'altro modello", "SN-X", DR,
+                       "tutt'altra nota"))
     raise SystemExit("doveva rifiutare un identificativo gia' in inventario")
 except InventoryError as exc:
     assert "gia' in inventario" in str(exc), str(exc)
-# 2. era nel cestino: entra, e la voce del cestino se ne va
-assert store.add(new_item("IT-0106", "Laptop", "T14", "PF6", DR)) == "IT-0106"
+# 2. era nel cestino: entra, e la voce del cestino se ne va. La scheda che
+# rientra non somiglia a quella eliminata: si riconoscono dal tag e basta
+assert store.add(new_item("IT-0106", "Tablet", "modello nuovo", "SN-NUOVO", DR,
+                          "note nuove")) == "IT-0106"
 store.load()
 tolti = store.togli_dal_cestino(["IT-0106"])
 assert tolti == [{"asset_tag": "IT-0106", "tipo": "Laptop", "stanza": DR}], tolti

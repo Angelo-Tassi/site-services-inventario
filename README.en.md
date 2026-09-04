@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.5.1).** The features are complete and every release
+> **Beta version (1.0.0-beta.5.2).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -719,12 +719,19 @@ program **asks which room to put them in**.
 The program does not create them, and an identifier already in the inventory
 **never gets in a second time**.
 
+The only field that can never repeat is the **asset tag** - the IMEI for
+iPhones. Everything else in the record - type, model, serial, room, notes - may
+vary freely, and is not even looked at when deciding whether a device is already
+there: two records different in every field with the same asset tag are the same
+device, two records identical in everything with different asset tags are two
+devices.
+
 - **adding a device refuses** an identifier already present, saying where the
   existing one is and what it is, and without inserting anything;
 - an **import skips** the row and says **which room** the existing device is in.
-  It does not rewrite its record: if it is the same device there is no need, and
-  if it is a different one with the same code it is a typo to look at, not to
-  apply silently;
+  It does not rewrite its record, however different the sheet's one is: if it is
+  the same device there is no need, and if it is a different one with the same
+  code it is a typo to look at, not to apply silently;
 - if a sheet contains **the same identifier twice** the last row wins - that is a
   rule of the sheet, not of the inventory - and the summary says so before
   importing.
