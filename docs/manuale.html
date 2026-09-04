@@ -496,11 +496,19 @@ table{min-width:520px}
     <li><b>Rientro.</b> Lo stesso pulsante lo riporta disponibile e cancella il prestito.</li>
   </ol>
   <div class="avviso">Un dispositivo in prestito <b>non si sposta e non si elimina</b>,
-    da nessuna parte del programma: ne' con Elimina, ne' con Elimina +, ne' con Sposta in
-    stanza…, ne' cambiando la stanza dentro la scheda. Finche' e' fuori, l'inventario e'
-    l'unica traccia di chi ce l'ha. Si preme <b>Registra rientro</b> e torna libero. L'unica
-    eccezione e' <a href="#trasloco">togliere la stanza dei prestiti</a>: li' si sposta
-    anche lui, e il prestito resta aperto.</div>
+    da nessuna parte del programma: ne' con Elimina, ne' con Elimina +, ne' con Elimina da
+    Excel, ne' con Sposta in stanza…, ne' cambiando la stanza dentro la scheda. Finche' e'
+    fuori, l'inventario e' l'unica traccia di chi ce l'ha. Si preme <b>Registra rientro</b>
+    e torna libero. L'unica eccezione e' <a href="#trasloco">togliere la stanza dei
+    prestiti</a>: li' si sposta anche lui, e il prestito resta aperto.</div>
+  <div class="avviso">E le operazioni che cancellano in blocco <b>non partono nemmeno</b>:
+    il <b>reset</b> e le <b>importazioni che sostituiscono</b> si fermano se fra i
+    dispositivi che toglierebbero c'e' un prestito aperto, elencano quali sono e chi li ha,
+    e non toccano niente. Un dispositivo in prestito e' in mano a una persona, e toglierlo
+    in blocco vuol dire perderne la traccia proprio mentre e' fuori - senza nemmeno passare
+    dagli eliminati di recente, perche' una sostituzione non ci passa. Prima si registrano
+    i rientri. Sostituire un'altra stanza, dove prestiti aperti non ce ne sono, funziona
+    normalmente.</div>
   <p class="note">Nelle altre stanze la colonna Prestito non compare affatto. Gli iPhone
     non si prestano mai. Nota, modello e tipo si correggono anche mentre il dispositivo
     e' in prestito.</p>
@@ -1169,11 +1177,18 @@ table{min-width:520px}
     <li><b>Return.</b> The same button makes it available again and clears the loan.</li>
   </ol>
   <div class="avviso">A device on loan <b>is neither moved nor deleted</b>, anywhere in
-    the program: not with Delete, not with Delete +, not with Move to room…, not by
-    changing the room inside the record. While it is out, the inventory is the only trace
-    of who has it. Press <b>Register return</b> and it is free again. The only exception is
-    <a href="#trasloco-en">removing the loan room</a>: there it moves too, and the loan
-    stays open.</div>
+    the program: not with Delete, not with Delete +, not with Delete from Excel, not with
+    Move to room…, not by changing the room inside the record. While it is out, the
+    inventory is the only trace of who has it. Press <b>Register return</b> and it is free
+    again. The only exception is <a href="#trasloco-en">removing the loan room</a>: there
+    it moves too, and the loan stays open.</div>
+  <div class="avviso">And the operations that delete in bulk <b>do not even start</b>: the
+    <b>reset</b> and the <b>imports that replace</b> stop if there is an open loan among
+    the devices they would remove, list which ones and who has them, and touch nothing. A
+    device on loan is in somebody's hands, and removing it in bulk means losing track of it
+    exactly while it is out - without even passing through the recently deleted, because a
+    replace does not go through them. Register the returns first. Replacing another room,
+    where there are no open loans, works normally.</div>
   <p class="note">In other rooms the Loan column does not appear at all. iPhones are never
     lent. Notes, model and type can be corrected while the device is on loan.</p>
 </section>

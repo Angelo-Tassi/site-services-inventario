@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.5.5).** The features are complete and every release
+> **Beta version (1.0.0-beta.5.6).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -912,6 +912,15 @@ the loan and puts it back among the available ones.
 While it is on loan the device **is neither moved nor deleted**: it is already
 booked where it needs to be, and whoever looks for it must find it there. The
 program skips it and says who has it; to free it press *Register return*.
+
+This holds for the operations that delete in bulk too - above all for those.
+**The reset and the imports that replace do not even start** while there is an
+open loan among the devices they would remove: the program lists which ones and
+who has them, and touches nothing. A device on loan is physically in somebody's
+hands, and removing it from the inventory in bulk means losing track of it
+exactly while it is out - without even passing through the recently deleted,
+because a replace does not go through them. Register the returns first. Replacing
+**another room**, where there are no open loans, works normally.
 
 ## Shipping iPhones
 

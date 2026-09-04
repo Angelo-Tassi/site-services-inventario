@@ -1238,6 +1238,22 @@ EN = {
         'A device without a real room would show up in no card. Pick one of '
         'the existing rooms, or create it first from the settings.',
     "(nessuna stanza)": "(no room)",
+    # --- i prestiti fermano le operazioni distruttive
+    "Prima registra i rientri": "Register the returns first",
+    "Non si puo' svuotare l'inventario": 'The inventory cannot be emptied',
+    "Non si puo' sostituire %s": 'Cannot replace %s',
+    "%s: ci sono %d dispositivi in prestito.\n\n%s\n\n"
+    "Un dispositivo in prestito e' in mano a qualcuno: toglierlo\n"
+    "dall'inventario vuol dire perderne la traccia proprio mentre\n"
+    "e' fuori. Registra prima i rientri con il pulsante Registra\n"
+    "rientro, nella stanza dove sono stati prestati.\n\n"
+    "Non e' stato toccato niente.":
+        '%s: %d devices are out on loan.\n\n%s\n\n'
+        'A device on loan is in somebody\'s hands: taking it out of the\n'
+        'inventory means losing track of it exactly while it is out.\n'
+        'Register the returns first with the Register return button, in\n'
+        'the room they were lent from.\n\n'
+        'Nothing was touched.',
     # --- la stanza mancante nell'importazione
     "In che stanza vanno?": "Which room do they go in?",
     "In che stanza va?": "Which room does it go in?",

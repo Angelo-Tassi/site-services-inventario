@@ -66,6 +66,11 @@ excel_io.export([new_item("IT-0801", "Laptop", "T14 Gen 5", "PF801", DR),
 items, esito_file = rows_from_workbook(sorgente, app.cfg["rooms"])
 assert esito_file["stanze_trovate"] == [], "nessun separatore in questo foglio"
 prima_bau = sum(1 for i in app.store.items if i["stanza"] == BAU)
+# una sostituzione non parte con un prestito aperto dentro: prima il rientro
+for aperto in [i["asset_tag"] for i in app.store.items
+               if i.get("prestato_a") and i["stanza"] == KIOSK]:
+    app._run(lambda t=aperto: app.store.give_back(t), "ok")
+app.store.load()
 risultato = app._run(lambda: app.store.import_items(items, "replace", KIOSK), "ok")
 assert risultato["aggiunti"] == 2 and risultato["eliminati"] == 5, risultato
 assert risultato["copia"] and os.path.exists(risultato["copia"])

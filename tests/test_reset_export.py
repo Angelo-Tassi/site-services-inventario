@@ -66,6 +66,10 @@ assert prima == 15
 protetti = [i["asset_tag"] for i in app.store.items if not puo_essere_eliminato(i)[0]]
 assert sorted(protetti) == ["351234567890123", "356938035643809"], protetti
 
+# il reset non parte finche' c'e' un prestito aperto: prima i rientri
+for aperto in [i["asset_tag"] for i in app.store.items if i.get("prestato_a")]:
+    app._run(lambda t=aperto: app.store.give_back(t), "ok")
+app.store.load()
 eliminati, tenuti, copia = app._run(lambda: app.store.reset(), "ok")
 assert (eliminati, tenuti) == (13, 2), (eliminati, tenuti)
 app.store.load()

@@ -191,7 +191,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 1.0.0-beta.5.5 · beta</div>
+  <div class="alpha">versione 1.0.0-beta.5.6 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -217,6 +217,26 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.6</h3>
+      <p class="quando">4 settembre 2026</p>
+      <ul>
+        <li><b>Un dispositivo in prestito non sparisce piu' in blocco.</b>
+          Eliminarlo era gia' vietato ovunque, ma il <b>reset</b> e le
+          <b>importazioni che sostituiscono</b> lo toglievano insieme a tutti
+          gli altri: senza un avviso, e senza nemmeno passare dagli eliminati di
+          recente. Un dispositivo in prestito e' in mano a una persona, e
+          toglierlo dall'inventario proprio mentre e' fuori vuol dire perderne
+          la traccia. Adesso quelle operazioni <b>non partono nemmeno</b>:
+          elencano i dispositivi in prestito e chi li ha, e non toccano niente.
+          Prima si registrano i rientri. Sostituire un'altra stanza, dove
+          prestiti aperti non ce ne sono, funziona come prima.</li>
+        <li><b>E un iPhone protetto non finisce nel cestino togliendo la sua
+          stanza.</b> Dalla finestra non ci si arrivava - togliere la stanza
+          degli iPhone fa scattare il trasloco - ma la regola adesso sta
+          nell'archivio, dove c'era gia' quella dei prestiti.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.5</h3>
       <p class="quando">4 settembre 2026</p>
@@ -293,19 +313,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           salta e il programma dice dove sta quello che c'e' gia'.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.2</h3>
-      <p class="quando">4 settembre 2026</p>
-      <ul>
-        <li><b>Detto chiaro: a decidere e' solo l'asset tag.</b> L'unico campo
-          che non puo' mai ripetersi e' l'identificativo - per gli iPhone
-          l'IMEI. Tutto il resto della scheda - tipo, modello, seriale, stanza,
-          note - puo' variare liberamente, e non viene nemmeno guardato per
-          decidere se un dispositivo c'e' gia'. Il programma si e' sempre
-          comportato cosi'; adesso lo dicono anche il manuale, i due README e le
-          prove di collaudo, che prima lo lasciavano intendere e basta.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -347,7 +354,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
     <div class="bar"><span class="dot"></span><span>Site Services : Inventario Iphone, Laptop e Tablet</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : Inventario Iphone, Laptop e Tablet</b>
-        <div class="ver">v1.0.0-beta.5.5</div>
+        <div class="ver">v1.0.0-beta.5.6</div>
         <div class="s">Laptop e tablet in nostro possesso</div></div>
       <div class="dx">
         <span class="lin">Lingua <span class="sel">Italiano <s>▼</s></span></span>
@@ -526,7 +533,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 1.0.0-beta.5.5 · beta</div>
+  <div class="alpha">version 1.0.0-beta.5.6 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -552,6 +559,25 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.6</h3>
+      <p class="quando">4 September 2026</p>
+      <ul>
+        <li><b>A device on loan no longer disappears in bulk.</b> Deleting it was
+          already forbidden everywhere, but the <b>reset</b> and the <b>imports
+          that replace</b> removed it along with all the others: with no warning,
+          and without even passing through the recently deleted. A device on loan
+          is in somebody's hands, and taking it out of the inventory exactly
+          while it is out means losing track of it. Now those operations <b>do
+          not even start</b>: they list the devices on loan and who has them, and
+          touch nothing. Register the returns first. Replacing another room,
+          where there are no open loans, works as before.</li>
+        <li><b>And a protected iPhone does not end up in the bin when its room is
+          removed.</b> You could not get there from the window - removing the
+          iPhone room triggers the move - but the rule now lives in the store,
+          next to the one for loans that was already there.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.5</h3>
       <p class="quando">4 September 2026</p>
@@ -622,19 +648,6 @@ python Inventario.py</pre>
           skipped and the program says where the existing one is.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.2</h3>
-      <p class="quando">4 September 2026</p>
-      <ul>
-        <li><b>Said plainly: the asset tag alone decides.</b> The only field
-          that can never repeat is the identifier - the IMEI for iPhones.
-          Everything else in the record - type, model, serial, room, notes - may
-          vary freely, and is not even looked at when deciding whether a device
-          is already there. The program has always behaved this way; now the
-          manual, both READMEs and the test scenarios say so too, where before
-          they only implied it.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -675,7 +688,7 @@ python Inventario.py</pre>
     <div class="bar"><span class="dot"></span><span>Site Services : iPhone, Laptop and Tablet Inventory</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : iPhone, Laptop and Tablet Inventory</b>
-        <div class="ver">v1.0.0-beta.5.5</div>
+        <div class="ver">v1.0.0-beta.5.6</div>
         <div class="s">Laptops and tablets we hold</div></div>
       <div class="dx">
         <span class="lin">Language <span class="sel">English <s>▼</s></span></span>

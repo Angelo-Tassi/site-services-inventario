@@ -122,4 +122,25 @@ assert app._run(lambda: app.store.delete(["IT-0102"]), "ok") == 1
 # --- l'altro iPhone, mai spedito, resta protetto
 assert puo_essere_eliminato(app._item_by_tag("351234567890123")) == (False, None)
 app.destroy()
+
+# --- e nemmeno togliendo la sua stanza finisce nel cestino
+# Dalla finestra non ci si arriva - togliere la stanza degli iPhone fa scattare
+# il trasloco - ma la regola sta nell'archivio, non nella finestra che per caso
+# ci passa davanti.
+from inventario.store import InventoryStore
+protetto = InventoryStore(fixture.build(), iphone_room=fixture.BAU)
+protetto.stanze = [fixture.BAU, fixture.KIOSK, fixture.DR]
+protetto.load()
+protetto.add(new_item(tipo=fixture.TIPO_IPHONE, modello="Apple iPhone 14",
+                      imei="356938035643809", restituito_da="M. B."))
+protetto.load()
+try:
+    protetto.porta_via_gli_orfani([fixture.BAU])
+    raise SystemExit("un iPhone protetto e' finito nel cestino")
+except BloccoIphoneNonSpedito as exc:
+    assert "356938035643809" in str(exc), str(exc)
+protetto.load()
+assert [i for i in protetto.items if i.get("imei") == "356938035643809"], \
+    "l'iPhone e' ancora in inventario"
+assert not protetto.eliminati(), "e non e' finito nel cestino"
 print("SPEDIZIONE OK")

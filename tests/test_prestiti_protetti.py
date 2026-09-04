@@ -4,6 +4,11 @@ Finche' e' nelle mani di una persona, l'inventario e' l'unica traccia di dove
 sia finito e di chi ce l'abbia: spostarlo in un'altra stanza o cancellarlo
 significherebbe perderlo. Prima si registra il rientro.
 
+Vale anche - anzi, soprattutto - per le operazioni che cancellano in blocco:
+il reset e le importazioni che sostituiscono non partono nemmeno finche' c'e'
+un prestito aperto fra i dispositivi che toglierebbero. Prima si toglievano
+insieme a tutti gli altri, senza un avviso e senza nemmeno passare dal cestino.
+
 Nella configurazione i prestiti sono attivi sul Digital Kiosk, quindi e' li'
 che la regola si vede all'opera.
 """
@@ -139,4 +144,83 @@ assert "Registra prima il rientro" in testo, testo
 assert "IT-0107" in testo, testo
 
 app.destroy()
+# ============ le operazioni che cancellano in blocco non partono ============
+from inventario.store import BloccoPrestitiAperti, prestiti_aperti
+
+blocco = InventoryStore(fixture.build(), iphone_room=BAU)
+blocco.stanze = [BAU, KIOSK, DR]
+blocco.load()
+aperti = prestiti_aperti(blocco.items)
+assert sorted(i["asset_tag"] for i in aperti) == ["IT-0107", "IT-0110"], aperti
+assert prestiti_aperti(blocco.items, BAU) == [], "in BAU non ce ne sono"
+assert len(prestiti_aperti(blocco.items, KIOSK)) == 2, "sono tutti e due nel Kiosk"
+
+# ---- il reset si ferma, e dice chi ha che cosa
+try:
+    blocco.reset()
+    raise SystemExit("il reset ha cancellato dei dispositivi in prestito")
+except BloccoPrestitiAperti as exc:
+    assert "IT-0107  ->  Marco Bianchi" in str(exc), str(exc)
+    assert "Non e' stato toccato niente" in str(exc), str(exc)
+blocco.load()
+assert len(blocco.items) == 13, "non e' stato toccato niente davvero"
+
+# ---- la sostituzione totale pure
+try:
+    blocco.import_items([new_item("IT-9001", "Laptop", "T14", "PF1", BAU)], "replace")
+    raise SystemExit("la sostituzione ha cancellato dei dispositivi in prestito")
+except BloccoPrestitiAperti as exc:
+    assert "tutto l'inventario" in str(exc), str(exc)
+blocco.load()
+assert len(blocco.items) == 13 and not [i for i in blocco.items
+                                        if i["asset_tag"] == "IT-9001"]
+
+# ---- e quella della stanza in cui stanno
+try:
+    blocco.import_items([new_item("IT-9002", "Laptop", "T14", "PF2", KIOSK)],
+                        "replace", KIOSK)
+    raise SystemExit("la sostituzione della stanza ha cancellato un prestito")
+except BloccoPrestitiAperti as exc:
+    assert KIOSK in str(exc), str(exc)
+
+# ---- ma sostituire un'ALTRA stanza si puo': li' non c'e' nessun prestito
+esito = blocco.import_items([new_item("IT-9003", "Laptop", "T14", "PF3", DR)],
+                            "replace", DR)
+assert esito["aggiunti"] == 1 and esito["eliminati"] == 3, esito
+blocco.load()
+assert len(prestiti_aperti(blocco.items)) == 2, "i prestiti sono ancora li'"
+
+# ---- e l'anteprima lo dice prima, senza toccare niente
+a = blocco.anteprima_importazione(
+    [new_item("IT-9004", "Laptop", "T14", "PF4", BAU)], "replace")
+assert len(a["prestiti_aperti"]) == 2, a["prestiti_aperti"]
+a = blocco.anteprima_importazione(
+    [new_item("IT-9005", "Laptop", "T14", "PF5", BAU)], "merge")
+assert a["prestiti_aperti"] == [], "l'unione non cancella niente: non blocca"
+
+# ---- registrati i rientri, tutto riparte
+for tag in ("IT-0107", "IT-0110"):
+    blocco.give_back(tag)
+blocco.load()
+eliminati, tenuti, copia = blocco.reset()
+assert eliminati and copia, (eliminati, copia)
+
+# ---- e la finestra si ferma prima della conferma da scrivere
+avvisi = []
+messagebox.showwarning = lambda t, m, **k: avvisi.append((t, m))
+messagebox.showinfo = lambda t, m, **k: avvisi.append((t, m))
+app = App(fixture.build())
+app._initial_load()
+app.update()
+assert app._prestiti_fermano("Non si puo' svuotare l'inventario") is True
+assert avvisi[-1][0] == "Prima registra i rientri", avvisi[-1]
+assert "IT-0107  ->  Marco Bianchi" in avvisi[-1][1], avvisi[-1][1]
+avvisi.clear()
+app.on_reset()
+assert avvisi and avvisi[-1][0] == "Prima registra i rientri", avvisi
+app.store.load()
+assert len(app.store.items) == 13, "il reset non e' partito"
+assert not app._prestiti_fermano("x", BAU), "in BAU non c'e' niente che blocchi"
+app.destroy()
+
 print("PRESTITI PROTETTI OK")

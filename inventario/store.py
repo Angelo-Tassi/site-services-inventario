@@ -246,6 +246,37 @@ class BloccoIphoneNonSpedito(InventoryError):
             % (item["asset_tag"], MESI_CONSERVAZIONE))
 
 
+class BloccoPrestitiAperti(InventoryError):
+    """Un'operazione distruttiva non parte finche' ci sono prestiti aperti.
+
+    Eliminare un dispositivo in prestito e' gia' vietato ovunque nel programma:
+    e' fisicamente in mano a qualcuno, e toglierlo dall'inventario vuol dire
+    perderne la traccia proprio mentre e' fuori. Un reset o una sostituzione lo
+    toglierebbero comunque, in blocco e senza nemmeno passare dal cestino:
+    quindi non partono. Prima si registrano i rientri.
+    """
+
+    QUANTI_NE_ELENCA = 15
+
+    def __init__(self, prestati, che_cosa):
+        self.prestati = list(prestati)
+        righe = ["    %s  ->  %s" % (it.get("asset_tag") or it.get("imei"),
+                                     it.get("prestato_a") or "")
+                 for it in self.prestati[:self.QUANTI_NE_ELENCA]]
+        if len(self.prestati) > self.QUANTI_NE_ELENCA:
+            righe.append("    ...e altri %d"
+                         % (len(self.prestati) - self.QUANTI_NE_ELENCA))
+        InventoryError.__init__(
+            self,
+            "%s: ci sono %d dispositivi in prestito.\n\n%s\n\n"
+            "Un dispositivo in prestito e' in mano a qualcuno: toglierlo\n"
+            "dall'inventario vuol dire perderne la traccia proprio mentre e'\n"
+            "fuori. Registra prima i rientri con il pulsante Registra rientro,\n"
+            "nella stanza dove sono stati prestati.\n\n"
+            "Non e' stato toccato niente."
+            % (che_cosa, len(self.prestati), "\n".join(righe)))
+
+
 class BloccoConservazione(InventoryError):
     """Un dispositivo spedito non si elimina prima dei tre mesi di conservazione."""
 
@@ -528,6 +559,17 @@ def eliminabile_dal(item):
         except ValueError:
             continue
     return None
+
+
+def prestiti_aperti(items, stanza=None):
+    """I dispositivi con un prestito aperto, in tutto l'inventario o in una stanza.
+
+    Serve a chi sta per cancellarne tanti in un colpo solo - reset,
+    sostituzione - per fermarsi prima invece di accorgersene dopo.
+    """
+    return [it for it in items
+            if is_on_loan(it)
+            and (stanza is None or clean(it.get("stanza")) == clean(stanza))]
 
 
 def puo_essere_eliminato(item, adesso=None):
@@ -1180,10 +1222,20 @@ class InventoryStore(object):
             # Un dispositivo in prestito non si elimina, e finire nel cestino
             # sarebbe eliminarlo. L'unica strada per portarlo altrove e' il
             # trasloco della stanza, che glielo cambia sotto invece di
-            # toglierlo dall'inventario.
+            # toglierlo dall'inventario. Vale identico per un iPhone non ancora
+            # eliminabile: dalla finestra non ci si arriva - togliere la stanza
+            # degli iPhone fa scattare il trasloco - ma la regola sta qui, non
+            # nella finestra che per caso ci passa davanti.
             for it in items:
-                if clean(it.get("stanza")) in volute and is_on_loan(it):
+                if clean(it.get("stanza")) not in volute:
+                    continue
+                if is_on_loan(it):
                     raise BloccoPrestito(it)
+                libero, sblocco = puo_essere_eliminato(it)
+                if not libero:
+                    if sblocco is None:
+                        raise BloccoIphoneNonSpedito(it)
+                    raise BloccoConservazione(it, sblocco)
             portati[:] = [dict(it) for it in items if clean(it.get("stanza")) in volute]
             items[:] = [it for it in items if clean(it.get("stanza")) not in volute]
             return len(portati)
@@ -1644,10 +1696,18 @@ class InventoryStore(object):
         cancellarli qui significherebbe perderli per sempre. Restano dentro
         anche gli altri dispositivi non ancora eliminabili.
 
+        Non parte se c'e' anche un solo **prestito aperto**: quel dispositivo
+        e' in mano a qualcuno, e un reset lo toglierebbe dall'inventario senza
+        nemmeno passare dal cestino. Prima si registrano i rientri.
+
         Ritorna (eliminati, mantenuti, percorso della copia).
         """
 
         def op(items):
+            fuori = prestiti_aperti(items)
+            if fuori:
+                raise BloccoPrestitiAperti(
+                    fuori, T("Non si puo' svuotare l'inventario"))
             copia = self.copia_di_sicurezza()
             tenuti = [it for it in items
                       if is_iphone(it.get("tipo")) or not puo_essere_eliminato(it)[0]]
@@ -2137,6 +2197,7 @@ class InventoryStore(object):
                 riga["aggiunti"] += 1
                 nuovi.add(tag)
 
+        fuori = prestiti_aperti(items, stanza) if mode == "replace" else []
         eliminati = 0
         if mode == "replace":
             eliminati = sum(1 for it in items
@@ -2152,6 +2213,7 @@ class InventoryStore(object):
             "eliminati": eliminati,
             "senza_identificativo": senza_identificativo,
             "senza_stanza": senza_stanza,
+            "prestiti_aperti": fuori,
             "prima": len(items),
             "dopo": len(items) - eliminati + aggiunti,
         }
@@ -2166,6 +2228,10 @@ class InventoryStore(object):
         Prima di una sostituzione viene salvata una copia del file dati. Gli
         iPhone non si toccano mai: non arrivano da un'importazione, quindi una
         sostituzione li cancellerebbe senza possibilita' di recupero.
+
+        Una sostituzione non parte se fra i dispositivi che verrebbero tolti
+        c'e' un **prestito aperto**: quel dispositivo e' in mano a qualcuno.
+        Prima si registrano i rientri.
 
         Un asset tag gia' in inventario **non viene importato**: la riga si
         salta e finisce in `gia_presenti`, con la stanza in cui sta quello che
@@ -2191,6 +2257,12 @@ class InventoryStore(object):
             esito = {"aggiunti": 0, "gia_presenti": [], "senza_stanza": [],
                      "eliminati": 0, "copia": None}
             if mode == "replace":
+                fuori = prestiti_aperti(items, stanza)
+                if fuori:
+                    raise BloccoPrestitiAperti(
+                        fuori,
+                        T("Non si puo' sostituire %s")
+                        % (stanza or T("tutto l'inventario")))
                 esito["copia"] = self.copia_di_sicurezza()
                 prima = len(items)
                 items[:] = [it for it in items

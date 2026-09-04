@@ -20,7 +20,8 @@ from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE,
                     is_iphone, is_on_loan, is_shipped, new_item, norm_tag,
                     puo_essere_eliminato, righe_separatore,
                     rinomina_tocca_gli_iphone, rinomine_stanze,
-                    rinomine_tipi, righe_da_workbook, rows_from_workbook,
+                    prestiti_aperti, rinomine_tipi, righe_da_workbook,
+                    rows_from_workbook,
                     sembra_un_foglio_da_importare, testo_spedizione,
                     valore_visibile)
 
@@ -4511,6 +4512,10 @@ class App(tk.Tk):
             esito = dict(esito)
             esito["altre_stanze"] = scartati
             esito["regola"] = regola
+        if opzioni["mode"] == "replace" and self._prestiti_fermano(
+                T("Non si puo' sostituire %s")
+                % (stanza or T("tutto l'inventario")), stanza):
+            return
         conferma = ImportDialog(
             self, path, len(items), esito, opzioni,
             self.contati_in_eliminazione(opzioni),
@@ -4646,6 +4651,9 @@ class App(tk.Tk):
         esito_stanza = dict(esito)
         esito_stanza["altre_stanze"] = scartati
         esito_stanza["regola"] = regola
+        if opzioni["mode"] == "replace" and self._prestiti_fermano(
+                T("Non si puo' sostituire %s") % stanza, stanza):
+            return
         conferma = ImportDialog(
             self, path, len(miei), esito_stanza, opzioni,
             self.contati_in_eliminazione(opzioni),
@@ -4855,10 +4863,38 @@ class App(tk.Tk):
                 T("Stampa"), T("Il documento e' stato aperto in Excel.\n"
                 "Usa File > Stampa per inviarlo alla stampante."), parent=self)
 
+    def _prestiti_fermano(self, che_cosa, stanza=None):
+        """Vero se un prestito aperto impedisce l'operazione, e lo si e' detto.
+
+        La domanda si fa prima della conferma da scrivere: far scrivere
+        ELIMINA TUTTO per poi rispondere "no, non si puo'" e' prendere in giro
+        chi la sta scrivendo.
+        """
+        fuori = prestiti_aperti(self.store.items, stanza)
+        if not fuori:
+            return False
+        righe = ["    %s  ->  %s" % (valore_visibile(it, "asset_tag"),
+                                     it.get("prestato_a") or "")
+                 for it in fuori[:15]]
+        if len(fuori) > 15:
+            righe.append(T("    ...e altri %d") % (len(fuori) - 15))
+        messagebox.showwarning(
+            T("Prima registra i rientri"),
+            T("%s: ci sono %d dispositivi in prestito.\n\n%s\n\n"
+              "Un dispositivo in prestito e' in mano a qualcuno: toglierlo\n"
+              "dall'inventario vuol dire perderne la traccia proprio mentre\n"
+              "e' fuori. Registra prima i rientri con il pulsante Registra\n"
+              "rientro, nella stanza dove sono stati prestati.\n\n"
+              "Non e' stato toccato niente.")
+            % (che_cosa, len(fuori), "\n".join(righe)), parent=self)
+        return True
+
     def on_reset(self):
         """Svuota l'inventario, per poi ricaricarlo da un'importazione."""
         if not self.store.items:
             messagebox.showinfo(T("Reset"), T("L'inventario e' gia' vuoto."), parent=self)
+            return
+        if self._prestiti_fermano(T("Non si puo' svuotare l'inventario")):
             return
         protetti = [i for i in self.store.items
                     if is_iphone(i.get("tipo")) or not puo_essere_eliminato(i)[0]]

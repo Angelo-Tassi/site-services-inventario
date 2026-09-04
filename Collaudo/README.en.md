@@ -627,6 +627,30 @@ and what was deleted for good is written in the final summary.
 
 ---
 
+## 20. Loans stop the destructive operations
+
+This checks that a device on loan cannot disappear in bulk.
+
+1. in the **Digital Kiosk** lend a device to anybody;
+2. try **Settings > Reset inventory**. The window with the typed confirmation
+   must not even open: a **Register the returns first** warning must appear, with
+   the list of the devices on loan and **who has them**, and the sentence saying
+   nothing was touched;
+3. try *Import xls...* > **The whole inventory** > **Replace**: the same warning,
+   and nothing must start;
+4. try *Import xls...* > **One room only** > `Digital Kiosk` > **Replace**: the
+   same warning;
+5. try instead **One room only** > `Magazzino Disaster Recovery` > **Replace**:
+   there are no open loans there, so it must work normally, and the device on
+   loan in the Kiosk must not be touched;
+6. register the return with **Register return**, then repeat point 2: now the
+   reset must start.
+
+**What must happen:** no device on loan ever disappears from the inventory, and
+the program always says who has it instead of just refusing.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.

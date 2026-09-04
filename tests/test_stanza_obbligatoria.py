@@ -40,6 +40,10 @@ assert not [i for i in store.items if i["asset_tag"] == "IT-8001"], "non doveva 
 assert not [i for i in store.items if not i.get("stanza")], "nessuno senza stanza"
 
 # ---- nemmeno in sostituzione, dove il resto viene cancellato prima
+# (una sostituzione non parte con prestiti aperti: prima i rientri)
+for aperto in [i["asset_tag"] for i in store.items if i.get("prestato_a")]:
+    store.give_back(aperto)
+store.load()
 esito = store.import_items([senza_stanza("IT-8003")], "replace")
 assert esito["aggiunti"] == 0 and esito["senza_stanza"] == ["IT-8003"], esito
 store.load()

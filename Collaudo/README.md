@@ -648,6 +648,31 @@ riepilogo finale.
 
 ---
 
+## 20. I prestiti fermano le operazioni distruttive
+
+Serve a verificare che un dispositivo in prestito non possa sparire in blocco.
+
+1. nel **Digital Kiosk** presta un dispositivo a una persona qualsiasi;
+2. prova **Impostazioni > Reset inventario**. Non deve nemmeno aprirsi la
+   finestra della conferma da scrivere: deve comparire un avviso **Prima
+   registra i rientri**, con l'elenco dei dispositivi in prestito e **chi li
+   ha**, e la frase che non e' stato toccato niente;
+3. prova *Importa xls...* > **Tutto l'inventario** > **Sostituisci**: stesso
+   avviso, e non deve partire niente;
+4. prova *Importa xls...* > **Una sola stanza** > `Digital Kiosk` >
+   **Sostituisci**: stesso avviso;
+5. prova invece **Una sola stanza** > `Magazzino Disaster Recovery` >
+   **Sostituisci**: li' prestiti aperti non ce ne sono, quindi deve funzionare
+   normalmente, e il dispositivo in prestito nel Kiosk non deve essere toccato;
+6. registra il rientro con **Registra rientro**, poi rifai il punto 2: adesso il
+   reset deve partire.
+
+**Cosa deve succedere:** nessun dispositivo in prestito sparisce mai
+dall'inventario, e il programma dice sempre chi ce l'ha invece di limitarsi a
+rifiutare.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

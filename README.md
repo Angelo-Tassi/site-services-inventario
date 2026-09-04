@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.5.5).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5.6).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -774,6 +774,16 @@ colonna non esiste:
 Finche' e' in prestito, il dispositivo **non si sposta e non si elimina**: e'
 gia' registrato dove serve, e chi lo cerca deve trovarlo li'. Il programma lo
 salta e dice a chi e' stato dato; per liberarlo si preme *Registra rientro*.
+
+Vale anche - anzi, soprattutto - per le operazioni che cancellano in blocco.
+**Il reset e le importazioni che sostituiscono non partono nemmeno** finche' fra
+i dispositivi che toglierebbero c'e' un prestito aperto: il programma elenca
+quali sono e chi li ha, e non tocca niente. Un dispositivo in prestito e'
+fisicamente in mano a una persona, e toglierlo dall'inventario in blocco vuol
+dire perderne la traccia proprio mentre e' fuori - senza nemmeno passare dagli
+eliminati di recente, perche' una sostituzione non ci passa. Prima si registrano
+i rientri. Sostituire **un'altra stanza**, dove prestiti aperti non ce ne sono,
+funziona normalmente.
 
 Finche' il dispositivo e' fuori, la sua riga e' **evidenziata in rosso** e lo
 stato risulta **In prestito**; l'evidenziazione si ritrova anche nei file
