@@ -191,7 +191,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 1.0.0-beta.5.6 · beta</div>
+  <div class="alpha">versione 1.0.0-beta.5.7 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -217,6 +217,31 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.7</h3>
+      <p class="quando">17 settembre 2026</p>
+      <ul>
+        <li><b>La tastiera non si blocca piu' scrivendo nelle celle.</b> Il
+          campo che si apre con il doppio clic su una nota o su uno stato si
+          chiudeva a ogni perdita di fuoco - e il fuoco si perde anche aprendo
+          la tendina, il menu del tasto destro o un'altra finestra. Su Windows
+          la tendina prende il fuoco con una presa globale: il campo veniva
+          distrutto sotto le dita con la presa ancora attiva, e da li' non
+          rispondeva piu' niente. Adesso il campo si chiude solo quando si va
+          davvero su un altro campo.</li>
+        <li><b>Quello che si sta scrivendo non si perde piu'.</b> L'elenco si
+          ricarica da solo ogni quindici secondi quando un altro tecnico salva,
+          e il campo aperto spariva con lui, testo compreso, lasciando la
+          tastiera senza destinatario. Adesso, prima di ricostruire l'elenco,
+          il campo si chiude salvando.</li>
+        <li><b>Esc chiude la nota e basta.</b> Prima riportava anche alla home,
+          perche' il tasto arrivava fino alla finestra principale.</li>
+        <li>La tendina dello stato si apre con il tasto freccia invece che con
+          un clic finto, che lasciava Tk convinto che il mouse fosse ancora
+          premuto. E Ctrl+clic apre il menu del tasto destro solo su Mac, dove
+          e' il tasto destro.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.6</h3>
       <p class="quando">4 settembre 2026</p>
@@ -290,29 +315,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           finale elenca sempre quelli cancellati per sempre.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.3</h3>
-      <p class="quando">4 settembre 2026</p>
-      <ul>
-        <li><b>Nessun dispositivo entra piu' senza stanza.</b> Prima, importando
-          un foglio che non dichiarava le stanze, i dispositivi entravano senza:
-          non comparivano in nessuna stanza, non uscivano da nessuna
-          esportazione per stanza, e per ritrovarli bisognava gia' sapere che
-          c'erano. Adesso non entrano, da nessuna opzione e da nessuna
-          pagina.</li>
-        <li><b>Se il foglio non dice la stanza, il programma la chiede.</b>
-          Prima di scrivere qualsiasi cosa si apre una finestra con due strade:
-          <b>tutti nella stessa stanza</b>, oppure <b>uno per uno</b> - una
-          finestra per ogni dispositivo, con asset tag, tipo, modello, seriale e
-          note sotto gli occhi. Si puo' lasciarne fuori qualcuno, o annullare
-          tutto senza che venga scritto niente. Importando in una sola stanza la
-          domanda non compare: quella scelta vale gia' per tutte le righe.</li>
-        <li><b>Il foglio istruzioni del modello diceva ancora una cosa vecchia.</b>
-          Sosteneva che importando due volte lo stesso asset tag la scheda
-          "viene aggiornata": da due versioni non e' piu' vero - la riga si
-          salta e il programma dice dove sta quello che c'e' gia'.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -354,7 +356,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
     <div class="bar"><span class="dot"></span><span>Site Services : Inventario Iphone, Laptop e Tablet</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : Inventario Iphone, Laptop e Tablet</b>
-        <div class="ver">v1.0.0-beta.5.6</div>
+        <div class="ver">v1.0.0-beta.5.7</div>
         <div class="s">Laptop e tablet in nostro possesso</div></div>
       <div class="dx">
         <span class="lin">Lingua <span class="sel">Italiano <s>▼</s></span></span>
@@ -533,7 +535,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 1.0.0-beta.5.6 · beta</div>
+  <div class="alpha">version 1.0.0-beta.5.7 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -559,6 +561,32 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.7</h3>
+      <p class="quando">17 September 2026</p>
+      <ul>
+        <li><b>The keyboard no longer locks up while typing in cells.</b> The
+          field that opens on a double-click on a note or a status closed on
+          every loss of focus - and focus is lost by opening the dropdown, the
+          right-click menu or another window too. On Windows the dropdown takes
+          focus with a global grab: the field was destroyed under your fingers
+          with the grab still active, and from there nothing responded any
+          more. Now the field closes only when you really move to another
+          field.</li>
+        <li><b>What you are typing is no longer lost.</b> The list reloads by
+          itself every fifteen seconds when another technician saves, and the
+          open field vanished with it, text included, leaving the keyboard with
+          nowhere to go. Now, before rebuilding the list, the field closes and
+          saves.</li>
+        <li><b>Esc closes the note and nothing else.</b> It used to jump back to
+          the home screen too, because the key travelled up to the main
+          window.</li>
+        <li>The status dropdown opens with the arrow key instead of a fake
+          click, which left Tk convinced the mouse was still pressed. And
+          Ctrl+click opens the right-click menu only on Mac, where it is the
+          right button.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.6</h3>
       <p class="quando">4 September 2026</p>
@@ -626,28 +654,6 @@ python Inventario.py</pre>
           good. The final summary always lists the ones deleted for good.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.3</h3>
-      <p class="quando">4 September 2026</p>
-      <ul>
-        <li><b>No device gets in without a room any more.</b> Before, importing a
-          sheet that did not declare the rooms let devices in without one: they
-          showed up in no room, came out of no per-room export, and to find them
-          again you had to know already that they were there. Now they do not get
-          in, from any option and from any page.</li>
-        <li><b>If the sheet does not say the room, the program asks.</b> Before
-          anything is written a window opens with two ways: <b>all in the same
-          room</b>, or <b>one by one</b> - a window for each device, with asset
-          tag, type, model, serial and notes in front of you. You can leave some
-          out, or cancel everything with nothing written. Importing into one room
-          only never shows the question: that choice already covers every
-          row.</li>
-        <li><b>The template's instruction sheet still said something out of
-          date.</b> It claimed that importing the same asset tag twice "updates
-          the record": that has not been true for two versions - the row is
-          skipped and the program says where the existing one is.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -688,7 +694,7 @@ python Inventario.py</pre>
     <div class="bar"><span class="dot"></span><span>Site Services : iPhone, Laptop and Tablet Inventory</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : iPhone, Laptop and Tablet Inventory</b>
-        <div class="ver">v1.0.0-beta.5.6</div>
+        <div class="ver">v1.0.0-beta.5.7</div>
         <div class="s">Laptops and tablets we hold</div></div>
       <div class="dx">
         <span class="lin">Language <span class="sel">English <s>▼</s></span></span>

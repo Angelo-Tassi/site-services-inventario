@@ -147,6 +147,28 @@ REFRESH_MS = 15000
 # --------------------------------------------------------------- dialoghi
 
 
+def fuoco_andato_altrove(widget):
+    """Vero se il fuoco e' passato a un ALTRO campo di questa applicazione.
+
+    Un <FocusOut> arriva anche quando non si e' lasciato il campo affatto: si
+    apre la tendina del combobox (che su Windows prende il fuoco con una presa
+    globale), si apre il menu del tasto destro, si passa a un'altra
+    applicazione, la finestra va dietro. Chiudere il campo in quei casi vuol
+    dire distruggerlo sotto le dita di chi sta scrivendo - e la tastiera sembra
+    bloccata, o si resta con una presa appesa che non lascia piu' passare
+    niente. Si chiude solo quando il fuoco e' davvero su un altro campo.
+    """
+    try:
+        adesso = widget.focus_get()
+    except (tk.TclError, KeyError):
+        # un widget che esiste solo dentro Tk e Tkinter non conosce: e' la
+        # tendina del combobox, cioe' il campo stesso
+        return False
+    if adesso is None:
+        return False
+    return not str(adesso).startswith(str(widget))
+
+
 def installa_copia_incolla(root):
     """Copia, taglia e incolla in tutti i campi dell'applicazione.
 
@@ -291,7 +313,10 @@ def installa_copia_incolla(root):
                 root.bind_class(classe, virtuali[tasto], azione)
             except tk.TclError:
                 pass
-        for tasto_destro in ("<Button-3>", "<Button-2>", "<Control-Button-1>"):
+        tasti_destri = ["<Button-3>", "<Button-2>"]
+        if root.tk.call("tk", "windowingsystem") == "aqua":
+            tasti_destri.append("<Control-Button-1>")    # il tasto destro del Mac
+        for tasto_destro in tasti_destri:
             try:
                 root.bind_class(classe, tasto_destro, apri_menu, add="+")
             except tk.TclError:
@@ -3192,6 +3217,45 @@ class App(tk.Tk):
             return "break"          # ci pensa il pulsante disegnato sopra
         return None
 
+    def _apri_editor(self, chiudi):
+        """Registra il campo al volo aperto: uno solo alla volta, e mai orfano.
+
+        L'elenco si ricostruisce da solo - ogni quindici secondi se un altro
+        tecnico ha salvato, e dopo ogni salvataggio - e un campo lasciato
+        aperto dentro un elenco che sparisce viene distrutto con lui: quello
+        che si stava scrivendo si perde, il fuoco della tastiera non va piu' a
+        nessuno e sembra bloccata. Prima di ricostruire, si chiude salvando.
+
+        Chi apre un campo deve chiudere quello precedente PRIMA di creare il
+        suo: chiudere salva, salvare ricostruisce l'elenco, e un campo appena
+        creato dentro l'elenco vecchio sparirebbe con lui.
+        """
+        self._editor_aperto = chiudi
+
+    def _chiudi_editor_aperto(self):
+        chiudi = getattr(self, "_editor_aperto", None)
+        self._editor_aperto = None
+        if chiudi is not None:
+            try:
+                chiudi()
+            except tk.TclError:
+                pass
+            # chiudere salva, e salvare ricostruisce l'elenco: chi sta per
+            # aprire un altro campo deve trovare le righe gia' disegnate, o
+            # bbox() e' vuoto e il doppio clic sembra non fare niente
+            self.update_idletasks()
+
+    def _se_lasciato(self, widget, chiudi):
+        """Chiude il campo al volo quando il fuoco e' andato davvero altrove.
+
+        Si guarda dopo, non nell'istante del <FocusOut>: in quell'istante Tk
+        non sa ancora dove sta andando il fuoco.
+        """
+        def controlla():
+            if widget.winfo_exists() and fuoco_andato_altrove(widget):
+                chiudi()
+        widget.after_idle(controlla)
+
     def _on_double_click(self, event):
         if con_modificatore(event.state, self._ha_comando):
             return "break"       # un doppio Ctrl+clic non apre la scheda
@@ -3218,6 +3282,7 @@ class App(tk.Tk):
 
     def edit_stato_inline(self, tag):
         """Cambia lo stato con una tendina direttamente nell'elenco, senza popup."""
+        self._chiudi_editor_aperto()
         item = self._item_by_tag(tag)
         if item is None:
             return
@@ -3247,19 +3312,27 @@ class App(tk.Tk):
             if fatto["chiuso"]:
                 return
             fatto["chiuso"] = True
+            self._editor_aperto = None
             scelto = stato_canonico(var.get(), stati)
-            combo.destroy()
+            if combo.winfo_exists():
+                combo.destroy()
             if salva and scelto != item.get("stato"):
                 self._run(lambda: self.store.set_stato(tag, scelto),
                           T("%s: %s.") % (tag, scelto))
 
+        self._apri_editor(lambda: chiudi(False))
         combo.bind("<<ComboboxSelected>>", lambda e: chiudi(True))
-        combo.bind("<Escape>", lambda e: chiudi(False))
-        combo.bind("<FocusOut>", lambda e: chiudi(False))
-        combo.event_generate("<Button-1>")      # apre subito la tendina
+        combo.bind("<Escape>", lambda e: (chiudi(False), "break")[1])
+        combo.bind("<FocusOut>", lambda e: self._se_lasciato(combo, lambda: chiudi(False)))
+        # La tendina si apre subito, ma con il tasto freccia e non con un clic
+        # finto: un <Button-1> generato senza il rilascio lascia Tk convinto che
+        # il mouse sia ancora premuto, e da li' in poi gli eventi vanno storti.
+        combo.after_idle(lambda: combo.winfo_exists()
+                         and combo.event_generate("<Down>"))
 
     def edit_tipo_inline(self, tag):
         """Cambia il tipo con una tendina direttamente nell'elenco."""
+        self._chiudi_editor_aperto()
         item = self._item_by_tag(tag)
         if item is None:
             return
@@ -3288,16 +3361,19 @@ class App(tk.Tk):
             if fatto["chiuso"]:
                 return
             fatto["chiuso"] = True
+            self._editor_aperto = None
             scelto = var.get()
-            combo.destroy()
+            if combo.winfo_exists():
+                combo.destroy()
             if salva and scelto != item.get("tipo"):
                 self._run(lambda: self.store.set_tipo(tag, scelto),
                           T("%s: %s.") % (tag, scelto))
 
+        self._apri_editor(lambda: chiudi(True))
         combo.bind("<<ComboboxSelected>>", lambda e: chiudi(True))
-        combo.bind("<Return>", lambda e: chiudi(True))
-        combo.bind("<Escape>", lambda e: chiudi(False))
-        combo.bind("<FocusOut>", lambda e: chiudi(True))
+        combo.bind("<Return>", lambda e: (chiudi(True), "break")[1])
+        combo.bind("<Escape>", lambda e: (chiudi(False), "break")[1])
+        combo.bind("<FocusOut>", lambda e: self._se_lasciato(combo, lambda: chiudi(True)))
 
     def _segnala(self, messaggio):
         """Avviso discreto nella barra di stato, senza aprire finestre."""
@@ -3309,6 +3385,7 @@ class App(tk.Tk):
 
     def edit_testo_inline(self, tag, campo):
         """Modifica un campo di testo direttamente nell'elenco, senza popup."""
+        self._chiudi_editor_aperto()
         item = self._item_by_tag(tag)
         if item is None:
             return
@@ -3331,20 +3408,27 @@ class App(tk.Tk):
             if state["done"]:
                 return
             state["done"] = True
+            self._editor_aperto = None
+            if not entry.winfo_exists():
+                return                      # distrutto con l'elenco: niente da leggere
             text = entry.get()
             entry.destroy()
-            if save:
+            if save and text != item.get(campo, ""):
                 self._run(lambda: self.store.set_campo(tag, campo, text),
                           T("%s aggiornato su %s.")
                           % (intestazione(HEADERS[campo]), tag))
 
-        entry.bind("<Return>", lambda e: close(True))
-        entry.bind("<Escape>", lambda e: close(False))
-        entry.bind("<FocusOut>", lambda e: close(True))
+        self._apri_editor(lambda: close(True))
+        # "break": Esc sulla finestra principale vuol dire "torna alla home",
+        # e chi annulla una nota non vuole anche cambiare schermata
+        entry.bind("<Return>", lambda e: (close(True), "break")[1])
+        entry.bind("<Escape>", lambda e: (close(False), "break")[1])
+        entry.bind("<FocusOut>", lambda e: self._se_lasciato(entry, lambda: close(True)))
 
     # ------------------------------------------------------------ schermate
 
     def _clear_body(self):
+        self._chiudi_editor_aperto()
         self._clear_row_buttons()
         for child in self.body.winfo_children():
             child.destroy()
@@ -3559,6 +3643,7 @@ class App(tk.Tk):
         return result
 
     def refresh_table(self, keep_selection=True):
+        self._chiudi_editor_aperto()
         self.visible = self.filtered_items()
         if self.tree is None:
             self._update_status()

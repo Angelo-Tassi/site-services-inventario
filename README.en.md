@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.5.6).** The features are complete and every release
+> **Beta version (1.0.0-beta.5.7).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -345,8 +345,13 @@ use *Export xls...*.
 - **Add** asks first *what* you are adding, from a dropdown of the configured
   types, and only then *how*: by hand or with the barcode reader.
 - **Editing in place**, with no window to open: double-click the *Notes* or
-  *Model/Description* cell to type (`Enter` saves, `Esc` cancels), *Status* for
-  the dropdown. On *Type* the dropdown offers the configured types but you can
+  *Model/Description* cell to type (`Enter` saves, `Esc` cancels and stays in
+  the room), *Status* for the dropdown. The open field **does not close under
+  your fingers**: opening the dropdown, the right-click menu or switching to
+  another window does not touch it, and if the list reloads meanwhile because
+  another technician saved, what you were typing is **saved first**, not lost.
+  It closes when you click another field, which saves, or with `Enter` and
+  `Esc`. On *Type* the dropdown offers the configured types but you can
   also type or paste a different value, which then appears among the filters
   too. Double-clicking any other column opens the full
   record.

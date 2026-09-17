@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.5.6).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5.7).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -410,8 +410,13 @@ dice: non crea mai un inventario locale al posto di quello condiviso.
   badare a maiuscole e minuscole: *iPhone*, *Iphone* e *IPHONE* sono la stessa
   cosa.
 - **Modifica al volo**, senza aprire nessuna finestra: doppio clic sulla cella
-  *Note* o *Modello/Descrizione* per scriverci (`Invio` salva, `Esc` annulla),
-  su *Stato* per la tendina. Sul *Tipo* la tendina propone i tipi configurati ma
+  *Note* o *Modello/Descrizione* per scriverci (`Invio` salva, `Esc` annulla e
+  resta nella stanza), su *Stato* per la tendina. Il campo aperto **non si
+  chiude sotto le dita**: aprire la tendina, il menu del tasto destro o passare
+  a un'altra finestra non lo tocca, e se intanto l'elenco si ricarica perche'
+  un altro tecnico ha salvato, quello che si stava scrivendo viene **salvato
+  prima**, non perso. Si chiude quando si clicca su un altro campo, che salva,
+  oppure con `Invio` ed `Esc`. Sul *Tipo* la tendina propone i tipi configurati ma
   si puo' anche scrivere o incollare un valore diverso, che compare poi anche fra
   i filtri. Doppio clic su una qualsiasi altra colonna
   apre la scheda completa.

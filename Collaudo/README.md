@@ -673,6 +673,37 @@ rifiutare.
 
 ---
 
+## 21. La modifica al volo non blocca la tastiera
+
+Serve a verificare che scrivere in una cella dell'elenco non lasci mai la
+tastiera bloccata, e che quello che si scrive non vada perso. Da fare su
+Windows, con **due postazioni** collegate allo stesso inventario.
+
+1. entra in una stanza, fai **doppio clic sulla cella Note** di un dispositivo e
+   scrivi qualcosa, senza premere Invio;
+2. dall'**altra postazione** modifica un dispositivo qualsiasi e salva. Entro
+   quindici secondi la prima postazione ricarica l'elenco da sola: la nota che
+   stavi scrivendo deve risultare **salvata**, non sparita, e la tastiera deve
+   rispondere normalmente al clic successivo;
+3. riapri la nota, scrivi, poi **tasto destro** dentro il campo: il menu Copia /
+   Incolla deve aprirsi **senza che il campo si chiuda**, e *Incolla* deve
+   incollare nel campo;
+4. con il campo ancora aperto, passa a un'altra finestra (Alt+Tab) e torna
+   indietro: il campo deve essere ancora lì, con il testo;
+5. premi **Esc**: il campo si chiude senza salvare e **resti nella stanza** -
+   prima Esc riportava anche alla home;
+6. **doppio clic sulla cella Stato**: la tendina si apre da sola; scegli uno
+   stato. Poi prova a fare doppio clic su un'altra cella Stato e chiudi con Esc.
+   In nessun momento il mouse o la tastiera devono smettere di rispondere;
+7. doppio clic su una nota, scrivi, poi doppio clic **direttamente su un'altra
+   nota** senza premere Invio: la prima deve risultare salvata e la seconda
+   aperta.
+
+**Cosa deve succedere:** mai una tastiera bloccata, mai un testo perso, mai un
+campo rimasto appeso sopra l'elenco.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

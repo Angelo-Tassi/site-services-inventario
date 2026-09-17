@@ -651,6 +651,36 @@ the program always says who has it instead of just refusing.
 
 ---
 
+## 21. Editing in place does not lock the keyboard
+
+This checks that typing in a cell of the list never leaves the keyboard stuck,
+and that what you type is not lost. To be done on Windows, with **two
+workstations** connected to the same inventory.
+
+1. enter a room, **double-click the Notes cell** of a device and type
+   something, without pressing Enter;
+2. from the **other workstation** edit any device and save. Within fifteen
+   seconds the first workstation reloads the list by itself: the note you were
+   typing must turn out **saved**, not gone, and the keyboard must respond
+   normally to the next click;
+3. reopen the note, type, then **right-click** inside the field: the Copy /
+   Paste menu must open **without the field closing**, and *Paste* must paste
+   into the field;
+4. with the field still open, switch to another window (Alt+Tab) and come back:
+   the field must still be there, with the text;
+5. press **Esc**: the field closes without saving and **you stay in the room** -
+   Esc used to jump back to the home screen too;
+6. **double-click the Status cell**: the dropdown opens by itself; pick a
+   status. Then try double-clicking another Status cell and close with Esc. At
+   no point must the mouse or the keyboard stop responding;
+7. double-click a note, type, then double-click **straight onto another note**
+   without pressing Enter: the first must turn out saved and the second open.
+
+**What must happen:** never a stuck keyboard, never a lost text, never a field
+left hanging over the list.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.
