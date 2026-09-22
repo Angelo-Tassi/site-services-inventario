@@ -80,6 +80,11 @@ jobs:
           # registri accanto al programma, e nello zip non devono finire
           Copy-Item Pacchetto ProvaSuite -Recurse
           Copy-Item tests ProvaSuite\tests -Recurse
+          # quello che il pacchetto finale avra' accanto a se', e che i test
+          # leggono: i fogli di prova, la cartella delle copie, Produzione
+          Copy-Item Collaudo ProvaSuite\Collaudo -Recurse
+          Copy-Item Backup ProvaSuite\Backup -Recurse
+          Copy-Item Produzione ProvaSuite\Produzione -Recurse
           Push-Location ProvaSuite
           try {
             python\python.exe tests\run_all.py

@@ -45,20 +45,33 @@ for larghezza in (minima, 1000, 1100, 1220, 1350, 1409, 1500, 1800):
     assert not fuori, "a %d px restano fuori: %s" % (larghezza, fuori)
 
 # ---- larga va in una riga, stretta va a capo
-pulsanti_visibili(1800)
-assert app._righe_barra == "una", app._righe_barra
-alta_una = app.barra.winfo_height()
-pulsanti_visibili(1220)
-assert app._righe_barra == "due", app._righe_barra
-assert app.barra.winfo_height() > alta_una, "la seconda riga deve occupare spazio"
-pulsanti_visibili(minima)
-assert app._righe_barra == "due_basso", app._righe_barra
+# "larga" si misura sui pulsanti veri, non su un numero fisso: su Windows i
+# caratteri sono piu' larghi, e lo schermo del runner puo' essere piu' stretto
+# di 1800 px, nel qual caso la finestra non si allarga oltre lo schermo
+lavoro, file_, lato = (app.gruppo_lavoro.winfo_reqwidth(),
+                       app.gruppo_file.winfo_reqwidth(),
+                       app.gruppo_lato.winfo_reqwidth())
+larga = max(lavoro + file_ + lato + 120, 1800)
+# "media": ci stanno lavoro e lato, ma non anche il gruppo dei file
+media = lavoro + lato + file_ // 2
+if larga > app.winfo_screenwidth():
+    print("schermo da %d px: troppo stretto per una riga sola (%d), salto"
+          % (app.winfo_screenwidth(), larga))
+else:
+    pulsanti_visibili(larga)
+    assert app._righe_barra == "una", app._righe_barra
+    alta_una = app.barra.winfo_height()
+    pulsanti_visibili(media)
+    assert app._righe_barra == "due", (media, app._righe_barra)
+    assert app.barra.winfo_height() > alta_una, "la seconda riga deve occupare spazio"
+    pulsanti_visibili(minima)
+    assert app._righe_barra == "due_basso", app._righe_barra
 
-# ---- e si torna indietro: allargando si ricompone in una riga sola
-pulsanti_visibili(1800)
-assert app._righe_barra == "una"
-assert app.barra.winfo_height() == alta_una
-assert app.sep_barra.winfo_ismapped(), "il separatore torna fra i due gruppi"
+    # ---- e si torna indietro: allargando si ricompone in una riga sola
+    pulsanti_visibili(larga)
+    assert app._righe_barra == "una"
+    assert app.barra.winfo_height() == alta_una
+    assert app.sep_barra.winfo_ismapped(), "il separatore torna fra i due gruppi"
 
 # ---- i comandi che riscrivono l'inventario non stanno piu' nella barra
 nella_barra = set()
