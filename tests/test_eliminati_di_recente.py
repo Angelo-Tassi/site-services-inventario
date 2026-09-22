@@ -149,6 +149,9 @@ app.var_search.set("")
 app.update()
 
 dlg = CestinoDialog(app, app.store, app.cfg["rooms"])
+# le finestre modali nascono nascoste e compaiono in show(), che qui non si
+# puo' chiamare (bloccherebbe): la si mostra a mano, come farebbe show()
+dlg.deiconify()
 app.update(); dlg.update()
 
 # ---- dieci per pagina, e le pagine si girano

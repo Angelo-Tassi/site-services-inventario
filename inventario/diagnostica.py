@@ -110,6 +110,31 @@ def _misura_interfaccia(percorso):
     return esito or ["nessuna misura raccolta"]
 
 
+def registro_della_tastiera(cartelle):
+    """Le ultime righe di Tastiera.log, se il programma lo ha scritto.
+
+    Lo scrive quando si preme F12, o da solo quando vede il sintomo: un tasto
+    premuto mentre nessun widget ha il fuoco.
+    """
+    from .registro import NOME_FILE
+    righe = []
+    trovati = [os.path.join(c, NOME_FILE) for c in cartelle
+               if c and os.path.exists(os.path.join(c, NOME_FILE))]
+    if not trovati:
+        righe.append("nessun %s: la tastiera non si e' mai bloccata, o non e'" % NOME_FILE)
+        righe.append("stato premuto F12 quando e' successo")
+    for percorso_registro in trovati:
+        righe.append("file: %s" % percorso_registro)
+        try:
+            with open(percorso_registro, "r", encoding="utf-8") as fh:
+                coda = fh.read().splitlines()[-120:]
+            righe.append("(ultime %d righe)" % len(coda))
+            righe.extend("  " + r for r in coda)
+        except OSError as exc:
+            righe.append("  non leggibile: %s" % exc)
+    return righe
+
+
 def raccogli():
     from . import __version__, config
     from .store import (InventoryStore, righe_separatore,
@@ -212,6 +237,10 @@ def raccogli():
     _sezione(righe, "misura dell'interfaccia")
     for riga in _misura_interfaccia(percorso):
         righe.append(riga)
+
+    _sezione(righe, "registro della tastiera")
+    righe.extend(registro_della_tastiera([config.app_dir()]
+                                         + [d for _n, d in _desktop()]))
 
     _sezione(righe, "dove si trova il desktop")
     for come, dove in _desktop():

@@ -704,6 +704,38 @@ campo rimasto appeso sopra l'elenco.
 
 ---
 
+## 22. Se la tastiera si blocca
+
+Serve a verificare il caso segnalato sul campo - nella finestra del prestito
+si riuscivano a scrivere solo due caratteri - e a sapere che cosa fare se
+dovesse ricapitare, in qualunque punto del programma.
+
+1. entra nel **Digital Kiosk** e premi **Presta** sulla riga di un dispositivo
+   disponibile: si apre la finestra del nome, con il cursore **gia' nel campo**;
+2. scrivi un nome lungo, per esempio `Massimiliano Della Rovere`, **senza
+   fermarti**: devono arrivare tutte le lettere;
+3. mentre la finestra e' ancora aperta, fai passare piu' di quindici secondi
+   (e, se hai una seconda postazione, salva qualcosa da li'): la finestra deve
+   restare aperta con il nome dentro, e la tastiera continuare a rispondere;
+4. premi **Registra prestito**: il prestito e' registrato con il nome intero,
+   e cliccando nell'elenco la tastiera risponde subito (freccia giu' sposta la
+   riga);
+5. rifai i punti 1-2 con **Annulla** invece di registrare: stesso risultato;
+6. nella casella **Cerca** scrivi tre lettere, metti il cursore all'inizio e
+   premi **Canc**: cancella una lettera, e **non** si apre l'eliminazione dei
+   dispositivi. **Esc** nella casella resta nella stanza.
+
+**Se la tastiera si blocca, in qualunque punto:** premi **F12**. Il programma
+scrive `Tastiera.log` accanto a se stesso (o sul desktop). Mandalo insieme a
+`Diagnostica.txt`: dice quale campo aveva il fuoco in quel momento e che cosa
+e' successo nei secondi prima. Il file non contiene niente di quello che hai
+scritto, solo il genere dei tasti e i nomi dei campi.
+
+**Cosa deve succedere:** ogni tasto arriva, in ogni finestra; alla chiusura di
+ogni finestra la tastiera risponde subito nell'elenco.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

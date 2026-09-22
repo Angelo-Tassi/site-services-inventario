@@ -68,6 +68,27 @@ jobs:
           # import di tutto quello che serve, con i percorsi veri del pacchetto
           Pacchetto\python\python.exe -c "import tkinter, openpyxl, inventario.ui; print('avvio possibile')"
 
+      # La suite di test gira anche qui, con il Python e il Tk del pacchetto:
+      # quelli che avranno i tecnici, non quelli del Mac di chi sviluppa. Le
+      # tendine dei combobox, il fuoco delle finestre e le prese si comportano
+      # diversamente su Windows, e tre bug della tastiera erano invisibili
+      # sull'altra piattaforma. Un fallimento qui ferma il rilascio.
+      - name: Suite di test su Windows, con il Tk del pacchetto
+        shell: pwsh
+        run: |
+          # su una COPIA del pacchetto: i test scrivono copie di sicurezza e
+          # registri accanto al programma, e nello zip non devono finire
+          Copy-Item Pacchetto ProvaSuite -Recurse
+          Copy-Item tests ProvaSuite\tests -Recurse
+          Push-Location ProvaSuite
+          try {
+            python\python.exe tests\run_all.py
+            if ($LASTEXITCODE -ne 0) { throw "suite fallita su Windows" }
+          } finally {
+            Pop-Location
+            Remove-Item -Recurse -Force ProvaSuite
+          }
+
       - name: Verifica lo sblocco automatico nei .bat
         shell: pwsh
         run: |

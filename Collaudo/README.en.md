@@ -681,6 +681,38 @@ left hanging over the list.
 
 ---
 
+## 22. If the keyboard locks up
+
+This checks the case reported from the field - in the loan window only two
+characters could be typed - and tells you what to do if it happens again,
+anywhere in the program.
+
+1. enter the **Digital Kiosk** and press **Lend** on the row of an available
+   device: the name window opens, with the cursor **already in the field**;
+2. type a long name, say `Massimiliano Della Rovere`, **without stopping**:
+   every letter must arrive;
+3. with the window still open, let more than fifteen seconds pass (and, if you
+   have a second workstation, save something from there): the window must stay
+   open with the name in it, and the keyboard keep responding;
+4. press **Register loan**: the loan is recorded with the whole name, and
+   clicking in the list the keyboard responds at once (arrow down moves the
+   row);
+5. repeat points 1-2 with **Cancel** instead of registering: same result;
+6. in the **Search** box type three letters, put the cursor at the start and
+   press **Del**: it deletes one letter, and the device deletion does **not**
+   open. **Esc** in the box stays in the room.
+
+**If the keyboard locks up, anywhere:** press **F12**. The program writes
+`Tastiera.log` next to itself (or on the desktop). Send it together with
+`Diagnostica.txt`: it says which field had the focus at that moment and what
+happened in the seconds before. The file holds nothing of what you typed, only
+the kind of the keys and the names of the fields.
+
+**What must happen:** every key arrives, in every window; when any window closes
+the keyboard responds at once in the list.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.

@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.5.7).** The features are complete and every release
+> **Beta version (1.0.0-beta.5.8).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -279,6 +279,27 @@ the window and of the table, and where Windows puts the user's desktop.
 
 The file holds paths and room names, nothing confidential: send it to whoever
 helps you and it answers in one go questions that otherwise cost days.
+
+### If the keyboard locks up: F12
+
+The program keeps in memory the last three hundred events that matter - which
+field receives the keys, where focus goes and comes from, which windows open and
+close, when the list is rebuilt and why. It never writes them on its own, except
+when it **sees the symptom**: a key pressed while no field has the focus. In that
+case, and every time **F12** is pressed, it writes `Tastiera.log` next to the
+program (or on the desktop, if it cannot there), and `Diagnostica.bat` collects
+it with the rest.
+
+Of the keys it keeps **the kind** - letter, digit, Enter - and the field that
+received them, **never the character**: nothing of what was typed is in the
+file. If the keyboard stops responding, press F12 and send the file: it says who
+had the focus at that moment and what happened in the seconds before.
+
+The main window's keys - `Del` to delete, `Esc` to go home, `F5`, `Ctrl+N`,
+`Ctrl+P` - **do not apply inside a text field**: there `Del` deletes a character
+and `Esc` stays put. And the list **is never rebuilt** while a window is open or
+you are typing in a field: if another technician saves at that moment, the
+reload waits for the next round.
 
 ## How the package is built
 

@@ -13,6 +13,7 @@ from tkinter import filedialog, font as tkfont, messagebox, ttk
 from . import __version__, config, excel_io, theme
 from . import lingua as lang
 from .lingua import T, intestazione, stato as traduci_stato
+from .registro import registro
 from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE,
                     ELIMINATI_GIORNI, ELIMINATI_MASSIMO, HEADERS,
                     InventoryError, MASSIMO_ELIMINA_EXCEL, MESI_CONSERVAZIONE,
@@ -213,6 +214,8 @@ def installa_copia_incolla(root):
 
     def copia(evento):
         widget = evento.widget
+        if not widget.winfo_exists():
+            return "break"              # il menu era aperto su un campo morto
         testo = testo_selezionato(widget)
         if testo is None:
             testo = tutto_il_testo(widget)      # niente selezionato: tutto
@@ -240,7 +243,7 @@ def installa_copia_incolla(root):
 
     def incolla(evento):
         widget = evento.widget
-        if not scrivibile(widget):
+        if not widget.winfo_exists() or not scrivibile(widget):
             return "break"
         try:
             arrivato = widget.clipboard_get()
@@ -287,10 +290,16 @@ def installa_copia_incolla(root):
         menu.add_command(label=T("Seleziona tutto"),
                          command=lambda: seleziona_tutto(finto))
         try:
-            widget.focus_set()
             menu.tk_popup(evento.x_root, evento.y_root)
         finally:
             menu.grab_release()
+        # il fuoco torna al campo DOPO il menu, non prima: prima, il menu
+        # glielo toglieva subito e un campo al volo si chiudeva sotto di lui
+        try:
+            if widget.winfo_exists():
+                widget.focus_set()
+        except tk.TclError:
+            pass
         return "break"
 
     scorciatoie = (("c", copia), ("x", taglia), ("v", incolla), ("a", seleziona_tutto))
@@ -323,29 +332,132 @@ def installa_copia_incolla(root):
                 pass
 
 
+CAMPI_DI_TESTO = (tk.Entry, ttk.Entry, ttk.Combobox, tk.Text, tk.Spinbox)
+
+
+def e_un_campo_di_testo(widget):
+    return isinstance(widget, CAMPI_DI_TESTO)
+
+
+def primo_campo_di_testo(finestra):
+    """Il primo campo in cui si puo' scrivere, nell'ordine in cui e' disposto."""
+    for figlio in finestra.winfo_children():
+        if e_un_campo_di_testo(figlio):
+            try:
+                if str(figlio.cget("state")) != "disabled":
+                    return figlio
+            except tk.TclError:
+                return figlio
+        trovato = primo_campo_di_testo(figlio)
+        if trovato is not None:
+            return trovato
+    return None
+
+
+def restituisci_il_fuoco(finestra):
+    """Dopo una finestra modale, il fuoco torna a chi l'aveva aperta.
+
+    Su Windows una finestra Tk in cui nessun widget ha il fuoco e' esattamente
+    "la tastiera non risponde": i tasti arrivano alla finestra e nessuno li
+    riceve. Tk non rimette il fuoco da solo quando una finestra figlia si
+    chiude, quindi lo si fa qui - alla finestra che ha ancora la presa, se ce
+    n'e' una (una modale sotto un'altra), altrimenti a chi ha aperto.
+    """
+    try:
+        presa = finestra.grab_current()
+    except tk.TclError:
+        presa = None
+    bersaglio = presa if presa is not None and presa.winfo_exists() else finestra
+    try:
+        albero = getattr(bersaglio, "tree", None)
+        if albero is not None and albero.winfo_exists():
+            albero.focus_set()
+        else:
+            campo = primo_campo_di_testo(bersaglio) if bersaglio is not finestra else None
+            (campo or bersaglio).focus_set()
+    except tk.TclError:
+        pass
+
+
 class _Modal(tk.Toplevel):
+    """Una finestra che blocca quella sotto finche' non si chiude.
+
+    Si costruisce nascosta e si mostra in show(), gia' al suo posto: cosi' non
+    compare in un angolo per poi saltare al centro. E' show() a occuparsi delle
+    due cose che su Windows vanno storte piu' spesso: dare il fuoco al primo
+    campo solo quando la finestra e' davvero visibile e ha la presa, e
+    restituirlo a chi l'ha aperta quando si chiude.
+    """
+
     def __init__(self, parent, title):
         tk.Toplevel.__init__(self, parent)
+        self.withdraw()
         self.title(title)
         self.configure(bg=theme.BG)
         self.resizable(False, False)
         self.transient(parent)
         self.result = None
+        # Chi costruisce la finestra puo' dire quale campo deve avere il fuoco
+        # all'apertura; altrimenti e' il primo campo di testo che si trova.
+        self.primo_campo = None
         self.protocol("WM_DELETE_WINDOW", self._cancel)
         self.bind("<Escape>", lambda e: self._cancel())
+        registro.nota("finestra +", classe=type(self).__name__)
 
     def _cancel(self):
         self.result = None
         self.destroy()
 
+    def _campo_da_mettere_a_fuoco(self):
+        if self.primo_campo is not None and self.primo_campo.winfo_exists():
+            return self.primo_campo
+        # chi ha gia' preso il fuoco dentro la finestra vince
+        try:
+            adesso = self.focus_get()
+        except (tk.TclError, KeyError):
+            adesso = None
+        if adesso is not None and str(adesso).startswith(str(self) + "."):
+            return adesso
+        return primo_campo_di_testo(self)
+
     def show(self):
         self.update_idletasks()
         parent = self.master
-        x = parent.winfo_rootx() + (parent.winfo_width() - self.winfo_width()) // 2
-        y = parent.winfo_rooty() + (parent.winfo_height() - self.winfo_height()) // 3
+        x = parent.winfo_rootx() + (parent.winfo_width() - self.winfo_reqwidth()) // 2
+        y = parent.winfo_rooty() + (parent.winfo_height() - self.winfo_reqheight()) // 3
         self.geometry("+%d+%d" % (max(x, 0), max(y, 0)))
-        self.grab_set()
+        self.deiconify()
+        try:
+            self.wait_visibility()
+        except tk.TclError:
+            pass                        # distrutta prima di comparire
+        try:
+            presa_prima = self.grab_current()
+        except tk.TclError:
+            presa_prima = None
+        try:
+            self.grab_set()
+        except tk.TclError:
+            pass                        # non visibile: si va avanti senza presa
+        campo = self._campo_da_mettere_a_fuoco()
+        try:
+            # senza campi di testo il fuoco va alla finestra: da li' Tab
+            # arriva ai pulsanti, e i tasti non restano appesi alla finestra
+            # sotto, che con la presa attiva non puo' riceverli
+            (campo if campo is not None else self).focus_force()
+        except tk.TclError:
+            pass
+        registro.nota("finestra aperta", classe=type(self).__name__,
+                      fuoco=str(campo) if campo is not None else "-")
         self.wait_window(self)
+        registro.nota("finestra -", classe=type(self).__name__)
+        # Tk non ripristina la presa di una modale sotto, ne' il fuoco: si fa qui
+        if presa_prima is not None and presa_prima.winfo_exists():
+            try:
+                presa_prima.grab_set()
+            except tk.TclError:
+                pass
+        restituisci_il_fuoco(parent)
         return self.result
 
 
@@ -2439,6 +2551,7 @@ class App(tk.Tk):
         lang.imposta(config.load_language())
         self.fonts = theme.apply(self)
         installa_copia_incolla(self)
+        registro.installa(self)
         # Command esiste solo su macOS: dove non c'e', quel bit di stato
         # significa altro e non va letto.
         self._ha_comando = self.tk.call("tk", "windowingsystem") == "aqua"
@@ -2655,12 +2768,27 @@ class App(tk.Tk):
                   anchor="w", padding=(16, 6)).pack(fill="x")
 
     def _bind_keys(self):
-        self.bind("<Control-n>", lambda e: self.on_add())
+        """Le scorciatoie della finestra principale.
+
+        Un legame sulla finestra vale per ogni widget che ci sta dentro, la
+        casella Cerca compresa: senza il filtro, Canc nella ricerca apriva
+        l'eliminazione dei dispositivi ed Esc riportava alla home a meta' di
+        una parola. Dentro un campo di testo i tasti sono del campo.
+        """
+        self.bind("<Control-n>", self._scorciatoia("on_add"))
         self.bind("<Control-f>", lambda e: self.entry_search.focus_set())
-        self.bind("<Control-p>", lambda e: self.on_print())
-        self.bind("<F5>", lambda e: self.on_refresh())
-        self.bind("<Escape>", lambda e: self.show_home())
-        self.bind("<Delete>", lambda e: self.on_delete())
+        self.bind("<Control-p>", self._scorciatoia("on_print"))
+        self.bind("<F5>", self._scorciatoia("on_refresh"))
+        self.bind("<Escape>", self._scorciatoia("show_home"))
+        self.bind("<Delete>", self._scorciatoia("on_delete"))
+
+    def _scorciatoia(self, nome_azione):
+        def gestore(evento):
+            if e_un_campo_di_testo(evento.widget):
+                return None             # il tasto e' del campo
+            getattr(self, nome_azione)()
+            return "break"
+        return gestore
 
     # ------------------------------------------------------------ tabella
 
@@ -3111,6 +3239,14 @@ class App(tk.Tk):
         if getattr(self, "tree", None) is None or not self.tree.winfo_exists() \
                 or not self.action_column_visible():
             return
+        try:
+            if self.grab_current() is not None:
+                # una finestra modale e' aperta, magari proprio da uno di
+                # questi pulsanti: non si distrugge niente sotto di lei. Alla
+                # chiusura refresh_table li riallinea comunque.
+                return
+        except tk.TclError:
+            pass
         if not hasattr(self, "_row_buttons"):
             self._row_buttons = {}
         colonne = self._columns()
@@ -3145,12 +3281,27 @@ class App(tk.Tk):
             x, y, larghezza, altezza = box
             button.place(x=x + 6, y=y + 3, width=max(larghezza - 12, 40),
                          height=max(altezza - 6, 18))
-        for tag in [t for t in self._row_buttons if t not in vive]:
+        morti = [t for t in self._row_buttons if t not in vive]
+        if morti:
+            registro.nota("pulsanti riga", distrutti=len(morti), vivi=len(vive))
+        for tag in morti:
             self._row_buttons.pop(tag).destroy()
 
     def _on_row_button(self, tag):
+        """Il clic su un pulsante di riga: l'azione parte a clic concluso.
+
+        Il pulsante sta dentro l'elenco e viene ridisegnato a ogni <Configure>
+        del Treeview: aprire una finestra modale - un ciclo di eventi annidato
+        - dentro il gestore del rilascio di un widget che intanto puo' essere
+        distrutto e ricreato e' fragile. Con after_idle il gestore finisce
+        prima, e la finestra si apre da un terreno fermo.
+        """
+        registro.nota("pulsante riga", tag=tag)
+        self.after_idle(lambda: self._azione_di_riga(tag))
+
+    def _azione_di_riga(self, tag):
         item = self._item_by_tag(tag)
-        if item is None:
+        if item is None or self.tree is None or not self.tree.winfo_exists():
             return
         self.tree.selection_set([tag])
         if self.ship_column_visible():
@@ -3464,6 +3615,7 @@ class App(tk.Tk):
         self._render()
 
     def _render(self):
+        registro.nota("render", vista=self.view)
         self._clear_body()
         if self.view == "home":
             self._render_cards()
@@ -3755,6 +3907,7 @@ class App(tk.Tk):
         return [trovati[t] for t in tags if t in trovati]
 
     def _reload(self, message=None):
+        registro.nota("reload", motivo=(message or "-")[:40])
         try:
             self.store.load()
         except InventoryError as exc:
@@ -3778,12 +3931,45 @@ class App(tk.Tk):
         if message:
             self.var_status.set(message + "     " + self.var_status.get())
 
+    def _qualcuno_sta_lavorando(self):
+        """Vero se ricostruire la finestra adesso disturberebbe qualcuno.
+
+        Una finestra modale aperta, un campo al volo, o il fuoco dentro un
+        campo di testo con qualcosa scritto: in tutti questi casi rifare
+        l'elenco sotto le dita di chi scrive e' il modo per perdergli il testo
+        e lasciargli la tastiera senza destinatario. Si aspetta il giro dopo.
+        """
+        try:
+            if self.grab_current() is not None:
+                return True
+        except tk.TclError:
+            pass
+        if getattr(self, "_editor_aperto", None) is not None:
+            return True
+        try:
+            fuoco = self.focus_get()
+        except (tk.TclError, KeyError):
+            return True                 # la tendina di un combobox
+        if e_un_campo_di_testo(fuoco):
+            try:
+                testo = fuoco.get() if not isinstance(fuoco, tk.Text) \
+                    else fuoco.get("1.0", "end").strip()
+            except tk.TclError:
+                testo = ""
+            return bool(testo)
+        return False
+
     def _auto_refresh(self):
         try:
             if self.store.changed_on_disk():
-                self._reload(T("Inventario aggiornato da un altro utente."))
-        except Exception:
-            pass
+                if self._qualcuno_sta_lavorando():
+                    registro.nota("ricarica", esito="rimandata: qualcuno sta lavorando")
+                else:
+                    registro.nota("ricarica", esito="il file e' cambiato",
+                                  timbro=self.store._stamp)
+                    self._reload(T("Inventario aggiornato da un altro utente."))
+        except Exception as exc:
+            registro.nota("ricarica", esito="errore", errore=str(exc)[:80])
         self.after(REFRESH_MS, self._auto_refresh)
 
     def _run(self, action, success=None):
@@ -4318,7 +4504,7 @@ class App(tk.Tk):
         ttk.Button(buttons, text=T("Registra prestito"), style="Primary.TButton",
                    command=ok).pack(side="right")
         dialog.bind("<Return>", lambda e: ok())
-        entry.focus_set()
+        dialog.primo_campo = entry
         return dialog.show()
 
     def _ask_room(self, prompt):

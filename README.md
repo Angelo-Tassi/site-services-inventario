@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.5.7).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5.8).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -285,6 +285,28 @@ finestra e della tabella, e dove Windows mette il desktop dell'utente.
 
 Il file contiene percorsi e nomi di stanza, niente di riservato: si manda a chi
 assiste e risponde in un colpo solo a domande che altrimenti costano giorni.
+
+### Se la tastiera si blocca: F12
+
+Il programma tiene in memoria gli ultimi trecento eventi che contano - quale
+campo riceve i tasti, dove va e da dove viene il fuoco, quali finestre si
+aprono e chiudono, quando l'elenco viene ricostruito e perche'. Non li scrive
+mai da solo, tranne quando **vede il sintomo**: un tasto premuto mentre nessun
+campo ha il fuoco. In quel caso, e ogni volta che si preme **F12**, scrive
+`Tastiera.log` accanto al programma (o sul desktop, se li' non puo'), e
+`Diagnostica.bat` lo raccoglie insieme al resto.
+
+Dei tasti tiene **il genere** - lettera, cifra, Invio - e il campo che li ha
+ricevuti, **mai il carattere**: nel file non c'e' niente di quello che si e'
+scritto. Se la tastiera non risponde, si preme F12 e si manda il file: dice chi
+aveva il fuoco in quel momento e che cosa e' successo nei secondi prima.
+
+I tasti della finestra principale - `Canc` per eliminare, `Esc` per tornare
+alla home, `F5`, `Ctrl+N`, `Ctrl+P` - **non valgono dentro un campo di testo**:
+li' `Canc` cancella un carattere ed `Esc` resta dov'e'. E l'elenco **non si
+ricostruisce mai** mentre una finestra e' aperta o si sta scrivendo in un
+campo: se un altro tecnico salva in quel momento, la ricarica aspetta il giro
+dopo.
 
 ## Come viene costruito il pacchetto
 

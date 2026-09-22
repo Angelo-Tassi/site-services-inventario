@@ -191,7 +191,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 1.0.0-beta.5.7 · beta</div>
+  <div class="alpha">versione 1.0.0-beta.5.8 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -217,6 +217,42 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.8</h3>
+      <p class="quando">22 settembre 2026</p>
+      <ul>
+        <li><b>La tastiera bloccata, presa alla radice.</b> Nella finestra del
+          prestito si riuscivano a scrivere due caratteri; ad altri la tastiera
+          non rispondeva piu' del tutto. Le finestre modali ora nascono
+          nascoste, compaiono gia' al loro posto, danno il fuoco al primo campo
+          solo quando sono davvero visibili e con la presa, e alla chiusura
+          <b>restituiscono il fuoco</b> all'elenco: una finestra in cui nessun
+          campo ha il fuoco e' esattamente "la tastiera non risponde".</li>
+        <li><b>L'elenco non si ricostruisce mai sotto le dita.</b> Ogni quindici
+          secondi il programma controllava se qualcun altro avesse salvato,
+          fidandosi della data del file: su una cartella di rete la data letta
+          subito dopo il salvataggio e quella letta dopo possono differire nei
+          decimali, e la finestra veniva rifatta da capo - anche con una
+          finestra aperta e un campo con il fuoco. Adesso conta il contenuto
+          del file, non la data, e comunque non si ricostruisce niente mentre
+          una finestra e' aperta o si sta scrivendo.</li>
+        <li><b>I tasti della finestra non valgono dentro i campi.</b> Canc
+          nella casella Cerca apriva l'eliminazione dei dispositivi, Esc
+          riportava alla home a meta' parola. Dentro un campo di testo i tasti
+          sono del campo. I pulsanti dentro l'elenco aprono la loro finestra a
+          clic concluso, non piu' dentro il gestore di un widget che intanto
+          puo' essere ridisegnato.</li>
+        <li><b>F12 scrive il registro della tastiera.</b> Gli ultimi trecento
+          eventi che contano - chi riceve i tasti, dove va il fuoco, quali
+          finestre si aprono, quando l'elenco viene rifatto - finiscono in
+          <span class="mono">Tastiera.log</span>, mai con i caratteri scritti. Si
+          scrive anche da solo quando vede il sintomo. Se dovesse ricapitare,
+          il file dice esattamente dove: non si deduce piu', si legge.</li>
+        <li><b>La suite di test gira anche su Windows</b>, con il Tk del
+          pacchetto, a ogni rilascio. Finora girava solo sul Mac di chi
+          sviluppa, dove questi difetti sono invisibili.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.7</h3>
       <p class="quando">17 settembre 2026</p>
@@ -288,33 +324,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           barra di stato in fondo.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.4</h3>
-      <p class="quando">4 settembre 2026</p>
-      <ul>
-        <li><b>Elimina da Excel</b>, il pulsante rosso in home accanto agli
-          eliminati di recente. Carica un file - un'esportazione del programma o
-          una colonna sola di codici - dice da quali stanze spariscono i
-          dispositivi, uno per uno, e che cosa salta e perche'; per procedere si
-          scrive <span class="mono">ACCETTO</span>. Al massimo 200 per volta:
-          oltre quel numero l'elenco di quello che sta per sparire non lo legge
-          piu' nessuno. Finiscono negli eliminati di recente, da cui si
-          ripescano.</li>
-        <li><b>Una stanza che non esiste vale come nessuna stanza.</b> Se nella
-          colonna Stanza c'era scritto un nome che nel programma non c'e' -
-          <span class="mono">Cantina</span> - il dispositivo entrava lo stesso e
-          poi non compariva in nessuna scheda. Adesso viene chiesta, come per le
-          righe senza stanza. Si perdona il modo di scriverla - lo spazio di
-          troppo e la maiuscola sbagliata - e il dispositivo entra col nome
-          ufficiale della stanza.</li>
-        <li><b>Il cestino tiene 300 record, e quando e' pieno chiede.</b> Prima i
-          piu' vecchi uscivano in silenzio. Ma quello che esce dal cestino e'
-          perso per sempre: adesso il programma dice quanti sono quelli che non
-          ci entrano e lascia scegliere - metterli dentro al posto dei piu'
-          vecchi, o cancellare definitivamente quelli in eccesso. Il riepilogo
-          finale elenca sempre quelli cancellati per sempre.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -356,7 +365,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
     <div class="bar"><span class="dot"></span><span>Site Services : Inventario Iphone, Laptop e Tablet</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : Inventario Iphone, Laptop e Tablet</b>
-        <div class="ver">v1.0.0-beta.5.7</div>
+        <div class="ver">v1.0.0-beta.5.8</div>
         <div class="s">Laptop e tablet in nostro possesso</div></div>
       <div class="dx">
         <span class="lin">Lingua <span class="sel">Italiano <s>▼</s></span></span>
@@ -535,7 +544,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 1.0.0-beta.5.7 · beta</div>
+  <div class="alpha">version 1.0.0-beta.5.8 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -561,6 +570,41 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.8</h3>
+      <p class="quando">22 September 2026</p>
+      <ul>
+        <li><b>The stuck keyboard, taken at the root.</b> In the loan window only
+          two characters could be typed; for others the keyboard stopped
+          responding altogether. Modal windows are now born hidden, appear
+          already in place, give the focus to the first field only when they
+          are really visible and hold the grab, and on closing <b>hand the focus
+          back</b> to the list: a window in which no field has the focus is
+          exactly "the keyboard does not respond".</li>
+        <li><b>The list is never rebuilt under your fingers.</b> Every fifteen
+          seconds the program checked whether someone else had saved, trusting
+          the file's date: on a network folder the date read right after saving
+          and the one read later can differ in the decimals, and the window was
+          rebuilt from scratch - even with a window open and a field focused.
+          Now the file's content counts, not its date, and nothing is rebuilt
+          anyway while a window is open or you are typing.</li>
+        <li><b>The window's keys do not apply inside fields.</b> Del in the
+          Search box opened the device deletion, Esc jumped home mid-word.
+          Inside a text field the keys belong to the field. The buttons inside
+          the list open their window once the click is over, no longer inside
+          the handler of a widget that may be redrawn meanwhile.</li>
+        <li><b>F12 writes the keyboard log.</b> The last three hundred events
+          that matter - who receives the keys, where focus goes, which windows
+          open, when the list is rebuilt - go to
+          <span class="mono">Tastiera.log</span>, never with the typed
+          characters. It also writes itself when it sees the symptom. Should it
+          happen again, the file says exactly where: no more deducing, just
+          reading.</li>
+        <li><b>The test suite runs on Windows too</b>, with the package's Tk, at
+          every release. So far it ran only on the developer's Mac, where these
+          defects are invisible.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.7</h3>
       <p class="quando">17 September 2026</p>
@@ -630,30 +674,6 @@ python Inventario.py</pre>
           bar at the bottom.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.4</h3>
-      <p class="quando">4 September 2026</p>
-      <ul>
-        <li><b>Delete from Excel</b>, the red button on the home screen next to
-          the recently deleted. It loads a file - an export from the program, or
-          a single column of codes - says which rooms the devices disappear from,
-          one by one, and what it skips and why; to go on you type
-          <span class="mono">ACCETTO</span>. At most 200 at a time: beyond that
-          number nobody reads the list of what is about to disappear. They land
-          in the recently deleted, from where they are fished back.</li>
-        <li><b>A room that does not exist counts as no room.</b> If the Room
-          column held a name the program does not have -
-          <span class="mono">Cantina</span> - the device got in all the same and
-          then showed up in no card. Now it is asked for, as for rows with no
-          room. The way it is written is forgiven - the extra space and the wrong
-          case - and the device goes in under the room's official name.</li>
-        <li><b>The bin holds 300 records, and when it is full it asks.</b> The
-          oldest used to leave in silence. But what leaves the bin is lost for
-          good: now the program says how many do not fit and lets you choose -
-          put them in in place of the oldest, or delete the ones in excess for
-          good. The final summary always lists the ones deleted for good.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -694,7 +714,7 @@ python Inventario.py</pre>
     <div class="bar"><span class="dot"></span><span>Site Services : iPhone, Laptop and Tablet Inventory</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : iPhone, Laptop and Tablet Inventory</b>
-        <div class="ver">v1.0.0-beta.5.7</div>
+        <div class="ver">v1.0.0-beta.5.8</div>
         <div class="s">Laptops and tablets we hold</div></div>
       <div class="dx">
         <span class="lin">Language <span class="sel">English <s>▼</s></span></span>

@@ -83,11 +83,32 @@ assert app.store.changed_on_disk(), "il file e' cambiato sotto"
 app._auto_refresh()
 respira()
 assert not esplosioni, "nessuna eccezione nascosta: %s" % (esplosioni[0][1],)
+# la ricarica ASPETTA: il campo e' ancora li', col suo testo, e l'elenco non e'
+# stato ricostruito sotto le dita
+assert editor_aperto() is campo, "il campo non si tocca mentre si scrive"
+assert campo.get() == "scritto a meta'"
+assert not [i for i in app.store.items if i["asset_tag"] == "IT-7777"], \
+    "l'elenco non e' stato ricaricato: si aspetta che si finisca"
+# finito di scrivere, si salva; al giro dopo la ricarica passa
+campo.event_generate("<Return>"); respira()
 app.store.load()
 salvata = [i for i in app.store.items if i["asset_tag"] == tag][0]["note"]
 assert salvata == "scritto a meta'", "quello che si stava scrivendo e' salvato: %r" % salvata
-assert editor_aperto() is None, "e non e' rimasto un campo orfano"
-assert app._editor_aperto is None
+assert editor_aperto() is None and app._editor_aperto is None
+app.tree.focus_set(); respira()
+app._auto_refresh(); respira()
+assert [i for i in app.store.items if i["asset_tag"] == "IT-7777"], \
+    "a campo chiuso la ricarica e' passata"
+
+# ---- e se l'elenco viene ricostruito comunque (un salvataggio proprio), il
+# campo aperto si chiude salvando invece di sparire col testo
+campo = apri_nota(tag)
+campo.delete(0, "end"); campo.insert(0, "sotto ricostruzione")
+app._render(); respira()
+assert not esplosioni, esplosioni
+app.store.load()
+assert [i for i in app.store.items if i["asset_tag"] == tag][0]["note"] == "sotto ricostruzione"
+assert editor_aperto() is None and app._editor_aperto is None
 
 # ============ 2. il <FocusOut> che non e' un abbandono ============
 campo = apri_nota(tag)

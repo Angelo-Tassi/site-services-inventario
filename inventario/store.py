@@ -15,6 +15,7 @@ Sicurezza sugli accessi concorrenti:
 
 import calendar
 import getpass
+import hashlib
 import json
 import os
 import platform
@@ -670,6 +671,7 @@ class InventoryStore(object):
         self.modifiche = 0
         self.items = []
         self._stamp = None
+        self._impronta_letta = None
         # Le copie automatiche buttate via dall'ultima rotazione: chi vuole puo'
         # dirlo, ma nessuno deve dipenderne.
         self.copie_scartate = []
@@ -752,19 +754,51 @@ class InventoryStore(object):
         return True
 
     def _disk_stamp(self):
+        """Data (al secondo) e dimensione del file: un indizio, non una prova.
+
+        La data al secondo intero e non con i decimali: su una cartella di
+        rete lo stat letto subito dopo la scrittura e quello letto quindici
+        secondi dopo possono differire nei decimali senza che nessuno abbia
+        toccato niente - cache del client, precisione diversa fra client e
+        server. E' cosi' che il programma credeva che "un altro utente" avesse
+        scritto, e ricostruiva la finestra sotto le dita di chi lavorava.
+        """
         try:
             st = os.stat(self.path)
         except OSError:
             return None
-        return (st.st_mtime, st.st_size)
+        return (int(st.st_mtime), st.st_size)
+
+    def _impronta(self):
+        """L'impronta del contenuto: e' lei a dire se il file e' cambiato."""
+        try:
+            with open(self.path, "rb") as fh:
+                return hashlib.sha1(fh.read()).hexdigest()
+        except OSError:
+            return None
 
     def changed_on_disk(self):
-        """True se qualcun altro ha scritto il file dopo la nostra lettura."""
-        return self._disk_stamp() != self._stamp
+        """True se qualcun altro ha scritto il file dopo la nostra lettura.
+
+        Data e dimensione dicono solo che vale la pena guardare: la risposta
+        la da' il contenuto. Il file e' piccolo - poche centinaia di kilobyte al
+        massimo - e leggerlo per intero costa meno di una ricostruzione della
+        finestra fatta per niente. Se l'impronta e' la stessa, il timbro si
+        aggiorna e basta.
+        """
+        timbro = self._disk_stamp()
+        if timbro == self._stamp:
+            return False
+        impronta = self._impronta()
+        if impronta is not None and impronta == self._impronta_letta:
+            self._stamp = timbro          # era solo la data a ballare
+            return False
+        return True
 
     def load(self):
         self.items = self._read()
         self._stamp = self._disk_stamp()
+        self._impronta_letta = self._impronta()
         return self.items
 
     def _read(self):
@@ -828,6 +862,7 @@ class InventoryStore(object):
             self._write(items)
             self.items = items
             self._stamp = self._disk_stamp()
+            self._impronta_letta = self._impronta()
             self.modifiche += _quanti_cambiati(prima, items)
         return result
 
