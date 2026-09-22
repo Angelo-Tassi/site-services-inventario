@@ -16,6 +16,22 @@ SOLO_POSIX = {
 }
 
 
+def annota_su_actions(nome, coda):
+    """Su GitHub Actions, il fallimento diventa un'annotazione del job.
+
+    Le annotazioni si leggono dall'API pubblica anche senza essere loggati,
+    i log completi no: e' l'unico modo per vedere da un Mac senza account che
+    cosa e' fallito sul runner Windows. Il testo va su una riga sola, con i
+    ritorni a capo codificati come vuole il formato.
+    """
+    if not os.environ.get("GITHUB_ACTIONS"):
+        return
+    messaggio = coda[-3000:].replace("%", "%25").replace("\r", "%0D") \
+        .replace("\n", "%0A")
+    print("::error title=%s::%s" % (nome, messaggio))
+    sys.stdout.flush()
+
+
 def main():
     suite = sorted(f for f in os.listdir(QUI)
                    if f.startswith("test_") and f.endswith(".py"))
@@ -34,6 +50,8 @@ def main():
         except subprocess.TimeoutExpired:
             falliti.append(nome)
             print("%-26s BLOCCATA dopo %d secondi" % (nome, TIMEOUT))
+            annota_su_actions(nome, "bloccata dopo %d secondi: probabile finestra "
+                                    "di dialogo in attesa" % TIMEOUT)
             print("    probabile finestra di dialogo in attesa: sostituisci "
                   "messagebox nel test")
             continue
@@ -43,7 +61,9 @@ def main():
         else:
             falliti.append(nome)
             print("%-26s FALLITO" % nome)
-            print((esito.stdout + esito.stderr).strip()[-1200:])
+            coda = (esito.stdout + esito.stderr).strip()[-1200:]
+            print(coda)
+            annota_su_actions(nome, coda)
     print()
     print("%d suite, %d fallite%s" % (len(suite), len(falliti),
                                      ", %d saltate" % saltate if saltate else ""))
