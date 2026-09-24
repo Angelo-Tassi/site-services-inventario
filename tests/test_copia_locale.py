@@ -69,6 +69,32 @@ t.join(); timer.cancel()
 assert durata >= 0.3, "non ha aspettato il lock: %.2f s" % durata
 assert quanti3 == 14, quanti3
 
+# ---- su Windows un file aperto non si cancella: il rilascio del lucchetto
+# insiste invece di arrendersi. Prima, un lucchetto rimasto al suo posto
+# fermava tutti gli altri venti secondi a ogni salvataggio.
+import inventario.store as modulo_store
+vero_remove = modulo_store.os.remove
+rifiuti = {"n": 0}
+def remove_come_windows(percorso):
+    if percorso.endswith(".lock") and rifiuti["n"] < 3:
+        rifiuti["n"] += 1
+        raise PermissionError(13, "Il file e' in uso da un altro processo", percorso)
+    return vero_remove(percorso)
+modulo_store.os.remove = remove_come_windows
+try:
+    lucchetto = _Lock(store.path)
+    with lucchetto:
+        assert os.path.exists(lucchetto.path)
+    assert rifiuti["n"] == 3, "doveva essere rifiutato tre volte"
+    assert not os.path.exists(lucchetto.path), "il lucchetto e' rimasto al suo posto"
+finally:
+    modulo_store.os.remove = vero_remove
+# ...e chi viene dopo lo prende subito, senza aspettare
+inizio = time.time()
+with _Lock(store.path):
+    pass
+assert time.time() - inizio < 1, "il lucchetto era ancora occupato"
+
 # ---- la copia sta fuori dal programma e dalla share, dove l'ha chiesta l'utente
 assert not os.path.abspath(destinazione).startswith(os.path.dirname(percorso))
 assert not os.path.abspath(destinazione).startswith(os.path.abspath(config.app_dir()))

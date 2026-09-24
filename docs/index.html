@@ -237,6 +237,18 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           dove.</li>
         <li>Il modello da compilare, anche quello sul sito, ha la colonna nuova
           con la sua tendina, e cosi' i fogli di collaudo.</li>
+        <li><b>Trovata la causa dei "due caratteri".</b> La suite di test che
+          adesso gira su Windows l'ha presa: la finestra del prestito compare,
+          il fuoco va al campo del nome, ma un attimo dopo Windows attiva la
+          finestra e le da' il fuoco a lei, invece che al campo. I primi
+          caratteri entrano, gli altri vanno nel vuoto. Adesso ogni volta che il
+          fuoco arriva alla finestra in se' torna subito al campo.</li>
+        <li><b>E una causa possibile dei blocchi totali.</b> Il lucchetto che
+          impedisce a due tecnici di salvare nello stesso istante non veniva
+          rilasciato se in quel momento qualcun altro lo stava leggendo: su
+          Windows un file aperto non si cancella. Chi veniva dopo restava fermo
+          venti secondi, con la finestra che non rispondeva. Adesso il rilascio
+          insiste finche' ci riesce.</li>
       </ul>
     </div>
     <div class="rilascio">
@@ -585,6 +597,18 @@ python Inventario.py</pre>
           and asks where.</li>
         <li>The template to fill in, the one on the site too, has the new column
           with its dropdown, and so do the test sheets.</li>
+        <li><b>The cause of the "two characters" found.</b> The test suite now
+          running on Windows caught it: the loan window appears, focus goes to
+          the name field, but a moment later Windows activates the window and
+          gives the focus to the window itself instead of the field. The first
+          characters get in, the rest go nowhere. Now whenever focus lands on
+          the window itself it goes straight back to the field.</li>
+        <li><b>And a possible cause of the total freezes.</b> The lock that
+          stops two technicians saving at the same instant was not released if
+          someone else was reading it at that moment: on Windows an open file
+          cannot be deleted. Whoever came next was stuck twenty seconds, with the
+          window not responding. Now the release keeps trying until it
+          succeeds.</li>
       </ul>
     </div>
     <div class="rilascio">

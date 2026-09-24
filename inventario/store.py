@@ -234,6 +234,10 @@ def sembra_un_foglio_da_importare(path, rooms):
 
 LOCK_TIMEOUT = 20.0     # secondi di attesa prima di rinunciare
 LOCK_STALE_AFTER = 120  # secondi dopo i quali un lock e' considerato abbandonato
+# Rilascio del lucchetto: quante volte riprovare, e ogni quanto, se il sistema
+# rifiuta di cancellarlo perche' qualcuno lo tiene aperto in quel momento.
+LOCK_RILASCIO_TENTATIVI = 25
+LOCK_RILASCIO_PAUSA = 0.08
 
 
 class InventoryError(Exception):
@@ -663,7 +667,10 @@ class _Lock(object):
                 self.fd = None
                 return self
             except FileExistsError:
-                holder = self._holder()
+                # Chi tiene il lucchetto si legge SOLO per il messaggio finale,
+                # non a ogni giro: su Windows un file aperto, anche solo in
+                # lettura, non si puo' cancellare, e leggerlo a ripetizione
+                # impediva a chi aveva finito di rilasciarlo.
                 # L'eta' si misura sul file, non sul contenuto: subito dopo la
                 # creazione il file e' ancora vuoto e non va scambiato per
                 # abbandonato.
@@ -679,6 +686,7 @@ class _Lock(object):
                         pass
                     continue
                 if time.time() >= deadline:
+                    holder = self._holder()
                     raise LockBusy(
                         "L'inventario e' in uso da %s. Riprova tra qualche istante."
                         % (holder.get("utente") or "un altro utente")
@@ -690,10 +698,23 @@ class _Lock(object):
                 )
 
     def __exit__(self, *exc):
-        try:
-            os.remove(self.path)
-        except OSError:
-            pass
+        """Rilascia il lucchetto, insistendo se Windows lo tiene occupato.
+
+        Su Windows la cancellazione di un file aperto da un altro processo - un
+        altro tecnico che in quel momento lo sta leggendo, un antivirus, il
+        client della cartella di rete - fallisce. Arrendersi al primo rifiuto
+        lasciava il lucchetto al suo posto: tutti gli altri restavano fermi
+        venti secondi a ogni salvataggio, con la finestra che non rispondeva,
+        per i due minuti che servono a considerarlo abbandonato.
+        """
+        for tentativo in range(LOCK_RILASCIO_TENTATIVI):
+            try:
+                os.remove(self.path)
+                return False
+            except FileNotFoundError:
+                return False
+            except OSError:
+                time.sleep(LOCK_RILASCIO_PAUSA)
         return False
 
 

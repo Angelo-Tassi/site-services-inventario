@@ -65,6 +65,9 @@ def quando_pronta(azione, scadenza=None):
         pronta = (d.winfo_viewable() and app.grab_current() is d
                   and fuoco is not None and str(fuoco).startswith(str(d)))
     if pronta or time.time() > scadenza:
+        # un giro di eventi prima di agire: se il fuoco e' finito sulla
+        # finestra stessa, e' il momento in cui torna al campo
+        respira()
         azione()
     else:
         app.after(20, lambda: quando_pronta(azione, scadenza))
@@ -185,7 +188,12 @@ def dentro_il_prestito():
     try:
         campo = app.focus_get()
         esito["campo"] = campo
+        assert isinstance(campo, (tk.Entry, ttk.Entry)), "il fuoco non e' sul nome: %s" % campo
         scrivi(campo, "Ma")                 # due caratteri...
+        # ...e Windows attiva la finestra un attimo dopo che e' comparsa, dando
+        # il fuoco alla finestra stessa invece che al campo: e' il caso vero,
+        # quello dei "due caratteri e poi piu' niente"
+        d.focus_set(); respira()
         # ...e in quel momento un altro tecnico salva e scatta la ricarica
         altro.load()
         altro.add(new_item("IT-7778", "Laptop", "T14", "PF8", BAU))
@@ -193,7 +201,8 @@ def dentro_il_prestito():
         app._auto_refresh(); respira()
         esito["viva"] = d.winfo_exists()
         esito["fuoco_dopo"] = app.focus_get()
-        scrivi(campo, "rio Rossi")          # ...e si continua a scrivere
+        # ...e si continua a scrivere: i tasti vanno dove sta davvero il fuoco
+        scrivi(app.focus_get(), "rio Rossi")
         esito["nome"] = campo.get()
         esito["ricaricato"] = bool([i for i in app.store.items
                                     if i["asset_tag"] == "IT-7778"])

@@ -401,9 +401,43 @@ class _Modal(tk.Toplevel):
         # Chi costruisce la finestra puo' dire quale campo deve avere il fuoco
         # all'apertura; altrimenti e' il primo campo di testo che si trova.
         self.primo_campo = None
+        self._ultimo_campo = None
         self.protocol("WM_DELETE_WINDOW", self._cancel)
         self.bind("<Escape>", lambda e: self._cancel())
+        # Un legame sulla finestra vale anche per tutto quello che contiene:
+        # qui si vede ogni <FocusIn>, suo e dei suoi campi.
+        self.bind("<FocusIn>", self._fuoco_entrato, add="+")
         registro.nota("finestra +", classe=type(self).__name__)
+
+    def _fuoco_entrato(self, evento):
+        """Il fuoco resta sul campo, anche quando Windows lo da' alla finestra.
+
+        Su Windows la finestra viene attivata dal sistema un attimo DOPO essere
+        comparsa, e in quel momento il fuoco va alla finestra stessa invece che
+        al campo in cui si sta scrivendo. Chi comincia subito a scrivere vede
+        entrare i primi due o tre caratteri, poi piu' niente: i tasti arrivano
+        a una finestra che non li sa usare. Succede anche tornando alla
+        finestra con Alt+Tab. Qui, ogni volta che il fuoco arriva alla finestra
+        in se', lo si rimanda all'ultimo campo che l'aveva - o al primo.
+        """
+        if evento.widget is not self:
+            if e_un_campo_di_testo(evento.widget):
+                self._ultimo_campo = evento.widget
+            return
+        campo = self._ultimo_campo
+        if campo is None or not campo.winfo_exists():
+            campo = self._campo_da_mettere_a_fuoco()
+        if campo is not None and campo is not self:
+            registro.nota("fuoco rimandato", da=str(self), a=str(campo))
+
+            def rimanda():
+                # la finestra puo' essersi chiusa nel frattempo
+                try:
+                    if campo.winfo_exists():
+                        campo.focus_set()
+                except tk.TclError:
+                    pass
+            self.after_idle(rimanda)
 
     def _cancel(self):
         self.result = None
