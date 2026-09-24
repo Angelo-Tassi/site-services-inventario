@@ -33,8 +33,17 @@ from .lingua import T
 
 SHEET_NAME = "Inventario"
 
-FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
-          "stanza", "stato", "prestato_a", "prestato_il", "spedito_il", "note"]
+FIELDS = ["asset_tag", "tipo", "funzione", "modello", "seriale", "imei",
+          "restituito_da", "stanza", "stato", "prestato_a", "prestato_il",
+          "spedito_il", "note"]
+
+# A che cosa serve il dispositivo. Due valori soli, gli stessi in italiano e in
+# inglese. Il campo non e' obbligatorio: un dispositivo che non ce l'ha resta
+# vuoto - non si inventa - e un'importazione senza quella colonna passa lo
+# stesso. Gli iPhone non ce l'hanno: non sono postazioni da rinnovare.
+STANDARD = "Standard"
+PC_REFRESH = "PC Refresh"
+FUNZIONI = [STANDARD, PC_REFRESH]
 
 # Per un iPhone l'identita' e' l'IMEI, non l'asset tag aziendale.
 TIPO_IPHONE = "iphone"
@@ -74,6 +83,7 @@ ALL_FIELDS = FIELDS + AUDIT_FIELDS
 HEADERS = {
     "asset_tag": "Asset Tag",
     "tipo": "Tipo",
+    "funzione": "Asset Function",
     "modello": "Modello/Descrizione",
     "seriale": "Numero di serie",
     "imei": "IMEI",
@@ -92,6 +102,8 @@ HEADERS = {
 HEADER_ALIASES = {
     "asset_tag": ["asset tag", "assettag", "asset", "tag", "etichetta", "inventario"],
     "tipo": ["tipo", "tipologia", "categoria", "device type", "type"],
+    "funzione": ["asset function", "assetfunction", "funzione", "funzione asset",
+                 "function", "asset funzione", "uso"],
     "modello": ["modello", "model", "modello/descrizione", "model/description",
                 "descrizione", "description", "dispositivo", "device"],
     "seriale": ["numero di serie", "seriale", "serial", "serial number", "s/n",
@@ -453,12 +465,37 @@ def rinomina_tocca_gli_iphone(coppie):
     return None
 
 
+def funzione_canonica(valore):
+    """Standard, PC Refresh, oppure vuoto.
+
+    Si perdona il modo di scriverla - "pc refresh", "PC-REFRESH", "pcrefresh",
+    "refresh" - perche' e' il valore giusto scritto male. Un valore che non e'
+    nessuno dei due non si inventa: resta vuoto, e l'importazione lo dice.
+    """
+    testo = "".join(c for c in clean(valore).lower() if c.isalnum())
+    if not testo:
+        return ""
+    if testo in ("standard", "std"):
+        return STANDARD
+    if testo in ("pcrefresh", "refresh", "pcrefreshment"):
+        return PC_REFRESH
+    return ""
+
+
+def normalize_funzione(item):
+    """La funzione col suo nome ufficiale; niente funzione per gli iPhone."""
+    item["funzione"] = "" if is_iphone(item.get("tipo")) \
+        else funzione_canonica(item.get("funzione"))
+    return item
+
+
 def new_item(asset_tag="", tipo="", modello="", seriale="", stanza="", note="",
              prestato_a="", prestato_il="", imei="", restituito_da="", stato="",
-             spedito_il=""):
+             spedito_il="", funzione=""):
     item = {
         "asset_tag": norm_tag(asset_tag),
         "tipo": clean(tipo),
+        "funzione": clean(funzione),
         "modello": clean(modello),
         "seriale": clean(seriale),
         "imei": clean(imei),
@@ -472,7 +509,7 @@ def new_item(asset_tag="", tipo="", modello="", seriale="", stanza="", note="",
         "modificato_il": "",
         "modificato_da": "",
     }
-    return normalize_state(normalize_identity(item))
+    return normalize_funzione(normalize_state(normalize_identity(item)))
 
 
 def normalize_identity(item):
@@ -1969,6 +2006,85 @@ class InventoryStore(object):
 
         return self._apply(op)
 
+    def set_funzione(self, tag, funzione):
+        """Cambia la funzione di un dispositivo (tendina nell'elenco).
+
+        Non e' uno spostamento: si cambia anche a un dispositivo in prestito.
+        """
+        tag = norm_tag(tag)
+        funzione = funzione_canonica(funzione)
+        if not funzione:
+            raise InventoryError(T("Funzione non prevista: scegli fra %s.")
+                                 % ", ".join(FUNZIONI))
+
+        def op(items):
+            index = _index_of(items, tag)
+            if index is None:
+                raise InventoryError(T("Il dispositivo %s non esiste piu' nell'inventario.") % tag)
+            item = items[index]
+            if is_iphone(item.get("tipo")):
+                raise InventoryError(T("Gli iPhone non hanno una Asset Function."))
+            if item.get("funzione") == funzione:
+                return False
+            item["funzione"] = funzione
+            _stamp_item(item)
+            return True
+
+        return self._apply(op)
+
+    def anteprima_funzioni(self, valori):
+        """Che cosa cambierebbe aggiornando le Asset Function, senza scrivere.
+
+        `valori` e' {asset tag: funzione}. Ritorna un dizionario con i cambi
+        (tag, prima, dopo), quanti sono gia' uguali, gli iPhone saltati e gli
+        asset tag che nell'inventario non ci sono.
+        """
+        per_tag = dict((norm_tag(i["asset_tag"]), i) for i in self.load())
+        esito = {"cambi": [], "uguali": 0, "iphone": [], "assenti": []}
+        for tag, funzione in valori.items():
+            tag = norm_tag(tag)
+            funzione = funzione_canonica(funzione)
+            item = per_tag.get(tag)
+            if item is None:
+                esito["assenti"].append(tag)
+            elif is_iphone(item.get("tipo")):
+                esito["iphone"].append(tag)
+            elif not funzione:
+                continue
+            elif item.get("funzione") == funzione:
+                esito["uguali"] += 1
+            else:
+                esito["cambi"].append((tag, item.get("funzione") or "", funzione))
+        return esito
+
+    def aggiorna_funzioni(self, valori):
+        """Scrive la Asset Function dei dispositivi indicati, e solo quella.
+
+        Stanza, stato, prestito, note: niente altro si tocca, e nessun
+        dispositivo si sposta. Chi non e' in inventario qui si ignora - ad
+        aggiungerlo ci pensa chi chiama, con le regole di un'importazione. Gli
+        iPhone non hanno una funzione, e un valore che non e' ne' Standard ne'
+        PC Refresh non cancella quello che c'e'.
+
+        Ritorna l'elenco dei cambi fatti, (tag, prima, dopo).
+        """
+        voluti = dict((norm_tag(t), funzione_canonica(f)) for t, f in valori.items())
+
+        def op(items):
+            cambi = []
+            for item in items:
+                funzione = voluti.get(norm_tag(item["asset_tag"]))
+                if not funzione or is_iphone(item.get("tipo")):
+                    continue
+                if item.get("funzione") == funzione:
+                    continue
+                cambi.append((item["asset_tag"], item.get("funzione") or "", funzione))
+                item["funzione"] = funzione
+                _stamp_item(item)
+            return cambi
+
+        return self._apply(op)
+
     # Campi che si cambiano direttamente nell'elenco, senza aprire la scheda:
     # sono quelli che cambiano spesso e che si correggono guardando l'oggetto
     # che si ha in mano.
@@ -2440,7 +2556,98 @@ def _row_to_item(row, mapping):
             item[field] = norm_tag(row[idx]) if field == "asset_tag" else clean(row[idx])
     normalize_identity(item)
     normalize_state(item)
+    normalize_funzione(item)
     return item if item["asset_tag"] else None
+
+
+def _colonna_delle_funzioni(tutte, header, mapping):
+    """L'indice della colonna con le Asset Function, o None.
+
+    Prima per nome - Asset Function, Funzione, Function. Se nessuna colonna si
+    chiama cosi', si cerca quella che contiene SOLO Standard e PC Refresh: chi
+    prepara il foglio puo' averla chiamata in qualunque modo, ma quello che
+    c'e' dentro non lascia dubbi. Se ce n'e' piu' d'una, vince quella con piu'
+    valori.
+    """
+    for indice, campo in mapping.items():
+        if campo == "funzione":
+            return indice
+    identificativi = set(i for i, c in mapping.items() if c in ("asset_tag", "imei"))
+    dopo_la_testa = False
+    conteggi = {}
+    scartate = set()
+    for row in tutte:
+        if not dopo_la_testa:
+            if row is header:
+                dopo_la_testa = True
+            continue
+        if row is None:
+            continue
+        for indice, cella in enumerate(row):
+            if indice in identificativi or indice in scartate:
+                continue
+            testo = clean(cella)
+            if not testo:
+                continue
+            if funzione_canonica(testo):
+                conteggi[indice] = conteggi.get(indice, 0) + 1
+            else:
+                scartate.add(indice)
+    candidate = [(n, i) for i, n in conteggi.items() if i not in scartate]
+    return max(candidate)[1] if candidate else None
+
+
+def funzioni_da_workbook(path, rooms=None):
+    """I dispositivi di un foglio Excel, con la loro Asset Function.
+
+    Ritorna (items, esito) come rows_from_workbook, con in piu' in esito la
+    colonna da cui e' stata letta la funzione ("colonna_funzione", o None se
+    nel foglio non ce n'e' nessuna) e le righe con un valore che non e' ne'
+    Standard ne' PC Refresh.
+    """
+    items, esito = rows_from_workbook(path, rooms)
+    try:
+        wb = load_workbook(path, read_only=True, data_only=True)
+    except Exception as exc:
+        raise InventoryError(T("Impossibile leggere il file:\n%s") % exc)
+    valori, nomi = {}, []
+    try:
+        for ws in wb.worksheets:
+            tutte = list(ws.iter_rows(values_only=True))
+            header, mapping = _trova_intestazioni(iter(tutte))
+            if header is None:
+                continue
+            colonna = _colonna_delle_funzioni(tutte, header, mapping)
+            if colonna is None:
+                continue
+            nome = clean(header[colonna]) if colonna < len(header) else ""
+            if nome and nome not in nomi:
+                nomi.append(nome)
+            tag_col = next((i for i, c in mapping.items() if c == "asset_tag"),
+                           next((i for i, c in mapping.items() if c == "imei"), None))
+            if tag_col is None:
+                continue
+            dentro = False
+            for row in tutte:
+                if not dentro:
+                    dentro = row is header
+                    continue
+                if row is None or tag_col >= len(row) or colonna >= len(row):
+                    continue
+                tag = norm_tag(row[tag_col])
+                if tag:
+                    valori[tag] = clean(row[colonna])
+    finally:
+        wb.close()
+    esito["colonna_funzione"] = ", ".join(nomi) or None
+    for item in items:
+        if item["asset_tag"] in valori:
+            item["funzione"] = "" if is_iphone(item.get("tipo")) \
+                else funzione_canonica(valori[item["asset_tag"]])
+    esito["funzione_sconosciuta"] = [
+        "%s: %s" % (tag, grezzo) for tag, grezzo in valori.items()
+        if grezzo and not funzione_canonica(grezzo)]
+    return items, esito
 
 
 # Un file da cui si eliminano dispositivi non ha bisogno di essere un
@@ -2524,7 +2731,8 @@ def rows_from_workbook(path, rooms=None):
         tags = tag_stanze(rooms or [])
         items = []
         esito = {"scartate": 0, "da_tag": 0, "iphone": 0, "senza_modello": 0,
-                 "stanze_trovate": [], "colonne_ignorate": [], "doppioni": []}
+                 "stanze_trovate": [], "colonne_ignorate": [], "doppioni": [],
+                 "funzione_sconosciuta": []}
         visti = set()
         letto = False
 
@@ -2561,6 +2769,15 @@ def rows_from_workbook(path, rooms=None):
                 if not item:
                     esito["scartate"] += 1
                     continue
+                # la funzione non e' obbligatoria; ma se c'era scritto qualcosa
+                # che non e' ne' Standard ne' PC Refresh, e' rimasta vuota, e
+                # chi importa deve saperlo
+                colonna = next((i for i, c in mapping.items() if c == "funzione"), None)
+                if colonna is not None and colonna < len(row) and clean(row[colonna]) \
+                        and not item.get("funzione") \
+                        and not is_iphone(item.get("tipo")):
+                    esito["funzione_sconosciuta"].append(
+                        "%s: %s" % (item["asset_tag"], clean(row[colonna])))
                 if is_iphone(item.get("tipo")):
                     esito["iphone"] += 1
                     continue

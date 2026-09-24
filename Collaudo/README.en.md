@@ -713,6 +713,56 @@ the keyboard responds at once in the list.
 
 ---
 
+## 23. The Asset Function column
+
+1. on the home screen, the **Asset Function** column sits just to the right of
+   *Type* and before *Room*. Devices that were there before this version have it
+   **empty**: the program does not make it up;
+2. **double-click** a cell of the column: a dropdown opens with **Standard** and
+   **PC Refresh**. Pick one: the row updates. Try it on a device **on loan** in
+   the Digital Kiosk too: it changes, because it is not a move;
+3. **Add** a laptop: the record has the Asset Function, just before *Room*, and
+   it starts from **Standard**. Add an **iPhone**: the field is not there;
+4. open the **Iphone** container: the column does not show;
+5. **Export xls...** in all three shapes, and try **Print**: the column is
+   always there, between *Type* and *Room*, even for devices that have it empty;
+6. import `Inventario_di_prova.xlsx`: it now has the column, with two devices
+   per room in *PC Refresh* and one left empty. They come in with their values;
+7. import a sheet of yours **without** the column: it imports as before, with no
+   warnings. Then `Inventario_di_prova_con_difetti.xlsx`: the summary flags row
+   `IT-KSK-903`, which has *Ricondizionato* - neither Standard nor PC Refresh -
+   and imports it all the same, with the field empty.
+
+**What must happen:** the column is everywhere except on iPhones, and no import
+requires it.
+
+## 24. Importing the Asset Functions from a sheet
+
+Prepare a sheet with three columns: *Asset Tag*, a column you call whatever you
+like - say `Programma 2026` - holding **only** Standard and PC Refresh, and
+*Room*. Put two asset tags **already in the inventory**, writing next to them a
+room **different** from the one they are in, and two **new** asset tags: one
+with the room, one without.
+
+1. **Settings**, **Asset Function** box, **Import Asset Function from an Excel
+   sheet...**, and choose the sheet;
+2. for the new device with no room the question opens: it must say they are
+   **new**, **not in the inventory yet**, with the **code**, and ask which room
+   to add them to. Pick one;
+3. the summary must say it read the column `Programma 2026`, list the functions
+   **to update** (from what to what) and the devices **to add**, room by room.
+   Confirm;
+4. the two devices that were there have the new function and **are still in
+   their old room**: the room written in the sheet did not move them;
+5. the two new ones are there: one in the sheet's room, the other in the one you
+   picked;
+6. repeat the same import: it must say there is **nothing to update**.
+
+**What must happen:** only the function is written, no device already there
+moves, and the missing ones are added knowing they are new.
+
+---
+
 ## Way A - reset, then import
 
 Use this if you want to see the inventory empty before loading.

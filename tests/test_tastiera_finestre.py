@@ -46,6 +46,29 @@ def finestra_aperta():
             if isinstance(w, _Modal) and w.winfo_exists()]
     return vive[-1] if vive else None
 
+def quando_pronta(azione, scadenza=None):
+    """Esegue `azione` appena la finestra modale e' davvero pronta.
+
+    Pronta vuol dire quello che vede un utente: a schermo, con la presa e con
+    il fuoco dentro. Un timer fisso non basta - sotto carico scatta mentre la
+    finestra sta ancora comparendo, e la prova osserverebbe uno stato che
+    nessuno puo' vedere, perche' la finestra non e' ancora a schermo.
+    """
+    scadenza = scadenza or time.time() + 10
+    d = finestra_aperta()
+    pronta = False
+    if d is not None:
+        try:
+            fuoco = app.focus_get()
+        except KeyError:
+            fuoco = None
+        pronta = (d.winfo_viewable() and app.grab_current() is d
+                  and fuoco is not None and str(fuoco).startswith(str(d)))
+    if pronta or time.time() > scadenza:
+        azione()
+    else:
+        app.after(20, lambda: quando_pronta(azione, scadenza))
+
 def scrivi(campo, testo):
     for lettera in testo:
         campo.event_generate("<KeyPress>", keysym="space" if lettera == " " else lettera)
@@ -95,7 +118,7 @@ def prova(nome, apri, campo_atteso=None, quanti=len(VENTI)):
             if d.winfo_exists():
                 d.destroy()
 
-    app.after(200, dentro)
+    app.after(20, lambda: quando_pronta(dentro))
     apri()
     respira()
     d = esito.get("finestra")
@@ -178,7 +201,7 @@ def dentro_il_prestito():
         if d.winfo_exists():
             d.destroy()
 
-app.after(200, dentro_il_prestito)
+app.after(20, lambda: quando_pronta(dentro_il_prestito))
 app._on_row_button(tag)          # rimandato con after_idle: parte dall'update
 respira()
 assert esito.get("finestra") is not None, "la finestra del prestito non si e' aperta"

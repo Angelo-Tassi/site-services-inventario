@@ -34,8 +34,8 @@ def intestazioni(file_prodotto):
         wb.close()
 
 # ---- un file esportato dice che cosa abbiamo, dove sta e che cosa c'e' da
-# sapere. Stesse quattro colonne ovunque.
-ATTESE = ["Asset Tag", "Tipo", "Stanza", "Note"]
+# sapere. Stesse colonne ovunque - e la Asset Function sempre, anche vuota.
+ATTESE = ["Asset Tag", "Tipo", "Asset Function", "Stanza", "Note"]
 colonne = intestazioni(excel_io.export(items, os.path.join(fuori, "tutto.xlsx"),
                                        rooms=[BAU, KIOSK, DR]))
 assert colonne == ATTESE, colonne

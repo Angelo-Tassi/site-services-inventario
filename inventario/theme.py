@@ -63,6 +63,7 @@ COLORE_COLONNA = {
     "imei": "#1F4E79",
     "seriale": "#5B8DB8",
     "tipo": "#16A085",            # che cos'e': verde
+    "funzione": "#16A085",        # a che cosa serve: e' ancora "che cos'e'"
     "modello": "#16A085",
     "stanza": "#8E44AD",          # dov'e': viola
     "stato": "#C0392B",           # come sta: rosso

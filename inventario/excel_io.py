@@ -11,14 +11,15 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-from .store import (ALL_FIELDS, HEADERS, InventoryError, NON_DISPONIBILE,
-                    SPEDITO, STATI, clean, is_iphone, larghezza_colonna,
-                    valore_visibile)
+from .store import (ALL_FIELDS, FUNZIONI, HEADERS, InventoryError,
+                    NON_DISPONIBILE, SPEDITO, STATI, clean, is_iphone,
+                    larghezza_colonna, valore_visibile)
 from .lingua import T, intestazione, stato as traduci_stato
 
-PRINT_FIELDS = ["asset_tag", "tipo", "modello", "seriale", "imei", "restituito_da",
-                "stanza", "stato", "prestato_a", "prestato_il", "spedito_il", "note"]
-PRINT_WIDTHS = {"asset_tag": 16, "tipo": 10, "modello": 26, "seriale": 16,
+PRINT_FIELDS = ["asset_tag", "tipo", "funzione", "modello", "seriale", "imei",
+                "restituito_da", "stanza", "stato", "prestato_a", "prestato_il",
+                "spedito_il", "note"]
+PRINT_WIDTHS = {"asset_tag": 16, "tipo": 10, "funzione": 14, "modello": 26, "seriale": 16,
                 "imei": 18, "restituito_da": 20, "stanza": 22, "stato": 24,
                 "prestato_a": 20, "prestato_il": 15, "spedito_il": 15, "note": 24,
                 "modificato_il": 18, "modificato_da": 24}
@@ -119,7 +120,8 @@ def _sottotitolo(stamp, quanti, lingua):
 
 # Le colonne portanti di un inventario: ci sono sempre, anche vuote, perche'
 # danno al file la forma che chi lo apre - o chi lo reimporta - si aspetta.
-CAMPI_PORTANTI = ["asset_tag", "tipo", "modello", "seriale", "stanza", "stato", "note"]
+CAMPI_PORTANTI = ["asset_tag", "tipo", "funzione", "modello", "seriale", "stanza",
+                  "stato", "note"]
 
 # Un file esportato dice che cosa abbiamo, dove sta e che cosa c'e' da sapere:
 # le note viaggiano con il dispositivo, perche' sono quello che una riga ha di
@@ -129,7 +131,7 @@ CAMPI_PORTANTI = ["asset_tag", "tipo", "modello", "seriale", "stanza", "stato", 
 #
 # Attenzione: da un'esportazione non si ricostruisce un inventario, perche' quei
 # campi non ci sono. Per quello c'e' la copia locale, che copia il file vero.
-CAMPI_ESPORTAZIONE = ["asset_tag", "tipo", "stanza", "note"]
+CAMPI_ESPORTAZIONE = ["asset_tag", "tipo", "funzione", "stanza", "note"]
 
 
 def campi_con_valore(items, fields):
@@ -264,6 +266,7 @@ TEMPLATE_FIELDS = list(CAMPI_ESPORTAZIONE)
 TEMPLATE_ESEMPI = {
     "asset_tag": "IT-0000",
     "tipo": "Laptop",
+    "funzione": "PC Refresh",
     "stanza": "Magazzino Disaster Recovery",
     "note": "Batteria da sostituire, rientro dal reparto",
     "stato": "Guasto in attesa tecnico",
@@ -294,6 +297,8 @@ ISTRUZIONI_IT = [
     ("  importata, e il programma dice in che stanza sta quello che c'e'.", False),
     ("  Il resto della scheda puo' variare, non viene guardato.", False),
     ("- Tipo e Stanza hanno la tendina: usa i valori proposti.", False),
+    ("- Asset Function: Standard o PC Refresh, dalla tendina. Non e'", False),
+    ("  obbligatoria: si puo' lasciare vuota, e l'importazione va avanti.", False),
     ("- La stanza si puo' anche non scriverla: la dicono i separatori.", False),
     ("- Un dispositivo senza stanza non entra in inventario. Se il foglio", False),
     ("  non la dice, il programma la chiede prima di importare: tutti in", False),
@@ -343,6 +348,8 @@ ISTRUZIONI_EN = [
     ("  imported, and the program says which room the existing one is in.", False),
     ("  The rest of the record may vary, it is not looked at.", False),
     ("- Type and Room have dropdowns: use the values offered.", False),
+    ("- Asset Function: Standard or PC Refresh, from the dropdown. It is", False),
+    ("  optional: you can leave it empty, and the import goes ahead.", False),
     ("- You can leave the room empty: the separators declare it.", False),
     ("- A device with no room does not get into the inventory. If the", False),
     ("  sheet does not say it, the program asks before importing: all in", False),
@@ -427,6 +434,21 @@ def build_template(path, rooms, stati=None, lingua=None):
     ws.add_data_validation(tipi)
     colonna_tipo = get_column_letter(TEMPLATE_FIELDS.index("tipo") + 1)
     tipi.add("%s2:%s%d" % (colonna_tipo, colonna_tipo, ultima))
+
+    # la funzione ha la sua tendina, ma si puo' lasciare vuota: non e'
+    # obbligatoria, e un foglio senza non viene rifiutato
+    if "funzione" in TEMPLATE_FIELDS:
+        funzioni = DataValidation(type="list", formula1='"%s"' % ",".join(FUNZIONI),
+                                  allow_blank=True, showDropDown=False)
+        if lingua == "en":
+            funzioni.error = "Choose Standard or PC Refresh, or leave it empty."
+            funzioni.errorTitle = "Invalid Asset Function"
+        else:
+            funzioni.error = "Scegli Standard o PC Refresh, o lasciala vuota."
+            funzioni.errorTitle = "Asset Function non valida"
+        ws.add_data_validation(funzioni)
+        colonna_funzione = get_column_letter(TEMPLATE_FIELDS.index("funzione") + 1)
+        funzioni.add("%s2:%s%d" % (colonna_funzione, colonna_funzione, ultima))
 
     stati_mostrati = [traduci_stato(v, lingua) for v in stati]
     scelte = DataValidation(type="list", formula1='"%s"' % ",".join(stati_mostrati),

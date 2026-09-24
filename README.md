@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.5.8).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5.9).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -717,8 +717,8 @@ colonna vuota per costruzione non porta informazione: toglie spazio a quello che
 si deve leggere.
 
 L'**inventario completo in home** e' una panoramica: dice che cos'e' un
-dispositivo, dov'e', come sta e da quando - asset tag, tipo, stanza, note,
-stato, ultima modifica, modificato da - in una riga che si legge senza scorrere
+dispositivo, dov'e', come sta e da quando - asset tag, tipo, Asset Function,
+stanza, note, stato, ultima modifica, modificato da - in una riga che si legge senza scorrere
 di lato. **Modello/Descrizione e numero di serie non ci sono**: si leggono
 davanti all'oggetto che si ha in mano, cioe' dentro la stanza. Le altre domande
 in panoramica le riassume lo stato: *In prestito*, *Spedito al servizio
@@ -730,7 +730,7 @@ telefonia*.
 | **Site Services BAU** | Stanza, In prestito a, Prestato il |
 | **Digital Kiosk** | Stanza, IMEI, Restituito da, Spedito il |
 | **Magazzino Disaster Recovery** | Stanza, prestiti e campi degli iPhone |
-| **Contenitore Iphone** | Asset tag, seriale, prestiti, stanza e tipo |
+| **Contenitore Iphone** | Asset tag, seriale, prestiti, stanza, tipo e Asset Function |
 
 Ogni colonna e' **larga quanto serve** a mostrare per intero quello che contiene:
 niente testo tagliato, niente colonne da allargare a mano. Una colonna vuota resta
@@ -756,8 +756,31 @@ un'altra stanza dalle impostazioni, le due colonne compaiono li'.
 ### La stessa regola nei file che escono
 
 Un file esportato dice **che cosa abbiamo, dove sta e che cosa c'e' da sapere**.
-Quattro colonne: asset tag, tipo, stanza, note - le note viaggiano con il
-dispositivo, perche' sono quello che una riga ha di particolare.
+Cinque colonne: asset tag, tipo, **Asset Function**, stanza, note - le note
+viaggiano con il dispositivo, perche' sono quello che una riga ha di particolare.
+La Asset Function esce **sempre**, da ogni esportazione e dalla stampa, anche
+quando per qualche dispositivo e' vuota.
+
+### La Asset Function
+
+Dice **a che cosa serve il dispositivo**, con due valori soli: **Standard** e
+**PC Refresh**. Sta nell'elenco subito a destra di *Tipo* e prima di *Stanza*,
+nello stesso ordine in cui esce nei file.
+
+- si sceglie dalla **tendina** nella scheda del dispositivo, oppure con un
+  **doppio clic sulla cella**, direttamente nell'elenco; si cambia anche a un
+  dispositivo in prestito, perche' non e' uno spostamento;
+- un dispositivo **nuovo** parte da *Standard*; uno che c'era gia' prima di
+  questa colonna resta **vuoto** finche' qualcuno non la sceglie: il programma
+  non la inventa;
+- **non e' obbligatoria in nessuna importazione**: un foglio senza quella
+  colonna si importa come prima, e i dispositivi entrano con il campo vuoto. Se
+  la colonna c'e', il nome si riconosce anche come *Funzione* o *Function*, e il
+  valore anche scritto male - `pc refresh`, `PC-REFRESH`, `refresh`. Un valore
+  che non e' nessuno dei due resta vuoto, e il riepilogo prima di importare lo
+  dice riga per riga;
+- gli **iPhone** non ce l'hanno: nel loro contenitore la colonna non compare.
+  Anche il **modello da compilare** ha la colonna, con la sua tendina.
 
 Stato, modello, numero di serie, prestiti, IMEI, spedizioni e ultima modifica
 restano fuori: servono a chi lavora davanti all'elenco, dentro la stanza che li
@@ -876,6 +899,31 @@ da un file locale...** (una copia che ti sei salvato tu, anche fuori dalla rete)
 e **Reset inventario**. I primi tre erano nella barra
 in alto; si usano di rado e li' rubavano spazio ai comandi di tutti i giorni,
 fino a spingerli fuori dallo schermo sui monitor piu' stretti.
+
+### Importare le Asset Function da un foglio
+
+Sotto, nel riquadro **Asset Function**, c'e' **Importa Asset Function da foglio
+Excel...**. Serve quando la classificazione Standard / PC Refresh arriva da
+fuori - un elenco del programma di rinnovo, per esempio - e va riportata
+sull'inventario che c'e' gia'.
+
+- nel foglio servono l'**Asset Tag** e la funzione. La colonna della funzione si
+  trova **per nome** (*Asset Function*, *Funzione*, *Function*) oppure, se si
+  chiama in un altro modo, **per contenuto**: vale qualsiasi colonna che contiene
+  **solo** Standard e PC Refresh. Il riepilogo dice da quale colonna ha letto;
+- dei dispositivi **gia' in inventario** si scrive la funzione **e nient'altro**:
+  la stanza non cambia, nessuno si sposta, stato, note e prestito restano
+  com'erano - anche se nel foglio c'e' scritta un'altra stanza;
+- i dispositivi del foglio che **nell'inventario non ci sono** si **aggiungono**,
+  con le regole di un'importazione: se il foglio dice la stanza entrano li', se
+  non la dice il programma **dice che sono nuovi, elenca i codici e chiede in
+  che stanza aggiungerli** - tutti nella stessa, o uno per uno;
+- prima di scrivere si vede tutto: quali funzioni cambiano (da che cosa a che
+  cosa), quante sono gia' uguali, quali dispositivi si aggiungono e dove, i
+  valori non riconosciuti. Si conferma, e prima di toccare niente viene salvata
+  una **copia di sicurezza**;
+- un valore che non e' ne' Standard ne' PC Refresh **non cancella** quello che
+  c'e'; gli iPhone si saltano, perche' non hanno una funzione.
 
 ### La barra dei comandi va a capo
 

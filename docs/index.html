@@ -191,7 +191,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 1.0.0-beta.5.8 · beta</div>
+  <div class="alpha">versione 1.0.0-beta.5.9 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -217,6 +217,28 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.9</h3>
+      <p class="quando">24 settembre 2026</p>
+      <ul>
+        <li><b>La colonna Asset Function.</b> Due valori, <b>Standard</b> e
+          <b>PC Refresh</b>, subito a destra di Tipo e prima di Stanza. Si
+          sceglie dalla scheda o con un doppio clic sulla cella; esce da tutte
+          le esportazioni e dalla stampa; <b>nessuna importazione la
+          pretende</b> - un foglio senza la colonna si importa come prima. I
+          dispositivi che c'erano gia' l'hanno vuota: non si inventa. Gli iPhone
+          non ce l'hanno.</li>
+        <li><b>Importa Asset Function da foglio Excel</b>, in Impostazioni.
+          Legge l'Asset Tag e la funzione - la colonna si trova per nome, o come
+          quella che contiene solo Standard e PC Refresh - e la scrive sui
+          dispositivi gia' in inventario <b>senza spostarli ne' toccare
+          altro</b>. Quelli che mancano si aggiungono: se il foglio non dice la
+          stanza, il programma dice che sono nuovi, con i codici, e chiede
+          dove.</li>
+        <li>Il modello da compilare, anche quello sul sito, ha la colonna nuova
+          con la sua tendina, e cosi' i fogli di collaudo.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.8</h3>
       <p class="quando">22 settembre 2026</p>
@@ -298,32 +320,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           nell'archivio, dove c'era gia' quella dei prestiti.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.5</h3>
-      <p class="quando">4 settembre 2026</p>
-      <ul>
-        <li><b>La stanza fantasma rientrava dal cestino.</b> Un record eliminato
-          si porta dietro il nome della stanza che aveva. Se quella stanza
-          veniva <b>rinominata</b>, il ripristino rimetteva il dispositivo in
-          una stanza che non esiste piu' e spariva da tutte le schede: adesso la
-          voce nel cestino segue la rinomina. Se la stanza veniva <b>tolta</b>,
-          il programma chiede dove rimetterlo, come per un orfano.</li>
-        <li><b>Un ripristino da una copia poteva lasciare un dispositivo in due
-          posti.</b> Tornando a una copia presa quando il dispositivo c'era
-          ancora, quello rientrava in inventario ma la sua voce restava nel
-          cestino - e da li' se ne poteva "ripristinare" una seconda copia.
-          Adesso esce dal cestino, e il messaggio finale lo dice. Le copie si
-          portano dietro il cestino anche quando e' vuoto, cosi' il ripristino
-          lo riporta davvero com'era.</li>
-        <li><b>Inserimento e modifica rifiutano una stanza che non esiste.</b>
-          Dalla finestra non poteva succedere - la stanza si sceglie da una
-          tendina - ma adesso la regola vale per chiunque scriva
-          nell'archivio.</li>
-        <li>Le <b>schermate</b> sulla pagina del progetto rifanno l'interfaccia
-          di adesso: numero di versione, tendina della lingua, riga dei filtri e
-          barra di stato in fondo.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -365,7 +361,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
     <div class="bar"><span class="dot"></span><span>Site Services : Inventario Iphone, Laptop e Tablet</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : Inventario Iphone, Laptop e Tablet</b>
-        <div class="ver">v1.0.0-beta.5.8</div>
+        <div class="ver">v1.0.0-beta.5.9</div>
         <div class="s">Laptop e tablet in nostro possesso</div></div>
       <div class="dx">
         <span class="lin">Lingua <span class="sel">Italiano <s>▼</s></span></span>
@@ -421,15 +417,15 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
       </div>
       <div class="tw">
         <table>
-          <thead><tr><th></th><th>Asset Tag</th><th>Tipo</th><th>Stanza</th>
+          <thead><tr><th></th><th>Asset Tag</th><th>Tipo</th><th>Asset Function</th><th>Stanza</th>
             <th>Note</th><th>Stato</th><th>Ultima modifica</th><th>Modificato da</th></tr></thead>
           <tbody>
-            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Postazione reception</td><td>Disponibile</td><td>02/09/2026 18:12</td><td class="mono">a.tassi</td></tr>
-            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Restituito da M. Bianchi</td><td>Da Rispedire</td><td>02/09/2026 17:40</td><td class="mono">a.tassi</td></tr>
-            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>Con tastiera e pennino</td><td>Controllare</td><td>01/09/2026 09:05</td><td class="mono">m.rossi</td></tr>
-            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>—</td><td>In prestito</td><td>02/09/2026 11:23</td><td class="mono">a.tassi</td></tr>
-            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Rispedito il 28/08/2026</td><td>Spedito al servizio telefonia</td><td>28/08/2026 16:02</td><td class="mono">m.rossi</td></tr>
-            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>Scorta sigillata</td><td>Da rebuildare</td><td>30/08/2026 08:47</td><td class="mono">a.tassi</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Standard</td><td>Site Services BAU</td><td>Postazione reception</td><td>Disponibile</td><td>02/09/2026 18:12</td><td class="mono">a.tassi</td></tr>
+            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td></td><td>Site Services BAU</td><td>Restituito da M. Bianchi</td><td>Da Rispedire</td><td>02/09/2026 17:40</td><td class="mono">a.tassi</td></tr>
+            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>PC Refresh</td><td>Site Services BAU</td><td>Con tastiera e pennino</td><td>Controllare</td><td>01/09/2026 09:05</td><td class="mono">m.rossi</td></tr>
+            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Standard</td><td>Digital Kiosk</td><td>—</td><td>In prestito</td><td>02/09/2026 11:23</td><td class="mono">a.tassi</td></tr>
+            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td></td><td>Site Services BAU</td><td>Rispedito il 28/08/2026</td><td>Spedito al servizio telefonia</td><td>28/08/2026 16:02</td><td class="mono">m.rossi</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>PC Refresh</td><td>Magazzino DR</td><td>Scorta sigillata</td><td>Da rebuildare</td><td>30/08/2026 08:47</td><td class="mono">a.tassi</td></tr>
           </tbody>
         </table>
       </div>
@@ -544,7 +540,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 1.0.0-beta.5.8 · beta</div>
+  <div class="alpha">version 1.0.0-beta.5.9 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -570,6 +566,27 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.9</h3>
+      <p class="quando">24 September 2026</p>
+      <ul>
+        <li><b>The Asset Function column.</b> Two values, <b>Standard</b> and
+          <b>PC Refresh</b>, just to the right of Type and before Room. It is
+          picked from the record or with a double-click on the cell; it comes
+          out of every export and of printing; <b>no import requires it</b> - a
+          sheet without the column imports as before. Devices already there
+          have it empty: it is not made up. iPhones do not have it.</li>
+        <li><b>Import Asset Function from an Excel sheet</b>, in Settings. It
+          reads the Asset Tag and the function - the column is found by name,
+          or as the one holding only Standard and PC Refresh - and writes it on
+          the devices already in the inventory <b>without moving them or
+          touching anything else</b>. The missing ones are added: if the sheet
+          does not say the room, the program says they are new, with the codes,
+          and asks where.</li>
+        <li>The template to fill in, the one on the site too, has the new column
+          with its dropdown, and so do the test sheets.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.8</h3>
       <p class="quando">22 September 2026</p>
@@ -650,30 +667,6 @@ python Inventario.py</pre>
           next to the one for loans that was already there.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.5</h3>
-      <p class="quando">4 September 2026</p>
-      <ul>
-        <li><b>The ghost room was coming back through the bin.</b> A deleted
-          record carries the name of the room it had. If that room was
-          <b>renamed</b>, the restore put the device into a room that no longer
-          exists and it vanished from every card: now the bin entry follows the
-          rename. If the room was <b>removed</b>, the program asks where to put
-          it, as for an orphan.</li>
-        <li><b>A restore from a copy could leave a device in two places.</b>
-          Going back to a copy taken while the device was still there put it
-          back into the inventory, but its entry stayed in the bin - and from
-          there a second copy could be "restored". Now it leaves the bin, and
-          the final message says so. Copies carry the bin even when it is empty,
-          so a restore really puts it back as it was.</li>
-        <li><b>Adding and editing refuse a room that does not exist.</b> It could
-          not happen from the window - the room is picked from a dropdown - but
-          the rule now holds for anyone writing into the store.</li>
-        <li>The <b>screenshots</b> on the project page redraw the interface as it
-          is now: version number, language dropdown, filter row and the status
-          bar at the bottom.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -714,7 +707,7 @@ python Inventario.py</pre>
     <div class="bar"><span class="dot"></span><span>Site Services : iPhone, Laptop and Tablet Inventory</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : iPhone, Laptop and Tablet Inventory</b>
-        <div class="ver">v1.0.0-beta.5.8</div>
+        <div class="ver">v1.0.0-beta.5.9</div>
         <div class="s">Laptops and tablets we hold</div></div>
       <div class="dx">
         <span class="lin">Language <span class="sel">English <s>▼</s></span></span>
@@ -770,15 +763,15 @@ python Inventario.py</pre>
       </div>
       <div class="tw">
         <table>
-          <thead><tr><th></th><th>Asset Tag</th><th>Type</th><th>Room</th>
+          <thead><tr><th></th><th>Asset Tag</th><th>Type</th><th>Asset Function</th><th>Room</th>
             <th>Notes</th><th>Status</th><th>Last change</th><th>Changed by</th></tr></thead>
           <tbody>
-            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Site Services BAU</td><td>Reception desk</td><td>Available</td><td>02/09/2026 18:12</td><td class="mono">a.tassi</td></tr>
-            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Returned by M. Bianchi</td><td>To be shipped back</td><td>02/09/2026 17:40</td><td class="mono">a.tassi</td></tr>
-            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>Site Services BAU</td><td>With keyboard and stylus</td><td>To be checked</td><td>01/09/2026 09:05</td><td class="mono">m.rossi</td></tr>
-            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Digital Kiosk</td><td>—</td><td>On loan</td><td>02/09/2026 11:23</td><td class="mono">a.tassi</td></tr>
-            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td>Site Services BAU</td><td>Shipped on 28/08/2026</td><td>Shipped to the phone service</td><td>28/08/2026 16:02</td><td class="mono">m.rossi</td></tr>
-            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>Magazzino DR</td><td>Sealed spare</td><td>To be rebuilt</td><td>30/08/2026 08:47</td><td class="mono">a.tassi</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">IT-0101</td><td>Laptop</td><td>Standard</td><td>Site Services BAU</td><td>Reception desk</td><td>Available</td><td>02/09/2026 18:12</td><td class="mono">a.tassi</td></tr>
+            <tr class="ip"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td></td><td>Site Services BAU</td><td>Returned by M. Bianchi</td><td>To be shipped back</td><td>02/09/2026 17:40</td><td class="mono">a.tassi</td></tr>
+            <tr class="tb2"><td class="sel">◉</td><td class="mono">IT-0104</td><td>Tablet</td><td>PC Refresh</td><td>Site Services BAU</td><td>With keyboard and stylus</td><td>To be checked</td><td>01/09/2026 09:05</td><td class="mono">m.rossi</td></tr>
+            <tr class="ln"><td class="sel">◯</td><td class="mono">IT-0107</td><td>Laptop</td><td>Standard</td><td>Digital Kiosk</td><td>—</td><td>On loan</td><td>02/09/2026 11:23</td><td class="mono">a.tassi</td></tr>
+            <tr class="sp"><td class="sel">◯</td><td class="mono">—</td><td>Iphone</td><td></td><td>Site Services BAU</td><td>Shipped on 28/08/2026</td><td>Shipped to the phone service</td><td>28/08/2026 16:02</td><td class="mono">m.rossi</td></tr>
+            <tr><td class="sel">◯</td><td class="mono">DR-0201</td><td>Laptop</td><td>PC Refresh</td><td>Magazzino DR</td><td>Sealed spare</td><td>To be rebuilt</td><td>30/08/2026 08:47</td><td class="mono">a.tassi</td></tr>
           </tbody>
         </table>
       </div>

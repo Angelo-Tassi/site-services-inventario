@@ -305,6 +305,7 @@ table{min-width:520px}
     <tr><td><span class="k rosso">Ripristina da una copia…</span></td><td class="d">Riporta l'inventario a una delle copie automatiche sulla rete, scelta dall'elenco. Vedi <a href="#ripristino">Tornare indietro</a>.</td></tr>
     <tr><td><span class="k rosso">Ripristina da un file locale…</span></td><td class="d">Riparte da una copia salvata fuori dalla rete: tornano dispositivi <b>e</b> impostazioni, stanze comprese. E' la via d'uscita se la cartella di rete non c'e' piu'.</td></tr>
     <tr><td><span class="k rosso">Reset inventario</span></td><td class="d">Svuota l'inventario. Chiede di scrivere <span class="mono">ELIMINA TUTTO</span> e salva prima una copia. Gli iPhone non si toccano mai.</td></tr>
+    <tr><td><span class="k arancio">Importa Asset Function da foglio Excel…</span></td><td class="d">Legge da un foglio l'<b>Asset Tag</b> e la funzione - la colonna si trova per nome, o come quella che contiene <b>solo</b> Standard e PC Refresh - e la scrive sui dispositivi gia' in inventario <b>senza spostarli ne' toccare altro</b>. Quelli che mancano si aggiungono: se il foglio non dice la stanza, il programma dice che sono nuovi e chiede dove. Prima si vede tutto, e si salva una copia.</td></tr>
   </table></div>
   <p class="note">Se la finestra e' stretta, la barra dei comandi va a capo su due righe:
     nessun pulsante viene lasciato fuori. Allargandola torna su una riga sola.</p>
@@ -338,15 +339,29 @@ table{min-width:520px}
     <i>In prestito</i>, <i>Spedito al servizio telefonia</i>.</p>
   <div class="tw"><table class="man">
     <tr><th>Dove sei</th><th>Che cosa vedi</th><th>Che cosa sparisce</th></tr>
-    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, tipo, stanza, note, stato, ultima modifica, modificato da. Sette colonne per dire che cos'e', dov'e', come sta e da quando.</td><td class="d">Tutto il resto: Modello/Descrizione e numero di serie, che si leggono davanti all'oggetto; IMEI, chi ha il prestito e da quando, chi ha restituito, quando e' stato spedito.</td></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, tipo, Asset Function, stanza, note, stato, ultima modifica, modificato da. Otto colonne per dire che cos'e', a che cosa serve, dov'e', come sta e da quando.</td><td class="d">Tutto il resto: Modello/Descrizione e numero di serie, che si leggono davanti all'oggetto; IMEI, chi ha il prestito e da quando, chi ha restituito, quando e' stato spedito.</td></tr>
     <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Restituito da e Spedito il, perche' li' stanno i telefoni.</td><td class="d">Stanza, In prestito a, Prestato il.</td></tr>
     <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">In prestito a, Prestato il e la colonna <b>Prestito</b> con i pulsanti.</td><td class="d">Stanza, IMEI, Restituito da, Spedito il.</td></tr>
-    <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Solo l'essenziale: asset tag, tipo, note, stato, modello, seriale.</td><td class="d">Stanza, tutto il prestito, tutto quello degli iPhone.</td></tr>
-    <tr><td class="d"><b>Contenitore Iphone</b></td><td class="d">Modello/Descrizione, IMEI, Restituito da, stato, Spedito il, note, piu' la colonna <b>Spedizione</b>.</td><td class="d">Asset tag e seriale (un iPhone non ne ha), prestiti, stanza e tipo.</td></tr>
+    <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Solo l'essenziale: asset tag, tipo, Asset Function, note, stato, modello, seriale.</td><td class="d">Stanza, tutto il prestito, tutto quello degli iPhone.</td></tr>
+    <tr><td class="d"><b>Contenitore Iphone</b></td><td class="d">Modello/Descrizione, IMEI, Restituito da, stato, Spedito il, note, piu' la colonna <b>Spedizione</b>.</td><td class="d">Asset tag e seriale (un iPhone non ne ha), prestiti, stanza, tipo e Asset Function.</td></tr>
   </table></div>
   <p class="note">La colonna <b>Stanza</b> sparisce sempre dentro una stanza: sarebbe
     uguale su ogni riga, e il nome e' gia' scritto sopra l'elenco. Lo stesso vale per il
     <b>tipo</b> dentro il contenitore Iphone.</p>
+
+  <h3>La Asset Function</h3>
+  <p class="sub">Dice <b>a che cosa serve il dispositivo</b>, con due valori soli:
+    <b>Standard</b> e <b>PC Refresh</b>. Sta subito a destra di <i>Tipo</i> e prima di
+    <i>Stanza</i>, nell'elenco come nei file esportati, e ha lo stesso colore verde del
+    tipo: e' ancora "che cos'e'".</p>
+  <div class="tw"><table class="man">
+    <tr><th>Che cosa</th><th>Come</th></tr>
+    <tr><td class="d">Si sceglie</td><td class="d">dalla tendina nella scheda del dispositivo, o con un <b>doppio clic sulla cella</b> nell'elenco. Anche su un dispositivo in prestito: non e' uno spostamento.</td></tr>
+    <tr><td class="d">Un dispositivo nuovo</td><td class="d">parte da <i>Standard</i>. Uno che c'era gia' prima di questa colonna resta <b>vuoto</b> finche' qualcuno non la sceglie: non si inventa.</td></tr>
+    <tr><td class="d">Esportazioni e stampa</td><td class="d">la portano <b>sempre</b>, anche quando per qualche dispositivo e' vuota.</td></tr>
+    <tr><td class="d">Importazioni</td><td class="d"><b>non e' obbligatoria in nessuna</b>. Un foglio senza la colonna si importa come prima; se c'e', il valore si riconosce anche scritto male, e uno che non e' ne' Standard ne' PC Refresh resta vuoto e il riepilogo lo dice.</td></tr>
+    <tr><td class="d">Gli iPhone</td><td class="d">non ce l'hanno: nel loro contenitore la colonna non compare.</td></tr>
+  </table></div>
 
   <h3>Ogni colonna ha il suo colore</h3>
   <p class="sub">Una riga verticale colorata divide una colonna dall'altra, e la stessa
@@ -999,6 +1014,7 @@ table{min-width:520px}
     <tr><td><span class="k rosso">Restore from a copy…</span></td><td class="d">Takes the inventory back to one of the automatic copies on the network, chosen from the list. See <a href="#ripristino-en">Going back</a>.</td></tr>
     <tr><td><span class="k rosso">Restore from a local file…</span></td><td class="d">Starts again from a copy saved off the network: devices <b>and</b> settings come back, rooms included. It is the way out if the network folder is gone.</td></tr>
     <tr><td><span class="k rosso">Reset inventory</span></td><td class="d">Empties the inventory. It asks you to type <span class="mono">ELIMINA TUTTO</span> and saves a copy first. iPhones are never touched.</td></tr>
+    <tr><td><span class="k arancio">Import Asset Function from an Excel sheet…</span></td><td class="d">Reads the <b>Asset Tag</b> and the function from a sheet - the column is found by name, or as the one holding <b>only</b> Standard and PC Refresh - and writes it on the devices already in the inventory <b>without moving them or touching anything else</b>. The missing ones are added: if the sheet does not say the room, the program says they are new and asks where. You see everything first, and a copy is saved.</td></tr>
   </table></div>
   <p class="note">If the window is narrow, the toolbar wraps onto two rows: no button is
     ever left out. Widen it and it goes back to a single row.</p>
@@ -1032,15 +1048,29 @@ table{min-width:520px}
     loan</i>, <i>Shipped to the phone service</i>.</p>
   <div class="tw"><table class="man">
     <tr><th>Where you are</th><th>What you see</th><th>What goes away</th></tr>
-    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, type, room, notes, status, last change, changed by. Seven columns to say what a device is, where it is, how it is and since when.</td><td class="d">Everything else: Model/Description and serial number, which you read in front of the device; IMEI, who has it on loan and since when, who returned it, when it was shipped.</td></tr>
+    <tr><td class="d"><b>Home</b></td><td class="d">Asset tag, type, Asset Function, room, notes, status, last change, changed by. Eight columns to say what a device is, what it is for, where it is, how it is and since when.</td><td class="d">Everything else: Model/Description and serial number, which you read in front of the device; IMEI, who has it on loan and since when, who returned it, when it was shipped.</td></tr>
     <tr><td class="d"><b>Site Services BAU</b></td><td class="d">IMEI, Returned by and Shipped on, because the phones live there.</td><td class="d">Room, On loan to, Lent on.</td></tr>
     <tr><td class="d"><b>Digital Kiosk</b></td><td class="d">On loan to, Lent on, and the <b>Loan</b> column with its buttons.</td><td class="d">Room, IMEI, Returned by, Shipped on.</td></tr>
-    <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Only the essentials: asset tag, type, notes, status, model, serial.</td><td class="d">Room, everything about loans, everything about iPhones.</td></tr>
-    <tr><td class="d"><b>Iphone container</b></td><td class="d">Model/Description, IMEI, Returned by, status, Shipped on, notes, plus the <b>Shipment</b> column.</td><td class="d">Asset tag and serial (an iPhone has neither), loans, room and type.</td></tr>
+    <tr><td class="d"><b>Magazzino Disaster Recovery</b></td><td class="d">Only the essentials: asset tag, type, Asset Function, notes, status, model, serial.</td><td class="d">Room, everything about loans, everything about iPhones.</td></tr>
+    <tr><td class="d"><b>Iphone container</b></td><td class="d">Model/Description, IMEI, Returned by, status, Shipped on, notes, plus the <b>Shipment</b> column.</td><td class="d">Asset tag and serial (an iPhone has neither), loans, room, type and Asset Function.</td></tr>
   </table></div>
   <p class="note">The <b>Room</b> column always disappears inside a room: it would be the
     same on every row, and the name is already written above the list. The same goes for
     <b>type</b> inside the Iphone container.</p>
+
+  <h3>The Asset Function</h3>
+  <p class="sub">It says <b>what the device is for</b>, with two values only:
+    <b>Standard</b> and <b>PC Refresh</b>. It sits just to the right of <i>Type</i> and
+    before <i>Room</i>, in the list as in the exported files, and has the same green as the
+    type: it is still "what it is".</p>
+  <div class="tw"><table class="man">
+    <tr><th>What</th><th>How</th></tr>
+    <tr><td class="d">It is picked</td><td class="d">from the dropdown in the device record, or with a <b>double-click on the cell</b> in the list. On a device on loan too: it is not a move.</td></tr>
+    <tr><td class="d">A new device</td><td class="d">starts from <i>Standard</i>. One that was there before this column stays <b>empty</b> until someone picks it: it is not made up.</td></tr>
+    <tr><td class="d">Exports and printing</td><td class="d">carry it <b>always</b>, even when it is empty for some devices.</td></tr>
+    <tr><td class="d">Imports</td><td class="d"><b>none requires it</b>. A sheet without the column imports as before; if it is there, the value is recognised even written badly, and one that is neither Standard nor PC Refresh stays empty and the summary says so.</td></tr>
+    <tr><td class="d">iPhones</td><td class="d">do not have it: in their container the column does not show.</td></tr>
+  </table></div>
 
   <h3>Every column has its own colour</h3>
   <p class="sub">A coloured vertical line divides one column from the next, and the same

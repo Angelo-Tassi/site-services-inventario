@@ -22,7 +22,7 @@ CARTELLA = os.path.join(RADICE, "Collaudo")
 # il modello contiene il minimo per caricare dei dispositivi, questi servono a
 # provare che l'importazione riconosca tutte le colonne che puo' incontrare in
 # un foglio vero. L'ordine e' quello dell'elenco nel programma.
-CAMPI = ["asset_tag", "tipo", "note", "stato", "modello", "seriale"]
+CAMPI = ["asset_tag", "tipo", "funzione", "note", "stato", "modello", "seriale"]
 assert set(TEMPLATE_FIELDS) - {"stanza"} <= set(CAMPI), \
     "il file di prova deve contenere almeno le colonne del modello"
 INTESTAZIONI = [HEADERS[c] for c in CAMPI]
@@ -55,8 +55,11 @@ def _dispositivo(prefisso, base, indice):
         modello = TABLET[indice % len(TABLET)]
         seriale = "%dH%s%03d" % (4 + indice % 5, prefisso[:1], numero % 1000)
         tipo = "Tablet"
+    # quasi tutti Standard, due per stanza in PC Refresh, e uno lasciato vuoto:
+    # la colonna non e' obbligatoria, e il collaudo lo deve far vedere
+    funzione = {3: "PC Refresh", 6: "PC Refresh", 10: ""}.get(indice, "Standard")
     valori = {"asset_tag": "IT-%s-%03d" % (prefisso, numero), "tipo": tipo,
-              "modello": modello, "seriale": seriale,
+              "funzione": funzione, "modello": modello, "seriale": seriale,
               "stato": STATI[indice - 1], "note": NOTE[indice - 1]}
     return [valori[c] for c in CAMPI]
 
@@ -135,7 +138,7 @@ def inventario_con_difetti(percorso):
                    costo=1150, fornitore="Dell Italia", cc="CC-01"))
     ws.append([None] * (len(CAMPI) + len(extra)))
     _separatore(ws, "KIOSK")
-    ws.append(riga(asset_tag="IT-KSK-903", tipo="Tablet",
+    ws.append(riga(asset_tag="IT-KSK-903", tipo="Tablet", funzione="Ricondizionato",
                    modello="Dell Latitude 7320 Detachable", seriale="8HK903",
                    stato="Controllare", costo=900, fornitore="Dell Italia", cc="CC-02"))
     ws.append(riga(tipo="Laptop", modello="senza identificativo",

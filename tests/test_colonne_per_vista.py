@@ -27,7 +27,8 @@ def campi():
 # dov'e', come sta e da quando; il resto si guarda dentro la stanza
 app.show_home()
 # l'ordine conta: dopo lo stato si legge chi ha toccato la riga per ultimo
-assert campi() == ["asset_tag", "tipo", "stanza", "note", "stato",
+# la Asset Function sta fra il tipo e la stanza, come nei file esportati
+assert campi() == ["asset_tag", "tipo", "funzione", "stanza", "note", "stato",
                    "modificato_il", "modificato_da"], campi()
 # modello e numero di serie servono davanti all'oggetto, cioe' dentro la stanza
 assert "modello" not in campi() and "seriale" not in campi(), campi()
@@ -64,7 +65,7 @@ assert app._columns()[:2] == [CHECK_COLUMN, ACTION_COLUMN]
 # ---- Magazzino Disaster Recovery: ne' prestiti ne' telefoni, la piu' pulita
 app.show_room(DR)
 assert not any(c in campi() for c in IPHONE + PRESTITO), campi()
-assert campi() == ["asset_tag", "tipo", "note", "stato", "modello", "seriale",
+assert campi() == ["asset_tag", "tipo", "funzione", "note", "stato", "modello", "seriale",
                    "modificato_il", "modificato_da"], campi()
 
 # ---- contenitore iPhone: niente asset tag, niente seriale, niente prestiti,

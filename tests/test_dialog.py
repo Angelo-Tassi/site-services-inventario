@@ -34,8 +34,9 @@ corpo = dlg.winfo_children()[0]
 prima = [w.cget("text") for w in corpo.winfo_children()
          if w.grid_info().get("row") == 0 and w.grid_info().get("column") == 0]
 assert prima == ["Tipo *"], prima
-assert etichette(dlg) == ["Asset Tag", "Modello", "Numero di serie", "Stanza",
-                          "Stato", "Note"], etichette(dlg)
+assert etichette(dlg) == ["Asset Tag", "Modello", "Numero di serie", "Asset Function",
+                          "Stanza", "Stato", "Note"], etichette(dlg)
+assert dlg.var_funzione.get() == "Standard", "un dispositivo nuovo parte da Standard"
 assert obbligatori(dlg) == ["Asset Tag"], obbligatori(dlg)
 assert dlg.var_stato.get() == DISPONIBILE
 

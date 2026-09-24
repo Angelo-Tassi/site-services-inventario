@@ -17,8 +17,8 @@ RADICE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CARTELLA = os.path.join(RADICE, "Collaudo")
 # Il file di prova e' piu' ricco del modello: serve a provare che l'importazione
 # riconosca tutte le colonne che puo' incontrare in un foglio vero.
-ATTESE = ["Asset Tag", "Tipo", "Note", "Stato", "Modello/Descrizione",
-          "Numero di serie"]
+ATTESE = ["Asset Tag", "Tipo", "Asset Function", "Note", "Stato",
+          "Modello/Descrizione", "Numero di serie"]
 STANZE = [fixture.BAU, fixture.KIOSK, fixture.DR]
 
 def foglio(nome):

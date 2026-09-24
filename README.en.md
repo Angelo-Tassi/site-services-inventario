@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.5.8).** The features are complete and every release
+> **Beta version (1.0.0-beta.5.9).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -426,6 +426,31 @@ file...** (a copy you saved yourself, even off the network) and **Reset
 inventory**. The first three used to be in the toolbar; they
 are rarely used and up there they stole room from the everyday commands, to the
 point of pushing them off the screen on narrower monitors.
+
+### Importing the Asset Functions from a sheet
+
+Below, in the **Asset Function** box, is **Import Asset Function from an Excel
+sheet...**. It is for when the Standard / PC Refresh classification comes from
+outside - a list from the refresh programme, say - and has to be carried onto the
+inventory that is already there.
+
+- the sheet needs the **Asset Tag** and the function. The function column is
+  found **by name** (*Asset Function*, *Funzione*, *Function*) or, if it is
+  called something else, **by content**: any column holding **only** Standard
+  and PC Refresh will do. The summary says which column it read;
+- for devices **already in the inventory** the function is written **and
+  nothing else**: the room does not change, nobody moves, status, notes and loan
+  stay as they were - even if the sheet has another room written in it;
+- devices in the sheet that **are not in the inventory** are **added**, with
+  the rules of an import: if the sheet says the room they go there, if it does
+  not the program **says they are new, lists the codes and asks which room to
+  add them to** - all in the same one, or one by one;
+- before writing you see everything: which functions change (from what to
+  what), how many are already the same, which devices are added and where, the
+  values not recognised. You confirm, and before anything is touched a **backup
+  copy** is saved;
+- a value that is neither Standard nor PC Refresh **does not erase** what is
+  there; iPhones are skipped, since they have no function.
 
 ### The toolbar wraps
 
@@ -856,8 +881,8 @@ by construction carries no information: it takes space away from what you have
 to read.
 
 The **complete inventory on the home screen** is an overview: it says what a
-device is, where it is, how it is and since when - asset tag, type, room, notes,
-status, last change, changed by - in a row you can read without scrolling
+device is, where it is, how it is and since when - asset tag, type, Asset
+Function, room, notes, status, last change, changed by - in a row you can read without scrolling
 sideways. **Model/Description and serial number are not there**: you read those
 in front of the device you are holding, which means inside the room. The other
 questions the status sums up in the overview: *On loan*, *Shipped to the phone
@@ -869,7 +894,7 @@ service*.
 | **Site Services BAU** | Room, On loan to, Lent on |
 | **Digital Kiosk** | Room, IMEI, Returned by, Shipped on |
 | **Magazzino Disaster Recovery** | Room, loans and the iPhone fields |
-| **Iphone container** | Asset tag, serial, loans, room and type |
+| **Iphone container** | Asset tag, serial, loans, room, type and Asset Function |
 
 Every column is **as wide as it needs to be** to show what it holds in full: no
 truncated text, no columns to widen by hand. An empty column stays at least as wide
@@ -895,8 +920,29 @@ the settings and the two columns appear there.
 ### The same rule in the files that come out
 
 An exported file says **what we have, where it is and what there is to know**.
-Four columns: asset tag, type, room, notes - the notes travel with the device,
-because they are what a row has that is particular to it.
+Five columns: asset tag, type, **Asset Function**, room, notes - the notes travel
+with the device, because they are what a row has that is particular to it. The
+Asset Function comes out **always**, from every export and from printing, even
+when it is empty for some devices.
+
+### The Asset Function
+
+It says **what the device is for**, with two values only: **Standard** and **PC
+Refresh**. In the list it sits just to the right of *Type* and before *Room*, in
+the same order it comes out in the files.
+
+- you pick it from the **dropdown** in the device record, or with a
+  **double-click on the cell**, right in the list; it can be changed on a device
+  on loan too, because it is not a move;
+- a **new** device starts from *Standard*; one that was there before this column
+  stays **empty** until someone picks it: the program does not make it up;
+- **it is not required by any import**: a sheet without that column imports as
+  before, and the devices come in with the field empty. If the column is there,
+  its name is also recognised as *Funzione* or *Function*, and the value even
+  when written badly - `pc refresh`, `PC-REFRESH`, `refresh`. A value that is
+  neither stays empty, and the summary before importing says so row by row;
+- **iPhones** do not have it: in their container the column does not show. The
+  **template to fill in** has the column too, with its dropdown.
 
 Status, model, serial number, loans, IMEI, shipments and last change stay out:
 they serve whoever is working in front of the list, inside the room they belong

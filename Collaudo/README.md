@@ -736,6 +736,58 @@ ogni finestra la tastiera risponde subito nell'elenco.
 
 ---
 
+## 23. La colonna Asset Function
+
+1. in home, la colonna **Asset Function** sta subito a destra di *Tipo* e prima
+   di *Stanza*. I dispositivi che c'erano prima di questa versione l'hanno
+   **vuota**: il programma non la inventa;
+2. **doppio clic** su una cella della colonna: si apre la tendina con
+   **Standard** e **PC Refresh**. Scegline uno: la riga si aggiorna. Prova anche
+   su un dispositivo **in prestito** nel Digital Kiosk: si cambia, perche' non
+   e' uno spostamento;
+3. **Aggiungi** un laptop: nella scheda la Asset Function c'e', subito prima di
+   *Stanza*, e parte da **Standard**. Aggiungi un **iPhone**: il campo non c'e';
+4. apri il contenitore **Iphone**: la colonna non compare;
+5. **Esporta xls...** in tutte e tre le forme, e prova la **Stampa**: la colonna
+   c'e' sempre, fra *Tipo* e *Stanza*, anche per i dispositivi che l'hanno vuota;
+6. importa `Inventario_di_prova.xlsx`: adesso ha la colonna, con due dispositivi
+   per stanza in *PC Refresh* e uno lasciato vuoto. Entrano con i loro valori;
+7. importa un tuo foglio **senza** la colonna: si importa come prima, senza
+   avvisi. Poi `Inventario_di_prova_con_difetti.xlsx`: il riepilogo segnala la
+   riga `IT-KSK-903`, che ha *Ricondizionato* - non e' ne' Standard ne' PC
+   Refresh - e la importa comunque, con il campo vuoto.
+
+**Cosa deve succedere:** la colonna c'e' dappertutto tranne che sugli iPhone, e
+nessuna importazione la pretende.
+
+## 24. Importare le Asset Function da un foglio
+
+Prepara un foglio con tre colonne: *Asset Tag*, una colonna che chiami come
+vuoi - per esempio `Programma 2026` - con dentro **solo** Standard e PC
+Refresh, e *Stanza*. Metti due asset tag **gia' in inventario**, scrivendo
+accanto una stanza **diversa** da quella in cui stanno, e due asset tag
+**nuovi**: uno con la stanza, uno senza.
+
+1. **Impostazioni**, riquadro **Asset Function**, **Importa Asset Function da
+   foglio Excel...**, e scegli il foglio;
+2. per il dispositivo nuovo senza stanza si apre la domanda: deve dire che sono
+   **nuovi**, **non ancora in inventario**, con il **codice**, e chiedere in che
+   stanza aggiungerli. Scegline una;
+3. il riepilogo deve dire che ha letto la colonna `Programma 2026`, elencare le
+   funzioni **da aggiornare** (da che cosa a che cosa) e i dispositivi **da
+   aggiungere**, stanza per stanza. Conferma;
+4. i due dispositivi che c'erano hanno la funzione nuova e **sono ancora nella
+   loro stanza di prima**: la stanza scritta nel foglio non li ha spostati;
+5. i due nuovi ci sono: uno nella stanza del foglio, l'altro in quella che hai
+   scelto;
+6. rifai la stessa importazione: deve dire che non c'e' **niente da
+   aggiornare**.
+
+**Cosa deve succedere:** si scrive solo la funzione, nessun dispositivo
+presente si sposta, e chi manca si aggiunge sapendo che e' nuovo.
+
+---
+
 ## Modo A - reset, poi importazione
 
 Da usare se vuoi verificare che l'inventario sia vuoto prima di caricare.

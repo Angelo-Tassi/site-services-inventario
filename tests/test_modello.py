@@ -22,7 +22,8 @@ assert [c.value for c in ws[1]] == [HEADERS[f] for f in excel_io.TEMPLATE_FIELDS
 # le tendine devono stare sulle colonne di tipo e stato, comunque siano ordinate
 from openpyxl.utils import get_column_letter
 # le tendine stanno sui campi a scelta fissa che il modello contiene
-con_tendina = [c for c in ("tipo", "stato", "stanza") if c in excel_io.TEMPLATE_FIELDS]
+con_tendina = [c for c in ("tipo", "funzione", "stato", "stanza")
+               if c in excel_io.TEMPLATE_FIELDS]
 attese = {get_column_letter(excel_io.TEMPLATE_FIELDS.index(c) + 1) for c in con_tendina}
 trovate = {str(dv.sqref).split("2:")[0] for dv in ws.data_validations.dataValidation}
 assert trovate == attese, (trovate, attese)

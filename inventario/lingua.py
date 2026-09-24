@@ -1238,6 +1238,71 @@ EN = {
         'A device without a real room would show up in no card. Pick one of '
         'the existing rooms, or create it first from the settings.',
     "(nessuna stanza)": "(no room)",
+    "%d dispositivi nuovi, senza stanza": "%d new devices, with no room",
+    " e altri %d": " and %d more",
+    "Non sono ancora in inventario: %s.\n\n"
+    "Il foglio non dice in che stanza vanno, e un dispositivo\n"
+    "senza stanza non entra. In che stanza li aggiungo?":
+        'They are not in the inventory yet: %s.\n\n'
+        'The sheet does not say which room they go in, and a device\n'
+        'with no room does not get in. Which room do I add them to?',
+    "Dispositivo nuovo %d di %d, non ancora in inventario":
+        'New device %d of %d, not in the inventory yet',
+    # --- importare le Asset Function da un foglio
+    "Importa Asset Function da foglio Excel...": "Import Asset Function from an Excel sheet...",
+    "Aggiorna la Asset Function dei dispositivi gia' in inventario,\n"
+    "senza spostarli ne' toccare altro, e aggiunge quelli che\n"
+    "mancano.":
+        'Updates the Asset Function of the devices already in the\n'
+        'inventory, without moving them or touching anything else,\n'
+        'and adds the missing ones.',
+    "Foglio con le Asset Function": "Sheet with the Asset Functions",
+    "Nessuna Asset Function nel foglio": "No Asset Function in the sheet",
+    "Nel foglio non c'e' nessuna colonna che si chiami Asset Function,\n"
+    "e nessuna che contenga solo Standard e PC Refresh.\n\n"
+    "Non e' stato toccato niente.":
+        'The sheet has no column called Asset Function, and none that\n'
+        'holds only Standard and PC Refresh.\n\n'
+        'Nothing was touched.',
+    "Niente da aggiornare": "Nothing to update",
+    "Le Asset Function del foglio sono gia' tutte uguali a quelle\n"
+    "dell'inventario, e non ci sono dispositivi nuovi.\n\n"
+    "Non e' stato toccato niente.":
+        "The sheet's Asset Functions are all the same as the inventory's,\n"
+        'and there are no new devices.\n\n'
+        'Nothing was touched.',
+    "Importa Asset Function": "Import Asset Function",
+    "Aggiornare %d Asset Function e aggiungere %d dispositivi?":
+        'Update %d Asset Functions and add %d devices?',
+    "Le stanze dei dispositivi presenti non cambiano e nessuno si sposta.\n"
+    "Una copia del file dati viene salvata prima di procedere.":
+        'The rooms of the devices already there do not change and nobody moves.\n'
+        'A copy of the data file is saved before going ahead.',
+    "Operazione annullata": "Operation cancelled",
+    "Asset Function aggiornate: %d": "Asset Functions updated: %d",
+    "Dispositivi aggiunti: %d": "Devices added: %d",
+    "Le stanze dei dispositivi presenti non sono cambiate.":
+        'The rooms of the devices already there have not changed.',
+    "Asset Function importate": "Asset Functions imported",
+    "Dal foglio %s, colonna %s.": "From sheet %s, column %s.",
+    "DA AGGIORNARE: %d": "TO UPDATE: %d",
+    "(vuota)": "(empty)",
+    "Gia' uguali, non si toccano: %d": "Already the same, left alone: %d",
+    "DA AGGIUNGERE, non sono in inventario: %d": "TO ADD, not in the inventory: %d",
+    "Lasciati fuori, senza stanza: %d": "Left out, with no room: %d",
+    "iPhone saltati, non hanno una Asset Function: %d":
+        'iPhones skipped, they have no Asset Function: %d',
+    "Valori non riconosciuti, lasciati com'erano: %d":
+        'Values not recognised, left as they were: %d',
+    # --- la Asset Function (il nome della colonna sta in INTESTAZIONI_EN)
+    "Gli iPhone non hanno una Asset Function.": "iPhones have no Asset Function.",
+    "Funzione non prevista: scegli fra %s.": "Unexpected function: choose from %s.",
+    "%d righe hanno una Asset Function che non e' ne' Standard ne'\n"
+    "PC Refresh (%s): verranno importate con quel campo vuoto,\n"
+    "da completare a mano. Il campo non e' obbligatorio.":
+        '%d rows have an Asset Function that is neither Standard nor\n'
+        'PC Refresh (%s): they will be imported with that field empty,\n'
+        'to be filled in by hand. The field is optional.',
     # --- i prestiti fermano le operazioni distruttive
     "Prima registra i rientri": "Register the returns first",
     "Non si puo' svuotare l'inventario": 'The inventory cannot be emptied',
@@ -1353,6 +1418,7 @@ EN = {
 INTESTAZIONI_EN = {
     "Asset Tag": "Asset Tag",
     "Tipo": "Type",
+    "Asset Function": "Asset Function",
     "Modello/Descrizione": "Model/Description",
     "Numero di serie": "Serial number",
     "IMEI": "IMEI",

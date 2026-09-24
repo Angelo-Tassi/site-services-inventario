@@ -14,7 +14,7 @@ from . import __version__, config, excel_io, theme
 from . import lingua as lang
 from .lingua import T, intestazione, stato as traduci_stato
 from .registro import registro
-from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE,
+from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE, FUNZIONI, STANDARD,
                     ELIMINATI_GIORNI, ELIMINATI_MASSIMO, HEADERS,
                     InventoryError, MASSIMO_ELIMINA_EXCEL, MESI_CONSERVAZIONE,
                     InventoryStore, NON_DISPONIBILE, SPEDITO, clean,
@@ -22,7 +22,7 @@ from .store import (ALL_FIELDS, COPIE_DA_TENERE, DA_RISPEDIRE,
                     puo_essere_eliminato, righe_separatore,
                     rinomina_tocca_gli_iphone, rinomine_stanze,
                     prestiti_aperti, rinomine_tipi, righe_da_workbook,
-                    rows_from_workbook,
+                    rows_from_workbook, funzioni_da_workbook,
                     sembra_un_foglio_da_importare, testo_spedizione,
                     valore_visibile)
 
@@ -37,7 +37,7 @@ LARGHEZZA_MINIMA = 46
 # per ultimi i campi lunghi, che si leggono solo quando servono davvero. Il
 # contenitore Iphone non segue questo ordine: li' l'IMEI e' l'identificativo e
 # viene per primo.
-ORDINE_COLONNE = ["asset_tag", "tipo", "stanza", "note", "stato",
+ORDINE_COLONNE = ["asset_tag", "tipo", "funzione", "stanza", "note", "stato",
                   "modello", "seriale",
                   "imei", "restituito_da", "prestato_a", "prestato_il",
                   "spedito_il", "modificato_il", "modificato_da"]
@@ -120,7 +120,8 @@ CHECK_COLUMN = "_sel"
 ACTION_COLUMN = "_azione"
 # Un iPhone non ha numero di serie e non si presta: nel suo contenitore quelle
 # colonne sarebbero sempre vuote.
-COLONNE_NON_IPHONE = ("asset_tag", "seriale", "prestato_a", "prestato_il")
+COLONNE_NON_IPHONE = ("asset_tag", "seriale", "prestato_a", "prestato_il",
+                      "funzione")
 # Bit dei modificatori dentro `event.state`. Mod1 si legge solo dove Command
 # esiste davvero: su Windows quello stesso bit e' il Bloc Num, e leggerlo li'
 # vorrebbe dire scambiare ogni clic per un Ctrl+clic a chi tiene acceso il
@@ -138,7 +139,7 @@ def con_modificatore(stato, comando=False):
 
 CHECK_ON = "\u25c9"      # cerchio pieno: riga selezionata
 CHECK_OFF = "\u25cb"     # cerchio vuoto
-COLUMN_WIDTHS = {CHECK_COLUMN: 46, ACTION_COLUMN: 175, "asset_tag": 120, "tipo": 75, "modello": 185,
+COLUMN_WIDTHS = {CHECK_COLUMN: 46, ACTION_COLUMN: 175, "asset_tag": 120, "tipo": 75, "funzione": 120, "modello": 185,
                  "seriale": 120, "imei": 130, "restituito_da": 135, "stanza": 160,
                  "stato": 185, "prestato_a": 140, "prestato_il": 120, "spedito_il": 120, "note": 180,
                  "modificato_il": 120, "modificato_da": 145}
@@ -491,6 +492,10 @@ class ItemDialog(_Modal):
                                      (item.get("asset_tag", "") if is_iphone(item.get("tipo")) else ""))
         self.var_restituito = tk.StringVar(value=item.get("restituito_da", ""))
         self.var_stanza = tk.StringVar(value=item.get("stanza", ""))
+        # un dispositivo nuovo parte da Standard; uno che c'e' gia' tiene la sua,
+        # anche vuota: non la si inventa aprendo la scheda
+        self.var_funzione = tk.StringVar(
+            value=item.get("funzione", "") if item.get("asset_tag") else STANDARD)
         self.var_stato = tk.StringVar(value=item.get("stato") or
                                       (self.stati[0] if self.stati else ""))
 
@@ -557,6 +562,13 @@ class ItemDialog(_Modal):
                 self.required.append((etichetta, var, entry))
 
         riga = len(righe)
+        if not self.is_iphone():
+            ttk.Label(self.fields, text=intestazione(HEADERS["funzione"])).grid(
+                row=riga, column=0, sticky="w", pady=5)
+            ttk.Combobox(self.fields, textvariable=self.var_funzione, values=FUNZIONI,
+                         state="readonly", width=32).grid(row=riga, column=1,
+                                                          sticky="we", pady=5)
+            riga += 1
         # La stanza non blocca il salvataggio: e' una tendina, e se non e' stata
         # scelta si parte dalla prima invece di lasciare un dispositivo senza
         # stanza, che non comparirebbe in nessuna scheda.
@@ -639,6 +651,7 @@ class ItemDialog(_Modal):
 
         comuni = dict(
             tipo=self.var_tipo.get(),
+            funzione=self.var_funzione.get(),
             modello=self.var_modello.get(),
             stanza=self.var_stanza.get(),
             note=self.text_note.get("1.0", "end"),
@@ -740,8 +753,18 @@ class RoomsDialog(_Modal):
                          "cartella, si riparte da un file locale.")
                   % COPIE_DA_TENERE).pack(side="left", padx=(14, 0))
 
+        funzioni = ttk.LabelFrame(body, text=intestazione(HEADERS["funzione"]), padding=10)
+        funzioni.grid(row=7, column=0, columnspan=3, sticky="we", pady=(10, 0))
+        ttk.Button(funzioni, text=T("Importa Asset Function da foglio Excel..."),
+                   style="Arancio.TButton",
+                   command=self._importa_funzioni).pack(side="left", padx=(0, 8))
+        ttk.Label(funzioni, style="Muted.TLabel",
+                  text=T("Aggiorna la Asset Function dei dispositivi gia' in inventario,\n"
+                         "senza spostarli ne' toccare altro, e aggiunge quelli che\n"
+                         "mancano.")).pack(side="left", padx=(14, 0))
+
         buttons = ttk.Frame(body)
-        buttons.grid(row=7, column=0, columnspan=3, sticky="we", pady=(16, 0))
+        buttons.grid(row=8, column=0, columnspan=3, sticky="we", pady=(16, 0))
         ttk.Button(buttons, text=T("Collega inventario condiviso..."),
                    command=self._collega).pack(side="left", padx=(0, 8))
         ttk.Button(buttons, text=T("Annulla"), command=self._cancel).pack(side="right", padx=6)
@@ -766,6 +789,10 @@ class RoomsDialog(_Modal):
 
     def _reset(self):
         self.result = {"reset": True}
+        self.destroy()
+
+    def _importa_funzioni(self):
+        self.result = {"importa_funzioni": True}
         self.destroy()
 
     def _ok(self):
@@ -1323,17 +1350,35 @@ class StanzeDaAssegnareDialog(_Modal):
     stanza si chiede: tutte insieme in una sola, oppure una per una.
     """
 
-    def __init__(self, parent, quanti, stanze):
+    def __init__(self, parent, quanti, stanze, nuovi=False, codici=()):
+        """`nuovi`: sono dispositivi che nell'inventario non ci sono ancora.
+
+        Quando si aggiornano le Asset Function, chi importa pensa di toccare
+        dispositivi che ci sono gia': che alcuni siano nuovi, e vadano
+        aggiunti, e' la prima cosa da dirgli - con i codici, per riconoscerli.
+        """
         _Modal.__init__(self, parent, T("In che stanza vanno?"))
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
-        ttk.Label(body, text=T("%d dispositivi senza stanza") % quanti,
-                  style="Section.TLabel").pack(anchor="w")
-        ttk.Label(body, style="Muted.TLabel", justify="left",
-                  text=T("Il foglio non dice in che stanza vanno. Un dispositivo\n"
-                       "senza stanza non entra in inventario: bisogna dirlo\n"
-                       "adesso, o quelle righe non vengono importate.")).pack(
-            anchor="w", pady=(4, 12))
+        if nuovi:
+            ttk.Label(body, text=T("%d dispositivi nuovi, senza stanza") % quanti,
+                      style="Section.TLabel").pack(anchor="w")
+            elenco = ", ".join(list(codici)[:8])
+            if len(codici) > 8:
+                elenco += T(" e altri %d") % (len(codici) - 8)
+            ttk.Label(body, style="Muted.TLabel", justify="left", wraplength=440,
+                      text=T("Non sono ancora in inventario: %s.\n\n"
+                           "Il foglio non dice in che stanza vanno, e un dispositivo\n"
+                           "senza stanza non entra. In che stanza li aggiungo?")
+                      % elenco).pack(anchor="w", pady=(4, 12))
+        else:
+            ttk.Label(body, text=T("%d dispositivi senza stanza") % quanti,
+                      style="Section.TLabel").pack(anchor="w")
+            ttk.Label(body, style="Muted.TLabel", justify="left",
+                      text=T("Il foglio non dice in che stanza vanno. Un dispositivo\n"
+                           "senza stanza non entra in inventario: bisogna dirlo\n"
+                           "adesso, o quelle righe non vengono importate.")).pack(
+                anchor="w", pady=(4, 12))
 
         self.var_come = tk.StringVar(value="una")
         ttk.Radiobutton(body, variable=self.var_come, value="una",
@@ -1382,11 +1427,12 @@ class StanzaDelDispositivoDialog(_Modal):
     per deciderlo deve vedere di quale si tratta, non solo un codice.
     """
 
-    def __init__(self, parent, item, stanze, numero, totale):
+    def __init__(self, parent, item, stanze, numero, totale, nuovo=False):
         _Modal.__init__(self, parent, T("Dispositivo %d di %d") % (numero, totale))
         body = ttk.Frame(self, padding=18)
         body.pack(fill="both", expand=True)
-        ttk.Label(body, text=T("Dispositivo %d di %d") % (numero, totale),
+        ttk.Label(body, text=(T("Dispositivo nuovo %d di %d, non ancora in inventario")
+                              if nuovo else T("Dispositivo %d di %d")) % (numero, totale),
                   style="Muted.TLabel").pack(anchor="w")
         ttk.Label(body, text=clean(item.get("asset_tag")) or T("(senza asset tag)"),
                   style="Section.TLabel").pack(anchor="w", pady=(2, 0))
@@ -1579,6 +1625,16 @@ class ImportDialog(_Modal):
                 T("Colonne non riconosciute, il cui contenuto non verra' importato:\n%s\n"
                   "Se una di queste e' un dato che ti serve, rinominala come la colonna\n"
                   "corrispondente dell'inventario e riprova.") % elenco)
+        sconosciute = esito.get("funzione_sconosciuta") or []
+        if sconosciute:
+            elenco = ", ".join(sconosciute[:4])
+            if len(sconosciute) > 4:
+                elenco += T(" e altre %d") % (len(sconosciute) - 4)
+            messaggi.append(
+                T("%d righe hanno una Asset Function che non e' ne' Standard ne'\n"
+                  "PC Refresh (%s): verranno importate con quel campo vuoto,\n"
+                  "da completare a mano. Il campo non e' obbligatorio.")
+                % (len(sconosciute), elenco))
         senza = esito.get("senza_modello")
         if senza:
             messaggi.append(
@@ -3422,6 +3478,9 @@ class App(tk.Tk):
         if column == "tipo" and tag:
             self.edit_tipo_inline(tag)
             return "break"
+        if column == "funzione" and tag:
+            self.edit_funzione_inline(tag)
+            return "break"
         self.on_edit()
         return "break"
 
@@ -3478,6 +3537,50 @@ class App(tk.Tk):
         # La tendina si apre subito, ma con il tasto freccia e non con un clic
         # finto: un <Button-1> generato senza il rilascio lascia Tk convinto che
         # il mouse sia ancora premuto, e da li' in poi gli eventi vanno storti.
+        combo.after_idle(lambda: combo.winfo_exists()
+                         and combo.event_generate("<Down>"))
+
+    def edit_funzione_inline(self, tag):
+        """Cambia la Asset Function con una tendina direttamente nell'elenco."""
+        self._chiudi_editor_aperto()
+        item = self._item_by_tag(tag)
+        if item is None:
+            return
+        if is_iphone(item.get("tipo")):
+            self._segnala(T("Gli iPhone non hanno una Asset Function."))
+            return
+        colonne = self._columns()
+        if "funzione" not in colonne:
+            return
+        box = self.tree.bbox(tag, colonne.index("funzione"))
+        if not box:
+            return
+        var = tk.StringVar(value=item.get("funzione") or STANDARD)
+        combo = ttk.Combobox(self.tree, textvariable=var, values=FUNZIONI,
+                             state="readonly", font=self.fonts["base"])
+        combo.place(x=box[0], y=box[1], width=box[2], height=box[3])
+        combo.focus_set()
+        fatto = {"chiuso": False}
+
+        def chiudi(salva):
+            if fatto["chiuso"]:
+                return
+            fatto["chiuso"] = True
+            self._editor_aperto = None
+            scelta = var.get()
+            if combo.winfo_exists():
+                combo.destroy()
+            if salva and scelta != item.get("funzione"):
+                self._run(lambda: self.store.set_funzione(tag, scelta),
+                          T("%s: %s.") % (tag, scelta))
+
+        self._apri_editor(lambda: chiudi(False))
+        combo.bind("<<ComboboxSelected>>", lambda e: chiudi(True))
+        combo.bind("<Return>", lambda e: (chiudi(True), "break")[1])
+        combo.bind("<Escape>", lambda e: (chiudi(False), "break")[1])
+        combo.bind("<FocusOut>", lambda e: self._se_lasciato(combo, lambda: chiudi(False)))
+        # come per lo stato: la tendina si apre con la freccia, non con un
+        # clic finto
         combo.after_idle(lambda: combo.winfo_exists()
                          and combo.event_generate("<Down>"))
 
@@ -3785,7 +3888,7 @@ class App(tk.Tk):
             if text and not any(
                 text in str(item.get(f, "")).lower()
                 for f in ("asset_tag", "modello", "seriale", "imei",
-                          "restituito_da", "note", "tipo", "stanza",
+                          "restituito_da", "note", "tipo", "funzione", "stanza",
                           "stato", "prestato_a")
             ):
                 continue
@@ -4942,7 +5045,7 @@ class App(tk.Tk):
                                 risultato, esito_stanza, opzioni, scartati, tolti)),
                             parent=self)
 
-    def _chiedi_le_stanze_mancanti(self, items):
+    def _chiedi_le_stanze_mancanti(self, items, nuovi=False):
         """Nessun dispositivo entra senza stanza: se il foglio non la dice, si chiede.
 
         Ritorna (righe, non_assegnati). Le righe tornano con la stanza dentro,
@@ -4966,7 +5069,9 @@ class App(tk.Tk):
                 "Aggiungine una dalle impostazioni e riprova.") % len(orfani),
                 parent=self)
             return None, 0
-        scelta = StanzeDaAssegnareDialog(self, len(orfani), stanze).show()
+        scelta = StanzeDaAssegnareDialog(
+            self, len(orfani), stanze, nuovi=nuovi,
+            codici=[i.get("asset_tag") for i in orfani]).show()
         if not scelta:
             return None, 0
         if scelta["come"] == "una":
@@ -4976,7 +5081,7 @@ class App(tk.Tk):
         saltati = set()
         for numero, item in enumerate(orfani, start=1):
             risposta = StanzaDelDispositivoDialog(
-                self, item, stanze, numero, len(orfani)).show()
+                self, item, stanze, numero, len(orfani), nuovo=nuovi).show()
             if not risposta:
                 return None, 0
             if risposta.get("salta"):
@@ -5159,6 +5264,120 @@ class App(tk.Tk):
               "Non e' stato toccato niente.")
             % (che_cosa, len(fuori), "\n".join(righe)), parent=self)
         return True
+
+    def on_importa_funzioni(self):
+        """Aggiorna la Asset Function dell'inventario leggendola da un foglio.
+
+        Dei dispositivi che ci sono gia' si scrive la funzione e basta: la
+        stanza non cambia, nessuno si sposta, il resto della scheda resta com'e'.
+        Quelli del foglio che in inventario non ci sono si aggiungono, con le
+        regole di sempre - una stanza vera, chiesta se il foglio non la dice.
+        Prima di scrivere si vede tutto, e si salva una copia di sicurezza.
+        """
+        path = filedialog.askopenfilename(
+            parent=self, title=T("Foglio con le Asset Function"),
+            filetypes=[(T("File Excel"), "*.xlsx *.xlsm"), (T("Tutti i file"), "*.*")])
+        if not path:
+            return
+        try:
+            items, esito = funzioni_da_workbook(path, self.cfg.get("rooms"))
+        except InventoryError as exc:
+            messagebox.showerror(T("File non leggibile"), str(exc), parent=self)
+            return
+        if not esito.get("colonna_funzione"):
+            messagebox.showwarning(
+                T("Nessuna Asset Function nel foglio"),
+                T("Nel foglio non c'e' nessuna colonna che si chiami Asset Function,\n"
+                  "e nessuna che contenga solo Standard e PC Refresh.\n\n"
+                  "Non e' stato toccato niente."), parent=self)
+            return
+
+        presenti = set(i["asset_tag"] for i in self.store.items)
+        valori = dict((i["asset_tag"], i["funzione"]) for i in items
+                      if i["asset_tag"] in presenti and i.get("funzione"))
+        nuovi = [i for i in items if i["asset_tag"] not in presenti]
+        # i nuovi entrano con le regole di un'importazione: una stanza vera
+        non_assegnati = 0
+        if nuovi:
+            nuovi, non_assegnati = self._chiedi_le_stanze_mancanti(nuovi, nuovi=True)
+            if nuovi is None:
+                return
+        anteprima = self.store.anteprima_funzioni(valori)
+        if not anteprima["cambi"] and not nuovi:
+            messagebox.showinfo(
+                T("Niente da aggiornare"),
+                T("Le Asset Function del foglio sono gia' tutte uguali a quelle\n"
+                  "dell'inventario, e non ci sono dispositivi nuovi.\n\n"
+                  "Non e' stato toccato niente."), parent=self)
+            return
+        righe = self._riepilogo_funzioni(path, esito, anteprima, nuovi, non_assegnati)
+        if not ConfermaOperazioneDialog(
+            self, T("Importa Asset Function"),
+            T("Aggiornare %d Asset Function e aggiungere %d dispositivi?")
+            % (len(anteprima["cambi"]), len(nuovi)),
+            righe, T("Aggiorna"), "Primary.TButton",
+            T("Le stanze dei dispositivi presenti non cambiano e nessuno si sposta.\n"
+              "Una copia del file dati viene salvata prima di procedere.")
+        ).show():
+            return
+        try:
+            copia = self.store.copia_di_sicurezza()
+        except InventoryError as exc:
+            messagebox.showerror(T("Operazione annullata"), str(exc), parent=self)
+            return
+        cambi = self._run(lambda: self.store.aggiorna_funzioni(valori))
+        if cambi is None:
+            return
+        aggiunti = 0
+        if nuovi:
+            risultato = self._run(lambda: self.store.import_items(nuovi, "merge"))
+            if risultato is None:
+                return
+            aggiunti = risultato["aggiunti"]
+            self._aggiorna_cestino()
+        fine = [T("Asset Function aggiornate: %d") % len(cambi),
+                T("Dispositivi aggiunti: %d") % aggiunti, "",
+                T("Le stanze dei dispositivi presenti non sono cambiate."), "",
+                T("Copia di sicurezza del file precedente:"), copia]
+        messagebox.showinfo(T("Asset Function importate"), "\n".join(fine), parent=self)
+
+    def _riepilogo_funzioni(self, path, esito, anteprima, nuovi, non_assegnati):
+        righe = [T("Dal foglio %s, colonna %s.")
+                 % (os.path.basename(path), esito["colonna_funzione"]), ""]
+        cambi = anteprima["cambi"]
+        righe.append(T("DA AGGIORNARE: %d") % len(cambi))
+        for tag, prima, dopo in cambi[:40]:
+            righe.append("    %s   %s  ->  %s" % (tag, prima or T("(vuota)"), dopo))
+        if len(cambi) > 40:
+            righe.append(T("    ...e altri %d") % (len(cambi) - 40))
+        if anteprima["uguali"]:
+            righe.append("")
+            righe.append(T("Gia' uguali, non si toccano: %d") % anteprima["uguali"])
+        if nuovi:
+            righe.append("")
+            righe.append(T("DA AGGIUNGERE, non sono in inventario: %d") % len(nuovi))
+            per_stanza = {}
+            for item in nuovi:
+                per_stanza.setdefault(item.get("stanza") or NO_ROOM(), []).append(item)
+            for stanza in sorted(per_stanza):
+                righe.append(T("  %s - %d dispositivi") % (stanza, len(per_stanza[stanza])))
+                for item in per_stanza[stanza][:15]:
+                    righe.append("    %s  %s" % (item["asset_tag"],
+                                                 item.get("funzione") or T("(vuota)")))
+        if non_assegnati:
+            righe.append("")
+            righe.append(T("Lasciati fuori, senza stanza: %d") % non_assegnati)
+        if anteprima["iphone"]:
+            righe.append("")
+            righe.append(T("iPhone saltati, non hanno una Asset Function: %d")
+                         % len(anteprima["iphone"]))
+        sbagliate = esito.get("funzione_sconosciuta") or []
+        if sbagliate:
+            righe.append("")
+            righe.append(T("Valori non riconosciuti, lasciati com'erano: %d") % len(sbagliate))
+            for voce in sbagliate[:10]:
+                righe.append("    " + voce)
+        return righe
 
     def on_reset(self):
         """Svuota l'inventario, per poi ricaricarlo da un'importazione."""
@@ -5417,6 +5636,9 @@ class App(tk.Tk):
             return
         if result.get("reset"):
             self.on_reset()
+            return
+        if result.get("importa_funzioni"):
+            self.on_importa_funzioni()
             return
         if result.get("ripristina_locale"):
             self.on_ripristino_locale()
