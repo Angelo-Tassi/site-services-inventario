@@ -197,6 +197,11 @@ def dentro_il_prestito():
         esito["nome"] = campo.get()
         esito["ricaricato"] = bool([i for i in app.store.items
                                     if i["asset_tag"] == "IT-7778"])
+    except Exception:
+        # dentro un evento Tk un'eccezione non risale: la si porta fuori,
+        # intera, perche' su Windows e' l'unico modo di leggerla
+        import traceback
+        esito["errore"] = traceback.format_exc()
     finally:
         if d.winfo_exists():
             d.destroy()
@@ -204,6 +209,7 @@ def dentro_il_prestito():
 app.after(20, lambda: quando_pronta(dentro_il_prestito))
 app._on_row_button(tag)          # rimandato con after_idle: parte dall'update
 respira()
+assert not esito.get("errore"), "eccezione dentro la finestra:\n%s" % esito.get("errore")
 assert esito.get("finestra") is not None, "la finestra del prestito non si e' aperta"
 assert esito.get("viva"), "la ricarica ha chiuso la finestra del prestito"
 assert esito.get("nome") == "Mario Rossi", \
