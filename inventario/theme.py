@@ -82,7 +82,7 @@ COLORE_COLONNA = {
 }
 COLORE_COLONNA_ALTRO = "#78888A"
 
-ROOM_COLORS = ["#087F8C", "#4567A1", "#8063A5", "#A36B20", "#AC5161"]
+ROOM_COLORS = ["#2E86C1", "#16A085", "#8E44AD", "#D68910", "#C0392B"]
 IPHONE_COLOR = "#5D6D7E"   # scheda di comodo, non una stanza vera
 
 
@@ -103,7 +103,7 @@ def apply(root):
         "small": (family, 9),
         "bold": (family, 10, "bold"),
         "card_title": (family, 11, "bold"),
-        "count": (family, 32, "bold"),
+        "count": (family, 30, "bold"),
         "title": (family, 17, "bold"),
         "subtitle": (family, 9),
         "section": (family, 12, "bold"),

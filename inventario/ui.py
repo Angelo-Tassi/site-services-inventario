@@ -2590,9 +2590,9 @@ class RoomCard(tk.Frame):
         tk.Frame.__init__(self, parent, bg=theme.CARD, highlightthickness=1,
                           highlightbackground=theme.BORDER, cursor="hand2")
         self.command = command
-        stripe = tk.Frame(self, bg=color, height=3)
+        stripe = tk.Frame(self, bg=color, height=4)
         stripe.pack(fill="x")
-        inner = tk.Frame(self, bg=theme.CARD, padx=18, pady=16)
+        inner = tk.Frame(self, bg=theme.CARD, padx=18, pady=14)
         inner.pack(fill="both", expand=True)
 
         self.labels = []
@@ -2601,7 +2601,7 @@ class RoomCard(tk.Frame):
         title.pack(fill="x")
         number = tk.Label(inner, text=str(count), bg=theme.CARD, fg=color,
                           font=fonts["count"], anchor="w")
-        number.pack(fill="x", pady=(6, 2))
+        number.pack(fill="x")
         sub = tk.Label(inner, text=breakdown, bg=theme.CARD, fg=theme.MUTED,
                        font=fonts["small"], anchor="w")
         sub.pack(fill="x")
@@ -2614,32 +2614,17 @@ class RoomCard(tk.Frame):
         link.pack(fill="x", pady=(10, 0))
 
         self.labels = [inner, title, number, sub, self.note, link]
-        self._testi_a_capo = [title, sub, self.note, link]
-        inner.bind("<Configure>", self._adatta_larghezza)
         for widget in [self] + self.labels:
             widget.bind("<Button-1>", lambda e: self.command())
             widget.bind("<Enter>", self._enter)
             widget.bind("<Leave>", self._leave)
             widget.configure(cursor="hand2")
 
-    def _adatta_larghezza(self, evento):
-        """Le stanze con nomi lunghi restano dentro la loro scheda."""
-        larghezza = max(1, evento.width - 36)
-        for widget in self._testi_a_capo:
-            if int(widget.cget("wraplength")) != larghezza:
-                widget.configure(wraplength=larghezza)
-
     def _enter(self, _event=None):
         self.configure(highlightbackground=theme.ACCENT)
-        for widget in self.labels:
-            widget.configure(bg=theme.CARD_HOVER)
-        self.configure(bg=theme.CARD_HOVER)
 
     def _leave(self, _event=None):
         self.configure(highlightbackground=theme.BORDER)
-        for widget in self.labels:
-            widget.configure(bg=theme.CARD)
-        self.configure(bg=theme.CARD)
 
 
 # ------------------------------------------------------------ finestra principale
