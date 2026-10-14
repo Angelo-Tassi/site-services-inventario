@@ -1,4 +1,6 @@
 @echo off
+setlocal EnableExtensions DisableDelayedExpansion
+set "INV_DIR=%~dp0"
 rem ---------------------------------------------------------------------------
 rem  Avvia il programma. Se accanto c'e' la cartella "python" usa quello, che
 rem  viaggia col programma e non richiede niente sul PC. Altrimenti ripiega sul
@@ -11,7 +13,7 @@ rem  ha a che fare con una firma mancante. Qui lo si toglie da tutta la
 rem  cartella una volta sola, cosi' i prossimi doppi clic - su questo file e
 rem  sugli altri accanto - non lo chiedono piu'.
 if exist "%~dp0.sbloccato" goto :gia_sbloccato
-powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command "Get-ChildItem -LiteralPath '%~dp0' -Recurse -File -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue" >nul 2>&1
+powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command "Get-ChildItem -LiteralPath $env:INV_DIR -Recurse -File -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue" >nul 2>&1
 type nul > "%~dp0.sbloccato" 2>nul
 attrib +h "%~dp0.sbloccato" >nul 2>&1
 :gia_sbloccato

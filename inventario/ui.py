@@ -2590,9 +2590,9 @@ class RoomCard(tk.Frame):
         tk.Frame.__init__(self, parent, bg=theme.CARD, highlightthickness=1,
                           highlightbackground=theme.BORDER, cursor="hand2")
         self.command = command
-        stripe = tk.Frame(self, bg=color, height=4)
+        stripe = tk.Frame(self, bg=color, height=3)
         stripe.pack(fill="x")
-        inner = tk.Frame(self, bg=theme.CARD, padx=18, pady=14)
+        inner = tk.Frame(self, bg=theme.CARD, padx=18, pady=16)
         inner.pack(fill="both", expand=True)
 
         self.labels = []
@@ -2601,7 +2601,7 @@ class RoomCard(tk.Frame):
         title.pack(fill="x")
         number = tk.Label(inner, text=str(count), bg=theme.CARD, fg=color,
                           font=fonts["count"], anchor="w")
-        number.pack(fill="x")
+        number.pack(fill="x", pady=(6, 2))
         sub = tk.Label(inner, text=breakdown, bg=theme.CARD, fg=theme.MUTED,
                        font=fonts["small"], anchor="w")
         sub.pack(fill="x")
@@ -2614,17 +2614,32 @@ class RoomCard(tk.Frame):
         link.pack(fill="x", pady=(10, 0))
 
         self.labels = [inner, title, number, sub, self.note, link]
+        self._testi_a_capo = [title, sub, self.note, link]
+        inner.bind("<Configure>", self._adatta_larghezza)
         for widget in [self] + self.labels:
             widget.bind("<Button-1>", lambda e: self.command())
             widget.bind("<Enter>", self._enter)
             widget.bind("<Leave>", self._leave)
             widget.configure(cursor="hand2")
 
+    def _adatta_larghezza(self, evento):
+        """Le stanze con nomi lunghi restano dentro la loro scheda."""
+        larghezza = max(1, evento.width - 36)
+        for widget in self._testi_a_capo:
+            if int(widget.cget("wraplength")) != larghezza:
+                widget.configure(wraplength=larghezza)
+
     def _enter(self, _event=None):
         self.configure(highlightbackground=theme.ACCENT)
+        for widget in self.labels:
+            widget.configure(bg=theme.CARD_HOVER)
+        self.configure(bg=theme.CARD_HOVER)
 
     def _leave(self, _event=None):
         self.configure(highlightbackground=theme.BORDER)
+        for widget in self.labels:
+            widget.configure(bg=theme.CARD)
+        self.configure(bg=theme.CARD)
 
 
 # ------------------------------------------------------------ finestra principale
@@ -2661,9 +2676,8 @@ class App(tk.Tk):
         self._build_header()
         self._build_toolbar()
         self._build_filters()
-        self.body = ttk.Frame(self, padding=(16, 4, 16, 8))
-        self.body.pack(fill="both", expand=True)
         self._build_status()
+        self._build_body()
         self._bind_keys()
 
         self.after(100, self._initial_load)
@@ -2706,26 +2720,27 @@ class App(tk.Tk):
         self._build_header()
         self._build_toolbar()
         self._build_filters()
-        self.body = ttk.Frame(self, padding=(16, 4, 16, 8))
-        self.body.pack(fill="both", expand=True)
         self._build_status()
+        self._build_body()
         self._sync_filter_values()
         self.show_home()
 
         self._avvisa_versione()
 
     def _build_header(self):
-        head = ttk.Frame(self, style="Head.TFrame", padding=(20, 14))
+        head = ttk.Frame(self, style="Head.TFrame", padding=(24, 18))
         head.pack(fill="x")
         left = ttk.Frame(head, style="Head.TFrame")
         left.pack(side="left")
         ttk.Label(left, text=T("Site Services : Inventario Iphone, Laptop e Tablet"),
                   style="HeadTitle.TLabel").pack(anchor="w")
-        ttk.Label(left, text="v" + __version__,
-                  style="HeadSub.TLabel").pack(anchor="w")
         self.var_subtitle = tk.StringVar(value=T("Laptop e tablet in nostro possesso"))
-        ttk.Label(left, textvariable=self.var_subtitle,
-                  style="HeadSub.TLabel").pack(anchor="w", pady=(2, 0))
+        dettagli = ttk.Frame(left, style="Head.TFrame")
+        dettagli.pack(anchor="w", pady=(6, 0))
+        ttk.Label(dettagli, textvariable=self.var_subtitle,
+                  style="HeadSub.TLabel").pack(side="left")
+        ttk.Label(dettagli, text="  ·  v" + __version__,
+                  style="HeadSub.TLabel").pack(side="left")
         destra = ttk.Frame(head, style="Head.TFrame")
         destra.pack(side="right")
         scelta = ttk.Frame(destra, style="Head.TFrame")
@@ -2751,12 +2766,12 @@ class App(tk.Tk):
         stanno in tre gruppi e i gruppi vanno a capo quando serve, cosi' non
         se ne perde mai nessuno.
         """
-        self.barra = ttk.Frame(self, padding=(16, 12, 16, 4))
+        self.barra = ttk.Frame(self, style="Card.TFrame", padding=(16, 12, 16, 8))
         self.barra.pack(fill="x")
         self.barra.columnconfigure(1, weight=1)
 
         # 1. i comandi di tutti i giorni
-        self.gruppo_lavoro = ttk.Frame(self.barra)
+        self.gruppo_lavoro = ttk.Frame(self.barra, style="Card.TFrame")
         self.btn_home = ttk.Button(self.gruppo_lavoro, text=T("‹  Home"),
                                    style="Ghost.TButton", command=self.show_home)
         self.btn_home.pack(side="left", padx=(0, 10))
@@ -2773,7 +2788,7 @@ class App(tk.Tk):
         # 2. i file che entrano ed escono. Il colore dice a quale famiglia
         # appartiene il comando: arancione i dati che entrano, verde quelli che
         # escono, rosso quello che riscrive l'inventario di tutti.
-        self.gruppo_file = ttk.Frame(self.barra)
+        self.gruppo_file = ttk.Frame(self.barra, style="Card.TFrame")
         self.sep_barra = ttk.Separator(self.gruppo_file, orient="vertical")
         self.sep_barra.pack(side="left", fill="y", padx=10)
         for text, command, stile in (
@@ -2785,7 +2800,7 @@ class App(tk.Tk):
                        command=command).pack(side="left", padx=(0, 6))
 
         # 3. quello che non riguarda i dispositivi
-        self.gruppo_lato = ttk.Frame(self.barra)
+        self.gruppo_lato = ttk.Frame(self.barra, style="Card.TFrame")
         ttk.Button(self.gruppo_lato, text=T("Aggiorna"),
                    command=self.on_refresh).pack(side="left", padx=(0, 6))
         ttk.Button(self.gruppo_lato, text=T("Impostazioni"),
@@ -2847,34 +2862,77 @@ class App(tk.Tk):
         return figli[0] if figli else None
 
     def _build_filters(self):
-        bar = ttk.Frame(self, padding=(16, 4))
+        bar = ttk.Frame(self, style="Card.TFrame", padding=(16, 4, 16, 12))
         bar.pack(fill="x")
-        ttk.Label(bar, text=T("Cerca")).pack(side="left")
+        ttk.Label(bar, text=T("Cerca"), style="Card.TLabel").pack(side="left")
         self.var_search = tk.StringVar()
         self.var_search.trace_add("write", lambda *a: self.refresh_table())
         self.entry_search = ttk.Entry(bar, textvariable=self.var_search, width=34)
         self.entry_search.pack(side="left", padx=(6, 16))
 
-        self.label_room = ttk.Label(bar, text=T("Stanza"))
+        self.label_room = ttk.Label(bar, text=T("Stanza"), style="Card.TLabel")
         self.label_room.pack(side="left")
         self.var_room = tk.StringVar(value=TUTTE())
         self.combo_room = ttk.Combobox(bar, textvariable=self.var_room, state="readonly", width=20)
         self.combo_room.pack(side="left", padx=(6, 16))
         self.combo_room.bind("<<ComboboxSelected>>", self._on_room_filter)
 
-        ttk.Label(bar, text=T("Tipo")).pack(side="left")
+        ttk.Label(bar, text=T("Tipo"), style="Card.TLabel").pack(side="left")
         self.var_type = tk.StringVar(value=TUTTI())
         self.combo_type = ttk.Combobox(bar, textvariable=self.var_type, state="readonly", width=14)
         self.combo_type.pack(side="left", padx=(6, 16))
         self.combo_type.bind("<<ComboboxSelected>>", self._on_type_filter)
 
         ttk.Button(bar, text=T("Azzera filtri"), command=self.reset_filters).pack(side="left")
+        ttk.Separator(self).pack(fill="x")
 
     def _build_status(self):
         self.var_status = tk.StringVar()
-        ttk.Separator(self).pack(fill="x")
         ttk.Label(self, textvariable=self.var_status, style="Status.TLabel",
-                  anchor="w", padding=(16, 6)).pack(fill="x")
+                  anchor="w", padding=(16, 8)).pack(side="bottom", fill="x")
+        ttk.Separator(self).pack(side="bottom", fill="x")
+
+    def _build_body(self):
+        # Il riepilogo puo' essere piu' alto dello spazio disponibile. La
+        # tabella ha una zona propria: il minimo deve valere anche per i suoi
+        # contenitori, non soltanto per la griglia interna del Treeview.
+        self.content = ttk.Frame(self, padding=(16, 4, 16, 8))
+        self.content.pack(fill="both", expand=True)
+        self.content.columnconfigure(0, weight=1)
+        self.content.rowconfigure(1, weight=1,
+                                  minsize=ALTEZZA_MINIMA_TABELLA + 18)
+        self.overview = tk.Canvas(self.content, bg=theme.BG,
+                                  highlightthickness=0, height=1)
+        self.overview.grid(row=0, column=0, sticky="nsew")
+        self.overview_scroll = ttk.Scrollbar(self.content, orient="vertical",
+                                             command=self.overview.yview)
+        self.overview.configure(yscrollcommand=self.overview_scroll.set)
+        self.body = ttk.Frame(self.overview)
+        self._overview_window = self.overview.create_window(
+            0, 0, anchor="nw", window=self.body)
+        self.table_area = ttk.Frame(self.content)
+        self.table_area.grid(row=1, column=0, columnspan=2, sticky="nsew")
+        self.content.bind("<Configure>", self._sistema_body)
+        self.body.bind("<Configure>", self._sistema_body)
+        self.overview.bind("<Configure>", self._sistema_body)
+
+    def _sistema_body(self, _event=None):
+        disponibile = max(1, self.content.winfo_height() - 12
+                          - ALTEZZA_MINIMA_TABELLA - 18)
+        richiesta = self.body.winfo_reqheight()
+        altezza = min(richiesta, disponibile)
+        scorre = richiesta > disponibile
+        if scorre:
+            self.overview_scroll.grid(row=0, column=1, sticky="ns")
+        else:
+            self.overview_scroll.grid_remove()
+            self.overview.yview_moveto(0)
+        if int(self.overview.cget("height")) != altezza:
+            self.overview.configure(height=altezza)
+        larghezza = max(1, self.overview.winfo_width())
+        if int(float(self.overview.itemcget(self._overview_window, "width"))) != larghezza:
+            self.overview.itemconfigure(self._overview_window, width=larghezza)
+        self.overview.configure(scrollregion=(0, 0, larghezza, richiesta))
 
     def _bind_keys(self):
         """Le scorciatoie della finestra principale.
@@ -3761,8 +3819,10 @@ class App(tk.Tk):
     def _clear_body(self):
         self._chiudi_editor_aperto()
         self._clear_row_buttons()
-        for child in self.body.winfo_children():
-            child.destroy()
+        for parent in (self.body, self.table_area):
+            for child in parent.winfo_children():
+                child.destroy()
+        self.overview.yview_moveto(0)
         self.tree = None
 
     def show_home(self):
@@ -3806,19 +3866,19 @@ class App(tk.Tk):
             self.var_section_count = tk.StringVar()
             ttk.Label(header, textvariable=self.var_section_count,
                       style="Muted.TLabel").pack(side="left", padx=(10, 0))
-            ttk.Button(header, text=T("Scarica il modello di importazione"),
-                       command=self.on_template).pack(side="right")
-            ttk.Button(header, text=T("Controllo generale duplicati"),
-                       style="Rosso.TButton",
-                       command=self.on_duplicati).pack(side="right", padx=(0, 6))
-            ttk.Button(header, text=T("Elimina da Excel"),
-                       style="Rosso.TButton",
-                       command=self.on_elimina_da_excel).pack(side="right",
-                                                              padx=(0, 6))
             self.btn_cestino = ttk.Button(header, style="Cestino.TButton",
                                           text=self._etichetta_cestino(),
                                           command=self.on_cestino)
-            self.btn_cestino.pack(side="right", padx=(0, 10))
+            self.btn_cestino.pack(side="right")
+            # I comandi sul file hanno una riga propria: il titolo e il cestino
+            # restano leggibili anche con i testi inglesi sullo schermo piccolo.
+            strumenti = ttk.Frame(self.body)
+            strumenti.pack(fill="x", pady=(0, 10))
+            ttk.Button(strumenti, text=T("Scarica il modello di importazione"),
+                       command=self.on_template).pack(side="left")
+            ttk.Button(strumenti, text=T("Elimina da Excel"),
+                       style="Rosso.TButton",
+                       command=self.on_elimina_da_excel).pack(side="right")
         else:
             header = ttk.Frame(self.body)
             header.pack(fill="x", pady=(10, 8))
@@ -3835,7 +3895,7 @@ class App(tk.Tk):
             self.var_section_count = tk.StringVar()
             ttk.Label(header, textvariable=self.var_section_count,
                       style="Muted.TLabel").pack(side="left", padx=(10, 0))
-        self.tree = self._make_table(self.body)
+        self.tree = self._make_table(self.table_area)
         self.refresh_table(keep_selection=False)
 
     def _render_cards(self):
@@ -4804,104 +4864,6 @@ class App(tk.Tk):
         if len(tolti) > 12:
             righe.append(T("    ...e altri %d") % (len(tolti) - 12))
         return righe
-
-    def on_duplicati(self):
-        """Cerca in tutto l'inventario i dispositivi registrati due volte.
-
-        Il file dati e' un .xlsx che si puo' aprire e correggere a mano: e' da
-        li' che i doppioni entrano. Il programma non ne crea, ma deve saperli
-        togliere.
-
-        Guarda anche nel cestino: un identificativo che sta insieme in elenco e
-        fra gli eliminati di recente e' un doppione come gli altri, e da li' si
-        potrebbe "ripristinare" una seconda copia.
-        """
-        tolti = self._pulisci_cestino()
-        gruppi, seriali = self.store.trova_duplicati()
-        if not gruppi and not seriali:
-            messagebox.showinfo(
-                T("Nessun duplicato"),
-                T("Ho confrontato l'ASSET TAG di %d dispositivi: ognuno compare una\n"
-                  "volta sola. E' quello l'identificativo, e su quello si controlla.\n\n"
-                  "Nemmeno un numero di serie risulta ripetuto, ma quella e' solo una\n"
-                  "verifica in piu': il seriale non identifica il dispositivo.")
-                % len(self.store.items)
-                + "\n".join([""] + self._righe_tolti_dal_cestino(tolti)), parent=self)
-            return
-
-        righe = [T("Confrontato l'asset tag di %d dispositivi.")
-                 % len(self.store.items), ""]
-        righe.extend(self._righe_tolti_dal_cestino(tolti))
-        if tolti:
-            righe.append("")
-        if gruppi:
-            quanti = sum(len(e) - 1 for _t, e in gruppi)
-            righe.append(T("DOPPIONI TROVATI: %d asset tag registrati piu' volte, "
-                           "%d righe in piu'.") % (len(gruppi), quanti))
-            for tag, elenco in gruppi[:12]:
-                tenuto = self.store._piu_recente(elenco)
-                righe.append("")
-                righe.append("  %s  -  %d registrazioni" % (tag, len(elenco)))
-                for item in elenco:
-                    segno = T("TIENE") if item is tenuto else T("elimina")
-                    righe.append("    [%s] %s  %s  %s"
-                                 % (segno, item.get("stanza") or "-",
-                                    (item.get("modello") or "")[:28],
-                                    item.get("modificato_il") or ""))
-            if len(gruppi) > 12:
-                righe.append("")
-                righe.append(T("  ... e altri %d asset tag") % (len(gruppi) - 12))
-            righe.append("")
-            righe.append(T("Si tiene la registrazione modificata piu' di recente."))
-        if seriali:
-            righe.append("")
-            righe.append(T("Nota a margine - numeri di serie ripetuti su asset tag\n"
-                           "diversi: %d") % len(seriali))
-            for seriale, elenco in seriali[:8]:
-                righe.append("    %s  ->  %s" % (seriale, ", ".join(
-                    valore_visibile(i, "asset_tag") for i in elenco)))
-            righe.append(T("Il seriale non identifica il dispositivo, quindi questi\n"
-                           "NON sono duplicati e non vengono toccati. Di solito pero'\n"
-                           "sono un errore di battitura, e conviene guardarli."))
-
-        if not gruppi:
-            messagebox.showwarning(T("Controllo duplicati"), "\n".join(righe),
-                                   parent=self)
-            return
-        if not messagebox.askyesno(
-            T("Controllo duplicati"),
-            "\n".join(righe) + T("\n\nProcedo a eliminare le righe in piu'?\n"
-                                 "Una copia di sicurezza viene salvata prima."),
-            parent=self
-        ):
-            return
-
-        rapporto = self._run(lambda: self.store.rimuovi_duplicati(),
-                             T("Duplicati rimossi."))
-        if not rapporto:
-            return
-        self._render()
-        fine = [T("Eliminate %d righe in piu'.") % len(rapporto["eliminati"]), ""]
-        for item in rapporto["eliminati"][:15]:
-            fine.append("    %s  %s  %s" % (valore_visibile(item, "asset_tag"),
-                                            item.get("stanza") or "-",
-                                            (item.get("modello") or "")[:24]))
-        if len(rapporto["eliminati"]) > 15:
-            fine.append(T("    ... e altre %d") % (len(rapporto["eliminati"]) - 15))
-        if rapporto["protetti"]:
-            fine.append("")
-            fine.append(T("NON eliminate, protette: %d") % len(rapporto["protetti"]))
-            for item, motivo in rapporto["protetti"]:
-                fine.append("    %s  -  %s"
-                            % (valore_visibile(item, "asset_tag"), motivo))
-        fine.append("")
-        fine.append(T("Dispositivi prima: %d") % rapporto["prima"])
-        fine.append(T("Dispositivi adesso: %d") % rapporto["dopo"])
-        if rapporto["copia"]:
-            fine.append("")
-            fine.append(T("Copia di sicurezza del file precedente:"))
-            fine.append(rapporto["copia"])
-        messagebox.showinfo(T("Duplicati rimossi"), "\n".join(fine), parent=self)
 
     def on_template(self):
         """Genera il modello vuoto da compilare e reimportare."""

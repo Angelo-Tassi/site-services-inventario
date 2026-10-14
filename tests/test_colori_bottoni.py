@@ -106,7 +106,12 @@ for sfondo, testo in ((theme.AZIONE_ROSSA_BG, theme.AZIONE_ROSSA_FG),
                       (theme.AZIONE_VERDE_BG, theme.AZIONE_VERDE_FG),
                       (theme.AZIONE_VERDE_BG_ON, theme.AZIONE_VERDE_FG),
                       (theme.AZIONE_ARANCIO_BG, theme.AZIONE_ARANCIO_FG),
-                      (theme.AZIONE_ARANCIO_BG_ON, theme.AZIONE_ARANCIO_FG)):
+                      (theme.AZIONE_ARANCIO_BG_ON, theme.AZIONE_ARANCIO_FG),
+                      (theme.ACCENT, "#FFFFFF"),
+                      (theme.ACCENT_DARK, "#FFFFFF"),
+                      (theme.HEAD_BG, theme.PRIMARY),
+                      (theme.CARD, theme.MUTED),
+                      (theme.CARD_HOVER, theme.TEXT)):
     rapporto = contrasto(sfondo, testo)
     assert rapporto >= 4.5, "%s su %s: contrasto %.1f" % (testo, sfondo, rapporto)
 

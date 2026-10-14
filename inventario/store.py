@@ -354,13 +354,13 @@ COPIE_DA_TENERE = 10
 # essere riaperta da un'altra, dove l'inventario si chiama in un altro modo.
 # Il cestino: quanti record ci stanno e per quanto. Non e' un archivio storico,
 # e' la rete di sicurezza per l'eliminazione sbagliata di ieri.
-ELIMINATI_MASSIMO = 300
+ELIMINATI_MASSIMO = 500
 ELIMINATI_GIORNI = 30
 # Quanti dispositivi si possono eliminare in un colpo da un file Excel. Non e'
 # un limite tecnico: e' il punto oltre il quale nessuno legge davvero l'elenco
 # di quello che sta per sparire, e una conferma che non si legge non e' una
 # conferma.
-MASSIMO_ELIMINA_EXCEL = 200
+MASSIMO_ELIMINA_EXCEL = 300
 
 NOME_DATI_NELLO_ZIP = "Inventario.xlsx"
 NOME_IMPOSTAZIONI_NELLO_ZIP = "inventario_impostazioni.json"
@@ -1258,7 +1258,7 @@ class InventoryStore(object):
         recente: sarebbe un doppione fra due posti che si contraddicono, e chi
         lo ripescasse dal cestino ne creerebbe una seconda copia. Ogni strada
         che rimette dentro un identificativo - importazione, inserimento
-        singolo, controllo doppioni - passa di qui.
+        singolo, ripristino - passa di qui.
 
         `tags` limita la pulizia a quegli identificativi; senza, guarda tutto
         l'inventario. Si toglie solo cio' che in inventario c'e' davvero: il
@@ -2282,104 +2282,6 @@ class InventoryStore(object):
     def set_note(self, tag, note):
         """Aggiorna soltanto le note (modifica al volo dall'elenco)."""
         return self.set_campo(tag, "note", note)
-
-    def trova_duplicati(self):
-        """Dispositivi registrati piu' di una volta con lo stesso identificativo.
-
-        Il file dati e' un .xlsx che si puo' aprire e modificare a mano: e' da
-        li' che i doppioni entrano, perche' il programma da solo non ne crea.
-        Vengono segnalati anche i numeri di serie ripetuti, che duplicati non
-        sono ma quasi sempre sono un errore di battitura.
-
-        Ritorna (gruppi, seriali), dove gruppi e' una lista di (identificativo,
-        [dispositivi]) e seriali una lista di (seriale, [dispositivi]).
-        """
-        items = self.load()
-        per_tag, per_seriale = {}, {}
-        for it in items:
-            per_tag.setdefault(norm_tag(it.get("asset_tag")), []).append(it)
-            seriale = clean(it.get("seriale")).upper()
-            if seriale:
-                per_seriale.setdefault(seriale, []).append(it)
-        gruppi = [(tag, elenco) for tag, elenco in sorted(per_tag.items())
-                  if tag and len(elenco) > 1]
-        seriali = [(seriale, elenco) for seriale, elenco in sorted(per_seriale.items())
-                   if len(elenco) > 1
-                   and len(set(norm_tag(i.get("asset_tag")) for i in elenco)) > 1]
-        return gruppi, seriali
-
-    def _piu_recente(self, elenco):
-        """Il doppione da tenere: l'ultimo toccato, o il primo se non si sa."""
-        def quando(item):
-            try:
-                return datetime.strptime(item.get("modificato_il", ""),
-                                         "%d/%m/%Y %H:%M:%S")
-            except (ValueError, TypeError):
-                return datetime.min
-        return max(elenco, key=quando)
-
-    def rimuovi_duplicati(self):
-        """Tiene una sola copia di ogni dispositivo e toglie le altre.
-
-        Si tiene la registrazione modificata piu' di recente: e' quella su cui
-        qualcuno ha lavorato per ultimo. Gli iPhone protetti non si toccano
-        nemmeno qui, e vengono elencati perche' se ne occupi una persona.
-
-        Ritorna un rapporto con quello che e' stato fatto e quello che non si e'
-        potuto fare.
-        """
-        gruppi, seriali = self.trova_duplicati()
-        rapporto = {"gruppi": len(gruppi), "eliminati": [], "tenuti": [],
-                    "protetti": [], "seriali": seriali, "copia": None,
-                    "prima": len(self.items), "dopo": len(self.items)}
-        if not gruppi:
-            return rapporto
-
-        da_togliere = []
-        for tag, elenco in gruppi:
-            tenuto = self._piu_recente(elenco)
-            rapporto["tenuti"].append(tenuto)
-            for item in elenco:
-                if item is tenuto:
-                    continue
-                libero, sblocco = puo_essere_eliminato(item)
-                if not libero:
-                    motivo = ("iPhone non ancora rispedito" if sblocco is None
-                              else "in conservazione fino al %s"
-                              % sblocco.strftime("%d/%m/%Y"))
-                    rapporto["protetti"].append((item, motivo))
-                    continue
-                da_togliere.append(item)
-        if not da_togliere:
-            return rapporto
-
-        rapporto["copia"] = self.copia_di_sicurezza()
-
-        # I doppioni si riconoscono per contenuto, non per identita': due copie
-        # identiche restano due righe distinte nel file, e se ne toglie una sola
-        # per ogni copia in eccesso.
-        chiavi = [(norm_tag(i.get("asset_tag")), i.get("modificato_il"),
-                   i.get("modificato_da")) for i in da_togliere]
-
-        def op(items):
-            rimasti, tolti = [], []
-            residui = list(chiavi)
-            for it in items:
-                chiave = (norm_tag(it.get("asset_tag")), it.get("modificato_il"),
-                          it.get("modificato_da"))
-                if chiave in residui:
-                    residui.remove(chiave)
-                    tolti.append(it)
-                    continue
-                rimasti.append(it)
-            items[:] = rimasti
-            return tolti
-
-        tolti = self._apply(op)
-        rapporto["eliminati"] = tolti
-        rapporto["dopo"] = len(self.items)
-        rapporto["prima"] = rapporto["dopo"] + len(tolti)
-        return rapporto
 
     def anteprima_eliminazione(self, codici):
         """Che cosa succederebbe eliminando i codici indicati, senza toccarli.

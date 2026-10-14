@@ -82,7 +82,7 @@ store.delete(["IT-0102", "DR-0201"])
 assert [v["asset_tag"] for v in store.eliminati("dr-02")] == ["DR-0201"]
 assert [v["asset_tag"] for v in store.eliminati(KIOSK.lower())] == []
 
-# ---- oltre i 30 giorni un record scade, e oltre 200 si tiene il piu' recente
+# ---- oltre i 30 giorni un record scade, e oltre 500 si tiene il piu' recente
 vecchio = (datetime.now() - timedelta(days=ELIMINATI_GIORNI + 1)).strftime(
     "%d/%m/%Y %H:%M:%S")
 voci = store._leggi_eliminati()

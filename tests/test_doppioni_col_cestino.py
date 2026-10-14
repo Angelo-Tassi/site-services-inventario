@@ -8,7 +8,7 @@ dispositivo, due schede identiche in tutto con asset tag diversi sono due
 dispositivi.
 
 Tre regole, che valgono da ogni strada che rimette dentro un dispositivo -
-importazione da qualsiasi pagina, inserimento singolo, controllo doppioni:
+importazione da qualsiasi pagina, inserimento singolo, ripristino:
 
 1. gia' in inventario  -> non si importa MAI: la riga si salta e si dice in che
    stanza sta quello che c'e' gia'. La sua scheda non viene riscritta da un
@@ -158,19 +158,6 @@ assert "NON IMPORTATI, gia' in inventario: 1" in testo, testo
 assert ("IT-0101  ->  %s" % BAU) in testo, testo
 assert "TOLTI DAGLI ELIMINATI DI RECENTE: 1" in testo, testo
 assert ("IT-0106  ->  %s" % KIOSK) in testo, testo
-
-# ---- il controllo generale duplicati fa la stessa pulizia
-app._run(lambda: app.store.delete(["IT-0102"]), "ok")
-app._run(lambda: app.store.add(new_item("IT-0102", "Laptop", "T14", "PF2", DR)), "ok")
-app.store.load()
-assert [v["asset_tag"] for v in app.store.eliminati()] == ["IT-0102"], \
-    "IT-0102 e' in inventario E nel cestino: e' il caso da ripulire"
-avvisi.clear()
-app.on_duplicati()
-assert not app.store.eliminati(), "il controllo doppioni deve averlo tolto"
-corpo = avvisi[-1][1]
-assert "TOLTI DAGLI ELIMINATI DI RECENTE: 1" in corpo, corpo
-assert ("IT-0102  ->  %s" % DR) in corpo, corpo
 
 app.destroy()
 print("DOPPIONI COL CESTINO OK")

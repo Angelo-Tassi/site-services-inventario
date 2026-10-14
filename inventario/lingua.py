@@ -608,46 +608,6 @@ EN = {
         'Copied to the clipboard: %s.',
     "Il tipo non puo' restare vuoto.":
         'The type cannot be left empty.',
-    'Controllo generale duplicati':
-        'General duplicate check',
-    'Nessun duplicato':
-        'No duplicates',
-    "Ho controllato %d dispositivi: ognuno compare una volta sola.\n\nNessun numero di serie e' ripetuto su due dispositivi diversi.":
-        'I checked %d devices: each appears only once.\n\nNo serial number is repeated on two different devices.',
-    'Controllati %d dispositivi.':
-        '%d devices checked.',
-    "DOPPIONI TROVATI: %d identificativi, %d righe in piu'.":
-        'DUPLICATES FOUND: %d identifiers, %d extra rows.',
-    'TIENE':
-        'KEEPS',
-    'elimina':
-        'deletes',
-    '  ... e altri %d identificativi':
-        '  ... and %d more identifiers',
-    "Si tiene la registrazione modificata piu' di recente.":
-        'The most recently changed record is the one kept.',
-    'NUMERI DI SERIE RIPETUTI su dispositivi diversi: %d':
-        'SERIAL NUMBERS REPEATED on different devices: %d',
-    'Questi non vengono toccati: vanno guardati a mano.':
-        'These are not touched: they need a look by hand.',
-    'Controllo duplicati':
-        'Duplicate check',
-    "\n\nProcedo a eliminare le righe in piu'?\nUna copia di sicurezza viene salvata prima.":
-        '\n\nShall I delete the extra rows?\nA backup copy is saved first.',
-    'Duplicati rimossi.':
-        'Duplicates removed.',
-    'Duplicati rimossi':
-        'Duplicates removed',
-    "Eliminate %d righe in piu'.":
-        '%d extra rows deleted.',
-    '    ... e altre %d':
-        '    ... and %d more',
-    'NON eliminate, protette: %d':
-        'NOT deleted, protected: %d',
-    'Dispositivi prima: %d':
-        'Devices before: %d',
-    'Dispositivi adesso: %d':
-        'Devices now: %d',
     "%d identificativi compaiono piu' volte nel foglio (%s): vale l'ultima riga.":
         '%d identifiers appear more than once in the sheet (%s): the last row wins.',
     ' e altri':
@@ -764,18 +724,6 @@ EN = {
         'The shared folder cannot be written to:\n  %s\n\n%s\n\nModify permission on that folder is needed: ask whoever\nadministers the share.',
     "Sulla share non c'e' nessun inventario:\n  %s":
         'There is no inventory on the share:\n  %s',
-    "Ho confrontato l'ASSET TAG di %d dispositivi: ognuno compare una\nvolta sola. E' quello l'identificativo, e su quello si controlla.\n\nNemmeno un numero di serie risulta ripetuto, ma quella e' solo una\nverifica in piu': il seriale non identifica il dispositivo.":
-        'I compared the ASSET TAG of %d devices: each appears only once.\nThat is the identifier, and that is what the check is on.\n\nNo serial number is repeated either, but that is only an extra\ncheck: the serial does not identify the device.',
-    "Confrontato l'asset tag di %d dispositivi.":
-        'Compared the asset tag of %d devices.',
-    "DOPPIONI TROVATI: %d asset tag registrati piu' volte, %d righe in piu'.":
-        'DUPLICATES FOUND: %d asset tags recorded more than once, %d extra rows.',
-    '  ... e altri %d asset tag':
-        '  ... and %d more asset tags',
-    'Nota a margine - numeri di serie ripetuti su asset tag\ndiversi: %d':
-        'Side note - serial numbers repeated on different asset\ntags: %d',
-    "Il seriale non identifica il dispositivo, quindi questi\nNON sono duplicati e non vengono toccati. Di solito pero'\nsono un errore di battitura, e conviene guardarli.":
-        'The serial does not identify the device, so these are NOT\nduplicates and are not touched. They usually are a typo\nthough, and are worth a look.',
     "%d righe ignorate: manca l'asset tag.":
         '%d rows ignored: the asset tag is missing.',
     "%d asset tag compaiono piu' volte nel foglio (%s): vale l'ultima riga.":

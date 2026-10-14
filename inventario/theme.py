@@ -3,16 +3,21 @@
 import tkinter.font as tkfont
 from tkinter import ttk
 
-BG = "#EEF2F7"          # sfondo finestra
-CARD = "#FFFFFF"        # sfondo schede e tabella
-PRIMARY = "#1F4E79"     # blu istituzionale (lo stesso dei file Excel)
-PRIMARY_DARK = "#163A5B"
-ACCENT = "#2E86C1"
-TEXT = "#1B2733"
-MUTED = "#6B7A8C"
-BORDER = "#D7E0EA"
-HEAD_BG = "#E7EEF6"
-ROW_ALT = "#F6F9FC"
+BG = "#F3F6F9"          # sfondo finestra
+CARD = "#FFFFFF"        # superfici e tabella
+CARD_HOVER = "#F0F8F9"  # scheda sotto il puntatore
+PRIMARY = "#16344A"     # intestazione e titoli: blu ardesia
+PRIMARY_DARK = "#0F283A"
+ACCENT = "#087F8C"      # azione principale: verde petrolio
+ACCENT_DARK = "#066873"
+TEXT = "#223548"
+MUTED = "#526779"
+BORDER = "#DCE5ED"
+HEAD_BG = "#EAF0F5"
+HEAD_HOVER = "#DCE8EE"
+ROW_ALT = "#F7FAFC"
+DISABLED_BG = "#EDF1F5"
+DISABLED_FG = "#738394"
 # Ambra: e' l'unica tinta che nessuna categoria di riga usa. Con l'azzurro di
 # prima una riga selezionata era quasi identica a un tablet Dell, e con venti
 # righe accese insieme non si capiva piu' che cosa fosse una spunta e che cosa
@@ -22,7 +27,7 @@ DANGER = "#B03A2E"
 LOAN_BG = "#FDEEEC"     # riga di un dispositivo in prestito
 LOAN_BG_ALT = "#FAE6E3"
 LOAN_FG = "#A93226"
-LINK = "#1A6BA8"        # cella-pulsante nell'elenco
+LINK = "#087F8C"        # cella-pulsante nell'elenco
 IPHONE_ROW = "#EDF9EF"  # riga di un iPhone
 IPHONE_ROW_ALT = "#E5F4E8"
 TABLET_ROW = "#EAF4FD"  # riga di un tablet Dell
@@ -77,7 +82,7 @@ COLORE_COLONNA = {
 }
 COLORE_COLONNA_ALTRO = "#78888A"
 
-ROOM_COLORS = ["#2E86C1", "#16A085", "#8E44AD", "#D68910", "#C0392B"]
+ROOM_COLORS = ["#087F8C", "#4567A1", "#8063A5", "#A36B20", "#AC5161"]
 IPHONE_COLOR = "#5D6D7E"   # scheda di comodo, non una stanza vera
 
 
@@ -98,12 +103,20 @@ def apply(root):
         "small": (family, 9),
         "bold": (family, 10, "bold"),
         "card_title": (family, 11, "bold"),
-        "count": (family, 30, "bold"),
-        "title": (family, 16, "bold"),
+        "count": (family, 32, "bold"),
+        "title": (family, 17, "bold"),
         "subtitle": (family, 9),
         "section": (family, 12, "bold"),
     }
     root.configure(bg=BG)
+    # Anche i widget Tk e le tendine dei combobox seguono il font di sistema.
+    for nome in ("TkDefaultFont", "TkTextFont", "TkMenuFont"):
+        tkfont.nametofont(nome, root=root).configure(family=family, size=10)
+    root.option_add("*TCombobox*Listbox.font", fonts["base"])
+    root.option_add("*TCombobox*Listbox.background", CARD)
+    root.option_add("*TCombobox*Listbox.foreground", TEXT)
+    root.option_add("*TCombobox*Listbox.selectBackground", PRIMARY)
+    root.option_add("*TCombobox*Listbox.selectForeground", "#FFFFFF")
 
     style = ttk.Style(root)
     if "clam" in style.theme_names():
@@ -112,57 +125,69 @@ def apply(root):
     style.configure(".", background=BG, foreground=TEXT, font=fonts["base"])
     style.configure("TFrame", background=BG)
     style.configure("Card.TFrame", background=CARD)
+    style.configure("Card.TLabel", background=CARD, foreground=MUTED,
+                    font=fonts["small"])
     style.configure("Head.TFrame", background=PRIMARY)
     style.configure("TLabel", background=BG, foreground=TEXT, font=fonts["base"])
     style.configure("Muted.TLabel", background=BG, foreground=MUTED, font=fonts["small"])
     style.configure("Section.TLabel", background=BG, foreground=PRIMARY, font=fonts["section"])
     style.configure("HeadTitle.TLabel", background=PRIMARY, foreground="#FFFFFF",
                     font=fonts["title"])
-    style.configure("HeadSub.TLabel", background=PRIMARY, foreground="#BBD4EA",
+    style.configure("HeadSub.TLabel", background=PRIMARY, foreground="#CBDDE8",
                     font=fonts["subtitle"])
-    style.configure("Status.TLabel", background="#E3E9F0", foreground=MUTED,
+    style.configure("Status.TLabel", background=CARD, foreground=MUTED,
                     font=fonts["small"])
 
+    # Il tema clam permette gli stessi pulsanti piatti su Windows e macOS.
+    # Il focus resta visibile per chi usa la tastiera; premuto precede hover.
     style.configure("TButton", background=CARD, foreground=TEXT, font=fonts["base"],
-                    borderwidth=1, relief="flat", padding=(12, 6))
+                    borderwidth=0, relief="flat", padding=(12, 8),
+                    focuscolor=ACCENT, focusthickness=1)
     style.map("TButton",
-              background=[("active", HEAD_BG), ("pressed", HEAD_BG)],
-              bordercolor=[("!disabled", BORDER)])
-    style.configure("Primary.TButton", background=PRIMARY, foreground="#FFFFFF",
-                    font=fonts["bold"], borderwidth=0, padding=(14, 6))
-    style.map("Primary.TButton", background=[("active", PRIMARY_DARK),
-                                             ("pressed", PRIMARY_DARK)])
+              background=[("disabled", DISABLED_BG), ("pressed", HEAD_HOVER),
+                          ("active", HEAD_BG)],
+              foreground=[("disabled", DISABLED_FG)],
+              relief=[("pressed", "flat")])
+    style.configure("Primary.TButton", background=ACCENT, foreground="#FFFFFF",
+                    font=fonts["bold"], borderwidth=0, padding=(14, 8),
+                    focuscolor="#FFFFFF")
+    style.map("Primary.TButton",
+              background=[("disabled", DISABLED_BG), ("pressed", ACCENT_DARK),
+                          ("active", ACCENT_DARK)],
+              foreground=[("disabled", DISABLED_FG)])
     for nome, sfondo, acceso, testo in (
         ("Rosso", AZIONE_ROSSA_BG, AZIONE_ROSSA_BG_ON, AZIONE_ROSSA_FG),
         ("Verde", AZIONE_VERDE_BG, AZIONE_VERDE_BG_ON, AZIONE_VERDE_FG),
         ("Arancio", AZIONE_ARANCIO_BG, AZIONE_ARANCIO_BG_ON, AZIONE_ARANCIO_FG),
     ):
         style.configure("%s.TButton" % nome, background=sfondo, foreground=testo,
-                        font=fonts["bold"], borderwidth=1, relief="flat",
-                        padding=(12, 6))
+                        font=fonts["bold"], borderwidth=0, relief="flat",
+                        padding=(12, 8))
         style.map("%s.TButton" % nome,
-                  background=[("active", acceso), ("pressed", acceso)],
-                  foreground=[("active", testo), ("pressed", testo)],
+                  background=[("disabled", DISABLED_BG), ("pressed", acceso), ("active", acceso)],
+                  foreground=[("disabled", DISABLED_FG), ("active", testo), ("pressed", testo)],
                   bordercolor=[("!disabled", acceso)])
 
     # Piu' grande e in stampatello: e' un pulsante che si cerca con lo sguardo
     # quando ci si accorge di aver eliminato la riga sbagliata.
     style.configure("Cestino.TButton", background=CESTINO_BG, foreground=CESTINO_FG,
                     font=(family, 11, "bold"), borderwidth=0, relief="flat",
-                    padding=(10, 4))
+                    padding=(12, 8))
     style.map("Cestino.TButton",
-              background=[("active", CESTINO_BG_ON), ("pressed", CESTINO_BG_ON)],
-              foreground=[("active", CESTINO_FG), ("pressed", CESTINO_FG)])
+              background=[("disabled", DISABLED_BG), ("pressed", CESTINO_BG_ON), ("active", CESTINO_BG_ON)],
+              foreground=[("disabled", DISABLED_FG), ("active", CESTINO_FG), ("pressed", CESTINO_FG)])
 
     style.configure("Ghost.TButton", background=BG, foreground=PRIMARY,
-                    font=fonts["bold"], borderwidth=0, padding=(6, 4))
-    style.map("Ghost.TButton", background=[("active", BG)], foreground=[("active", ACCENT)])
+                    font=fonts["bold"], borderwidth=0, padding=(8, 8))
+    style.map("Ghost.TButton",
+              background=[("pressed", HEAD_HOVER), ("active", HEAD_BG)],
+              foreground=[("disabled", DISABLED_FG), ("active", ACCENT)])
 
     style.configure("Inv.Treeview", background=CARD, fieldbackground=CARD,
-                    foreground=TEXT, rowheight=32, borderwidth=0, font=fonts["base"])
+                    foreground=TEXT, rowheight=38, borderwidth=0, font=fonts["base"])
     style.configure("Inv.Treeview.Heading", background=HEAD_BG, foreground=PRIMARY,
-                    font=fonts["bold"], relief="flat", padding=(8, 7))
-    style.map("Inv.Treeview.Heading", background=[("active", "#DAE5F0")])
+                    font=fonts["bold"], relief="flat", padding=(10, 10))
+    style.map("Inv.Treeview.Heading", background=[("pressed", HEAD_HOVER), ("active", HEAD_HOVER)])
     # Solo lo sfondo: senza mappare il colore del testo, una riga in prestito
     # selezionata conserva il suo rosso e una spedita il suo viola, cosi' le due
     # informazioni piu' urgenti attraversano la selezione.
@@ -171,7 +196,7 @@ def apply(root):
     style.configure("Row.TButton", background=LINK, foreground="#FFFFFF",
                     font=(family, 9, "bold"), borderwidth=0, relief="flat",
                     padding=(6, 2), focuscolor=LINK)
-    style.map("Row.TButton", background=[("active", PRIMARY), ("pressed", PRIMARY)])
+    style.map("Row.TButton", background=[("pressed", ACCENT_DARK), ("active", ACCENT_DARK)])
     style.configure("RowShip.TButton", background=SHIP_FG, foreground="#FFFFFF",
                     font=(family, 9, "bold"), borderwidth=0, relief="flat",
                     padding=(6, 2), focuscolor=SHIP_FG)
@@ -181,8 +206,24 @@ def apply(root):
                     padding=(6, 2), focuscolor=LOAN_FG)
     style.map("RowBack.TButton", background=[("active", "#8E2A21"), ("pressed", "#8E2A21")])
 
-    style.configure("TCombobox", fieldbackground=CARD, background=CARD,
-                    bordercolor=BORDER, arrowcolor=PRIMARY)
-    style.configure("TEntry", fieldbackground=CARD, bordercolor=BORDER)
+    style.configure("TCombobox", fieldbackground=CARD, background=HEAD_BG,
+                    foreground=TEXT, bordercolor=BORDER, arrowcolor=PRIMARY,
+                    lightcolor=CARD, darkcolor=CARD, padding=(8, 7))
+    style.map("TCombobox", fieldbackground=[("readonly", CARD)],
+              bordercolor=[("focus", ACCENT)],
+              foreground=[("disabled", DISABLED_FG), ("readonly", TEXT)],
+              selectbackground=[("readonly", PRIMARY)],
+              selectforeground=[("readonly", "#FFFFFF")])
+    style.configure("TEntry", fieldbackground=CARD, foreground=TEXT,
+                    bordercolor=BORDER, lightcolor=CARD, darkcolor=CARD,
+                    padding=(8, 7))
+    style.map("TEntry", bordercolor=[("focus", ACCENT)],
+              foreground=[("disabled", DISABLED_FG)])
+    style.configure("TCheckbutton", background=BG, foreground=TEXT, padding=(0, 4))
+    style.configure("TRadiobutton", background=BG, foreground=TEXT, padding=(0, 4))
+    style.configure("TScrollbar", background=HEAD_BG, troughcolor=BG,
+                    borderwidth=0, arrowsize=14, arrowcolor=MUTED,
+                    relief="flat")
+    style.map("TScrollbar", background=[("pressed", BORDER), ("active", BORDER)])
     style.configure("TSeparator", background=BORDER)
     return fonts

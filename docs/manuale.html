@@ -288,7 +288,7 @@ table{min-width:520px}
     <tr><td><span class="k grigio">Modifica</span></td><td class="d">Apre il dispositivo selezionato per cambiarne i campi.</td></tr>
     <tr><td><span class="k grigio">Elimina</span></td><td class="d">Toglie <b>tutti i dispositivi selezionati</b>, dopo un riepilogo che li elenca uno per uno e una copia di sicurezza. Gli iPhone hanno protezioni in piu': vedi <a href="#iphone">iPhone</a>.</td></tr>
     <tr><td><span class="k rosso">Elimina +</span></td><td class="d"><b>Eliminazione in blocco.</b> Si incollano i codici presi da Excel, uno per riga; il programma dice quali esistono, da quale stanza spariranno e che cosa salta e perche'. Per procedere si scrive <span class="mono">ACCETTO</span>. Una copia di sicurezza viene salvata comunque prima.</td></tr>
-    <tr><td><span class="k rosso">Elimina da Excel</span></td><td class="d">In home, subito a destra degli eliminati di recente. Come <b>Elimina +</b>, ma l'elenco si carica da un <b>file</b> invece di incollarlo: al massimo 200 dispositivi per volta. Vedi <a href="#elimina-excel">Eliminare da un file Excel</a>.</td></tr>
+    <tr><td><span class="k rosso">Elimina da Excel</span></td><td class="d">Nella riga degli strumenti sotto il titolo dell'inventario completo, in home. Come <b>Elimina +</b>, ma l'elenco si carica da un <b>file</b> invece di incollarlo: al massimo 300 dispositivi per volta. Vedi <a href="#elimina-excel">Eliminare da un file Excel</a>.</td></tr>
     <tr><td><span class="k grigio">Sposta in stanza…</span></td><td class="d">Cambia la stanza di <b>tutti i dispositivi selezionati</b>, dopo un riepilogo che dice da dove partono e come restano le stanze. Gli iPhone non si spostano.</td></tr>
     <tr><td><span class="k arancio">Importa xls…</span></td><td class="d">Carica dispositivi da un foglio Excel. Prima chiede <b>che cosa</b> importare e <b>come</b>. Vedi <a href="#importare">Importare</a>.</td></tr>
     <tr><td><span class="k verde">Esporta xls…</span></td><td class="d">Produce un file Excel dell'inventario. Prima chiede ambito e forma. Vedi <a href="#esportare">Esportare</a>.</td></tr>
@@ -636,33 +636,20 @@ table{min-width:520px}
     sua voce nel cestino sparisce. Non puo' stare insieme in elenco e fra gli eliminati,
     o da li' si potrebbe ripristinarne una seconda copia. Il riepilogo lo dice, con
     l'identificativo e la stanza in cui e' finito.</div>
-  <p class="sub">I doppioni entrano da un'altra strada: il file dati e' un
-    <code>.xlsx</code> che si puo' aprire e correggere a mano. Per quello c'e'
-    <span class="k rosso">Controllo generale duplicati</span>, accanto al pulsante del
-    modello, in home.</p>
-  <div class="tw"><table class="man">
-    <tr><th>Che cosa fa</th><th>Come</th></tr>
-    <tr><td class="d">Confronta l'<b>asset tag</b></td><td class="d">e' quello l'identificativo del dispositivo - per gli iPhone e' l'IMEI - e il controllo si fa su quello. Cerca chi compare piu' di una volta in tutto l'inventario.</td></tr>
-    <tr><td class="d">Mostra <b>ogni gruppo</b></td><td class="d">quale registrazione tiene e quali elimina, con stanza, modello e data dell'ultima modifica.</td></tr>
-    <tr><td class="d">Tiene la <b>piu' recente</b></td><td class="d">e' quella su cui qualcuno ha lavorato per ultimo.</td></tr>
-    <tr><td class="d">Chiede conferma</td><td class="d">e salva una copia di sicurezza prima di eliminare.</td></tr>
-    <tr><td class="d">Segnala i <b>numeri di serie ripetuti</b></td><td class="d">su asset tag diversi. Il seriale non identifica il dispositivo: serve per consultazione, quindi quelli <b>non sono duplicati</b> e non vengono toccati - ma quasi sempre sono un errore di battitura.</td></tr>
-    <tr><td class="d">Non tocca gli <b>iPhone protetti</b></td><td class="d">li elenca a parte, con il motivo.</td></tr>
-  </table></div>
 
 </section>
 
 <section id="elimina-excel">
   <h2>Eliminare da un file Excel</h2>
-  <p class="sub">Il pulsante <span class="k rosso">Elimina da Excel</span>, in home subito
-    a destra di <span class="k grigio">ELIMINATI DI RECENTE</span>, elimina in blocco i
+  <p class="sub">Il pulsante <span class="k rosso">Elimina da Excel</span>, nella riga
+    degli strumenti sotto il titolo dell'inventario completo in home, elimina in blocco i
     dispositivi elencati in un file. E' la stessa cosa di <b>Elimina +</b>, per chi
     l'elenco ce l'ha gia' in un foglio invece che negli appunti: chi deve dismettere
     ottanta portatili ha un file, non una colonna da incollare.</p>
   <div class="tw"><table class="man">
     <tr><th>Che cosa fa</th><th>Come</th></tr>
     <tr><td class="d">Legge <b>qualsiasi forma</b></td><td class="d">un'esportazione del programma - riconosce le colonne <i>Asset Tag</i> e <i>IMEI</i> e legge solo quelle - oppure una colonna sola di codici, salvata senza intestazioni. Non c'e' un formato da rispettare.</td></tr>
-    <tr><td class="d">Al massimo <b>200 per volta</b></td><td class="d">non e' un limite tecnico: e' il punto oltre il quale l'elenco di quello che sta per sparire non lo legge piu' nessuno, e una conferma che non si legge non e' una conferma. Se il file ne contiene di piu' il programma lo dice e non fa niente.</td></tr>
+    <tr><td class="d">Al massimo <b>300 per volta</b></td><td class="d">non e' un limite tecnico: e' il punto oltre il quale l'elenco di quello che sta per sparire non lo legge piu' nessuno, e una conferma che non si legge non e' una conferma. Se il file ne contiene di piu' il programma lo dice e non fa niente.</td></tr>
     <tr><td class="d">Mostra il <b>riepilogo</b></td><td class="d">da quali stanze spariscono i dispositivi, uno per uno, con modello ed eventuale prestito; e a parte quelli saltati - non in inventario, o che non si possono eliminare - con il motivo di ciascuno.</td></tr>
     <tr><td class="d">Chiede la <b>parola</b></td><td class="d">per procedere si scrive <span class="mono">ACCETTO</span>. Finche' non e' scritta il pulsante rosso resta spento.</td></tr>
     <tr><td class="d">Finiscono negli <b>eliminati di recente</b></td><td class="d">e prima di toccare qualsiasi cosa viene salvata una copia di sicurezza del file dati. Se il cestino non li tiene tutti, il programma chiede che fare: vedi <a href="#eliminati">Eliminati di recente</a>.</td></tr>
@@ -672,13 +659,13 @@ table{min-width:520px}
 <section id="eliminati">
   <h2>Eliminati di recente</h2>
   <p class="sub">Il pulsante <span class="k grigio">ELIMINATI DI RECENTE (n)</span> - nero,
-    in stampatello, con dentro quanti record contiene - in home accanto al controllo dei
-    doppioni, apre il cestino: gli ultimi dispositivi eliminati,
+    in stampatello, con dentro quanti record contiene - in home accanto al titolo
+    dell'inventario completo, apre il cestino: gli ultimi dispositivi eliminati,
     da cui si ripesca quello tolto per sbaglio. Quello che ci sta dentro <b>non e' piu'
     inventario</b>: non compare in nessuna esportazione, stampa o ricerca.</p>
   <div class="tw"><table class="man">
     <tr><th>Che cosa fa</th><th>Come</th></tr>
-    <tr><td class="d">Tiene gli ultimi <b>300</b>, per <b>30 giorni</b></td><td class="d">non e' un archivio storico: e' la rete di sicurezza per l'errore di ieri.</td></tr>
+    <tr><td class="d">Tiene gli ultimi <b>500</b>, per <b>30 giorni</b></td><td class="d">non e' un archivio storico: e' la rete di sicurezza per l'errore di ieri.</td></tr>
     <tr><td class="d">Se non ci stanno tutti, <b>chiede</b></td><td class="d">quello che esce dal cestino e' perso per sempre, e non si decide al posto di chi elimina. La finestra dice quanti sono quelli in eccesso e offre due strade: <b>mettili nel cestino al posto dei piu' vecchi</b> - e i piu' vecchi escono per sempre - oppure <b>cancella definitivamente quelli in eccesso</b>, che non passano dal cestino e non si ripristinano. Il riepilogo finale li elenca.</td></tr>
     <tr><td class="d">Mostra <b>asset tag e tipo</b></td><td class="d">dieci per pagina. Il resto della scheda non si perde: torna intero con il ripristino.</td></tr>
     <tr><td class="d">La <b>ricerca</b> in cima</td><td class="d">guarda tutto il cestino, non la pagina che si sta vedendo; i risultati vengono impaginati a loro volta.</td></tr>
@@ -820,6 +807,10 @@ table{min-width:520px}
 
 <section id="collegamento">
   <h2>Se il collegamento sul desktop non compare</h2>
+  <p class="sub">Il <code>.bat</code> usa <code>Crea collegamento sul desktop.ps1</code>:
+    tienilo nella stessa cartella di <code>Avvia Inventario.bat</code>. Il desktop viene
+    chiesto a Windows, anche con OneDrive. In caso di errore la finestra mostra il
+    motivo; la copia del collegamento nella cartella del programma e' facoltativa.</p>
   <p class="sub">Su alcune postazioni la creazione automatica viene bloccata dai criteri
     di sicurezza. Il collegamento fatto a mano invece non fallisce mai:</p>
   <ol class="steps">
@@ -828,7 +819,7 @@ table{min-width:520px}
       <i>Mostra altre opzioni</i> &rsaquo; <i>Invia a</i> &rsaquo;
       <i>Desktop (crea collegamento)</i>;</li>
     <li>in alternativa, trascina sul desktop la copia
-      <code>Inventario dispositivi.lnk</code> rimasta nella cartella: si puo' dare anche
+      <code>Inventario dispositivi.lnk</code> se presente nella cartella: si puo' dare anche
       a un altro utente senza eseguire niente.</li>
   </ol>
   <p class="note">Il collegamento creato dal programma punta ad
@@ -995,7 +986,7 @@ table{min-width:520px}
     <tr><td><span class="k blu">Add</span></td><td class="d">Asks first <b>which type</b> of device, then whether to enter it by hand or with the barcode reader.</td></tr>
     <tr><td><span class="k grigio">Edit</span></td><td class="d">Opens the selected device to change its fields.</td></tr>
     <tr><td><span class="k grigio">Delete</span></td><td class="d">Removes <b>every selected device</b>, after a summary listing them one by one and a backup copy. iPhones have extra protection: see <a href="#iphone-en">iPhones</a>.</td></tr>
-    <tr><td><span class="k rosso">Delete from Excel</span></td><td class="d">On the home screen, just to the right of the recently deleted. Like <b>Delete +</b>, but the list is loaded from a <b>file</b> instead of pasted: at most 200 devices at a time. See <a href="#elimina-excel-en">Deleting from an Excel file</a>.</td></tr>
+    <tr><td><span class="k rosso">Delete from Excel</span></td><td class="d">In the tools row below the complete inventory title on the home screen. Like <b>Delete +</b>, but the list is loaded from a <b>file</b> instead of pasted: at most 300 devices at a time. See <a href="#elimina-excel-en">Deleting from an Excel file</a>.</td></tr>
     <tr><td><span class="k rosso">Delete +</span></td><td class="d"><b>Bulk deletion.</b> You paste the codes from Excel, one per line; the program says which exist, which room they will disappear from, and what it skips and why. To go ahead you type <span class="mono">ACCETTO</span>. A backup copy is saved first anyway.</td></tr>
     <tr><td><span class="k grigio">Move to room…</span></td><td class="d">Changes the room of <b>every selected device</b>, after a summary saying where they come from and how the rooms end up. iPhones do not move.</td></tr>
     <tr><td><span class="k arancio">Import xls…</span></td><td class="d">Loads devices from an Excel sheet. It asks first <b>what</b> to import and <b>how</b>. See <a href="#importare-en">Importing</a>.</td></tr>
@@ -1342,32 +1333,20 @@ table{min-width:520px}
     disappears. It cannot be in the list and among the deleted at the same time, or a
     second copy could be restored from there. The summary says so, with the identifier
     and the room it landed in.</div>
-  <p class="sub">Duplicates get in another way: the data file is an <code>.xlsx</code>
-    anyone can open and correct by hand. That is what <span class="k rosso">General
-    duplicate check</span> is for, next to the template button on the home screen.</p>
-  <div class="tw"><table class="man">
-    <tr><th>What it does</th><th>How</th></tr>
-    <tr><td class="d">Compares the <b>asset tag</b></td><td class="d">that is the device's identifier - for iPhones it is the IMEI - and the check is on that. It looks for any appearing more than once in the whole inventory.</td></tr>
-    <tr><td class="d">Shows <b>every group</b></td><td class="d">which record it keeps and which it deletes, with room, model and the date of the last change.</td></tr>
-    <tr><td class="d">Keeps the <b>most recent</b></td><td class="d">it is the one somebody worked on last.</td></tr>
-    <tr><td class="d">Asks for confirmation</td><td class="d">and saves a backup copy before deleting.</td></tr>
-    <tr><td class="d">Flags <b>repeated serial numbers</b></td><td class="d">on different asset tags. The serial does not identify the device: it is there for reference, so those are <b>not duplicates</b> and are not touched - but they are almost always a typo.</td></tr>
-    <tr><td class="d">Leaves <b>protected iPhones</b> alone</td><td class="d">they are listed separately, with the reason.</td></tr>
-  </table></div>
 
 </section>
 
 <section id="elimina-excel-en">
   <h2>Deleting from an Excel file</h2>
-  <p class="sub">The <span class="k rosso">Delete from Excel</span> button, on the home
-    screen just to the right of <span class="k grigio">RECENTLY DELETED</span>, deletes in
+  <p class="sub">The <span class="k rosso">Delete from Excel</span> button, in the tools
+    row below the complete inventory title on the home screen, deletes in
     bulk the devices listed in a file. It is the same thing as <b>Delete +</b>, for whoever
     already has the list in a sheet rather than on the clipboard: someone decommissioning
     eighty laptops has a file, not a column to paste.</p>
   <div class="tw"><table class="man">
     <tr><th>What it does</th><th>How</th></tr>
     <tr><td class="d">Reads <b>any shape</b></td><td class="d">an export from the program - it recognises the <i>Asset Tag</i> and <i>IMEI</i> columns and reads only those - or a single column of codes saved without headers. There is no format to comply with.</td></tr>
-    <tr><td class="d">At most <b>200 at a time</b></td><td class="d">not a technical limit: it is the point beyond which nobody reads the list of what is about to disappear any more, and a confirmation nobody reads is not a confirmation. If the file holds more, the program says so and does nothing.</td></tr>
+    <tr><td class="d">At most <b>300 at a time</b></td><td class="d">not a technical limit: it is the point beyond which nobody reads the list of what is about to disappear any more, and a confirmation nobody reads is not a confirmation. If the file holds more, the program says so and does nothing.</td></tr>
     <tr><td class="d">Shows the <b>summary</b></td><td class="d">which rooms the devices disappear from, one by one, with model and any loan; and separately the ones skipped - not in the inventory, or impossible to delete - with the reason for each.</td></tr>
     <tr><td class="d">Asks for the <b>word</b></td><td class="d">to go on you type <span class="mono">ACCETTO</span>. Until it is typed the red button stays off.</td></tr>
     <tr><td class="d">They land in the <b>recently deleted</b></td><td class="d">and before anything is touched a backup copy of the data file is saved. If the bin cannot hold them all, the program asks what to do: see <a href="#eliminati-en">Recently deleted</a>.</td></tr>
@@ -1377,13 +1356,13 @@ table{min-width:520px}
 <section id="eliminati-en">
   <h2>Recently deleted</h2>
   <p class="sub">The <span class="k grigio">RECENTLY DELETED (n)</span> button - black, in
-    capitals, carrying how many records it holds - on the home screen next to the
-    duplicate check, opens the bin: the devices deleted most recently,
+    capitals, carrying how many records it holds - next to the complete inventory
+    title on the home screen, opens the bin: the devices deleted most recently,
     from which you fish back the one removed by mistake. What sits in there <b>is no
     longer inventory</b>: it appears in no export, printout or search.</p>
   <div class="tw"><table class="man">
     <tr><th>What it does</th><th>How</th></tr>
-    <tr><td class="d">Keeps the last <b>300</b>, for <b>30 days</b></td><td class="d">it is not a historical archive: it is the safety net for yesterday's mistake.</td></tr>
+    <tr><td class="d">Keeps the last <b>500</b>, for <b>30 days</b></td><td class="d">it is not a historical archive: it is the safety net for yesterday's mistake.</td></tr>
     <tr><td class="d">If they do not all fit, it <b>asks</b></td><td class="d">what leaves the bin is lost for good, and that is not decided on behalf of whoever is deleting. The window says how many are in excess and offers two ways: <b>put them in the bin in place of the oldest</b> - and the oldest leave for good - or <b>delete the ones in excess for good</b>, which never go through the bin and cannot be restored. The final summary lists them.</td></tr>
     <tr><td class="d">Shows <b>asset tag and type</b></td><td class="d">ten per page. The rest of the record is not lost: it comes back whole with the restore.</td></tr>
     <tr><td class="d">The <b>search</b> at the top</td><td class="d">looks at the whole bin, not the page you are on; the results are paginated in turn.</td></tr>
@@ -1527,6 +1506,10 @@ table{min-width:520px}
 
 <section id="collegamento-en">
   <h2>If the desktop shortcut does not appear</h2>
+  <p class="sub">The <code>.bat</code> uses <code>Crea collegamento sul desktop.ps1</code>:
+    keep it beside <code>Avvia Inventario.bat</code>. Windows supplies the desktop
+    location, including OneDrive. The window shows the reason if anything fails;
+    the extra shortcut copy in the program folder is optional.</p>
   <p class="sub">On some workstations automatic creation is blocked by security policy.
     Creating the shortcut by hand never fails:</p>
   <ol class="steps">
@@ -1534,7 +1517,7 @@ table{min-width:520px}
     <li>right-click <code>Avvia Inventario.bat</code> &rsaquo; <i>Show more options</i>
       &rsaquo; <i>Send to</i> &rsaquo; <i>Desktop (create shortcut)</i>;</li>
     <li>alternatively, drag onto the desktop the
-      <code>Inventario dispositivi.lnk</code> copy left in the folder: it can be handed
+      <code>Inventario dispositivi.lnk</code> copy, if present in the folder: it can be handed
       to another user without running anything.</li>
   </ol>
   <p class="note">The shortcut the program creates points at

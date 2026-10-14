@@ -22,6 +22,8 @@ from inventario.ui import App, CestinoPienoDialog, EliminaDaExcelDialog
 
 BAU, KIOSK, DR = fixture.BAU, fixture.KIOSK, fixture.DR
 INTESTAZIONI = ["Asset Tag", "Tipo", "Modello", "Numero di serie", "Stato", "Note"]
+assert MASSIMO_ELIMINA_EXCEL == 300
+assert ELIMINATI_MASSIMO == 500
 
 def scrivi(righe, titolo="Inventario"):
     wb = Workbook(); ws = wb.active; ws.title = titolo
@@ -62,8 +64,7 @@ assert store.eccesso_cestino(ELIMINATI_MASSIMO + 5) == 5, store.eccesso_cestino(
 # riempiamo il cestino fin quasi all'orlo
 tanti = [new_item("IT-9%03d" % n, "Laptop", "T14", "PF%d" % n, KIOSK)
          for n in range(ELIMINATI_MASSIMO - 2)]
-for item in tanti:
-    store.add(item)
+store.import_items(tanti, "merge")
 store.load()
 store.delete([i["asset_tag"] for i in tanti])
 store.load()
@@ -85,8 +86,7 @@ assert store.cancellati_per_sempre == [], "nessuno e' stato cancellato al volo"
 # ---- "cancella quelli in eccesso": il cestino non cresce, e lo dice
 store = InventoryStore(fixture.build(), iphone_room=BAU)
 store.load()
-for item in tanti:
-    store.add(item)
+store.import_items(tanti, "merge")
 store.load()
 store.delete([i["asset_tag"] for i in tanti])
 store.load()
@@ -166,8 +166,7 @@ grande = App(fixture.build())
 grande._initial_load()
 molti = [new_item("IT-7%03d" % n, "Laptop", "T14", "PF%d" % n, KIOSK)
          for n in range(MASSIMO_ELIMINA_EXCEL + 1)]
-for item in molti:
-    grande.store.add(item)
+grande.store.import_items(molti, "merge")
 grande.store.load()
 filedialog.askopenfilename = lambda **k: scrivi([[i["asset_tag"]] for i in molti])
 d = EliminaDaExcelDialog(grande, grande.store)
@@ -176,6 +175,25 @@ testo = d.riepilogo.get("1.0", "end")
 assert "%d dispositivi in inventario" % (MASSIMO_ELIMINA_EXCEL + 1) in testo, testo
 assert "al massimo %d per volta" % MASSIMO_ELIMINA_EXCEL in testo, testo
 assert "disabled" in str(d.btn_elimina.state()), "non si elimina niente"
+d._cancel()
+
+# ---- esattamente 300 sono ammessi, con il limite tradotto anche in inglese
+from inventario import lingua as lang
+lang.imposta("en")
+filedialog.askopenfilename = lambda **k: scrivi([[i["asset_tag"]] for i in molti[:300]])
+d = EliminaDaExcelDialog(grande, grande.store)
+d._scegli()
+assert "disabled" not in d.btn_elimina.state(), "300 dispositivi sono ammessi"
+etichette = [str(w.cget("text")) for w in d.winfo_children()[0].winfo_children()
+             if w.winfo_class() == "TLabel"]
+assert any("300" in testo and "at a time" in testo for testo in etichette), etichette
+lang.imposta("it")
+d.var_conferma.set(ui.PAROLA_ELIMINA)
+d._ok()
+assert len(d.result) == 300, len(d.result)
+# La cancellazione intera entra nel cestino, senza perdere alcuna scheda.
+assert grande.store.delete(d.result) == 300
+assert len(grande.store.eliminati()) == 300
 grande.destroy()
 
 # ===================== il giro completo dalla home =====================

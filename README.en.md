@@ -133,17 +133,21 @@ travels with it. Copy it as it is onto every workstation - by hand, by script,
 by software package or by GPO - always to the same local path.
 
 Then, on each workstation, double-click **`Crea collegamento sul desktop.bat`**:
-it puts the icon on the user's desktop and leaves a copy in the folder.
+it puts the icon on the user's desktop, including desktops managed by OneDrive.
+Keep **`Crea collegamento sul desktop.ps1`** beside the `.bat` and
+**`Avvia Inventario.bat`**: all three are included in the Windows package.
+It also leaves a copy of the shortcut in the program folder if that folder is
+writable. If anything fails, the window shows the reason.
 
 The shortcut points at **`Avvia Inventario.bat`**, not straight at `pythonw.exe`:
 on some workstations a shortcut to an executable with arguments is refused by
-security policy, while one to a `.bat` file always works.
+security policy; pointing at a `.bat` file avoids that problem.
 
 **If nothing appears on the desktop** - it happens where automatic creation is
 blocked - do it by hand and it will not fail: right-click
 `Avvia Inventario.bat` > *Show more options* > *Send to* >
 *Desktop (create shortcut)*. Alternatively drag onto the desktop the
-`Inventario dispositivi.lnk` copy left in the folder, which can also be handed
+`Inventario dispositivi.lnk` copy, if present in the folder, which can also be handed
 to other users without running anything.
 
 From then on the technician double-clicks the icon and works on everybody's
@@ -699,8 +703,9 @@ their protections.
 
 ## Deleting from an Excel file
 
-The **`Delete from Excel`** button, red, on the home screen just to the right of
-*RECENTLY DELETED*, deletes in bulk the devices listed in a file. It is the same
+The **`Delete from Excel`** button, red, in the tools row below the
+*Complete inventory* title on the home screen, deletes in bulk the devices listed
+in a file. It is the same
 thing as *Delete +*, for whoever already has the list in a sheet rather than on
 the clipboard: someone decommissioning eighty laptops has a file, not a column to
 paste.
@@ -708,7 +713,7 @@ paste.
 - **an export from the program** works - it recognises the *Asset Tag* and *IMEI*
   columns and reads only those - and **a single column** of codes saved without
   headers works too. There is no format to comply with;
-- at most **200 devices at a time** can be deleted. It is not a technical limit:
+- at most **300 devices at a time** can be deleted. It is not a technical limit:
   it is the point beyond which nobody reads the list of what is about to
   disappear any more, and a confirmation nobody reads is not a confirmation. If
   the file holds more, the program says so and does nothing;
@@ -776,8 +781,7 @@ the device is out.
 
 ## Recently deleted
 
-The **`RECENTLY DELETED (n)`** button, on the home page next to *General
-duplicate check*, opens the bin. It is black, in capitals, and carries **how many
+The **`RECENTLY DELETED (n)`** button, next to the *Complete inventory* title on the home page, opens the bin. It is black, in capitals, and carries **how many
 records it holds** in brackets: it is the only place you come back from a
 deletion, and it has to be found without looking for it: the devices deleted most recently, from which you fish
 back the one removed by mistake.
@@ -786,7 +790,7 @@ What sits in there **is no longer inventory**: it appears in no export, no
 printout, no room count and no search of the main list. If it appeared it would
 be a device, and instead it has been deleted.
 
-- records stay **30 days** from the deletion date, and at most **300** of them.
+- records stay **30 days** from the deletion date, and at most **500** of them.
   It is not a historical archive, it is the safety net for yesterday's mistake;
 - **when they do not all fit the program asks what to do**, instead of throwing
   the oldest out in silence: what leaves the bin is lost for good, and that is
@@ -869,21 +873,6 @@ in the bin is imported or added normally, and its bin entry disappears: it canno
 be in the list and among the deleted at the same time, or a second copy could be
 "restored" from there. The summary of the operation says so, with the identifier
 and the room it landed in.
-
-They get in another way: the data file is an `.xlsx` anyone can open and correct
-by hand. That is what **`General duplicate check`** is for, next to the template
-button on the home screen:
-
-- it compares the **asset tag** of every device - that is the identifier, and
-  for iPhones it is the IMEI - and looks for any that appears more than once;
-- it shows **every group**: which record it keeps and which it deletes, with
-  room, model and the date of the last change. It keeps the most recent one;
-- it asks for confirmation and **saves a backup copy** before deleting;
-- at the end it says what it deleted, what it could not touch - protected
-  iPhones - how many devices there were and how many there are now;
-- it separately flags **serial numbers repeated** on different asset tags: the
-  serial does not identify the device, so those are **not duplicates** and are
-  not touched - but they are almost always a typo.
 
 ## The columns of each room
 

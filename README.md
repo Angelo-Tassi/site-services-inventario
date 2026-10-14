@@ -135,18 +135,22 @@ mano, con uno script, con un pacchetto software o via GPO - sempre nello stesso
 percorso locale.
 
 Su ogni postazione, poi, doppio clic su **`Crea collegamento sul desktop.bat`**:
-mette l'icona sulla scrivania dell'utente e ne lascia una copia nella cartella.
+mette l'icona sulla scrivania dell'utente, anche se e' gestita da OneDrive.
+Il file **`Crea collegamento sul desktop.ps1`** deve restare accanto al `.bat`
+e ad **`Avvia Inventario.bat`**: sono tutti inclusi nel pacchetto Windows.
+Se la cartella del programma e' scrivibile, lascia anche una copia del
+collegamento li'. Se qualcosa fallisce, mostra il motivo nella finestra.
 
 Il collegamento punta ad **`Avvia Inventario.bat`**, non direttamente a
 `pythonw.exe`: su alcune postazioni un collegamento a un eseguibile con
 argomenti viene rifiutato dai criteri di sicurezza, mentre quello a un file
-`.bat` funziona sempre.
+`.bat` evita quel problema.
 
 **Se sul desktop non compare niente** - capita, dove la creazione automatica e'
 bloccata - si fa a mano e non fallisce: tasto destro su
 `Avvia Inventario.bat` > *Mostra altre opzioni* > *Invia a* >
 *Desktop (crea collegamento)*. In alternativa si trascina sul desktop la copia
-`Inventario dispositivi.lnk` rimasta nella cartella, che si puo' dare anche
+`Inventario dispositivi.lnk`, se presente nella cartella, che si puo' dare anche
 agli altri utenti senza eseguire niente.
 
 Da quel momento il tecnico fa doppio clic sull'icona e lavora sull'inventario di
@@ -528,8 +532,9 @@ mantengono tutte le loro protezioni.
 
 ## Eliminare da un file Excel
 
-Il pulsante **`Elimina da Excel`**, rosso, in home subito a destra di *ELIMINATI
-DI RECENTE*, elimina in blocco i dispositivi elencati in un file. E' la stessa
+Il pulsante **`Elimina da Excel`**, rosso, nella riga degli strumenti sotto il
+titolo *Inventario completo* in home, elimina in blocco i dispositivi elencati
+in un file. E' la stessa
 cosa di *Elimina +*, per chi l'elenco ce l'ha gia' in un foglio invece che negli
 appunti: chi deve dismettere ottanta portatili ha un file, non una colonna da
 incollare.
@@ -537,7 +542,7 @@ incollare.
 - va bene **un'esportazione del programma** - riconosce le colonne *Asset Tag* e
   *IMEI* e legge solo quelle - e va bene anche **una colonna sola** di codici,
   salvata senza intestazioni. Non c'e' un formato da rispettare;
-- si eliminano al massimo **200 dispositivi per volta**. Non e' un limite
+- si eliminano al massimo **300 dispositivi per volta**. Non e' un limite
   tecnico: e' il punto oltre il quale l'elenco di quello che sta per sparire non
   lo legge piu' nessuno, e una conferma che non si legge non e' una conferma. Se
   il file ne contiene di piu' il programma lo dice e non fa niente;
@@ -608,8 +613,7 @@ mentre il dispositivo e' fuori.
 
 ## Eliminati di recente
 
-Il pulsante **`ELIMINATI DI RECENTE (n)`**, in home accanto a *Controllo generale
-duplicati*, apre il cestino. E' nero, in stampatello e porta fra parentesi
+Il pulsante **`ELIMINATI DI RECENTE (n)`**, in home accanto al titolo *Inventario completo*, apre il cestino. E' nero, in stampatello e porta fra parentesi
 **quanti record contiene**: e' l'unico posto da cui si torna indietro da
 un'eliminazione, e va trovato senza cercarlo: gli ultimi dispositivi eliminati, da cui si ripesca
 quello tolto per sbaglio.
@@ -619,7 +623,7 @@ esportazioni, nella stampa, nei conteggi delle stanze ne' nella ricerca
 dell'elenco principale. Se comparisse sarebbe un dispositivo, e invece e' stato
 eliminato.
 
-- ci restano **30 giorni** dalla data di eliminazione, e al massimo **300
+- ci restano **30 giorni** dalla data di eliminazione, e al massimo **500
   record**. Non e' un archivio storico, e' la rete di sicurezza per l'errore di
   ieri;
 - **quando non ci stanno tutti il programma chiede che fare**, invece di
@@ -706,21 +710,6 @@ che sta solo nel cestino viene importato o inserito normalmente, e la sua voce
 nel cestino sparisce: non puo' stare insieme in elenco e fra gli eliminati,
 altrimenti da li' si potrebbe "ripristinare" una seconda copia. Il riepilogo
 dell'operazione lo dice, con l'identificativo e la stanza in cui e' finito.
-
-Entrano da un'altra strada: il file dati e' un `.xlsx` che si puo' aprire e
-correggere a mano. Per quello c'e' **`Controllo generale duplicati`**, accanto
-al pulsante del modello in home:
-
-- confronta l'**asset tag** di tutti i dispositivi - e' quello l'identificativo,
-  per gli iPhone e' l'IMEI - e cerca chi compare piu' di una volta;
-- mostra **ogni gruppo**: quale registrazione tiene e quali elimina, con stanza,
-  modello e data dell'ultima modifica. Tiene la piu' recente;
-- chiede conferma e **salva una copia di sicurezza** prima di eliminare;
-- alla fine dice che cosa ha eliminato, che cosa non ha potuto toccare - gli
-  iPhone protetti - quanti dispositivi c'erano e quanti ce ne sono adesso;
-- segnala a parte i **numeri di serie ripetuti** su asset tag diversi: il
-  seriale non identifica il dispositivo, quindi quelli **non sono duplicati** e
-  non vengono toccati - ma quasi sempre sono un errore di battitura.
 
 ## Le colonne di ogni stanza
 
@@ -1723,6 +1712,7 @@ aggiornati e gli altri aggiunti.
 ```
 Collega inventario condiviso.bat  punta la postazione all'inventario sulla share
 Crea collegamento sul desktop.bat mette l'icona sulla scrivania dell'utente
+Crea collegamento sul desktop.ps1 crea il collegamento e segnala eventuali errori
 Diagnostica.bat                   raccoglie le informazioni per chi assiste
 Avvia Inventario.bat              avvio dai sorgenti su Windows
 Avvia Inventario.command          avvio dai sorgenti su macOS / Linux

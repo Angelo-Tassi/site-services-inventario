@@ -1,66 +1,36 @@
 @echo off
-rem ---------------------------------------------------------------------------
-rem  Crea sul desktop un collegamento al programma.
-rem
-rem  Il collegamento punta ad "Avvia Inventario.bat" e non direttamente a
-rem  pythonw.exe: su alcune postazioni un collegamento a un eseguibile con
-rem  argomenti viene rifiutato dai criteri di sicurezza, mentre quello a un file
-rem  .bat funziona sempre. Parte minimizzato, cosi' la finestra nera si vede
-rem  appena.
-rem
-rem  Il desktop viene chiesto a Windows, non costruito a mano: con OneDrive la
-rem  scrivania vera e' dentro OneDrive, e %USERPROFILE%\Desktop e' una cartella
-rem  che l'utente non vede mai.
-rem ---------------------------------------------------------------------------
-rem  Il primo doppio clic su un file di questo pacchetto, appena estratto da
-rem  uno zip scaricato, fa comparire l'avviso "Editore sconosciuto": e' il
-rem  contrassegno che Windows mette su tutto cio' che arriva da Internet, non
-rem  ha a che fare con una firma mancante. Qui lo si toglie da tutta la
-rem  cartella una volta sola, cosi' i prossimi doppi clic - su questo file e
-rem  sugli altri accanto - non lo chiedono piu'.
-if exist "%~dp0.sbloccato" goto :gia_sbloccato
-powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command "Get-ChildItem -LiteralPath '%~dp0' -Recurse -File -ErrorAction SilentlyContinue | Unblock-File -ErrorAction SilentlyContinue" >nul 2>&1
-type nul > "%~dp0.sbloccato" 2>nul
-attrib +h "%~dp0.sbloccato" >nul 2>&1
-:gia_sbloccato
-setlocal
+setlocal EnableExtensions DisableDelayedExpansion
+rem I percorsi restano dati: niente codice PowerShell composto con apici o ^.
+rem Lo script accanto usa il desktop indicato da Windows, anche con OneDrive.
 set "INV_DIR=%~dp0"
-set "INV_EXE=%~dp0Avvia Inventario.bat"
-set "INV_ICON=%~dp0python\pythonw.exe,0"
+set "INV_PS=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
 
-if not exist "%INV_EXE%" (
-    echo In questa cartella manca "Avvia Inventario.bat":
-    echo   %INV_DIR%
-    echo Estrai qui il pacchetto per intero e rilancia questo file.
-    pause& exit /b 1
-)
-if not exist "%~dp0python\pythonw.exe" set "INV_ICON=%SystemRoot%\System32\shell32.dll,15"
+if not exist "%~dp0Avvia Inventario.bat" goto :manca_avvio
+if not exist "%~dp0Crea collegamento sul desktop.ps1" goto :manca_script
+if not exist "%INV_PS%" goto :manca_powershell
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$desk = [Environment]::GetFolderPath('Desktop');" ^
-  "if (-not $desk -or -not (Test-Path $desk)) { $desk = Join-Path $env:USERPROFILE 'Desktop' };" ^
-  "if (-not (Test-Path $desk)) { Write-Host 'Desktop non trovato.'; exit 1 };" ^
-  "$lnk = Join-Path $desk 'Inventario dispositivi.lnk';" ^
-  "$s = (New-Object -ComObject WScript.Shell).CreateShortcut($lnk);" ^
-  "$s.TargetPath = $env:INV_EXE; $s.WorkingDirectory = $env:INV_DIR;" ^
-  "$s.IconLocation = $env:INV_ICON; $s.WindowStyle = 7;" ^
-  "$s.Description = 'Inventario laptop e tablet'; $s.Save();" ^
-  "Copy-Item $lnk (Join-Path $env:INV_DIR 'Inventario dispositivi.lnk') -Force;" ^
-  "Write-Host ''; Write-Host 'Collegamento creato qui:'; Write-Host ('  ' + $lnk)"
+"%INV_PS%" -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0Crea collegamento sul desktop.ps1" %*
+set "INV_ESITO=%errorlevel%"
+if not "%INV_ESITO%"=="0" goto :errore
+if not defined INV_SENZA_PAUSA pause
+exit /b 0
 
+:manca_avvio
+echo Manca "Avvia Inventario.bat" in "%INV_DIR%".
+goto :pacchetto_incompleto
+:manca_script
+echo Manca "Crea collegamento sul desktop.ps1" in "%INV_DIR%".
+:pacchetto_incompleto
+echo Estrai il pacchetto per intero nella stessa cartella e riprova.
+set "INV_ESITO=1"
+goto :errore
+:manca_powershell
+echo Windows PowerShell non e' disponibile su questa postazione.
+set "INV_ESITO=1"
+:errore
 echo.
-echo --------------------------------------------------------------------
-echo  SE SUL DESKTOP NON COMPARE NIENTE
-echo.
-echo  Su alcune postazioni la creazione automatica viene bloccata. In quel
-echo  caso il collegamento si fa a mano, e funziona sempre:
-echo.
-echo     tasto destro su  "Avvia Inventario.bat"  in questa cartella
-echo     ^> Mostra altre opzioni ^> Invia a ^> Desktop ^(crea collegamento^)
-echo.
-echo  In questa cartella e' rimasta anche una copia gia' pronta,
-echo  "Inventario dispositivi.lnk": si puo' trascinare sul desktop, anche
-echo  su quello di un altro utente, senza eseguire niente.
-echo --------------------------------------------------------------------
-echo.
-pause
+echo Il collegamento non e' stato creato. Leggi l'errore qui sopra.
+echo Puoi crearlo a mano: tasto destro su "Avvia Inventario.bat",
+echo Mostra altre opzioni, Invia a, Desktop ^(crea collegamento^).
+if not defined INV_SENZA_PAUSA pause
+exit /b %INV_ESITO%

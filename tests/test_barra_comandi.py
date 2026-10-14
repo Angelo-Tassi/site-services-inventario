@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fixture
 from inventario import ui
+from inventario import lingua as lang
 from inventario.ui import App
 
 app = App(fixture.build())
@@ -84,6 +85,29 @@ gira(app.barra)
 for spostato in ("Reset inventario", "Ripristina", "Salva copia in locale..."):
     assert spostato not in nella_barra, spostato
 assert "Impostazioni" in nella_barra, "la porta per raggiungerli deve restare"
+
+# ---- titolo, cestino e strumenti della home restano visibili nelle due lingue
+for lingua in ("it", "en"):
+    lang.imposta(lingua)
+    app.ricostruisci()
+    pulsanti_visibili(minima)
+    richiesti = {lang.T(t) for t in (
+        "Scarica il modello di importazione", "Elimina da Excel")}
+    trovati = set()
+    def controlla_strumenti(widget):
+        if widget.winfo_class() == "TButton":
+            testo = str(widget.cget("text"))
+            trovati.add(testo)
+            if testo in richiesti or widget is app.btn_cestino:
+                assert widget.winfo_ismapped(), testo
+                assert widget.winfo_rootx() >= app.winfo_rootx(), testo
+                assert widget.winfo_rootx() + widget.winfo_width() <= (
+                    app.winfo_rootx() + app.winfo_width()), testo
+        for figlio in widget.winfo_children():
+            controlla_strumenti(figlio)
+    controlla_strumenti(app.body)
+    assert richiesti <= trovati, trovati
+lang.imposta("it")
 
 app.destroy()
 print("BARRA COMANDI OK")
