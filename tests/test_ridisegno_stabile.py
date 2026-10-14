@@ -24,8 +24,14 @@ with patch.object(App, "winfo_screenwidth", return_value=1280), \
     try:
         app._initial_load()
         respira(app)
-        assert app.winfo_width() <= 1280 - 60
-        assert app.winfo_height() <= 720 - 100
+        if app.tk.call("tk", "windowingsystem") == "win32":
+            # su Windows lo schermo piccolo fa partire la finestra
+            # massimizzata: la misura e' quella dello schermo vero del PC, non
+            # di quello simulato
+            assert app.state() == "zoomed", app.state()
+        else:
+            assert app.winfo_width() <= 1280 - 60
+            assert app.winfo_height() <= 720 - 100
         minimo = app.minsize()
         assert minimo[0] <= 1280 - 60 and minimo[1] <= 720 - 100, minimo
         app.show_room(fixture.KIOSK)
