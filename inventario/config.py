@@ -257,7 +257,11 @@ def load_shared_config(data_path):
 
 
 def save_shared_config(data_path, cfg):
-    tmp = shared_config_path(data_path) + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as fh:
-        json.dump(cfg, fh, indent=2, ensure_ascii=False)
-    os.replace(tmp, shared_config_path(data_path))
+    # Anche una modifica alle stanze appartiene all'inventario condiviso:
+    # una postazione vecchia non deve aggirare la sola lettura dalle impostazioni.
+    with store._Lock(data_path):
+        store.InventoryStore(data_path)._verifica_scrittura(rileggi=True)
+        tmp = shared_config_path(data_path) + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as fh:
+            json.dump(cfg, fh, indent=2, ensure_ascii=False)
+        os.replace(tmp, shared_config_path(data_path))

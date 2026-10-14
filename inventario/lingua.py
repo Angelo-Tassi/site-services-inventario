@@ -20,6 +20,16 @@ _corrente = ITALIANO
 # --------------------------------------------------------------- interfaccia
 
 EN = {
+    "Sola lettura": "Read-only",
+    "Aggiorna il programma": "Update the application",
+    "Questo inventario e' stato scritto dalla versione %s.\n"
+    "La versione in uso e' %s: aggiorna il programma su questa postazione.\n\n"
+    "L'inventario e' aperto in sola lettura; nessuna modifica e' consentita.":
+        "This inventory was written by version %s.\n"
+        "You are using version %s: update the application on this workstation.\n\n"
+        "The inventory is open read-only; no changes are allowed.",
+    "La Asset Function di %s e' cambiata mentre la scheda era aperta. Riapri la scheda e ripeti la modifica.":
+        "The Asset Function of %s changed while the form was open. Reopen the form and repeat your change.",
     # --- barra e schermate
     "Aggiungi": "Add",
     "Modifica": "Edit",

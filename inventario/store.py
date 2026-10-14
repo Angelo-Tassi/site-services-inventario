@@ -19,6 +19,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import shutil
 import socket
 import tempfile
@@ -29,9 +30,24 @@ from datetime import datetime, timedelta
 
 from openpyxl import Workbook, load_workbook
 
+from . import __version__
 from .lingua import T
 
 SHEET_NAME = "Inventario"
+VERSION_SHEET = "_Inventario_versione"
+
+
+def ordine_versione(versione):
+    """Confronta anche beta.5.9 e beta.5.10 come numeri, non come testo."""
+    testo = clean(versione).split("+", 1)[0]
+    trovato = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?", testo)
+    if not trovato:
+        return None
+    base = tuple(int(trovato.group(i)) for i in (1, 2, 3))
+    pre = trovato.group(4)
+    pezzi = tuple((0, int(p)) if p.isdigit() else (1, p)
+                  for p in pre.split(".")) if pre else ()
+    return base, pre is None, pezzi
 
 FIELDS = ["asset_tag", "tipo", "funzione", "modello", "seriale", "imei",
           "restituito_da", "stanza", "stato", "prestato_a", "prestato_il",
@@ -728,6 +744,10 @@ class InventoryStore(object):
         # tenersi una copia locale, non a fare statistiche.
         self.modifiche = 0
         self.items = []
+        self._extra_headers = []
+        self._extra_values = {}
+        self.versione_file = None
+        self.sola_lettura = False
         self._stamp = None
         self._impronta_letta = None
         # Le copie automatiche buttate via dall'ultima rotazione: chi vuole puo'
@@ -860,6 +880,10 @@ class InventoryStore(object):
         return self.items
 
     def _read(self):
+        self._extra_headers = []
+        self._extra_values = {}
+        self.versione_file = None
+        self.sola_lettura = False
         if not self.exists():
             return []
         try:
@@ -867,6 +891,7 @@ class InventoryStore(object):
         except Exception as exc:
             raise InventoryError(T("Impossibile leggere %s:\n%s") % (self.path, exc))
         try:
+            self._leggi_versione(wb)
             ws = wb[SHEET_NAME] if SHEET_NAME in wb.sheetnames else wb.worksheets[0]
             rows = ws.iter_rows(values_only=True)
             try:
@@ -874,35 +899,107 @@ class InventoryStore(object):
             except StopIteration:
                 return []
             mapping = map_headers(header)
+            extra = [i for i, titolo in enumerate(header) if i not in mapping
+                     and titolo is not None]
+            self._extra_headers = [header[i] for i in extra]
+            # Le formule delle colonne future vanno conservate come formule,
+            # mentre i campi conosciuti continuano a leggere il valore Excel.
+            grezzo = load_workbook(self.path, read_only=True, data_only=False) if extra else None
+            righe_grezze = grezzo[ws.title].iter_rows(values_only=True) if grezzo else None
+            if righe_grezze is not None:
+                next(righe_grezze, None)
             items = []
-            for row in rows:
-                item = _row_to_item(row, mapping)
-                if item:
-                    items.append(item)
+            try:
+                for row in rows:
+                    originale = next(righe_grezze, ()) if righe_grezze is not None else row
+                    item = _row_to_item(row, mapping)
+                    if item:
+                        items.append(item)
+                        self._extra_values[item["asset_tag"]] = [
+                            originale[i] if i < len(originale) else None for i in extra]
+            finally:
+                if grezzo:
+                    grezzo.close()
             return items
         finally:
             wb.close()
 
     # ---------------------------------------------------------- scrittura
 
+    def _leggi_versione(self, wb):
+        versione = wb[VERSION_SHEET]["B1"].value if VERSION_SHEET in wb.sheetnames else None
+        self.versione_file = clean(versione) or None
+        ordine = ordine_versione(self.versione_file)
+        # Un marcatore non interpretabile non autorizza a sovrascrivere dati.
+        self.sola_lettura = bool(self.versione_file and
+                                 (ordine is None or ordine > ordine_versione(__version__)))
+
+    def avviso_versione(self):
+        return T("Questo inventario e' stato scritto dalla versione %s.\n"
+                 "La versione in uso e' %s: aggiorna il programma su questa postazione.\n\n"
+                 "L'inventario e' aperto in sola lettura; nessuna modifica e' consentita.") \
+            % (self.versione_file, __version__)
+
+    def _verifica_scrittura(self, rileggi=False):
+        if rileggi and self.exists():
+            try:
+                wb = load_workbook(self.path, read_only=True, data_only=True)
+            except Exception as exc:
+                raise InventoryError(T("Impossibile leggere %s:\n%s") % (self.path, exc))
+            try:
+                self._leggi_versione(wb)
+            finally:
+                wb.close()
+        if self.sola_lettura:
+            raise InventoryError(self.avviso_versione())
+
     def _write(self, items):
+        self._verifica_scrittura(rileggi=True)
         wb = Workbook()
         ws = wb.active
         ws.title = SHEET_NAME
-        ws.append([HEADERS[f] for f in ALL_FIELDS])
+        ws.append([HEADERS[f] for f in ALL_FIELDS] + self._extra_headers)
         for item in items:
-            ws.append([valore_visibile(item, f) for f in ALL_FIELDS])
+            valori = self._extra_values.get(item["asset_tag"], [None] * len(self._extra_headers))
+            ws.append([valore_visibile(item, f) for f in ALL_FIELDS] + valori)
         _style_sheet(ws, len(items))
+        if self._extra_headers:
+            ws.auto_filter.ref = ws.dimensions
+        self._salva_workbook(wb)
+
+    def _salva_workbook(self, wb):
+        """Anche un ripristino registra chi scrive e sostituisce in modo atomico."""
+        versione = wb[VERSION_SHEET] if VERSION_SHEET in wb.sheetnames else wb.create_sheet(VERSION_SHEET)
+        versione["A1"] = "versione"
+        versione["B1"] = __version__
+        versione.sheet_state = "hidden"
         tmp = "%s.tmp-%d-%s" % (self.path, os.getpid(), uuid.uuid4().hex[:8])
         try:
             wb.save(tmp)
             os.replace(tmp, self.path)
+            self.versione_file = __version__
+            self.sola_lettura = False
         except Exception as exc:
             try:
                 os.remove(tmp)
             except OSError:
                 pass
             raise InventoryError(T("Impossibile salvare %s:\n%s") % (self.path, exc))
+        finally:
+            wb.close()
+
+    def _ripristina_file(self, percorso):
+        # Non passiamo da ALL_FIELDS: la copia puo' avere colonne e altri
+        # fogli che questa postazione non conosce e deve lasciare integri.
+        try:
+            wb = load_workbook(percorso)
+        except Exception as exc:
+            raise InventoryError(T("Impossibile leggere %s:\n%s") % (percorso, exc))
+        try:
+            sorgente = InventoryStore(percorso)
+            sorgente._leggi_versione(wb)
+            sorgente._verifica_scrittura()
+            self._salva_workbook(wb)
         finally:
             wb.close()
 
@@ -914,6 +1011,7 @@ class InventoryStore(object):
         """
         with _Lock(self.path):
             items = self._read()
+            self._verifica_scrittura()
             prima = dict((it["asset_tag"], dict(it)) for it in items)
             result = operation(items)
             items.sort(key=lambda it: (it.get("stanza", ""), it.get("asset_tag", "")))
@@ -958,7 +1056,7 @@ class InventoryStore(object):
 
         return self._apply(op)
 
-    def update(self, old_tag, item):
+    def update(self, old_tag, item, originale=None):
         old_tag = norm_tag(old_tag)
         item = dict(item)
         item["asset_tag"] = norm_tag(item.get("asset_tag"))
@@ -977,6 +1075,14 @@ class InventoryStore(object):
                     T("L'asset tag %s e' gia' presente nell'inventario.") % item["asset_tag"]
                 )
             precedente = items[index]
+            # Una scheda puo' restare aperta mentre un collega importa le
+            # funzioni. Se non e' stata toccata, vale quella fresca dal disco.
+            if originale is not None and item.get("funzione") == originale.get("funzione"):
+                item["funzione"] = precedente.get("funzione", "")
+            elif originale is not None and precedente.get("funzione") != originale.get("funzione") \
+                    and item.get("funzione") != precedente.get("funzione"):
+                raise InventoryError(T("La Asset Function di %s e' cambiata mentre la scheda "
+                                       "era aperta. Riapri la scheda e ripeti la modifica.") % old_tag)
             if is_on_loan(precedente) and clean(item.get("stanza")) != clean(
                     precedente.get("stanza")):
                 raise BloccoPrestito(precedente)
@@ -984,6 +1090,8 @@ class InventoryStore(object):
             self._stanza_o_rifiuta(item)
             normalize_state(item, self.stati)
             _stamp_item(item)
+            if item["asset_tag"] != old_tag and old_tag in self._extra_values:
+                self._extra_values[item["asset_tag"]] = self._extra_values.pop(old_tag)
             items[index] = item
 
         return self._apply(op)
@@ -1074,6 +1182,7 @@ class InventoryStore(object):
         return voci if isinstance(voci, list) else []
 
     def _scrivi_eliminati(self, voci):
+        self._verifica_scrittura(rileggi=True)
         percorso = self._percorso_eliminati()
         tmp = percorso + ".tmp"
         try:
@@ -1653,7 +1762,9 @@ class InventoryStore(object):
         try:
             dati, impostazioni, eliminati = self._estrai_copia_locale(percorso, cartella)
             try:
-                recuperati = InventoryStore(dati)._read()
+                sorgente = InventoryStore(dati)
+                recuperati = sorgente._read()
+                sorgente._verifica_scrittura()
             except InventoryError as exc:
                 raise InventoryError(
                     T("%s non e' un inventario leggibile:\n%s\n\n"
@@ -1667,9 +1778,10 @@ class InventoryStore(object):
                 except (OSError, ValueError):
                     letta = None      # i dispositivi tornano lo stesso
             with _Lock(self.path):
+                self._verifica_scrittura(rileggi=True)
                 precedente = self.copia_di_sicurezza()
                 try:
-                    shutil.copy2(dati, self.path)
+                    self._ripristina_file(dati)
                 except OSError as exc:
                     raise InventoryError(
                         T("Non riesco a ripristinare la copia:\n%s\n\n"
@@ -1746,16 +1858,19 @@ class InventoryStore(object):
         if not os.path.exists(percorso):
             raise InventoryError(T("La copia %s non esiste piu'.") % os.path.basename(percorso))
         try:
-            recuperati = InventoryStore(percorso)._read()
+            sorgente = InventoryStore(percorso)
+            recuperati = sorgente._read()
+            sorgente._verifica_scrittura()
         except InventoryError as exc:
             raise InventoryError(
                 T("%s non e' un inventario leggibile:\n%s\n\n"
                 "Non e' stato ripristinato niente.") % (os.path.basename(percorso), exc))
 
         with _Lock(self.path):
+            self._verifica_scrittura(rileggi=True)
             precedente = self.copia_di_sicurezza()
             try:
-                shutil.copy2(percorso, self.path)
+                self._ripristina_file(percorso)
             except OSError as exc:
                 raise InventoryError(
                     T("Non riesco a ripristinare la copia:\n%s\n\n"

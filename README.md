@@ -10,7 +10,7 @@ Applicazione desktop per Windows che gestisce l'inventario dei dispositivi
 fisicamente in nostro possesso: iPhone, laptop e tablet, divisi per stanza, con
 gestione dei prestiti, importazione, esportazione e stampa in formato Excel.
 
-> **Versione beta (1.0.0-beta.5.9).** Le funzioni sono complete e ogni versione
+> **Versione beta (1.0.0-beta.5.10).** Le funzioni sono complete e ogni versione
 > passa la sua suite di test prima di uscire, ma il collaudo sul campo continua:
 > aspettati ancora qualche aggiustamento prima della 1.0 definitiva. Segnala
 > qualsiasi cosa non torni aprendo una issue.
@@ -201,6 +201,15 @@ dentro una cartella tua, dove i permessi ce li hai:
 programma li sfiora. Anche i collegamenti sul desktop restano validi, perche'
 puntano allo stesso percorso locale.
 
+**Aggiorna tutte le postazioni, e togli i collegamenti vecchi.** Dalla
+1.0.0-beta.5.10 il programma scrive la sua versione dentro l'inventario: una
+postazione con una versione **piu' vecchia** di quella che ha scritto per ultima
+lo apre **in sola lettura** e chiede di aggiornare, invece di riscriverlo
+perdendo le colonne che non conosce. Le versioni precedenti a questa il
+controllo non ce l'hanno: una sola postazione rimasta indietro - o un
+collegamento sul desktop che apre ancora la cartella vecchia - basta a svuotare
+la colonna **Asset Function** alla prima modifica.
+
 ## Gli avvisi di sicurezza di Windows
 
 Il pacchetto non contiene nessun eseguibile costruito da noi, il che
@@ -282,6 +291,9 @@ Dentro c'e' quello che serve a capire un problema senza tirare a indovinare: la
 versione in uso e da dove parte, quale inventario apre e se puo' scriverci, le
 stanze che conosce, cosa legge davvero da un file Excel, la misura della
 finestra e della tabella, e dove Windows mette il desktop dell'utente.
+Dalla 1.0.0-beta.5.10 riporta anche lo schermo e la scala viste dal
+programma, e quante volte al secondo ridisegna le righe colorate e i pulsanti
+dell'elenco: a finestra ferma deve essere zero, altrimenti c'e' lo sfarfallio.
 
 Il file contiene percorsi e nomi di stanza, niente di riservato: si manda a chi
 assiste e risponde in un colpo solo a domande che altrimenti costano giorni.

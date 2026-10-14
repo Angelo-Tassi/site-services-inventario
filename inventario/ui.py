@@ -2631,12 +2631,14 @@ class RoomCard(tk.Frame):
 
 
 class App(tk.Tk):
-    def __init__(self, data_path):
+    def __init__(self, data_path, avvisi_versione=True):
         tk.Tk.__init__(self)
+        self._mostra_avvisi_versione = avvisi_versione
         self.title(T("Site Services : Inventario Iphone, Laptop e Tablet")
                    + "  -  v" + __version__)
-        self.geometry("1220x720")
-        self.minsize(980, 560)
+        self._geometria_iniziale()
+        self._overlay_idle = None
+        self._ridisegni = {"righelli": 0, "pulsanti": 0}
 
         lang.imposta(config.load_language())
         self.fonts = theme.apply(self)
@@ -2666,6 +2668,16 @@ class App(tk.Tk):
 
         self.after(100, self._initial_load)
         self.after(REFRESH_MS, self._auto_refresh)
+
+    def _geometria_iniziale(self):
+        # Tk misura gia' nelle coordinate della postazione. Lasciamo spazio
+        # a cornice e taskbar senza cambiare la DPI awareness del processo.
+        largo = max(1, self.winfo_screenwidth() - 60)
+        alto = max(1, self.winfo_screenheight() - 100)
+        self.geometry("%dx%d" % (min(1220, largo), min(720, alto)))
+        self.minsize(min(980, largo), min(560, alto))
+        if self.tk.call("tk", "windowingsystem") == "win32" and (largo < 1220 or alto < 720):
+            self.state("zoomed")
 
     # ------------------------------------------------------------ layout
 
@@ -2699,6 +2711,8 @@ class App(tk.Tk):
         self._build_status()
         self._sync_filter_values()
         self.show_home()
+
+        self._avvisa_versione()
 
     def _build_header(self):
         head = ttk.Frame(self, style="Head.TFrame", padding=(20, 14))
@@ -2784,20 +2798,25 @@ class App(tk.Tk):
     def _sistema_barra(self, event=None):
         """Decide se i comandi stanno in una riga o in due.
 
-        Cambia la disposizione solo quando cambia davvero: <Configure> arriva a
-        ogni pixel di ridimensionamento, e rifare la griglia ogni volta
-        sarebbe lavoro buttato. Andare a capo cambia l'altezza, non la
-        larghezza, quindi la scelta non puo' rimbalzare fra i due stati.
+        Il separatore sparisce su due righe: misurare il gruppo senza di lui
+        lo faceva sembrare abbastanza stretto da tornare su una riga, dove il
+        separatore lo riallargava. La misura deve restare indipendente dal layout.
         """
         larghezza = event.width if event is not None else self.barra.winfo_width()
         if larghezza <= 1:
             return
         lavoro = self.gruppo_lavoro.winfo_reqwidth()
-        file_ = self.gruppo_file.winfo_reqwidth()
+        file_ = sum(c.winfo_reqwidth() + 6 for c in self.gruppo_file.winfo_children()
+                    if c is not self.sep_barra) + self.sep_barra.winfo_reqwidth() + 20
         lato = self.gruppo_lato.winfo_reqwidth()
-        if lavoro + file_ + lato <= larghezza:
+        larghezza -= 32          # il padding della barra non ospita pulsanti
+        # Per tornare alla disposizione piu' larga servono alcuni pixel in
+        # piu': l'arrotondamento dei font/scaling non deve cambiare stato.
+        margine_una = 12 if self._righe_barra not in (None, "una") else 0
+        margine_due = 12 if self._righe_barra == "due_basso" else 0
+        if lavoro + file_ + lato + margine_una <= larghezza:
             stato = "una"
-        elif lavoro + lato <= larghezza:
+        elif lavoro + lato + margine_due <= larghezza:
             stato = "due"
         else:
             stato = "due_basso"
@@ -3254,10 +3273,20 @@ class App(tk.Tk):
         sopra la tabella, come i pulsanti delle righe, perche' ttk non ha le
         righe di griglia verticali.
         """
-        try:
-            self._disegna_righelli()
-        except tk.TclError:
-            pass          # tabella in ricostruzione: al prossimo giro ci sara'
+        self._sync_overlay()
+
+    def _sync_overlay(self):
+        """Scrollbar e Configure condividono un solo lavoro in coda a idle."""
+        if self._overlay_idle is None:
+            self._overlay_idle = self.after_idle(self._disegna_overlay)
+
+    def _disegna_overlay(self):
+        self._overlay_idle = None
+        for disegna in (self._disegna_righelli, self._disegna_pulsanti_riga):
+            try:
+                disegna()
+            except tk.TclError:
+                pass          # tabella distrutta durante una ricostruzione
 
     def _rientro_tabella(self):
         """Di quanto la prima colonna e' rientrata rispetto al bordo del widget.
@@ -3280,6 +3309,7 @@ class App(tk.Tk):
     def _disegna_righelli(self):
         if getattr(self, "tree", None) is None or not self.tree.winfo_exists():
             return
+        self._ridisegni["righelli"] += 1
         colonne = self._columns()
         larghezze = [int(self.tree.column(c, "width")) for c in colonne]
         totale = sum(larghezze) or 1
@@ -3291,8 +3321,7 @@ class App(tk.Tk):
         scostamento = self.tree.xview()[0] * totale
         altezza = self.tree.winfo_height()
         larghezza = self.tree.winfo_width()
-        for riga in self._righelli:
-            riga.place_forget()
+        visibili = set()
         x = self._rientro_tabella() - scostamento
         for indice, campo in enumerate(colonne[:-1]):
             x += larghezze[indice]
@@ -3300,15 +3329,28 @@ class App(tk.Tk):
                 continue
             colore = theme.COLORE_COLONNA.get(colonne[indice + 1],
                                               theme.COLORE_COLONNA_ALTRO)
-            if indice >= len(self._righelli):
+            while indice >= len(self._righelli):
                 self._righelli.append(tk.Frame(self.tree, width=2))
             riga = self._righelli[indice]
-            riga.configure(bg=colore, width=2)
-            riga.place(x=int(x) - 1, y=0, height=altezza)
+            visibili.add(indice)
+            stato = (int(x) - 1, altezza, colore)
+            prima = getattr(riga, "_inv_stato", None)
+            if prima != stato:
+                if prima is None or prima[2] != colore:
+                    riga.configure(bg=colore)
+                riga.place(x=stato[0], y=0, height=altezza)
+                riga._inv_stato = stato
+        for indice, riga in enumerate(self._righelli):
+            if indice not in visibili and getattr(riga, "_inv_stato", None) is not None:
+                riga.place_forget()
+                riga._inv_stato = None
 
     # ------------------------------------------- pulsanti veri sulle righe
 
     def _clear_row_buttons(self):
+        if self._overlay_idle is not None:
+            self.after_cancel(self._overlay_idle)
+            self._overlay_idle = None
         for button in getattr(self, "_row_buttons", {}).values():
             button.destroy()
         self._row_buttons = {}
@@ -3320,15 +3362,13 @@ class App(tk.Tk):
         ancora disegnando: se qui scappasse un'eccezione, quella finirebbe
         dentro il disegno della tabella. Per questo non solleva mai niente.
         """
-        try:
-            self._disegna_pulsanti_riga()
-        except tk.TclError:
-            pass          # tabella in ricostruzione: al prossimo giro ci sara'
+        self._sync_overlay()
 
     def _disegna_pulsanti_riga(self):
         if getattr(self, "tree", None) is None or not self.tree.winfo_exists() \
                 or not self.action_column_visible():
             return
+        self._ridisegni["pulsanti"] += 1
         try:
             if self.grab_current() is not None:
                 # una finestra modale e' aperta, magari proprio da uno di
@@ -3365,12 +3405,15 @@ class App(tk.Tk):
                 button = ttk.Button(self.tree, text=testo, style=stile, takefocus=False,
                                     command=lambda t=tag: self._on_row_button(t))
                 self._row_buttons[tag] = button
-            else:
-                button.configure(text=testo, style=stile,
-                                 command=lambda t=tag: self._on_row_button(t))
+                button._inv_contenuto = (testo, stile)
+            elif button._inv_contenuto != (testo, stile):
+                button.configure(text=testo, style=stile)
+                button._inv_contenuto = (testo, stile)
             x, y, larghezza, altezza = box
-            button.place(x=x + 6, y=y + 3, width=max(larghezza - 12, 40),
-                         height=max(altezza - 6, 18))
+            posizione = (x + 6, y + 3, max(larghezza - 12, 40), max(altezza - 6, 18))
+            if getattr(button, "_inv_posizione", None) != posizione:
+                button.place(x=posizione[0], y=posizione[1], width=posizione[2], height=posizione[3])
+                button._inv_posizione = posizione
         morti = [t for t in self._row_buttons if t not in vive]
         if morti:
             registro.nota("pulsanti riga", distrutti=len(morti), vivi=len(vive))
@@ -3845,7 +3888,20 @@ class App(tk.Tk):
             return
         self._sync_filter_values()
         self.show_home()
+        self._avvisa_versione()
         self._avvisa_se_foglio_da_importare()
+
+    def _avvisa_versione(self):
+        titolo = T("Site Services : Inventario Iphone, Laptop e Tablet") + "  -  v" + __version__
+        self.title(titolo + ("  -  " + T("Sola lettura") if self.store.sola_lettura else ""))
+        if self.store.sola_lettura and getattr(self, "_versione_avvisata", None) != self.store.versione_file:
+            self._versione_avvisata = self.store.versione_file
+            if self._mostra_avvisi_versione:
+                messagebox.showwarning(T("Aggiorna il programma"), self.store.avviso_versione(), parent=self)
+        if self.store.sola_lettura:
+            self.var_status.set(self.store.avviso_versione().replace("\n", " "))
+        else:
+            self._versione_avvisata = None
 
     def _avvisa_se_foglio_da_importare(self):
         """Dice all'utente se il file aperto e' un foglio da importare.
@@ -4050,6 +4106,7 @@ class App(tk.Tk):
         except InventoryError as exc:
             messagebox.showerror(T("Errore"), str(exc), parent=self)
             return
+        self._avvisa_versione()
         self.cfg = config.load_shared_config(self.store.path)
         self.store.iphone_room = self.cfg.get("iphone_room")
         self.store.stati = list(self.cfg.get("states") or [])
@@ -4283,7 +4340,7 @@ class App(tk.Tk):
                             iphone_room=self.iphone_room(),
                             stati=self.cfg.get("states")).show()
         if edited:
-            self._run(lambda: self.store.update(old["asset_tag"], edited),
+            self._run(lambda: self.store.update(old["asset_tag"], edited, originale=old),
                       T("Salvato %s.") % edited["asset_tag"])
 
     def on_delete(self):
@@ -5761,6 +5818,10 @@ class App(tk.Tk):
             spostati = esito
         try:
             config.save_shared_config(self.store.path, result)
+        except InventoryError as exc:
+            messagebox.showerror(T("Operazione non riuscita"), str(exc), parent=self)
+            self._reload()
+            return
         except OSError as exc:
             messagebox.showerror(T("Errore"), T("Impossibile salvare le impostazioni:\n%s") % exc,
                                  parent=self)

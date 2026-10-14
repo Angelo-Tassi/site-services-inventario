@@ -10,7 +10,7 @@ Desktop application for Windows that manages the inventory of the devices we
 physically hold: iPhones, laptops and tablets, split by room, with loan
 tracking, import, export and printing in Excel format.
 
-> **Beta version (1.0.0-beta.5.9).** The features are complete and every release
+> **Beta version (1.0.0-beta.5.10).** The features are complete and every release
 > passes its test suite before shipping, but field testing continues: expect a
 > few more adjustments before the final 1.0. Report anything that looks wrong by
 > opening an issue.
@@ -198,6 +198,14 @@ folder of your own, where you do have permissions:
 near it. The desktop shortcuts stay valid too, because they point at the same
 local path.
 
+**Update every workstation, and remove the old shortcuts.** From
+1.0.0-beta.5.10 the program writes its version inside the inventory: a
+workstation with an **older** version than the last one that wrote it opens it
+**read-only** and asks to be updated, instead of rewriting it and losing the
+columns it does not know. Versions before this one do not have the check: a
+single workstation left behind - or a desktop shortcut still opening the old
+folder - is enough to empty the **Asset Function** column at the first change.
+
 ## Windows security warnings
 
 The package contains no executable built by us, which removes the
@@ -276,6 +284,9 @@ Inside is what it takes to understand a problem without guessing: the version in
 use and where it starts from, which inventory it opens and whether it can write
 there, the rooms it knows, what it actually reads from an Excel file, the size of
 the window and of the table, and where Windows puts the user's desktop.
+From 1.0.0-beta.5.10 it also reports the screen and the scaling the program
+sees, and how many times a second it redraws the coloured lines and the buttons
+of the list: with the window still it must be zero, otherwise there is flicker.
 
 The file holds paths and room names, nothing confidential: send it to whoever
 helps you and it answers in one go questions that otherwise cost days.

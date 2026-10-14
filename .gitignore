@@ -35,3 +35,6 @@ Produzione/*
 
 # rapporto di diagnostica: e' una fotografia del PC di chi lo genera
 Diagnostica.txt
+.venv
+.venv.nosync/
+Inventario dati/

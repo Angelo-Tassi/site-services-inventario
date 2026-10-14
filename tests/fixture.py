@@ -12,6 +12,24 @@ lang.imposta(lang.ITALIANO)
 load_language_reale = config.load_language          # per chi vuole provarla davvero
 config.load_language = lambda: lang.ITALIANO
 
+# I test che non stanno verificando la configurazione delle copie non devono
+# leggere il percorso reale e scrivere nel Backup dell'utente. Chi cambia
+# app_dir o load_data_path per provarli mantiene invece la funzione originale.
+_backup_configurato = config.backup_dir
+_app_dir_originale = config.app_dir
+_load_data_originale = config.load_data_path
+_backup_prove = os.path.join(tempfile.mkdtemp(), "Backup")
+os.mkdir(_backup_prove)
+
+
+def _backup_isolato():
+    if config.app_dir is _app_dir_originale and config.load_data_path is _load_data_originale:
+        return _backup_prove
+    return _backup_configurato()
+
+
+config.backup_dir = _backup_isolato
+
 BAU, KIOSK, DR = "Site Services BAU", "Digital Kiosk", "Magazzino Disaster Recovery"
 TIPO_IPHONE = "Iphone"
 

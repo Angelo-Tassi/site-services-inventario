@@ -9,6 +9,7 @@ dove sta la scrivania dell'utente.
 
 import os
 import sys
+import time
 from datetime import datetime
 
 
@@ -54,14 +55,24 @@ def _misura_interfaccia(percorso):
 
     esito = []
 
-    def misura(app):
+    def misura(app, prima, inizio):
         try:
             app.update()
-            esito.append("scala di Windows   : %.2f" % app.tk.call("tk", "scaling"))
+            scala = float(app.tk.call("tk", "scaling"))
+            esito.append("scala Tk (px/punto): %.2f" % scala)
+            esito.append("DPI logici Tk      : %.1f" % app.winfo_fpixels("1i"))
+            esito.append("scala rispetto 96 DPI: %.0f%%" % (app.winfo_fpixels("1i") / 96 * 100))
             esito.append("schermo            : %dx%d"
                          % (app.winfo_screenwidth(), app.winfo_screenheight()))
             esito.append("finestra           : %dx%d"
                          % (app.winfo_width(), app.winfo_height()))
+            esito.append("geometria finestra : %s; stato: %s" % (app.geometry(), app.state()))
+            durata = max(time.monotonic() - inizio, 0.001)
+            for nome in ("righelli", "pulsanti"):
+                esito.append("ridisegni %s/s: %.2f (%d in %.2f s)" % (
+                    nome, (app._ridisegni[nome] - prima[nome]) / durata,
+                    app._ridisegni[nome] - prima[nome], durata))
+            esito.append("  A finestra ferma i contatori devono scendere a zero.")
             from tkinter import ttk
             altezza_riga = ttk.Style(app).lookup("Inv.Treeview", "rowheight")
             esito.append("altezza di una riga: %s" % altezza_riga)
@@ -99,9 +110,24 @@ def _misura_interfaccia(percorso):
                 pass
 
     try:
-        app = App(percorso)
+        # Il rapporto deve potersi raccogliere anche da una postazione vecchia,
+        # senza restare fermo su un avviso che attende un clic.
+        app = App(percorso, avvisi_versione=False)
         app._initial_load()
-        app.after(400, lambda: misura(app))
+        def prepara_misura():
+            # La home non ha pulsanti sulle righe: misuriamo anche quelli
+            # nella stanza prestiti, se configurata, dopo il disegno iniziale.
+            stanze = app.cfg.get("loan_rooms") or []
+            if stanze:
+                app.show_room(stanze[0])
+            app.after(200, inizia_misura)
+
+        def inizia_misura():
+            prima = dict(app._ridisegni)
+            inizio = time.monotonic()
+            app.after(1000, lambda: misura(app, prima, inizio))
+
+        app.after(400, prepara_misura)
         # se qualcosa si inceppa la finestra si chiude comunque
         app.after(8000, lambda: app.destroy())
         app.mainloop()
@@ -189,6 +215,8 @@ def raccogli():
         store = InventoryStore(percorso, iphone_room=cfg.get("iphone_room"),
                                stati=cfg.get("states"))
         items = store.load()
+        righe.append("versione scrittore   : %s" % (store.versione_file or "non registrata"))
+        righe.append("sola lettura per versione: %s" % store.sola_lettura)
         righe.append("dispositivi         : %d" % len(items))
         conteggio = {}
         for it in items:

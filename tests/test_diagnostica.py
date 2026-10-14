@@ -19,6 +19,9 @@ for atteso in ("versione            : " + __version__,
                "cartella programma", "percorso inventario", "cartella copie",
                "si puo' scrivere", "rooms", "iphone_room",
                "dispositivi         : 13",
+               "versione scrittore", "sola lettura per versione",
+               "scala Tk", "DPI logici Tk", "geometria finestra",
+               "ridisegni righelli/s", "ridisegni pulsanti/s",
                "lettura del file di prova", "dove si trova il desktop"):
     assert atteso in testo, atteso
 

@@ -191,7 +191,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h1>Inventario Iphone, Laptop e Tablet</h1>
   <p class="lede">I dispositivi che abbiamo fisicamente in casa, divisi per stanza, con i
     prestiti tracciati e l'inventario che resta un normale file Excel sulla cartella di rete.</p>
-  <div class="alpha">versione 1.0.0-beta.5.9 · beta</div>
+  <div class="alpha">versione 1.0.0-beta.5.10 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html">Come si usa: tenerlo aggiornato</a>
@@ -217,6 +217,32 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
   <h2>Ultime modifiche</h2>
   <p class="sub">Che cosa e' cambiato nelle ultime quattro versioni.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.10</h3>
+      <p class="quando">14 ottobre 2026</p>
+      <ul>
+        <li><b>La Asset Function non sparisce piu'.</b> Se la scheda di un
+          dispositivo era aperta mentre si importavano le funzioni - su
+          un'altra postazione, o prima dell'importazione - salvarla rimetteva la
+          funzione di prima, anche vuota, pure cambiando solo una nota. Adesso
+          la scheda tocca la funzione solo se e' stata cambiata li'.</li>
+        <li><b>Una postazione vecchia non cancella piu' le colonne nuove.</b>
+          Il programma conserva le colonne dell'inventario che non conosce e
+          scrive la sua versione dentro il file. Chi ha una versione piu'
+          vecchia di quella che ha scritto per ultima apre l'inventario <b>in
+          sola lettura</b> e un avviso chiede di aggiornare. Le versioni
+          precedenti questo controllo non ce l'hanno: <b>aggiorna tutte le
+          postazioni</b> e togli i collegamenti alle cartelle vecchie.</li>
+        <li><b>Niente piu' sfarfallio sui portatili.</b> Le righe colorate fra
+          le colonne e i pulsanti dell'elenco si ridisegnavano tutti a ogni
+          movimento, e su Windows ogni ridisegno lampeggia: adesso si ritocca
+          solo quello che cambia, una volta sola. La barra dei comandi non
+          rimbalza piu' fra una e due righe, e su uno schermo piccolo la
+          finestra parte massimizzata invece che piu' grande dello schermo.</li>
+        <li><b>Diagnostica.bat</b> riporta anche schermo, scala, misura della
+          finestra e quanti ridisegni fa al secondo.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.9</h3>
       <p class="quando">24 settembre 2026</p>
@@ -312,26 +338,6 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
           e' il tasto destro.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.6</h3>
-      <p class="quando">4 settembre 2026</p>
-      <ul>
-        <li><b>Un dispositivo in prestito non sparisce piu' in blocco.</b>
-          Eliminarlo era gia' vietato ovunque, ma il <b>reset</b> e le
-          <b>importazioni che sostituiscono</b> lo toglievano insieme a tutti
-          gli altri: senza un avviso, e senza nemmeno passare dagli eliminati di
-          recente. Un dispositivo in prestito e' in mano a una persona, e
-          toglierlo dall'inventario proprio mentre e' fuori vuol dire perderne
-          la traccia. Adesso quelle operazioni <b>non partono nemmeno</b>:
-          elencano i dispositivi in prestito e chi li ha, e non toccano niente.
-          Prima si registrano i rientri. Sostituire un'altra stanza, dove
-          prestiti aperti non ce ne sono, funziona come prima.</li>
-        <li><b>E un iPhone protetto non finisce nel cestino togliendo la sua
-          stanza.</b> Dalla finestra non ci si arrivava - togliere la stanza
-          degli iPhone fa scattare il trasloco - ma la regola adesso sta
-          nell'archivio, dove c'era gia' quella dei prestiti.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -373,7 +379,7 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding:28px 0 56px;
     <div class="bar"><span class="dot"></span><span>Site Services : Inventario Iphone, Laptop e Tablet</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : Inventario Iphone, Laptop e Tablet</b>
-        <div class="ver">v1.0.0-beta.5.9</div>
+        <div class="ver">v1.0.0-beta.5.10</div>
         <div class="s">Laptop e tablet in nostro possesso</div></div>
       <div class="dx">
         <span class="lin">Lingua <span class="sel">Italiano <s>▼</s></span></span>
@@ -552,7 +558,7 @@ python Inventario.py</pre>
   <h1>iPhone, Laptop and Tablet Inventory</h1>
   <p class="lede">The devices we physically hold, split by room, with loans
     tracked and the inventory staying an ordinary Excel file on the network folder.</p>
-  <div class="alpha">version 1.0.0-beta.5.9 · beta</div>
+  <div class="alpha">version 1.0.0-beta.5.10 · beta</div>
 
   <div class="cta">
     <a class="btn main" href="tenerlo-aggiornato.html?lang=en">How it's meant to be used</a>
@@ -578,6 +584,31 @@ python Inventario.py</pre>
   <h2>Latest changes</h2>
   <p class="sub">What changed in the last four versions.</p>
   <div class="novita">
+    <div class="rilascio">
+      <h3>v1.0.0-beta.5.10</h3>
+      <p class="quando">14 October 2026</p>
+      <ul>
+        <li><b>The Asset Function no longer disappears.</b> If a device's card
+          was open while the functions were being imported - on another
+          workstation, or before the import - saving it put back the old
+          function, even an empty one, even when only a note had changed. Now
+          the card touches the function only if it was changed there.</li>
+        <li><b>An old workstation no longer wipes the new columns.</b> The
+          program keeps the inventory columns it does not know and writes its
+          version inside the file. A workstation older than the last one that
+          wrote it opens the inventory <b>read-only</b>, and a warning asks to
+          update. Earlier versions do not have this check: <b>update every
+          workstation</b> and remove shortcuts to old folders.</li>
+        <li><b>No more flicker on laptops.</b> The coloured lines between the
+          columns and the buttons of the list were all redrawn at every
+          movement, and on Windows every redraw flashes: now only what changes
+          is touched, once. The command bar no longer bounces between one and
+          two rows, and on a small screen the window starts maximised instead
+          of larger than the screen.</li>
+        <li><b>Diagnostica.bat</b> also reports screen, scaling, window size
+          and how many redraws a second it does.</li>
+      </ul>
+    </div>
     <div class="rilascio">
       <h3>v1.0.0-beta.5.9</h3>
       <p class="quando">24 September 2026</p>
@@ -672,25 +703,6 @@ python Inventario.py</pre>
           right button.</li>
       </ul>
     </div>
-    <div class="rilascio">
-      <h3>v1.0.0-beta.5.6</h3>
-      <p class="quando">4 September 2026</p>
-      <ul>
-        <li><b>A device on loan no longer disappears in bulk.</b> Deleting it was
-          already forbidden everywhere, but the <b>reset</b> and the <b>imports
-          that replace</b> removed it along with all the others: with no warning,
-          and without even passing through the recently deleted. A device on loan
-          is in somebody's hands, and taking it out of the inventory exactly
-          while it is out means losing track of it. Now those operations <b>do
-          not even start</b>: they list the devices on loan and who has them, and
-          touch nothing. Register the returns first. Replacing another room,
-          where there are no open loans, works as before.</li>
-        <li><b>And a protected iPhone does not end up in the bin when its room is
-          removed.</b> You could not get there from the window - removing the
-          iPhone room triggers the move - but the rule now lives in the store,
-          next to the one for loans that was already there.</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -731,7 +743,7 @@ python Inventario.py</pre>
     <div class="bar"><span class="dot"></span><span>Site Services : iPhone, Laptop and Tablet Inventory</span><span class="sp"></span><span>— □ ×</span></div>
     <div class="appbar">
       <div><b>Site Services : iPhone, Laptop and Tablet Inventory</b>
-        <div class="ver">v1.0.0-beta.5.9</div>
+        <div class="ver">v1.0.0-beta.5.10</div>
         <div class="s">Laptops and tablets we hold</div></div>
       <div class="dx">
         <span class="lin">Language <span class="sel">English <s>▼</s></span></span>
